@@ -311,7 +311,7 @@ const onFileImport = (event: any) => {
       <div
         class="flex flex-wrap items-center col-span-12 mt-2 mb-2 intro-y sm:flex-nowrap"
       >
-        <Button
+        <!-- <Button
           class="mr-2 shadow-md"
           as="a"
           variant="primary"
@@ -335,7 +335,7 @@ const onFileImport = (event: any) => {
           "
         >
           <Lucide icon="Trash2" class="w-4 h-4 mr-2" /> 삭제</Button
-        >
+        > -->
         <div class="hidden mx-auto md:block text-slate-500"></div>
         <div class="mr-5">
           <a href="" class="flex items-center ml-auto text-primary">
