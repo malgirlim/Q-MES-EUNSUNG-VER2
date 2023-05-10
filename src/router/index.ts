@@ -6,6 +6,10 @@ import TopMenu from "../layouts/TopMenu/TopMenu.vue";
 import Main from "../pages/Main.vue";
 import Login from "../pages/Login.vue";
 
+import LoginKiosk from "../pages/LoginKiosk.vue";
+import FacilitySelect from "../pages/kiosk/FacilitySelect.vue";
+import KioskFacility1Main from "../pages/kiosk/Facility1/Main.vue";
+
 import ShareNotice from "../pages/share/ShareNotice.vue";
 
 import MasterUser from "../pages/master/MasterUser.vue";
@@ -106,6 +110,18 @@ const routes = [
   {
     path: "/login",
     component: Login,
+  },
+  {
+    path: "/kiosk/login",
+    component: LoginKiosk,
+  },
+  {
+    path: "/kiosk",
+    component: FacilitySelect,
+  },
+  {
+    path: "/kiosk/facility1",
+    component: KioskFacility1Main,
   },
   {
     path: "/",
