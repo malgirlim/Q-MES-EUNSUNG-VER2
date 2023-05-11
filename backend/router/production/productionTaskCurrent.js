@@ -307,6 +307,12 @@ router.post("/", async (req, res) => {
           ) AS ITEM ON ITEM.NO = [ISPC_ITEM_PK]
         ) AS RESULT
         WHERE (1=1)
+        AND CONVERT(varchar, CONVERT(datetime, 시작일), 12) >= ` +
+        req.body.startDate +
+        `
+        AND CONVERT(varchar, CONVERT(datetime, 시작일), 12) <= ` +
+        req.body.endDate +
+        `
         AND ( 작업코드 like concat('%',@input,'%')
         OR 품목구분 like concat('%',@input,'%')
         OR 품번 like concat('%',@input,'%')
@@ -314,7 +320,7 @@ router.post("/", async (req, res) => {
         OR 규격 like concat('%',@input,'%')
         OR 단위 like concat('%',@input,'%')
         OR 지시수량 like concat('%',@input,'%')
-        OR 생산수량 like concat('%',@input,'%')
+        OR 생산양품수량 like concat('%',@input,'%')
         OR 시작일 like concat('%',@input,'%')
         OR 공정명 like concat('%',@input,'%')
         OR 설비명 like concat('%',@input,'%')
@@ -455,6 +461,12 @@ router.post("/", async (req, res) => {
           ) AS ITEM ON ITEM.NO = [ISPC_ITEM_PK]
         ) AS RESULT
         WHERE (1=1)
+        AND CONVERT(varchar, CONVERT(datetime, 시작일), 12) >= ` +
+        req.body.startDate +
+        `
+        AND CONVERT(varchar, CONVERT(datetime, 시작일), 12) <= ` +
+        req.body.endDate +
+        `
         AND ` +
         req.body.searchKey +
         ` like concat('%',@input,'%')
@@ -719,13 +731,14 @@ router.post("/result/insert", async (req, res) => {
           ,[PCISP_CONTENT8]
           ,[PCISP_CONTENT9]
           ,[PCISP_CONTENT10]
+          ,[PCISP_REQUEST_DT]
           ,[PCISP_NOTE]
           ,[PCISP_REGIST_NM]
           ,[PCISP_REGIST_DT])
         VALUES
           ((SELECT MAX([PDRS_PK]) FROM [QMES2022].[dbo].[MANAGE_PRODUCE_RESULT_TB])
             ,'' ,'' ,@입고수 ,'미검사' ,'' ,'' ,'' ,'' ,'' ,'' ,'' ,'' ,'' ,''
-            ,@비고 ,@등록자 ,@등록일시)
+            ,GETDATE(),@비고 ,@등록자 ,@등록일시)
     `);
 
     // 로그기록 저장

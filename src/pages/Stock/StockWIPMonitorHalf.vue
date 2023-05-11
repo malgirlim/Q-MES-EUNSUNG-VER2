@@ -311,7 +311,7 @@ const onFileImport = (event: any) => {
       <div
         class="flex flex-wrap items-center col-span-12 mt-2 mb-2 intro-y sm:flex-nowrap"
       >
-        <Button
+        <!-- <Button
           class="mr-2 shadow-md"
           as="a"
           variant="primary"
@@ -335,14 +335,14 @@ const onFileImport = (event: any) => {
           "
         >
           <Lucide icon="Trash2" class="w-4 h-4 mr-2" /> 삭제</Button
-        >
+        > -->
         <div class="hidden mx-auto md:block text-slate-500"></div>
         <div class="mr-5">
           <a href="" class="flex items-center ml-auto text-primary">
             <Lucide icon="RefreshCcw" class="w-4 h-4 mr-3" /> 새로고침
           </a>
         </div>
-        <div>
+        <!-- <div>
           <Button
             class="mr-2 shadow-md"
             as="a"
@@ -378,7 +378,7 @@ const onFileImport = (event: any) => {
               placeholder="전체기간"
             />
           </div>
-        </div>
+        </div> -->
         <div class="ml-2">
           <FormSelect v-model="searchKey" class="w-30 mt-3 !box sm:mt-0">
             <option>전체</option>
@@ -532,7 +532,7 @@ const onFileImport = (event: any) => {
               style="position: sticky; top: 0px; z-index: 2"
             >
               <Table.Tr>
-                <Table.Th
+                <!-- <Table.Th
                   class="text-center border-b-0 whitespace-nowrap"
                   id="checkbox"
                   :style="table_setting.체크박스.style"
@@ -549,7 +549,7 @@ const onFileImport = (event: any) => {
                       }
                     "
                   />
-                </Table.Th>
+                </Table.Th> -->
                 <Table.Th
                   class="text-center border-b-0 whitespace-nowrap font-bold"
                   :style="table_setting.순번.style"
@@ -624,7 +624,7 @@ const onFileImport = (event: any) => {
                 :key="todo.NO"
                 class="intro-x"
               >
-                <Table.Td
+                <!-- <Table.Td
                   class="first:rounded-l-md last:rounded-r-md text-center bg-white border-b-0 dark:bg-darkmode-600 shadow-[20px_3px_20px_#0000000b]"
                   id="checkbox"
                   :style="table_setting.체크박스.style"
@@ -636,7 +636,7 @@ const onFileImport = (event: any) => {
                     :value="todo.NO"
                     v-model="checkDebug"
                   />
-                </Table.Td>
+                </Table.Td> -->
                 <Table.Td
                   class="first:rounded-l-md last:rounded-r-md text-center bg-white border-b-0 dark:bg-darkmode-600 shadow-[20px_3px_20px_#0000000b]"
                   :style="table_setting.순번.style"
@@ -750,389 +750,7 @@ const onFileImport = (event: any) => {
     <footer>&copy;2023 QInnotek. All rights reserved.</footer>
   </div>
   <!-- END: FOOTER(COPYRIGHT) -->
-  <!-- BEGIN: Insert Modal Content -->
-  <Dialog
-    size="md"
-    :open="insertModal"
-    @close="
-      () => {
-        setInsertModal(false);
-      }
-    "
-    :key="insertModalData?.발주코드"
-  >
-    <Dialog.Panel class="p-10 text-center">
-      <!--추가 Modal 내용 시작-->
-      <div class="mb-5" style="font-weight: bold">등록</div>
-      <Tab.Group>
-        <Tab.List variant="boxed-tabs">
-          <Tab>
-            <Tab.Button class="w-full py-2" as="button"> 기본 내용 </Tab.Button>
-          </Tab>
-          <Tab>
-            <Tab.Button class="w-full py-2" as="button"> 추가 내용 </Tab.Button>
-          </Tab>
-        </Tab.List>
-        <Tab.Panels class="mt-5">
-          <Tab.Panel class="leading-relaxed">
-            <div style="text-align: left">
-              <div class="mt-3">
-                <FormLabel htmlFor="vertical-form-3">발주코드</FormLabel>
-                <FormInput
-                  id="vertical-form-3"
-                  type="text"
-                  v-model="insertModalData.발주코드"
-                  placeholder="여기를 클릭하여 발주코드를 등록하세요"
-                  @click="setOrderModal(true)"
-                />
-              </div>
-              <div class="mt-3">
-                <FormLabel htmlFor="vertical-form-4">구분</FormLabel>
-                <FormInput
-                  id="vertical-form-4"
-                  type="text"
-                  v-model="insertModalData.구분"
-                  placeholder=""
-                />
-              </div>
-              <div class="mt-3">
-                <FormLabel htmlFor="vertical-form-6">공정명</FormLabel>
-                <FormInput
-                  id="vertical-form-6"
-                  type="text"
-                  v-model="insertModalData.공정명"
-                  placeholder=""
-                />
-              </div>
-            </div>
-          </Tab.Panel>
-          <Tab.Panel class="leading-relaxed">
-            <div style="text-align: left">
-              <div class="mt-3">
-                <FormLabel htmlFor="vertical-form-2">내용</FormLabel>
-                <FormInput
-                  id="vertical-form-2"
-                  type="text"
-                  v-model="insertModalData.내용"
-                  placeholder=""
-                />
-              </div>
-              <div class="mt-3">
-                <FormLabel htmlFor="vertical-form-11">비고</FormLabel>
-                <FormInput
-                  id="vertical-form-11"
-                  type="text"
-                  v-model="insertModalData.비고"
-                  placeholder=""
-                />
-              </div>
-            </div>
-          </Tab.Panel>
-        </Tab.Panels>
-      </Tab.Group>
-      <div style="text-align: left">
-        <div class="mt-5 text-right">
-          <Button
-            class="mr-2 shadow-md"
-            variant="primary"
-            @click="
-              async () => {
-                insertDataFunction();
-              }
-            "
-            >확인</Button
-          >
-          <Button
-            class="mr-2 shadow-md"
-            variant="outline-primary"
-            @click="
-              () => {
-                setInsertModal(false);
-              }
-            "
-            >취소</Button
-          >
-        </div>
-      </div>
-      <!--Modal 내용 끝-->
-    </Dialog.Panel>
-  </Dialog>
-  <!-- END: Insert Modal Content -->
-  <!-- BEGIN: Edit Modal Content -->
-  <Dialog
-    size="md"
-    :open="editModal"
-    @close="
-      () => {
-        setEditModal(false);
-      }
-    "
-  >
-    <Dialog.Panel class="p-10 text-center">
-      <div class="mb-5" style="font-weight: bold">검사 및 입고</div>
-      <Tab.Group>
-        <Tab.List variant="boxed-tabs">
-          <Tab>
-            <Tab.Button class="w-full py-2" as="button"> 기본 내용 </Tab.Button>
-          </Tab>
-          <Tab>
-            <Tab.Button class="w-full py-2" as="button"> 추가 내용 </Tab.Button>
-          </Tab>
-        </Tab.List>
-        <Tab.Panels class="mt-5">
-          <Tab.Panel class="leading-relaxed">
-            <div
-              style="
-                text-align: left;
-                overflow-y: scroll;
-                overflow-x: hidden;
-                height: 500px;
-              "
-            >
-              <div class="mt-3">
-                <FormLabel htmlFor="vertical-form-3">발주코드</FormLabel>
-                <FormInput
-                  id="vertical-form-3"
-                  type="text"
-                  v-model="editModalData.발주코드"
-                  placeholder=""
-                  readonly
-                />
-              </div>
-              <div class="mt-3">
-                <FormLabel htmlFor="vertical-form-4">발주품번</FormLabel>
-                <FormInput
-                  id="vertical-form-4"
-                  type="text"
-                  v-model="editModalData.발주품번"
-                  placeholder=""
-                  readonly
-                />
-              </div>
-              <div class="mt-3">
-                <FormLabel htmlFor="vertical-form-6">발주품명</FormLabel>
-                <FormInput
-                  id="vertical-form-6"
-                  type="text"
-                  v-model="editModalData.발주품명"
-                  placeholder=""
-                  readonly
-                />
-              </div>
-              <div class="mt-3">
-                <FormLabel htmlFor="vertical-form-6">전달사항</FormLabel>
-                <FormInput
-                  id="vertical-form-6"
-                  type="text"
-                  v-model="editModalData.전달사항"
-                  placeholder=""
-                  readonly
-                />
-              </div>
-              <div class="mt-3">
-                <FormLabel htmlFor="vertical-form-6">샘플수량</FormLabel>
-                <FormInput
-                  id="vertical-form-6"
-                  type="number"
-                  v-model="editModalData.샘플수량"
-                  placeholder=""
-                />
-              </div>
-              <div class="mt-3">
-                <FormLabel htmlFor="vertical-form-6">입고수량</FormLabel>
-                <FormInput
-                  id="vertical-form-6"
-                  type="number"
-                  v-model="editModalData.입고수량"
-                  placeholder=""
-                />
-              </div>
-              <div class="mt-3">
-                <FormLabel htmlFor="vertical-form-6">입고코드</FormLabel>
-                <FormInput
-                  id="vertical-form-6"
-                  type="text"
-                  v-model="itemReceiveData.입고코드"
-                  placeholder=""
-                />
-              </div>
-              <div class="mt-3">
-                <FormLabel htmlFor="vertical-form-6">입고일시</FormLabel>
-                <FormInput
-                  id="vertical-form-6"
-                  type="datetime-local"
-                  v-model="itemReceiveData.입고일시"
-                  placeholder=""
-                />
-              </div>
-              <div class="mt-3">
-                <FormLabel htmlFor="vertical-form-6">유효일자</FormLabel>
-                <FormInput
-                  id="vertical-form-6"
-                  type="date"
-                  v-model="itemReceiveData.유효일자"
-                  placeholder=""
-                />
-              </div>
-              <div class="mt-3">
-                <FormLabel htmlFor="vertical-form-6">결과</FormLabel>
-                <FormSelect v-model="editModalData.결과">
-                  <option value="합격">합격</option>
-                  <option value="불합격">불합격</option>
-                </FormSelect>
-              </div>
-            </div>
-          </Tab.Panel>
-          <Tab.Panel class="leading-relaxed">
-            <div
-              style="
-                text-align: left;
-                overflow-y: scroll;
-                overflow-x: hidden;
-                height: 500px;
-              "
-            >
-              <div class="mt-3">
-                <FormLabel htmlFor="vertical-form-2">구분</FormLabel>
-                <FormInput
-                  id="vertical-form-2"
-                  type="text"
-                  v-model="editModalData.구분"
-                  placeholder=""
-                />
-              </div>
-              <div class="mt-3">
-                <FormLabel htmlFor="vertical-form-2">내용1</FormLabel>
-                <FormInput
-                  id="vertical-form-2"
-                  type="text"
-                  v-model="editModalData.내용1"
-                  placeholder=""
-                />
-              </div>
-              <div class="mt-3">
-                <FormLabel htmlFor="vertical-form-2">내용2</FormLabel>
-                <FormInput
-                  id="vertical-form-2"
-                  type="text"
-                  v-model="editModalData.내용2"
-                  placeholder=""
-                />
-              </div>
-              <div class="mt-3">
-                <FormLabel htmlFor="vertical-form-2">내용3</FormLabel>
-                <FormInput
-                  id="vertical-form-2"
-                  type="text"
-                  v-model="editModalData.내용3"
-                  placeholder=""
-                />
-              </div>
-              <div class="mt-3">
-                <FormLabel htmlFor="vertical-form-2">내용4</FormLabel>
-                <FormInput
-                  id="vertical-form-2"
-                  type="text"
-                  v-model="editModalData.내용4"
-                  placeholder=""
-                />
-              </div>
-              <div class="mt-3">
-                <FormLabel htmlFor="vertical-form-2">내용5</FormLabel>
-                <FormInput
-                  id="vertical-form-2"
-                  type="text"
-                  v-model="editModalData.내용5"
-                  placeholder=""
-                />
-              </div>
-              <div class="mt-3">
-                <FormLabel htmlFor="vertical-form-2">내용6</FormLabel>
-                <FormInput
-                  id="vertical-form-2"
-                  type="text"
-                  v-model="editModalData.내용6"
-                  placeholder=""
-                />
-              </div>
-              <div class="mt-3">
-                <FormLabel htmlFor="vertical-form-2">내용7</FormLabel>
-                <FormInput
-                  id="vertical-form-2"
-                  type="text"
-                  v-model="editModalData.내용7"
-                  placeholder=""
-                />
-              </div>
-              <div class="mt-3">
-                <FormLabel htmlFor="vertical-form-2">내용8</FormLabel>
-                <FormInput
-                  id="vertical-form-2"
-                  type="text"
-                  v-model="editModalData.내용8"
-                  placeholder=""
-                />
-              </div>
-              <div class="mt-3">
-                <FormLabel htmlFor="vertical-form-2">내용9</FormLabel>
-                <FormInput
-                  id="vertical-form-2"
-                  type="text"
-                  v-model="editModalData.내용9"
-                  placeholder=""
-                />
-              </div>
-              <div class="mt-3">
-                <FormLabel htmlFor="vertical-form-2">내용10</FormLabel>
-                <FormInput
-                  id="vertical-form-2"
-                  type="text"
-                  v-model="editModalData.내용10"
-                  placeholder=""
-                />
-              </div>
-              <div class="mt-3">
-                <FormLabel htmlFor="vertical-form-11">비고</FormLabel>
-                <FormInput
-                  id="vertical-form-11"
-                  type="text"
-                  v-model="editModalData.비고"
-                  placeholder=""
-                />
-              </div>
-            </div>
-          </Tab.Panel>
-        </Tab.Panels>
-      </Tab.Group>
-      <div style="text-align: left">
-        <div class="mt-5 text-right">
-          <Button
-            class="mr-2 shadow-md"
-            variant="primary"
-            @click="
-              () => {
-                setCheckModal(true);
-                // editDataFunction();
-                // setEditModal(false);
-              }
-            "
-            >검사 및 입고</Button
-          >
-          <Button
-            class="mr-2 shadow-md"
-            variant="outline-primary"
-            @click="
-              () => {
-                setEditModal(false);
-              }
-            "
-            >취소</Button
-          >
-        </div>
-      </div>
-    </Dialog.Panel>
-  </Dialog>
-  <!-- END: Edit Modal Content -->
+
   <!-- BEGIN: Detail Modal Content -->
   <Dialog
     size="lg"
@@ -1163,53 +781,7 @@ const onFileImport = (event: any) => {
     </Dialog.Panel>
   </Dialog>
   <!-- END: Detail Modal Content -->
-  <!-- BEGIN: Delete Confirmation Modal -->
-  <Dialog
-    :open="deleteModal"
-    @close="
-      () => {
-        setDeleteModal(false);
-      }
-    "
-    :initialFocus="deleteButtonRef"
-  >
-    <Dialog.Panel>
-      <div class="p-5 text-center">
-        <Lucide icon="XCircle" class="w-16 h-16 mx-auto mt-3 text-danger" />
-        <div class="mt-5 text-3xl">삭제</div>
-        <div class="mt-2 text-slate-500">정말 삭제하시겠습니까?</div>
-      </div>
-      <div class="px-5 pb-8 text-center">
-        <Button
-          variant="outline-secondary"
-          type="button"
-          @click="
-            () => {
-              setDeleteModal(false);
-            }
-          "
-          class="w-24 mr-1"
-        >
-          취소
-        </Button>
-        <Button
-          variant="danger"
-          type="button"
-          class="w-24"
-          ref="deleteButtonRef"
-          @click="
-            () => {
-              deleteDataFunction();
-              setDeleteModal(false);
-            }
-          "
-        >
-          삭제
-        </Button>
-      </div>
-    </Dialog.Panel>
-  </Dialog>
-  <!-- END: Delete Confirmation Modal -->
+
   <!-- BEGIN: 엑셀 다운로드 Modal -->
   <Dialog :open="excelExportModal" @close="setExcelExportModal(false)">
     <Dialog.Panel>

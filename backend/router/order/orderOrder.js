@@ -1248,13 +1248,14 @@ router.post("/incoming_request/insert", async (req, res) => {
           ,[IPISP_CONTENT8]
           ,[IPISP_CONTENT9]
           ,[IPISP_CONTENT10]
+          ,[IPISP_REQUEST_DT]
           ,[IPISP_INFO]
           ,[IPISP_NOTE]
           ,[IPISP_REGIST_NM]
           ,[IPISP_REGIST_DT])
         VALUES
           (@발주NO,@구분,@샘플수량,@입고수량,@결과,@내용1,@내용2,@내용3,@내용4,@내용5,
-            @내용6,@내용7,@내용8,@내용9,@내용10,@전달사항,@비고,@등록자,@등록일시)
+            @내용6,@내용7,@내용8,@내용9,@내용10,GETDATE(),@전달사항,@비고,@등록자,@등록일시)
     `);
 
     // 로그기록 저장

@@ -132,6 +132,12 @@ router.post("/", async (req, res) => {
           ) AS ITEM ON ITEM.NO = [WKIS_ITEM_PK]
         ) AS RESULT
         WHERE (1=1)
+        AND CONVERT(varchar, CONVERT(datetime, 시작일), 12) >= ` +
+        req.body.startDate +
+        `
+        AND CONVERT(varchar, CONVERT(datetime, 시작일), 12) <= ` +
+        req.body.endDate +
+        `
         AND ( 코드 like concat('%',@input,'%')
         OR 품목구분 like concat('%',@input,'%')
         OR 품번 like concat('%',@input,'%')
@@ -185,6 +191,12 @@ router.post("/", async (req, res) => {
           ) AS ITEM ON ITEM.NO = [WKIS_ITEM_PK]
         ) AS RESULT
         WHERE (1=1)
+        AND CONVERT(varchar, CONVERT(datetime, 시작일), 12) >= ` +
+        req.body.startDate +
+        `
+        AND CONVERT(varchar, CONVERT(datetime, 시작일), 12) <= ` +
+        req.body.endDate +
+        `
         AND ` +
         req.body.searchKey +
         ` like concat('%',@input,'%')

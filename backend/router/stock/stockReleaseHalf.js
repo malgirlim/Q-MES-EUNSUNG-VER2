@@ -285,8 +285,15 @@ router.post("/", async (req, res) => {
               ) AS IMPORT_INSPECT ON IMPORT_INSPECT.NO = [ITRC_IMPORT_INSPECT_PK]
             ) AS ITEM_RECEIVE ON ITEM_RECEIVE.NO = [ITPC_ITEM_RECEIVE_PK]
           ) AS ITEM_PROCESS ON ITEM_PROCESS.NO = [PDUI_ITEM_PROCESS_PK]
+          WHERE ITEM_PROCESS.품목구분 = '반제품'
         ) AS RESULT
         WHERE (1=1)
+        AND CONVERT(varchar, CONVERT(datetime, 사용일시), 12) >= ` +
+        req.body.startDate +
+        `
+        AND CONVERT(varchar, CONVERT(datetime, 사용일시), 12) <= ` +
+        req.body.endDate +
+        `
         AND ( 코드 like concat('%',@input,'%')
         OR 품목구분 like concat('%',@input,'%')
         OR 품번 like concat('%',@input,'%')
@@ -416,8 +423,15 @@ router.post("/", async (req, res) => {
               ) AS IMPORT_INSPECT ON IMPORT_INSPECT.NO = [ITRC_IMPORT_INSPECT_PK]
             ) AS ITEM_RECEIVE ON ITEM_RECEIVE.NO = [ITPC_ITEM_RECEIVE_PK]
           ) AS ITEM_PROCESS ON ITEM_PROCESS.NO = [PDUI_ITEM_PROCESS_PK]
+          WHERE ITEM_PROCESS.품목구분 = '반제품'
         ) AS RESULT
         WHERE (1=1)
+        AND CONVERT(varchar, CONVERT(datetime, 사용일시), 12) >= ` +
+        req.body.startDate +
+        `
+        AND CONVERT(varchar, CONVERT(datetime, 사용일시), 12) <= ` +
+        req.body.endDate +
+        `
         AND ` +
         req.body.searchKey +
         ` like concat('%',@input,'%')
