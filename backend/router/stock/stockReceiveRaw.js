@@ -256,113 +256,219 @@ router.post("/", async (req, res) => {
       sql =
         `
         SELECT
-          NO AS NO, 수주NO AS 수주NO, 수주코드 AS 수주코드, 발주코드 AS 발주코드, 발주구분 AS 발주구분, 발주일자 AS 발주일자,
-          거래처NO AS 거래처NO, 거래처명 AS 거래처명, 품목NO AS 품목NO, 품목구분 AS 품목구분, 품번 AS 품번, 품명 AS 품명,
-          발주수량 AS 발주수량, 입고수량 AS 입고수량, 단가 AS 단가, 공급가액 AS 공급가액, 세액 AS 세액, 납기일 AS 납기일,
-          도착지주소 AS 도착지주소, 기타 AS 기타, 비고 AS 비고, 등록자 AS 등록자, 등록일시 AS 등록일시
+          NO AS NO, 생산실적NO AS 생산실적NO, 공정검사NO AS 공정검사NO, 불량재작업NO AS 불량재작업NO, 수입검사NO AS 수입검사NO,
+          구분 AS 구분, 입고일시 AS 입고일시, 입고코드 AS 입고코드, 품목구분 AS 품목구분, 품번 AS 품번, 품명 AS 품명,
+          규격 AS 규격, 단위 AS 단위, 입고수 AS 입고수, 유효일자 AS 유효일자, 
+          비고 AS 비고, 등록자 AS 등록자, 등록일시 AS 등록일시
         FROM(
           SELECT
-            [ORDR_PK] AS NO
-            ,[ORDR_ACCEPT_PK] AS 수주NO
-            ,ACCEPT.코드 AS 수주코드
-            ,[ORDR_CODE] AS 발주코드
-            ,[ORDR_DIV] AS 발주구분
-            ,CONVERT(varchar, [ORDR_DATE], 23) AS 발주일자
-            ,[ORDR_CLIENT_PK] AS 거래처NO
-            ,CLIENT.거래처명 AS 거래처명
-            ,[ORDR_ITEM_PK] AS 품목NO
-            ,ITEM.품목구분 AS 품목구분
-            ,ITEM.품번 AS 품번
-            ,ITEM.품명 AS 품명
-            ,[ORDR_AMOUNT] AS 발주수량
-            ,(SELECT COALESCE(SUM(CONVERT(numeric,ITRC_AMOUNT)),0) FROM [QMES2022].[dbo].[MANAGE_ITEM_RECEIVE_TB] WHERE [ITRC_IMPORT_INSPECT_PK] IN (SELECT IPISP_PK FROM [QMES2022].[dbo].[MANAGE_IMPORT_INSPECT_TB] WHERE [IPISP_ORDER_PK] = ORDR_PK)) AS 입고수량
-            ,[ORDR_UNIT_COST] AS 단가
-            ,[ORDR_SUPPLY_COST] AS 공급가액
-            ,[ORDR_TAX_COST] AS 세액
-            ,CONVERT(varchar, [ORDR_ALLIVE_DATE], 23) AS 납기일
-            ,[ORDR_ALLIVE_ADDRESS] AS 도착지주소
-            ,[ORDR_ETC] AS 기타
-            ,[ORDR_NOTE] AS 비고
-            ,[ORDR_REGIST_NM] AS 등록자
-            ,[ORDR_REGIST_DT] AS 등록일시
-          FROM [QMES2022].[dbo].[MANAGE_ORDER_TB]
+            [ITRC_PK] AS NO
+            ,[ITRC_PRODUCE_RESULT_PK] AS 생산실적NO
+            ,[ITRC_PROCESS_INSPECT_PK] AS 공정검사NO
+            ,[ITRC_DEFECT_REWORK_PK] AS 불량재작업NO
+            ,[ITRC_IMPORT_INSPECT_PK] AS 수입검사NO
+            ,[ITRC_DIV] AS 구분
+            ,CONVERT(VARCHAR, [ITRC_DT], 20) AS 입고일시
+            ,[ITRC_CODE] AS 입고코드
+            ,COALESCE(IMPORT_INSPECT.발주품목구분, PROCESS_INSPECT.품목구분) AS 품목구분
+            ,COALESCE(IMPORT_INSPECT.발주품번, PROCESS_INSPECT.품번) AS 품번
+            ,COALESCE(IMPORT_INSPECT.발주품명, PROCESS_INSPECT.품명) AS 품명
+            ,COALESCE(IMPORT_INSPECT.발주규격, PROCESS_INSPECT.규격) AS 규격
+            ,COALESCE(IMPORT_INSPECT.발주단위, PROCESS_INSPECT.단위) AS 단위
+            ,[ITRC_AMOUNT] AS 입고수
+            ,CONVERT(VARCHAR,[ITRC_EXPIRE_DATE], 23) AS 유효일자
+            ,[ITRC_NOTE] AS 비고
+            ,[ITRC_REGIST_NM] AS 등록자
+            ,[ITRC_REGIST_DT] AS 등록일시
+          FROM [QMES2022].[dbo].[MANAGE_ITEM_RECEIVE_TB]
           LEFT JOIN
           (
             SELECT
-              [ACPT_PK] AS NO
-              ,LEFT([ACPT_DATE],10) AS 수주일
-              ,[ACPT_CODE] AS 코드
-              ,[ACPT_CODE_NUM] AS 코드순번
-              ,[ACPT_DIV] AS 구분
-              ,[ACPT_CLIENT_PK] AS 거래처NO
-              ,CLIENT.거래처명 AS 거래처명
-              ,[ACPT_TEL] AS 연락처
-              ,[ACPT_ITEM_PK] AS 품목NO
-              ,ITEM.품목구분 AS 품목구분
-              ,ITEM.품번 AS 품번
-              ,ITEM.품명 AS 품명
-              ,[ACPT_AMOUNT] AS 수량
-              ,[ACPT_UNIT_COST] AS 단가
-              ,[ACPT_SUPPLY_COST] AS 공급가액
-              ,[ACPT_TAX_COST] AS 세액
-              ,[ACPT_PAY_CONDITION] AS 결제조건
-              ,LEFT([ACPT_PAY_DATE],10) AS 결제예정일
-              ,LEFT([ACPT_DELIVERY_DATE],10) AS 납기일
-              ,[ACPT_DELIVERY_ADDRESS] AS 도착지주소
-              ,[ACPT_ETC] AS 기타
-              ,[ACPT_NOTE] AS 비고
-              ,[ACPT_REGIST_NM] AS 등록자
-              ,[ACPT_REGIST_DT] AS 등록일시
-            FROM [QMES2022].[dbo].[MANAGE_ACCEPT_TB]
+              [IPISP_PK] AS NO
+              ,[IPISP_ORDER_PK] AS 발주NO
+              ,ORDERORDER.발주코드 AS 발주코드
+              ,ORDERORDER.품목구분 AS 발주품목구분
+              ,ORDERORDER.품번 AS 발주품번
+              ,ORDERORDER.품명 AS 발주품명
+              ,ORDERORDER.규격 AS 발주규격
+              ,ORDERORDER.단위 AS 발주단위
+              ,[IPISP_DIV] AS 구분
+              ,[IPISP_SAMPLE_AMT] AS 샘플수량
+              ,[IPISP_RECEIVE_AMT] AS 입고수량
+              ,[IPISP_RESULT] AS 결과
+              ,[IPISP_INFO] AS 전달사항
+            FROM [QMES2022].[dbo].[MANAGE_IMPORT_INSPECT_TB]
             LEFT JOIN
             (
               SELECT
-                [CLNT_PK] AS NO
-                ,[CLNT_NAME] AS 거래처명
-              FROM [QMES2022].[dbo].[MASTER_CLIENT_TB]
-            ) AS CLIENT ON CLIENT.NO = [ACPT_CLIENT_PK]
+                [ORDR_PK] AS NO
+                ,[ORDR_ACCEPT_PK] AS 수주NO
+                ,[ORDR_CODE] AS 발주코드
+                ,[ORDR_DIV] AS 발주구분
+                ,CONVERT(varchar, [ORDR_DATE], 23) AS 발주일자
+                ,[ORDR_CLIENT_PK] AS 거래처NO
+                ,CLIENT.거래처명 AS 거래처명
+                ,[ORDR_ITEM_PK] AS 품목NO
+                ,ITEM.품목구분 AS 품목구분
+                ,ITEM.품번 AS 품번
+                ,ITEM.품명 AS 품명
+                ,ITEM.규격 AS 규격
+                ,ITEM.단위 AS 단위
+                ,[ORDR_AMOUNT] AS 수량
+              FROM [QMES2022].[dbo].[MANAGE_ORDER_TB]
+              LEFT JOIN
+              (
+                SELECT
+                  [CLNT_PK] AS NO
+                  ,[CLNT_NAME] AS 거래처명
+                FROM [QMES2022].[dbo].[MASTER_CLIENT_TB]
+              ) AS CLIENT ON CLIENT.NO = [ORDR_CLIENT_PK]
+              LEFT JOIN
+              (
+                SELECT
+                  [ITEM_PK] AS NO
+                  ,[ITEM_DIV] AS 품목구분
+                  ,[ITEM_PRODUCT_NUM] AS 품번
+                  ,[ITEM_NAME] AS 품명
+                  ,[ITEM_SIZE] AS 규격
+                  ,[ITEM_UNIT] AS 단위
+                FROM [QMES2022].[dbo].[MASTER_ITEM_TB]
+              ) AS ITEM ON ITEM.NO = [ORDR_ITEM_PK]
+            ) AS ORDERORDER ON ORDERORDER.NO = [IPISP_ORDER_PK]
+          ) AS IMPORT_INSPECT ON IMPORT_INSPECT.NO = [ITRC_IMPORT_INSPECT_PK]
+          LEFT JOIN
+          (
+            SELECT
+              [PCISP_PK] AS NO
+              ,[PCISP_PRODUCE_RESULT_PK] AS 생산실적NO
+              ,PRODUCE_RESULT.작업코드 AS 작업코드
+              ,PRODUCE_RESULT.공정 AS 공정
+              ,PRODUCE_RESULT.품목구분 AS 품목구분
+              ,PRODUCE_RESULT.품번 AS 품번
+              ,PRODUCE_RESULT.품명 AS 품명
+              ,PRODUCE_RESULT.규격 AS 규격
+              ,PRODUCE_RESULT.단위 AS 단위
+              ,PRODUCE_RESULT.특이사항 AS 특이사항
+              ,[PCISP_DIV] AS 구분
+              ,[PCISP_SAMPLE_AMT] AS 샘플수량
+              ,[PCISP_RECEIVE_AMT] AS 입고수량
+              ,[PCISP_RESULT] AS 결과
+            FROM [QMES2022].[dbo].[MANAGE_PROCESS_INSPECT_TB]
             LEFT JOIN
             (
               SELECT
-                [ITEM_PK] AS NO
-                ,[ITEM_DIV] AS 품목구분
-                ,[ITEM_PRODUCT_NUM] AS 품번
-                ,[ITEM_NAME] AS 품명
-              FROM [QMES2022].[dbo].[MASTER_ITEM_TB]
-            ) AS ITEM ON ITEM.NO = [ACPT_ITEM_PK]
-          ) AS ACCEPT ON ACCEPT.NO = [ORDR_ACCEPT_PK]
-          LEFT JOIN
-          (
-            SELECT
-              [CLNT_PK] AS NO
-              ,[CLNT_NAME] AS 거래처명
-            FROM [QMES2022].[dbo].[MASTER_CLIENT_TB]
-          ) AS CLIENT ON CLIENT.NO = [ORDR_CLIENT_PK]
-          LEFT JOIN
-          (
-            SELECT
-              [ITEM_PK] AS NO
-              ,[ITEM_DIV] AS 품목구분
-              ,[ITEM_PRODUCT_NUM] AS 품번
-              ,[ITEM_NAME] AS 품명
-            FROM [QMES2022].[dbo].[MASTER_ITEM_TB]
-          ) AS ITEM ON ITEM.NO = [ORDR_ITEM_PK]
+                [PDRS_PK] AS NO
+                ,[PDRS_INST_PROCESS_PK] AS 지시공정NO
+                ,INSTRUCT_PROCESS.작업코드 AS 작업코드
+                ,INSTRUCT_PROCESS.품목구분 AS 품목구분
+                ,INSTRUCT_PROCESS.품번 AS 품번
+                ,INSTRUCT_PROCESS.품명 AS 품명
+                ,INSTRUCT_PROCESS.규격 AS 규격
+                ,INSTRUCT_PROCESS.단위 AS 단위
+                ,INSTRUCT_PROCESS.공정명 AS 공정
+                ,INSTRUCT_PROCESS.시작일 AS 시작일
+                ,[PDRS_USER_ID] AS 작업자ID
+                ,RESULT_USER.이름 AS 작업자
+                ,[PDRS_FACILITY_PK] AS 설비NO
+                ,RESULT_FACILITY.설비명 AS 설비명
+                ,CONVERT(VARCHAR, [PDRS_START_DT], 20) AS 시작일시
+                ,CONVERT(VARCHAR, [PDRS_END_DT], 20) AS 종료일시
+                ,[PDRS_REPORT] AS 특이사항
+              FROM [QMES2022].[dbo].[MANAGE_PRODUCE_RESULT_TB]
+              LEFT JOIN
+              (
+                SELECT
+                  [ISPC_PK] AS NO
+                  ,[ISPC_WORK_INSTRUCT_PK] AS 작업지시NO
+                  ,WORK_INSTRUCT.코드 AS 작업코드
+                  ,[ISPC_ITEM_PK] AS 품목NO
+                  ,ITEM.구분 AS 품목구분
+                  ,ITEM.품번 AS 품번
+                  ,ITEM.품명 AS 품명
+                  ,ITEM.규격 AS 규격
+                  ,ITEM.단위 AS 단위
+                  ,[ISPC_AMOUNT] AS 지시수량
+                  ,WORK_INSTRUCT.시작일 AS 시작일
+                  ,[ISPC_PROCESS_PK] AS 공정NO
+                  ,PROCESS.공정명 AS 공정명
+                  ,[ISPC_CONDITION] AS 진행상황
+                FROM [QMES2022].[dbo].[MANAGE_INSTRUCT_PROCESS_TB]
+                LEFT JOIN
+                (
+                  SELECT
+                    [WKIS_PK] AS NO
+                    ,[WKIS_CODE] AS 코드
+                    ,[WKIS_PRODUCE_PLAN_PK] AS 생산계획NO
+                    ,[WKIS_ITEM_PK] AS 품목NO
+                    ,[WKIS_AMOUNT] AS 수량
+                    ,LEFT([WKIS_START_DATE],10) AS 시작일
+                  FROM [QMES2022].[dbo].[MANAGE_WORK_INSTRUCT_TB]
+                ) AS WORK_INSTRUCT ON WORK_INSTRUCT.NO = [ISPC_WORK_INSTRUCT_PK]
+                LEFT JOIN
+                (
+                  SELECT
+                    [PRCS_PK] AS NO
+                    ,[PRCS_CODE] AS 코드
+                    ,[PRCS_DIV] AS 구분
+                    ,[PRCS_NAME] AS 공정명
+                    ,[PRCS_CONTENT] AS 내용
+                    ,[PRCS_FACILITY] AS 설비
+                  FROM [QMES2022].[dbo].[MASTER_PROCESS_TB]
+                ) AS PROCESS ON PROCESS.NO = [ISPC_PROCESS_PK]
+                LEFT JOIN
+                (
+                  SELECT
+                    [ITEM_PK] AS NO
+                    ,[ITEM_DIV] AS 구분
+                    ,[ITEM_PRODUCT_NUM] AS 품번
+                    ,[ITEM_NAME] AS 품명
+                    ,[ITEM_SIZE] AS 규격
+                    ,[ITEM_UNIT] AS 단위
+                  FROM [QMES2022].[dbo].[MASTER_ITEM_TB]
+                ) AS ITEM ON ITEM.NO = [ISPC_ITEM_PK]
+              ) AS INSTRUCT_PROCESS ON INSTRUCT_PROCESS.NO = [PDRS_INST_PROCESS_PK]
+              LEFT JOIN
+              (
+                SELECT
+                  [FCLT_PK] AS NO
+                  ,[FCLT_NAME] AS 설비명
+                  ,[FCLT_LINE] AS 라인
+                  ,[FCLT_SIZE] AS 규격
+                FROM [QMES2022].[dbo].[MASTER_FACILITY_TB]
+              ) AS RESULT_FACILITY ON RESULT_FACILITY.NO = [PDRS_FACILITY_PK]
+              LEFT JOIN
+              (
+                SELECT
+                  [USER_ID] AS 아이디,
+                  [USER_NAME] AS 이름,
+                  [USER_PHONE] AS 연락처,
+                  [USER_EMAIL] AS 이메일,
+                  [USER_DEPART] AS 부서명,
+                  [USER_POSITION] AS 직책,
+                  [USER_RANK] AS 직급
+                FROM [QMES2022].[dbo].[MASTER_USER_TB]
+              ) AS RESULT_USER ON RESULT_USER.아이디 = [PDRS_USER_ID]
+            ) AS PRODUCE_RESULT ON PRODUCE_RESULT.NO = [PCISP_PRODUCE_RESULT_PK]
+          ) AS PROCESS_INSPECT ON PROCESS_INSPECT.NO = [ITRC_PROCESS_INSPECT_PK]
+          WHERE IMPORT_INSPECT.발주품목구분 = '원부자재' OR PROCESS_INSPECT.품목구분 = '원부자재'
         ) AS RESULT
         WHERE (1=1)
-        AND ( 발주코드 like concat('%',@input,'%')
-        OR 발주구분 like concat('%',@input,'%')
-        OR 발주일자 like concat('%',@input,'%')
-        OR 거래처명 like concat('%',@input,'%')
+        AND CONVERT(varchar, CONVERT(datetime, 입고일시), 12) >= ` +
+        req.body.startDate +
+        `
+        AND CONVERT(varchar, CONVERT(datetime, 입고일시), 12) <= ` +
+        req.body.endDate +
+        `
+        AND ( 구분 like concat('%',@input,'%')
+        OR 입고일시 like concat('%',@input,'%')
+        OR 입고코드 like concat('%',@input,'%')
         OR 품목구분 like concat('%',@input,'%')
         OR 품번 like concat('%',@input,'%')
         OR 품명 like concat('%',@input,'%')
-        OR 발주수량 like concat('%',@input,'%')
-        OR 단가 like concat('%',@input,'%')
-        OR 공급가액 like concat('%',@input,'%')
-        OR 세액 like concat('%',@input,'%')
-        OR 납기일 like concat('%',@input,'%')
-        OR 도착지주소 like concat('%',@input,'%')
-        OR 기타 like concat('%',@input,'%')
+        OR 규격 like concat('%',@input,'%')
+        OR 단위 like concat('%',@input,'%')
+        OR 입고수 like concat('%',@input,'%')
+        OR 유효일자 like concat('%',@input,'%')
         OR 비고 like concat('%',@input,'%'))
         ORDER BY ` +
         req.body.sortKey +
@@ -374,99 +480,209 @@ router.post("/", async (req, res) => {
       sql =
         `
         SELECT
-          NO AS NO, 수주NO AS 수주NO, 수주코드 AS 수주코드, 발주코드 AS 발주코드, 발주구분 AS 발주구분, 발주일자 AS 발주일자,
-          거래처NO AS 거래처NO, 거래처명 AS 거래처명, 품목NO AS 품목NO, 품목구분 AS 품목구분, 품번 AS 품번, 품명 AS 품명,
-          발주수량 AS 발주수량, 입고수량 AS 입고수량, 단가 AS 단가, 공급가액 AS 공급가액, 세액 AS 세액, 납기일 AS 납기일,
-          도착지주소 AS 도착지주소, 기타 AS 기타, 비고 AS 비고, 등록자 AS 등록자, 등록일시 AS 등록일시
+          NO AS NO, 생산실적NO AS 생산실적NO, 공정검사NO AS 공정검사NO, 불량재작업NO AS 불량재작업NO, 수입검사NO AS 수입검사NO,
+          구분 AS 구분, 입고일시 AS 입고일시, 입고코드 AS 입고코드, 품목구분 AS 품목구분, 품번 AS 품번, 품명 AS 품명,
+          규격 AS 규격, 단위 AS 단위, 입고수 AS 입고수, 유효일자 AS 유효일자, 
+          비고 AS 비고, 등록자 AS 등록자, 등록일시 AS 등록일시
         FROM(
           SELECT
-            [ORDR_PK] AS NO
-            ,[ORDR_ACCEPT_PK] AS 수주NO
-            ,ACCEPT.코드 AS 수주코드
-            ,[ORDR_CODE] AS 발주코드
-            ,[ORDR_DIV] AS 발주구분
-            ,CONVERT(varchar, [ORDR_DATE], 23) AS 발주일자
-            ,[ORDR_CLIENT_PK] AS 거래처NO
-            ,CLIENT.거래처명 AS 거래처명
-            ,[ORDR_ITEM_PK] AS 품목NO
-            ,ITEM.품목구분 AS 품목구분
-            ,ITEM.품번 AS 품번
-            ,ITEM.품명 AS 품명
-            ,[ORDR_AMOUNT] AS 발주수량
-            ,(SELECT COALESCE(SUM(CONVERT(numeric,ITRC_AMOUNT)),0) FROM [QMES2022].[dbo].[MANAGE_ITEM_RECEIVE_TB] WHERE [ITRC_IMPORT_INSPECT_PK] IN (SELECT IPISP_PK FROM [QMES2022].[dbo].[MANAGE_IMPORT_INSPECT_TB] WHERE [IPISP_ORDER_PK] = ORDR_PK)) AS 입고수량
-            ,[ORDR_UNIT_COST] AS 단가
-            ,[ORDR_SUPPLY_COST] AS 공급가액
-            ,[ORDR_TAX_COST] AS 세액
-            ,CONVERT(varchar, [ORDR_ALLIVE_DATE], 23) AS 납기일
-            ,[ORDR_ALLIVE_ADDRESS] AS 도착지주소
-            ,[ORDR_ETC] AS 기타
-            ,[ORDR_NOTE] AS 비고
-            ,[ORDR_REGIST_NM] AS 등록자
-            ,[ORDR_REGIST_DT] AS 등록일시
-          FROM [QMES2022].[dbo].[MANAGE_ORDER_TB]
+            [ITRC_PK] AS NO
+            ,[ITRC_PRODUCE_RESULT_PK] AS 생산실적NO
+            ,[ITRC_PROCESS_INSPECT_PK] AS 공정검사NO
+            ,[ITRC_DEFECT_REWORK_PK] AS 불량재작업NO
+            ,[ITRC_IMPORT_INSPECT_PK] AS 수입검사NO
+            ,[ITRC_DIV] AS 구분
+            ,CONVERT(VARCHAR, [ITRC_DT], 20) AS 입고일시
+            ,[ITRC_CODE] AS 입고코드
+            ,COALESCE(IMPORT_INSPECT.발주품목구분, PROCESS_INSPECT.품목구분) AS 품목구분
+            ,COALESCE(IMPORT_INSPECT.발주품번, PROCESS_INSPECT.품번) AS 품번
+            ,COALESCE(IMPORT_INSPECT.발주품명, PROCESS_INSPECT.품명) AS 품명
+            ,COALESCE(IMPORT_INSPECT.발주규격, PROCESS_INSPECT.규격) AS 규격
+            ,COALESCE(IMPORT_INSPECT.발주단위, PROCESS_INSPECT.단위) AS 단위
+            ,[ITRC_AMOUNT] AS 입고수
+            ,CONVERT(VARCHAR,[ITRC_EXPIRE_DATE], 23) AS 유효일자
+            ,[ITRC_NOTE] AS 비고
+            ,[ITRC_REGIST_NM] AS 등록자
+            ,[ITRC_REGIST_DT] AS 등록일시
+          FROM [QMES2022].[dbo].[MANAGE_ITEM_RECEIVE_TB]
           LEFT JOIN
           (
             SELECT
-              [ACPT_PK] AS NO
-              ,LEFT([ACPT_DATE],10) AS 수주일
-              ,[ACPT_CODE] AS 코드
-              ,[ACPT_CODE_NUM] AS 코드순번
-              ,[ACPT_DIV] AS 구분
-              ,[ACPT_CLIENT_PK] AS 거래처NO
-              ,CLIENT.거래처명 AS 거래처명
-              ,[ACPT_TEL] AS 연락처
-              ,[ACPT_ITEM_PK] AS 품목NO
-              ,ITEM.품목구분 AS 품목구분
-              ,ITEM.품번 AS 품번
-              ,ITEM.품명 AS 품명
-              ,[ACPT_AMOUNT] AS 수량
-              ,[ACPT_UNIT_COST] AS 단가
-              ,[ACPT_SUPPLY_COST] AS 공급가액
-              ,[ACPT_TAX_COST] AS 세액
-              ,[ACPT_PAY_CONDITION] AS 결제조건
-              ,LEFT([ACPT_PAY_DATE],10) AS 결제예정일
-              ,LEFT([ACPT_DELIVERY_DATE],10) AS 납기일
-              ,[ACPT_DELIVERY_ADDRESS] AS 도착지주소
-              ,[ACPT_ETC] AS 기타
-              ,[ACPT_NOTE] AS 비고
-              ,[ACPT_REGIST_NM] AS 등록자
-              ,[ACPT_REGIST_DT] AS 등록일시
-            FROM [QMES2022].[dbo].[MANAGE_ACCEPT_TB]
+              [IPISP_PK] AS NO
+              ,[IPISP_ORDER_PK] AS 발주NO
+              ,ORDERORDER.발주코드 AS 발주코드
+              ,ORDERORDER.품목구분 AS 발주품목구분
+              ,ORDERORDER.품번 AS 발주품번
+              ,ORDERORDER.품명 AS 발주품명
+              ,ORDERORDER.규격 AS 발주규격
+              ,ORDERORDER.단위 AS 발주단위
+              ,[IPISP_DIV] AS 구분
+              ,[IPISP_SAMPLE_AMT] AS 샘플수량
+              ,[IPISP_RECEIVE_AMT] AS 입고수량
+              ,[IPISP_RESULT] AS 결과
+              ,[IPISP_INFO] AS 전달사항
+            FROM [QMES2022].[dbo].[MANAGE_IMPORT_INSPECT_TB]
             LEFT JOIN
             (
               SELECT
-                [CLNT_PK] AS NO
-                ,[CLNT_NAME] AS 거래처명
-              FROM [QMES2022].[dbo].[MASTER_CLIENT_TB]
-            ) AS CLIENT ON CLIENT.NO = [ACPT_CLIENT_PK]
+                [ORDR_PK] AS NO
+                ,[ORDR_ACCEPT_PK] AS 수주NO
+                ,[ORDR_CODE] AS 발주코드
+                ,[ORDR_DIV] AS 발주구분
+                ,CONVERT(varchar, [ORDR_DATE], 23) AS 발주일자
+                ,[ORDR_CLIENT_PK] AS 거래처NO
+                ,CLIENT.거래처명 AS 거래처명
+                ,[ORDR_ITEM_PK] AS 품목NO
+                ,ITEM.품목구분 AS 품목구분
+                ,ITEM.품번 AS 품번
+                ,ITEM.품명 AS 품명
+                ,ITEM.규격 AS 규격
+                ,ITEM.단위 AS 단위
+                ,[ORDR_AMOUNT] AS 수량
+              FROM [QMES2022].[dbo].[MANAGE_ORDER_TB]
+              LEFT JOIN
+              (
+                SELECT
+                  [CLNT_PK] AS NO
+                  ,[CLNT_NAME] AS 거래처명
+                FROM [QMES2022].[dbo].[MASTER_CLIENT_TB]
+              ) AS CLIENT ON CLIENT.NO = [ORDR_CLIENT_PK]
+              LEFT JOIN
+              (
+                SELECT
+                  [ITEM_PK] AS NO
+                  ,[ITEM_DIV] AS 품목구분
+                  ,[ITEM_PRODUCT_NUM] AS 품번
+                  ,[ITEM_NAME] AS 품명
+                  ,[ITEM_SIZE] AS 규격
+                  ,[ITEM_UNIT] AS 단위
+                FROM [QMES2022].[dbo].[MASTER_ITEM_TB]
+              ) AS ITEM ON ITEM.NO = [ORDR_ITEM_PK]
+            ) AS ORDERORDER ON ORDERORDER.NO = [IPISP_ORDER_PK]
+          ) AS IMPORT_INSPECT ON IMPORT_INSPECT.NO = [ITRC_IMPORT_INSPECT_PK]
+          LEFT JOIN
+          (
+            SELECT
+              [PCISP_PK] AS NO
+              ,[PCISP_PRODUCE_RESULT_PK] AS 생산실적NO
+              ,PRODUCE_RESULT.작업코드 AS 작업코드
+              ,PRODUCE_RESULT.공정 AS 공정
+              ,PRODUCE_RESULT.품목구분 AS 품목구분
+              ,PRODUCE_RESULT.품번 AS 품번
+              ,PRODUCE_RESULT.품명 AS 품명
+              ,PRODUCE_RESULT.규격 AS 규격
+              ,PRODUCE_RESULT.단위 AS 단위
+              ,PRODUCE_RESULT.특이사항 AS 특이사항
+              ,[PCISP_DIV] AS 구분
+              ,[PCISP_SAMPLE_AMT] AS 샘플수량
+              ,[PCISP_RECEIVE_AMT] AS 입고수량
+              ,[PCISP_RESULT] AS 결과
+            FROM [QMES2022].[dbo].[MANAGE_PROCESS_INSPECT_TB]
             LEFT JOIN
             (
               SELECT
-                [ITEM_PK] AS NO
-                ,[ITEM_DIV] AS 품목구분
-                ,[ITEM_PRODUCT_NUM] AS 품번
-                ,[ITEM_NAME] AS 품명
-              FROM [QMES2022].[dbo].[MASTER_ITEM_TB]
-            ) AS ITEM ON ITEM.NO = [ACPT_ITEM_PK]
-          ) AS ACCEPT ON ACCEPT.NO = [ORDR_ACCEPT_PK]
-          LEFT JOIN
-          (
-            SELECT
-              [CLNT_PK] AS NO
-              ,[CLNT_NAME] AS 거래처명
-            FROM [QMES2022].[dbo].[MASTER_CLIENT_TB]
-          ) AS CLIENT ON CLIENT.NO = [ORDR_CLIENT_PK]
-          LEFT JOIN
-          (
-            SELECT
-              [ITEM_PK] AS NO
-              ,[ITEM_DIV] AS 품목구분
-              ,[ITEM_PRODUCT_NUM] AS 품번
-              ,[ITEM_NAME] AS 품명
-            FROM [QMES2022].[dbo].[MASTER_ITEM_TB]
-          ) AS ITEM ON ITEM.NO = [ORDR_ITEM_PK]
+                [PDRS_PK] AS NO
+                ,[PDRS_INST_PROCESS_PK] AS 지시공정NO
+                ,INSTRUCT_PROCESS.작업코드 AS 작업코드
+                ,INSTRUCT_PROCESS.품목구분 AS 품목구분
+                ,INSTRUCT_PROCESS.품번 AS 품번
+                ,INSTRUCT_PROCESS.품명 AS 품명
+                ,INSTRUCT_PROCESS.규격 AS 규격
+                ,INSTRUCT_PROCESS.단위 AS 단위
+                ,INSTRUCT_PROCESS.공정명 AS 공정
+                ,INSTRUCT_PROCESS.시작일 AS 시작일
+                ,[PDRS_USER_ID] AS 작업자ID
+                ,RESULT_USER.이름 AS 작업자
+                ,[PDRS_FACILITY_PK] AS 설비NO
+                ,RESULT_FACILITY.설비명 AS 설비명
+                ,CONVERT(VARCHAR, [PDRS_START_DT], 20) AS 시작일시
+                ,CONVERT(VARCHAR, [PDRS_END_DT], 20) AS 종료일시
+                ,[PDRS_REPORT] AS 특이사항
+              FROM [QMES2022].[dbo].[MANAGE_PRODUCE_RESULT_TB]
+              LEFT JOIN
+              (
+                SELECT
+                  [ISPC_PK] AS NO
+                  ,[ISPC_WORK_INSTRUCT_PK] AS 작업지시NO
+                  ,WORK_INSTRUCT.코드 AS 작업코드
+                  ,[ISPC_ITEM_PK] AS 품목NO
+                  ,ITEM.구분 AS 품목구분
+                  ,ITEM.품번 AS 품번
+                  ,ITEM.품명 AS 품명
+                  ,ITEM.규격 AS 규격
+                  ,ITEM.단위 AS 단위
+                  ,[ISPC_AMOUNT] AS 지시수량
+                  ,WORK_INSTRUCT.시작일 AS 시작일
+                  ,[ISPC_PROCESS_PK] AS 공정NO
+                  ,PROCESS.공정명 AS 공정명
+                  ,[ISPC_CONDITION] AS 진행상황
+                FROM [QMES2022].[dbo].[MANAGE_INSTRUCT_PROCESS_TB]
+                LEFT JOIN
+                (
+                  SELECT
+                    [WKIS_PK] AS NO
+                    ,[WKIS_CODE] AS 코드
+                    ,[WKIS_PRODUCE_PLAN_PK] AS 생산계획NO
+                    ,[WKIS_ITEM_PK] AS 품목NO
+                    ,[WKIS_AMOUNT] AS 수량
+                    ,LEFT([WKIS_START_DATE],10) AS 시작일
+                  FROM [QMES2022].[dbo].[MANAGE_WORK_INSTRUCT_TB]
+                ) AS WORK_INSTRUCT ON WORK_INSTRUCT.NO = [ISPC_WORK_INSTRUCT_PK]
+                LEFT JOIN
+                (
+                  SELECT
+                    [PRCS_PK] AS NO
+                    ,[PRCS_CODE] AS 코드
+                    ,[PRCS_DIV] AS 구분
+                    ,[PRCS_NAME] AS 공정명
+                    ,[PRCS_CONTENT] AS 내용
+                    ,[PRCS_FACILITY] AS 설비
+                  FROM [QMES2022].[dbo].[MASTER_PROCESS_TB]
+                ) AS PROCESS ON PROCESS.NO = [ISPC_PROCESS_PK]
+                LEFT JOIN
+                (
+                  SELECT
+                    [ITEM_PK] AS NO
+                    ,[ITEM_DIV] AS 구분
+                    ,[ITEM_PRODUCT_NUM] AS 품번
+                    ,[ITEM_NAME] AS 품명
+                    ,[ITEM_SIZE] AS 규격
+                    ,[ITEM_UNIT] AS 단위
+                  FROM [QMES2022].[dbo].[MASTER_ITEM_TB]
+                ) AS ITEM ON ITEM.NO = [ISPC_ITEM_PK]
+              ) AS INSTRUCT_PROCESS ON INSTRUCT_PROCESS.NO = [PDRS_INST_PROCESS_PK]
+              LEFT JOIN
+              (
+                SELECT
+                  [FCLT_PK] AS NO
+                  ,[FCLT_NAME] AS 설비명
+                  ,[FCLT_LINE] AS 라인
+                  ,[FCLT_SIZE] AS 규격
+                FROM [QMES2022].[dbo].[MASTER_FACILITY_TB]
+              ) AS RESULT_FACILITY ON RESULT_FACILITY.NO = [PDRS_FACILITY_PK]
+              LEFT JOIN
+              (
+                SELECT
+                  [USER_ID] AS 아이디,
+                  [USER_NAME] AS 이름,
+                  [USER_PHONE] AS 연락처,
+                  [USER_EMAIL] AS 이메일,
+                  [USER_DEPART] AS 부서명,
+                  [USER_POSITION] AS 직책,
+                  [USER_RANK] AS 직급
+                FROM [QMES2022].[dbo].[MASTER_USER_TB]
+              ) AS RESULT_USER ON RESULT_USER.아이디 = [PDRS_USER_ID]
+            ) AS PRODUCE_RESULT ON PRODUCE_RESULT.NO = [PCISP_PRODUCE_RESULT_PK]
+          ) AS PROCESS_INSPECT ON PROCESS_INSPECT.NO = [ITRC_PROCESS_INSPECT_PK]
+          WHERE IMPORT_INSPECT.발주품목구분 = '원부자재' OR PROCESS_INSPECT.품목구분 = '원부자재'
         ) AS RESULT
         WHERE (1=1)
+        AND CONVERT(varchar, CONVERT(datetime, 입고일시), 12) >= ` +
+        req.body.startDate +
+        `
+        AND CONVERT(varchar, CONVERT(datetime, 입고일시), 12) <= ` +
+        req.body.endDate +
+        `
         AND ` +
         req.body.searchKey +
         ` like concat('%',@input,'%')

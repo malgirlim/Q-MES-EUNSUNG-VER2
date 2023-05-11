@@ -307,10 +307,10 @@ router.post("/", async (req, res) => {
           ) AS ITEM ON ITEM.NO = [ISPC_ITEM_PK]
         ) AS RESULT
         WHERE (1=1)
-        AND CONVERT(varchar, 시작일, 12) >= ` +
+        AND CONVERT(varchar, CONVERT(datetime, 시작일), 12) >= ` +
         req.body.startDate +
         `
-        AND CONVERT(varchar, 시작일, 12) <= ` +
+        AND CONVERT(varchar, CONVERT(datetime, 시작일), 12) <= ` +
         req.body.endDate +
         `
         AND ( 작업코드 like concat('%',@input,'%')
@@ -320,7 +320,7 @@ router.post("/", async (req, res) => {
         OR 규격 like concat('%',@input,'%')
         OR 단위 like concat('%',@input,'%')
         OR 지시수량 like concat('%',@input,'%')
-        OR 생산수량 like concat('%',@input,'%')
+        OR 생산양품수량 like concat('%',@input,'%')
         OR 시작일 like concat('%',@input,'%')
         OR 공정명 like concat('%',@input,'%')
         OR 설비명 like concat('%',@input,'%')
@@ -461,10 +461,10 @@ router.post("/", async (req, res) => {
           ) AS ITEM ON ITEM.NO = [ISPC_ITEM_PK]
         ) AS RESULT
         WHERE (1=1)
-        AND CONVERT(varchar, 시작일, 12) >= ` +
+        AND CONVERT(varchar, CONVERT(datetime, 시작일), 12) >= ` +
         req.body.startDate +
         `
-        AND CONVERT(varchar, 시작일, 12) <= ` +
+        AND CONVERT(varchar, CONVERT(datetime, 시작일), 12) <= ` +
         req.body.endDate +
         `
         AND ` +

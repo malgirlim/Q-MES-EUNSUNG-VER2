@@ -377,6 +377,12 @@ router.post("/", async (req, res) => {
           ) AS RESULT_USER ON RESULT_USER.아이디 = [PDRS_USER_ID]
         ) AS RESULT
         WHERE (1=1)
+        AND CONVERT(varchar, CONVERT(datetime, 시작일시), 12) >= ` +
+        req.body.startDate +
+        `
+        AND CONVERT(varchar, CONVERT(datetime, 시작일시), 12) <= ` +
+        req.body.endDate +
+        `
         AND ( 작업코드 like concat('%',@input,'%')
         OR 품목구분 like concat('%',@input,'%')
         OR 품번 like concat('%',@input,'%')
@@ -563,6 +569,12 @@ router.post("/", async (req, res) => {
           ) AS RESULT_USER ON RESULT_USER.아이디 = [PDRS_USER_ID]
         ) AS RESULT
         WHERE (1=1)
+        AND CONVERT(varchar, CONVERT(datetime, 시작일시), 12) >= ` +
+        req.body.startDate +
+        `
+        AND CONVERT(varchar, CONVERT(datetime, 시작일시), 12) <= ` +
+        req.body.endDate +
+        `
         AND ` +
         req.body.searchKey +
         ` like concat('%',@input,'%')
