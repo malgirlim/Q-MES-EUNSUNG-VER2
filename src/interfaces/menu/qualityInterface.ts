@@ -32,6 +32,7 @@ export interface QualityIncoming {
   내용8?: string;
   내용9?: string;
   내용10?: string;
+  요청일시?: string;
   전달사항?: string;
   비고?: string;
   등록자?: string;
@@ -65,6 +66,7 @@ export interface QualityProcess {
   내용8?: string;
   내용9?: string;
   내용10?: string;
+  요청일시?: string;
   비고?: string;
   등록자?: string;
   등록일시?: string;

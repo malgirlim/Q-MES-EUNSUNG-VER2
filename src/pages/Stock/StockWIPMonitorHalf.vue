@@ -342,7 +342,7 @@ const onFileImport = (event: any) => {
             <Lucide icon="RefreshCcw" class="w-4 h-4 mr-3" /> 새로고침
           </a>
         </div>
-        <div>
+        <!-- <div>
           <Button
             class="mr-2 shadow-md"
             as="a"
@@ -378,7 +378,7 @@ const onFileImport = (event: any) => {
               placeholder="전체기간"
             />
           </div>
-        </div>
+        </div> -->
         <div class="ml-2">
           <FormSelect v-model="searchKey" class="w-30 mt-3 !box sm:mt-0">
             <option>전체</option>

@@ -59,6 +59,7 @@ router.get("/", async (req, res) => {
         ,[PCISP_CONTENT8] AS 내용8
         ,[PCISP_CONTENT9] AS 내용9
         ,[PCISP_CONTENT10] AS 내용10
+        ,CONVERT(varchar,[PCISP_REQUEST_DT],20) AS 요청일시
         ,[PCISP_NOTE] AS 비고
         ,[PCISP_REGIST_NM] AS 등록자
         ,[PCISP_REGIST_DT] AS 등록일시
@@ -235,7 +236,7 @@ router.post("/", async (req, res) => {
           품명 AS 품명, 규격 AS 규격, 단위 AS 단위, 특이사항 AS 특이사항, 구분 AS 구분, 샘플수량 AS 샘플수량,
           입고수량 AS 입고수량, 결과 AS 결과, 내용1 AS 내용1, 내용2 AS 내용2, 내용3 AS 내용3, 내용4 AS 내용4,
           내용5 AS 내용5, 내용6 AS 내용6, 내용7 AS 내용7, 내용8 AS 내용8, 내용9 AS 내용9, 내용10 AS 내용10,
-          비고 AS 비고, 등록자 AS 등록자, 등록일시 AS 등록일시
+          요청일시 AS 요청일시, 비고 AS 비고, 등록자 AS 등록자, 등록일시 AS 등록일시
         FROM(
           SELECT
             [PCISP_PK] AS NO
@@ -262,6 +263,7 @@ router.post("/", async (req, res) => {
             ,[PCISP_CONTENT8] AS 내용8
             ,[PCISP_CONTENT9] AS 내용9
             ,[PCISP_CONTENT10] AS 내용10
+            ,CONVERT(varchar,[PCISP_REQUEST_DT],20) AS 요청일시
             ,[PCISP_NOTE] AS 비고
             ,[PCISP_REGIST_NM] AS 등록자
             ,[PCISP_REGIST_DT] AS 등록일시
@@ -404,6 +406,12 @@ router.post("/", async (req, res) => {
           ) AS PRODUCE_RESULT ON PRODUCE_RESULT.NO = [PCISP_PRODUCE_RESULT_PK]
         ) AS RESULT
         WHERE (1=1)
+        AND CONVERT(varchar, CONVERT(datetime, 요청일시), 12) >= ` +
+        req.body.startDate +
+        `
+        AND CONVERT(varchar, CONVERT(datetime, 요청일시), 12) <= ` +
+        req.body.endDate +
+        `
         AND ( 작업코드 like concat('%',@input,'%')
         OR 공정 like concat('%',@input,'%')
         OR 품목구분 like concat('%',@input,'%')
@@ -441,7 +449,7 @@ router.post("/", async (req, res) => {
           품명 AS 품명, 규격 AS 규격, 단위 AS 단위, 특이사항 AS 특이사항, 구분 AS 구분, 샘플수량 AS 샘플수량,
           입고수량 AS 입고수량, 결과 AS 결과, 내용1 AS 내용1, 내용2 AS 내용2, 내용3 AS 내용3, 내용4 AS 내용4,
           내용5 AS 내용5, 내용6 AS 내용6, 내용7 AS 내용7, 내용8 AS 내용8, 내용9 AS 내용9, 내용10 AS 내용10,
-          비고 AS 비고, 등록자 AS 등록자, 등록일시 AS 등록일시
+          요청일시 AS 요청일시, 비고 AS 비고, 등록자 AS 등록자, 등록일시 AS 등록일시
         FROM(
           SELECT
             [PCISP_PK] AS NO
@@ -468,6 +476,7 @@ router.post("/", async (req, res) => {
             ,[PCISP_CONTENT8] AS 내용8
             ,[PCISP_CONTENT9] AS 내용9
             ,[PCISP_CONTENT10] AS 내용10
+            ,CONVERT(varchar,[PCISP_REQUEST_DT],20) AS 요청일시
             ,[PCISP_NOTE] AS 비고
             ,[PCISP_REGIST_NM] AS 등록자
             ,[PCISP_REGIST_DT] AS 등록일시
@@ -610,6 +619,12 @@ router.post("/", async (req, res) => {
           ) AS PRODUCE_RESULT ON PRODUCE_RESULT.NO = [PCISP_PRODUCE_RESULT_PK]
         ) AS RESULT
         WHERE (1=1)
+        AND CONVERT(varchar, CONVERT(datetime, 요청일시), 12) >= ` +
+        req.body.startDate +
+        `
+        AND CONVERT(varchar, CONVERT(datetime, 요청일시), 12) <= ` +
+        req.body.endDate +
+        `
         AND ` +
         req.body.searchKey +
         ` like concat('%',@input,'%')
@@ -672,6 +687,10 @@ router.post("/insert", async (req, res) => {
       .input("내용8", req.body.data.내용8 ?? "")
       .input("내용9", req.body.data.내용9 ?? "")
       .input("내용10", req.body.data.내용10 ?? "")
+      .input(
+        "요청일시",
+        moment(req.body.data.요청일시).format("YYYY-MM-DD HH:mm:ss") ?? ""
+      )
       .input("비고", req.body.data.비고 ?? "")
       .input("등록자", req.body.user ?? "")
       .input(
@@ -694,12 +713,13 @@ router.post("/insert", async (req, res) => {
           ,[PCISP_CONTENT8]
           ,[PCISP_CONTENT9]
           ,[PCISP_CONTENT10]
+          ,[PCISP_REQUEST_DT]
           ,[PCISP_NOTE]
           ,[PCISP_REGIST_NM]
           ,[PCISP_REGIST_DT])
         VALUES
           (@생산실적NO,@구분,@샘플수량,@입고수량,@결과,@내용1,@내용2,@내용3,@내용4,@내용5,
-            @내용6,@내용7,@내용8,@내용9,@내용10,@비고,@등록자,@등록일시)
+            @내용6,@내용7,@내용8,@내용9,@내용10,@요청일시,@비고,@등록자,@등록일시)
     `);
 
     // 로그기록 저장
@@ -745,6 +765,10 @@ router.post("/insertAll", async (req, res) => {
         .input("내용8", req.body.data[i].내용8 ?? "")
         .input("내용9", req.body.data[i].내용9 ?? "")
         .input("내용10", req.body.data[i].내용10 ?? "")
+        .input(
+          "요청일시",
+          moment(req.body.data[i].요청일시).format("YYYY-MM-DD HH:mm:ss") ?? ""
+        )
         .input("비고", req.body.data[i].비고 ?? "")
         .input("등록자", req.body.user ?? "")
         .input(
@@ -767,12 +791,13 @@ router.post("/insertAll", async (req, res) => {
           ,[PCISP_CONTENT8]
           ,[PCISP_CONTENT9]
           ,[PCISP_CONTENT10]
+          ,[PCISP_REQUEST_DT]
           ,[PCISP_NOTE]
           ,[PCISP_REGIST_NM]
           ,[PCISP_REGIST_DT])
         VALUES
           (@생산실적NO,@구분,@샘플수량,@입고수량,@결과,@내용1,@내용2,@내용3,@내용4,@내용5,
-            @내용6,@내용7,@내용8,@내용9,@내용10,@비고,@등록자,@등록일시)
+            @내용6,@내용7,@내용8,@내용9,@내용10,@요청일시,@비고,@등록자,@등록일시)
       `);
 
       // 로그기록 저장
@@ -900,6 +925,7 @@ router.post("/delete", async (req, res) => {
           ,[PCISP_CONTENT8] AS 내용8
           ,[PCISP_CONTENT9] AS 내용9
           ,[PCISP_CONTENT10] AS 내용10
+          ,CONVERT(varchar,[PCISP_REQUEST_DT],20) AS 요청일시
           ,[PCISP_NOTE] AS 비고
           ,[PCISP_REGIST_NM] AS 등록자
           ,[PCISP_REGIST_DT] AS 등록일시

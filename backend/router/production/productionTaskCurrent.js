@@ -731,13 +731,14 @@ router.post("/result/insert", async (req, res) => {
           ,[PCISP_CONTENT8]
           ,[PCISP_CONTENT9]
           ,[PCISP_CONTENT10]
+          ,[PCISP_REQUEST_DT]
           ,[PCISP_NOTE]
           ,[PCISP_REGIST_NM]
           ,[PCISP_REGIST_DT])
         VALUES
           ((SELECT MAX([PDRS_PK]) FROM [QMES2022].[dbo].[MANAGE_PRODUCE_RESULT_TB])
             ,'' ,'' ,@입고수 ,'미검사' ,'' ,'' ,'' ,'' ,'' ,'' ,'' ,'' ,'' ,''
-            ,@비고 ,@등록자 ,@등록일시)
+            ,GETDATE(),@비고 ,@등록자 ,@등록일시)
     `);
 
     // 로그기록 저장
