@@ -4,9 +4,10 @@ import LoadingIcon from "../../../base-components/LoadingIcon";
 
 const props = defineProps<{
   name?: string;
-  running?: boolean;
+  running?: string;
   product?: string;
   worker?: string;
+  time?: string;
 }>();
 </script>
 
@@ -18,7 +19,7 @@ const props = defineProps<{
         'before:content-[\'\'] before:w-[90%] before:shadow-[0px_3px_20px_#0000000b] before:bg-slate-50 before:h-full before:mt-3 before:absolute before:rounded-md before:mx-auto before:inset-x-0 before:dark:bg-darkmode-400/70',
       ]"
     >
-      <div class="p-4 box h-44 bg-gray-600" v-if="running == false">
+      <div class="p-4 box h-44 bg-gray-600" v-if="running == '미가동'">
         <div class="p-1 text-3xl bg-gray-400">
           <strong>{{ props.name }}</strong>
         </div>
@@ -29,17 +30,25 @@ const props = defineProps<{
         </div>
       </div>
 
-      <div class="p-4 box h-44 bg-cyan-500" v-if="running == true">
+      <div class="p-4 box h-44 bg-lime-500" v-if="running == '가동중'">
         <div class="p-1 text-3xl bg-slate-200">
           <strong>{{ props.name }}</strong>
         </div>
         <div class="flex text-2xl mt-2">
           <div class="flex m-auto items-center">
-            <div><strong>가동중</strong></div>
+            <div>
+              <img
+                class="w-5 h-5 mr-1 mb-0.5"
+                src="../../../assets/images/running.gif"
+              />
+            </div>
+            <div>
+              <strong>가동중</strong>
+            </div>
           </div>
         </div>
 
-        <div class="flex text-xl mt-2 text-slate-200">
+        <div class="flex text-xl mt-2">
           <div class="flex m-auto items-center">
             <div>
               <strong>{{ props.product }}</strong>
@@ -47,9 +56,38 @@ const props = defineProps<{
           </div>
         </div>
         <div class="flex text-xl mt-2">
+          <div class="flex m-auto items-center text-white">
+            <div>
+              <strong>{{ props.time }} - {{ props.worker }}</strong>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="p-4 box h-44 bg-orange-500" v-if="running == '비가동'">
+        <div class="p-1 text-3xl bg-slate-200">
+          <strong>{{ props.name }}</strong>
+        </div>
+        <div class="flex text-2xl mt-2">
+          <div class="flex m-auto items-center">
+            <div><Lucide class="w-6 h-6 mb-1" icon="Pause" /></div>
+            <div>
+              <strong>비가동</strong>
+            </div>
+          </div>
+        </div>
+
+        <div class="flex text-xl mt-2">
           <div class="flex m-auto items-center">
             <div>
-              <strong>{{ props.worker }}</strong>
+              <strong>{{ props.product }}</strong>
+            </div>
+          </div>
+        </div>
+        <div class="flex text-xl mt-2">
+          <div class="flex m-auto items-center text-white">
+            <div>
+              <strong>{{ props.time }} - {{ props.worker }}</strong>
             </div>
           </div>
         </div>

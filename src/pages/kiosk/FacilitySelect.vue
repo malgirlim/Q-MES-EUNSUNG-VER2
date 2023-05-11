@@ -103,68 +103,78 @@ const year = ref(moment().format("YYYY"));
       <div class="grid grid-cols-4 gap-6">
         <FacilityCard
           name="인쇄기1"
-          :running="true"
+          running="가동중"
           product="제품1"
           worker="박명한"
+          time="2023-05-11 12:34"
           @click="$router.push('/kiosk/facility1/')"
         />
         <FacilityCard
           name="인쇄기2"
-          :running="true"
+          running="가동중"
           product="제품2"
           worker="고범석"
+          time="2023-05-11 12:34"
         />
         <FacilityCard
           name="인쇄기3"
-          :running="false"
+          running="비가동"
           product="제품3"
           worker="윤호상"
+          time="2023-05-11 12:34"
         />
         <FacilityCard
           name="인쇄기4"
-          :running="true"
+          running="가동중"
           product="제품4"
           worker="강민철"
+          time="2023-05-11 12:34"
         />
       </div>
       <div class="grid grid-cols-4 gap-6 mt-10">
         <FacilityCard
           name="인쇄기5"
-          :running="false"
+          running="미가동"
           product="제품5"
           worker="김주현"
+          time="2023-05-11 12:34"
         />
         <FacilityCard
           name="인쇄기6"
-          :running="true"
+          running="가동중"
           product="제품6"
           worker="송은아"
+          time="2023-05-11 12:34"
         />
         <FacilityCard
           name="인쇄기7"
-          :running="true"
+          running="가동중"
           product="제품7"
           worker="사은미"
+          time="2023-05-11 12:34"
         />
         <FacilityCard
           name="인쇄기8"
-          :running="true"
+          running="비가동"
           product="제품8"
           worker="이훈노"
+          time="2023-05-11 12:34"
         />
       </div>
       <div class="grid grid-cols-4 gap-6 mt-10">
         <FacilityCard
           name="검사기"
-          :running="false"
+          running="가동중"
           product="제품9"
           worker="최순우"
+          time="2023-05-11 12:34"
         />
         <FacilityCard
           name="제판기"
-          :running="true"
+          running="미가동"
           product="제품10"
           worker="손정일"
+          time="2023-05-11 12:34"
         />
       </div>
     </div>

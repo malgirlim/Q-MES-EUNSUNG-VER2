@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { getCurrentInstance, onMounted, ref, Ref } from "vue";
+import { getCurrentInstance, onMounted, ref, Ref, watch } from "vue";
 import _ from "lodash";
 import { FormLabel } from "../../../base-components/Form";
 
@@ -59,6 +59,48 @@ const setLogoutModal = (value: boolean) => {
 // 날짜 구하기
 const now = ref(moment().format("YYYY-MM-DD HH:mm:ss"));
 const year = ref(moment().format("YYYY"));
+
+// 불량, 양품
+const num_show = ref("0");
+
+let num_bad = ref("27");
+let num_good: any = ref(
+  Number(num_show.value.replace(/,/g, "")) - Number(num_bad.value)
+);
+
+// 키패드
+const num = ref("0");
+let num_split = [];
+let num_dot = ".";
+
+const insert_num = (numpad_value: any) => {
+  if (num.value == "0") num.value = "" + numpad_value;
+  else if (num.value.length < 13) num.value += numpad_value;
+};
+
+const insert_dot = () => {
+  const dot_count = num.value.split(".").length - 1;
+  if (dot_count < 1 && num.value.length < 13) num.value += ".";
+};
+
+const delete_num = () => {
+  if (num.value.length > 1) num.value = num.value.slice(0, -1);
+  else num.value = "0";
+};
+watch([num], (newValue, oldValue) => {
+  num_split = num.value.split(".");
+  if (num_split[1] == undefined) {
+    num_split[1] = "";
+    num_dot = "";
+  } else num_dot = ".";
+  num_show.value = Number(num_split[0]).toLocaleString();
+  if (num_split[1] != undefined || num_split[1] != "")
+    num_show.value += num_dot;
+  num_show.value += num_split[1];
+  num_good.value = (
+    Number(num_show.value.replace(/,/g, "")) - Number(num_bad.value)
+  ).toLocaleString();
+});
 </script>
 
 <template>
@@ -131,7 +173,8 @@ const year = ref(moment().format("YYYY"));
       </div>
     </div>
     <div class="p-1 mt-3 text-center text-xl intro-y">
-      <strong>인쇄기1 설비 작업현황</strong>
+      <div><strong>인쇄기1 설비 작업현황</strong></div>
+      <div><strong>인쇄기1 설비 작업현황</strong></div>
     </div>
     <div
       class="p-2 mt-3 border-2 border-[#3a437c] text-center text-xl rounded-md bg-white intro-y"
@@ -155,7 +198,20 @@ const year = ref(moment().format("YYYY"));
           <div class="pl-1 pr-1 pt-1 bg-primary text-white">
             <strong>생산실적</strong>
           </div>
-          <div class="border-2 border-primary" style="height: 279px"></div>
+          <div class="border-2 border-primary" style="height: 279px">
+            <div class="flex ml-2 mt-2 text-2xl text-left">
+              <div class="mr-2">생산수 :</div>
+              <div class="">{{ num_show }}</div>
+            </div>
+            <div class="flex ml-2 mt-2 text-2xl text-left">
+              <div class="mr-2">불량수 :</div>
+              <div class="">{{ num_bad }}</div>
+            </div>
+            <div class="flex ml-2 mt-2 text-2xl text-left">
+              <div class="mr-2">양품수 :</div>
+              <div class="">{{ num_good }}</div>
+            </div>
+          </div>
         </div>
       </div>
       <div class="grid grid-cols-4 gap-2 mt-2">
@@ -182,48 +238,70 @@ const year = ref(moment().format("YYYY"));
             <strong>생산수입력</strong>
           </div>
           <div class="border-2 border-primary" style="height: 279px">
-            <div class="grid grid-cols-3">
-              <div class="cols-span-1 mt-3">
-                <Button class="w-32 text-4xl">7</Button>
+            <div class="grid grid-cols-3 mt-4">
+              <div class="cols-span-1">
+                <Button class="w-32 text-4xl" @click="insert_num('1')"
+                  >1</Button
+                >
               </div>
               <div class="cols-span-1">
-                <Button class="w-32 text-4xl">8</Button>
+                <Button class="w-32 text-4xl" @click="insert_num('2')"
+                  >2</Button
+                >
               </div>
               <div class="cols-span-1">
-                <Button class="w-32 text-4xl">9</Button>
-              </div>
-            </div>
-            <div class="grid grid-cols-3 mt-1">
-              <div class="cols-span-1">
-                <Button class="w-32 text-4xl">4</Button>
-              </div>
-              <div class="cols-span-1">
-                <Button class="w-32 text-4xl">5</Button>
-              </div>
-              <div class="cols-span-1">
-                <Button class="w-32 text-4xl">6</Button>
+                <Button class="w-32 text-4xl" @click="insert_num('3')"
+                  >3</Button
+                >
               </div>
             </div>
             <div class="grid grid-cols-3 mt-1">
               <div class="cols-span-1">
-                <Button class="w-32 text-4xl">1</Button>
+                <Button class="w-32 text-4xl" @click="insert_num('4')"
+                  >4</Button
+                >
               </div>
               <div class="cols-span-1">
-                <Button class="w-32 text-4xl">2</Button>
+                <Button class="w-32 text-4xl" @click="insert_num('5')"
+                  >5</Button
+                >
               </div>
               <div class="cols-span-1">
-                <Button class="w-32 text-4xl">3</Button>
+                <Button class="w-32 text-4xl" @click="insert_num('6')"
+                  >6</Button
+                >
               </div>
             </div>
             <div class="grid grid-cols-3 mt-1">
               <div class="cols-span-1">
-                <Button class="w-32 text-4xl">AC</Button>
+                <Button class="w-32 text-4xl" @click="insert_num('7')"
+                  >7</Button
+                >
               </div>
               <div class="cols-span-1">
-                <Button class="w-32 text-4xl">0</Button>
+                <Button class="w-32 text-4xl" @click="insert_num('8')"
+                  >8</Button
+                >
               </div>
               <div class="cols-span-1">
-                <Button class="w-32 text-4xl">DEL</Button>
+                <Button class="w-32 text-4xl" @click="insert_num('9')"
+                  >9</Button
+                >
+              </div>
+            </div>
+            <div class="grid grid-cols-3 mt-1">
+              <div class="cols-span-1">
+                <Button class="w-32 text-4xl" @click="insert_dot()">.</Button>
+              </div>
+              <div class="cols-span-1">
+                <Button class="w-32 text-4xl" @click="insert_num('0')"
+                  >0</Button
+                >
+              </div>
+              <div class="cols-span-1">
+                <Button class="w-32 text-4xl" @click="delete_num()"
+                  ><Lucide icon="Delete" class="w-10 h-10 mx-auto text-info"
+                /></Button>
               </div>
             </div>
           </div>
