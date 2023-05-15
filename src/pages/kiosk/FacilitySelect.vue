@@ -186,18 +186,18 @@ const year = ref(moment().format("YYYY"));
   <!-- END: FOOTER(COPYRIGHT) -->
 
   <!-- BEGIN: 로그아웃 확인 Modal -->
-  <Dialog :open="logoutModal" @close="setLogoutModal(false)">
+  <Dialog :open="logoutModal" size="lg" @close="setLogoutModal(false)">
     <Dialog.Panel>
       <div class="p-5 text-center">
-        <Lucide icon="LogOut" class="w-16 h-16 mx-auto mt-3 text-danger" />
-        <div class="mt-5 text-xl">로그아웃 하시겠습니까?</div>
+        <Lucide icon="LogOut" class="w-32 h-32 mx-auto mt-3 text-danger" />
+        <div class="mt-10 text-3xl">로그아웃 하시겠습니까?</div>
       </div>
 
-      <div class="px-5 pb-8 text-center">
+      <div class="mt-10 px-5 pb-8 text-center">
         <Button
           variant="outline-secondary"
           type="button"
-          class="w-24 mr-3"
+          class="w-48 mr-10 text-2xl"
           @click="setLogoutModal(false)"
         >
           취소
@@ -212,7 +212,7 @@ const year = ref(moment().format("YYYY"));
               logout();
             }
           "
-          class="w-24 mr-1"
+          class="w-48 text-2xl"
         >
           확인
         </Button>

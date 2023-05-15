@@ -8,7 +8,7 @@ import Login from "../pages/Login.vue";
 
 import LoginKiosk from "../pages/LoginKiosk.vue";
 import FacilitySelect from "../pages/kiosk/FacilitySelect.vue";
-import KioskFacility1Main from "../pages/kiosk/Facility1/Main.vue";
+import KioskFacility1 from "../pages/kiosk/Facility1.vue";
 
 import ShareNotice from "../pages/share/ShareNotice.vue";
 
@@ -121,7 +121,7 @@ const routes = [
   },
   {
     path: "/kiosk/facility1",
-    component: KioskFacility1Main,
+    component: KioskFacility1,
   },
   {
     path: "/",

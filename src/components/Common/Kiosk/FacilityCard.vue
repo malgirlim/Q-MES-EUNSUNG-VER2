@@ -35,16 +35,12 @@ const props = defineProps<{
           <strong>{{ props.name }}</strong>
         </div>
         <div class="flex text-2xl mt-2">
-          <div class="flex m-auto items-center">
-            <div>
-              <img
-                class="w-5 h-5 mr-1 mb-0.5"
-                src="../../../assets/images/running.gif"
-              />
-            </div>
-            <div>
-              <strong>가동중</strong>
-            </div>
+          <div class="flex m-auto">
+            <img
+              class="h-7 mr-1 mb-0.5"
+              src="../../../assets/images/running_gear.gif"
+            />
+            <strong>가동중</strong>
           </div>
         </div>
 
@@ -69,11 +65,12 @@ const props = defineProps<{
           <strong>{{ props.name }}</strong>
         </div>
         <div class="flex text-2xl mt-2">
-          <div class="flex m-auto items-center">
-            <div><Lucide class="w-6 h-6 mb-1" icon="Pause" /></div>
-            <div>
-              <strong>비가동</strong>
-            </div>
+          <div class="flex m-auto">
+            <img
+              class="h-7 mr-1 mb-0.5"
+              src="../../../assets/images/standby_gear.png"
+            />
+            <strong>비가동</strong>
           </div>
         </div>
 
