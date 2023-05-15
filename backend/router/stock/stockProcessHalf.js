@@ -35,240 +35,73 @@ router.get("/", async (req, res) => {
     const Pool = await pool;
     const result = await Pool.request().query(`
       SELECT
-        [ITPC_PK] AS NO
-        ,[ITPC_DIV] AS 구분
-        ,[ITPC_INST_PRCS_ITEM_PK] AS 지시공정자재NO
-        ,INST_PRCS_ITEM.공정명 AS 공정
-        ,[ITPC_ITEM_RECEIVE_PK] AS 품목입고NO
-        ,ITEM_RECEIVE.입고코드 AS 입고코드
-        ,ITEM_RECEIVE.품목구분 AS 품목구분
-        ,ITEM_RECEIVE.품번 AS 품번
-        ,ITEM_RECEIVE.품명 AS 품명
-        ,ITEM_RECEIVE.규격 AS 규격
-        ,ITEM_RECEIVE.단위 AS 단위
-        ,[ITPC_AMOUNT] AS 수량
-        ,[ITPC_DT] AS 불출일시
-        ,[ITPC_NOTE] AS 비고
-        ,[ITPC_REGIST_NM] AS 등록자
-        ,[ITPC_REGIST_DT] AS 등록일시
-      FROM [QMES2022].[dbo].[MANAGE_ITEM_PROCESS_TB]
+        [ISPCI_PK] AS NO
+        ,[ISPCI_DIV] AS 구분
+        ,[ISPCI_INSTRUCT_PROCESS_PK] AS 작업지시공정NO
+        ,INSTRUCT_PROCESS.작업코드 AS 작업코드
+        ,INSTRUCT_PROCESS.공정명 AS 공정
+        ,[ISPCI_ITEM_PK] AS 품목NO
+        ,[ISPCI_LOTCODE] AS LOT코드
+        ,ITEM.품목구분 AS 품목구분
+        ,ITEM.품번 AS 품번
+        ,ITEM.품명 AS 품명
+        ,ITEM.규격 AS 규격
+        ,ITEM.단위 AS 단위
+        ,[ISPCI_AMOUNT] AS 수량
+        ,CONVERT(varchar, [ISPCI_DT], 20) AS 불출일시
+        ,[ISPCI_NOTE] AS 비고
+        ,[ISPCI_REGIST_NM] AS 등록자
+        ,[ISPCI_REGIST_DT] AS 등록일시
+      FROM [QMES2022].[dbo].[MANAGE_INSTRUCT_PROCESS_ITEM_TB]
       LEFT JOIN
       (
         SELECT
-          [ISPCI_PK] AS NO
-          ,[ISPCI_INSTRUCT_PROCESS_PK] AS 지시공정NO
-          ,INST_PROCESS.공정명 AS 공정명
-        FROM [QMES2022].[dbo].[MANAGE_INSTRUCT_PROCESS_ITEM_TB]
+          [ISPC_PK] AS NO
+          ,[ISPC_WORK_INSTRUCT_PK] AS 작업지시NO
+          ,WORK_INSTRUCT.작업코드 AS 작업코드
+          ,[ISPC_PROCESS_PK] AS 공정NO
+          ,PROCESS.공정명 AS 공정명
+        FROM [QMES2022].[dbo].[MANAGE_INSTRUCT_PROCESS_TB]
         LEFT JOIN
         (
           SELECT
-            [ISPC_PK] AS NO
-            ,[ISPC_PROCESS_PK] AS 공정NO
-            ,ISPC_PROCESS.공정명 AS 공정명
-          FROM [QMES2022].[dbo].[MANAGE_INSTRUCT_PROCESS_TB]
-          LEFT JOIN
-          (
-            SELECT
-              [PRCS_PK] AS NO
-              ,[PRCS_NAME] AS 공정명
-            FROM [QMES2022].[dbo].[MASTER_PROCESS_TB]
-          ) AS ISPC_PROCESS ON ISPC_PROCESS.NO = [ISPC_PROCESS_PK]
-        ) AS INST_PROCESS ON INST_PROCESS.NO = [ISPCI_INSTRUCT_PROCESS_PK]
-      ) AS INST_PRCS_ITEM ON INST_PRCS_ITEM.NO = [ITPC_INST_PRCS_ITEM_PK]
+            [WKIS_PK] AS NO
+            ,[WKIS_CODE] AS 작업코드
+          FROM [QMES2022].[dbo].[MANAGE_WORK_INSTRUCT_TB]
+        ) AS WORK_INSTRUCT ON WORK_INSTRUCT.NO = [ISPC_WORK_INSTRUCT_PK]
+        LEFT JOIN
+        (
+          SELECT
+            [PRCS_PK] AS NO
+            ,[PRCS_NAME] AS 공정명
+          FROM [QMES2022].[dbo].[MASTER_PROCESS_TB]
+        ) AS PROCESS ON PROCESS.NO = [ISPC_PROCESS_PK]
+      ) AS INSTRUCT_PROCESS ON INSTRUCT_PROCESS.NO = [ISPCI_INSTRUCT_PROCESS_PK]
       LEFT JOIN
       (
         SELECT
-          [ITRC_PK] AS NO
-          ,[ITRC_PRODUCE_RESULT_PK] AS 생산실적NO
-          ,[ITRC_PROCESS_INSPECT_PK] AS 공정검사NO
-          ,[ITRC_DEFECT_REWORK_PK] AS 불량재작업NO
-          ,[ITRC_IMPORT_INSPECT_PK] AS 수입검사NO
-          ,[ITRC_DIV] AS 구분
-          ,CONVERT(VARCHAR, [ITRC_DT], 20) AS 입고일시
-          ,[ITRC_CODE] AS 입고코드
-          ,COALESCE(IMPORT_INSPECT.발주품목구분, PROCESS_INSPECT.품목구분) AS 품목구분
-          ,COALESCE(IMPORT_INSPECT.발주품번, PROCESS_INSPECT.품번) AS 품번
-          ,COALESCE(IMPORT_INSPECT.발주품명, PROCESS_INSPECT.품명) AS 품명
-          ,COALESCE(IMPORT_INSPECT.발주규격, PROCESS_INSPECT.규격) AS 규격
-          ,COALESCE(IMPORT_INSPECT.발주단위, PROCESS_INSPECT.단위) AS 단위
-          ,[ITRC_AMOUNT] AS 입고수
-          ,CONVERT(VARCHAR,[ITRC_EXPIRE_DATE], 23) AS 유효일자
-          ,[ITRC_NOTE] AS 비고
-          ,[ITRC_REGIST_NM] AS 등록자
-          ,[ITRC_REGIST_DT] AS 등록일시
-        FROM [QMES2022].[dbo].[MANAGE_ITEM_RECEIVE_TB]
+          [ITEM_PK] AS NO
+          ,[ITEM_CLIENT_PK] AS 거래처NO
+          ,CLIENT.거래처명 AS 거래처명
+          ,[ITEM_DIV] AS 품목구분
+          ,[ITEM_PRODUCT_NUM] AS 품번
+          ,[ITEM_NAME] AS 품명
+          ,[ITEM_CAR] AS 차종
+          ,[ITEM_SIZE] AS 규격
+          ,[ITEM_UNIT] AS 단위
+          ,[ITEM_SAFE] AS 안전재고
+          ,[ITEM_COST] AS 단가
+        FROM [QMES2022].[dbo].[MASTER_ITEM_TB]
         LEFT JOIN
         (
           SELECT
-            [IPISP_PK] AS NO
-            ,[IPISP_ORDER_PK] AS 발주NO
-            ,ORDERORDER.발주코드 AS 발주코드
-            ,ORDERORDER.품목구분 AS 발주품목구분
-            ,ORDERORDER.품번 AS 발주품번
-            ,ORDERORDER.품명 AS 발주품명
-            ,ORDERORDER.규격 AS 발주규격
-            ,ORDERORDER.단위 AS 발주단위
-            ,[IPISP_DIV] AS 구분
-            ,[IPISP_SAMPLE_AMT] AS 샘플수량
-            ,[IPISP_RECEIVE_AMT] AS 입고수량
-            ,[IPISP_RESULT] AS 결과
-            ,[IPISP_INFO] AS 전달사항
-          FROM [QMES2022].[dbo].[MANAGE_IMPORT_INSPECT_TB]
-          LEFT JOIN
-          (
-            SELECT
-              [ORDR_PK] AS NO
-              ,[ORDR_ACCEPT_PK] AS 수주NO
-              ,[ORDR_CODE] AS 발주코드
-              ,[ORDR_DIV] AS 발주구분
-              ,CONVERT(varchar, [ORDR_DATE], 23) AS 발주일자
-              ,[ORDR_CLIENT_PK] AS 거래처NO
-              ,CLIENT.거래처명 AS 거래처명
-              ,[ORDR_ITEM_PK] AS 품목NO
-              ,ITEM.품목구분 AS 품목구분
-              ,ITEM.품번 AS 품번
-              ,ITEM.품명 AS 품명
-              ,ITEM.규격 AS 규격
-              ,ITEM.단위 AS 단위
-              ,[ORDR_AMOUNT] AS 수량
-            FROM [QMES2022].[dbo].[MANAGE_ORDER_TB]
-            LEFT JOIN
-            (
-              SELECT
-                [CLNT_PK] AS NO
-                ,[CLNT_NAME] AS 거래처명
-              FROM [QMES2022].[dbo].[MASTER_CLIENT_TB]
-            ) AS CLIENT ON CLIENT.NO = [ORDR_CLIENT_PK]
-            LEFT JOIN
-            (
-              SELECT
-                [ITEM_PK] AS NO
-                ,[ITEM_DIV] AS 품목구분
-                ,[ITEM_PRODUCT_NUM] AS 품번
-                ,[ITEM_NAME] AS 품명
-                ,[ITEM_SIZE] AS 규격
-                ,[ITEM_UNIT] AS 단위
-              FROM [QMES2022].[dbo].[MASTER_ITEM_TB]
-            ) AS ITEM ON ITEM.NO = [ORDR_ITEM_PK]
-          ) AS ORDERORDER ON ORDERORDER.NO = [IPISP_ORDER_PK]
-        ) AS IMPORT_INSPECT ON IMPORT_INSPECT.NO = [ITRC_IMPORT_INSPECT_PK]
-        LEFT JOIN
-        (
-          SELECT
-            [PCISP_PK] AS NO
-            ,[PCISP_PRODUCE_RESULT_PK] AS 생산실적NO
-            ,PRODUCE_RESULT.작업코드 AS 작업코드
-            ,PRODUCE_RESULT.공정 AS 공정
-            ,PRODUCE_RESULT.품목구분 AS 품목구분
-            ,PRODUCE_RESULT.품번 AS 품번
-            ,PRODUCE_RESULT.품명 AS 품명
-            ,PRODUCE_RESULT.규격 AS 규격
-            ,PRODUCE_RESULT.단위 AS 단위
-            ,PRODUCE_RESULT.특이사항 AS 특이사항
-            ,[PCISP_DIV] AS 구분
-            ,[PCISP_SAMPLE_AMT] AS 샘플수량
-            ,[PCISP_RECEIVE_AMT] AS 입고수량
-            ,[PCISP_RESULT] AS 결과
-          FROM [QMES2022].[dbo].[MANAGE_PROCESS_INSPECT_TB]
-          LEFT JOIN
-          (
-            SELECT
-              [PDRS_PK] AS NO
-              ,[PDRS_INST_PROCESS_PK] AS 지시공정NO
-              ,INSTRUCT_PROCESS.작업코드 AS 작업코드
-              ,INSTRUCT_PROCESS.품목구분 AS 품목구분
-              ,INSTRUCT_PROCESS.품번 AS 품번
-              ,INSTRUCT_PROCESS.품명 AS 품명
-              ,INSTRUCT_PROCESS.규격 AS 규격
-              ,INSTRUCT_PROCESS.단위 AS 단위
-              ,INSTRUCT_PROCESS.공정명 AS 공정
-              ,INSTRUCT_PROCESS.시작일 AS 시작일
-              ,[PDRS_USER_ID] AS 작업자ID
-              ,RESULT_USER.이름 AS 작업자
-              ,[PDRS_FACILITY_PK] AS 설비NO
-              ,RESULT_FACILITY.설비명 AS 설비명
-              ,CONVERT(VARCHAR, [PDRS_START_DT], 20) AS 시작일시
-              ,CONVERT(VARCHAR, [PDRS_END_DT], 20) AS 종료일시
-              ,[PDRS_REPORT] AS 특이사항
-            FROM [QMES2022].[dbo].[MANAGE_PRODUCE_RESULT_TB]
-            LEFT JOIN
-            (
-              SELECT
-                [ISPC_PK] AS NO
-                ,[ISPC_WORK_INSTRUCT_PK] AS 작업지시NO
-                ,WORK_INSTRUCT.코드 AS 작업코드
-                ,[ISPC_ITEM_PK] AS 품목NO
-                ,ITEM.구분 AS 품목구분
-                ,ITEM.품번 AS 품번
-                ,ITEM.품명 AS 품명
-                ,ITEM.규격 AS 규격
-                ,ITEM.단위 AS 단위
-                ,[ISPC_AMOUNT] AS 지시수량
-                ,WORK_INSTRUCT.시작일 AS 시작일
-                ,[ISPC_PROCESS_PK] AS 공정NO
-                ,PROCESS.공정명 AS 공정명
-                ,[ISPC_CONDITION] AS 진행상황
-              FROM [QMES2022].[dbo].[MANAGE_INSTRUCT_PROCESS_TB]
-              LEFT JOIN
-              (
-                SELECT
-                  [WKIS_PK] AS NO
-                  ,[WKIS_CODE] AS 코드
-                  ,[WKIS_PRODUCE_PLAN_PK] AS 생산계획NO
-                  ,[WKIS_ITEM_PK] AS 품목NO
-                  ,[WKIS_AMOUNT] AS 수량
-                  ,LEFT([WKIS_START_DATE],10) AS 시작일
-                FROM [QMES2022].[dbo].[MANAGE_WORK_INSTRUCT_TB]
-              ) AS WORK_INSTRUCT ON WORK_INSTRUCT.NO = [ISPC_WORK_INSTRUCT_PK]
-              LEFT JOIN
-              (
-                SELECT
-                  [PRCS_PK] AS NO
-                  ,[PRCS_CODE] AS 코드
-                  ,[PRCS_DIV] AS 구분
-                  ,[PRCS_NAME] AS 공정명
-                  ,[PRCS_CONTENT] AS 내용
-                  ,[PRCS_FACILITY] AS 설비
-                FROM [QMES2022].[dbo].[MASTER_PROCESS_TB]
-              ) AS PROCESS ON PROCESS.NO = [ISPC_PROCESS_PK]
-              LEFT JOIN
-              (
-                SELECT
-                  [ITEM_PK] AS NO
-                  ,[ITEM_DIV] AS 구분
-                  ,[ITEM_PRODUCT_NUM] AS 품번
-                  ,[ITEM_NAME] AS 품명
-                  ,[ITEM_SIZE] AS 규격
-                  ,[ITEM_UNIT] AS 단위
-                FROM [QMES2022].[dbo].[MASTER_ITEM_TB]
-              ) AS ITEM ON ITEM.NO = [ISPC_ITEM_PK]
-            ) AS INSTRUCT_PROCESS ON INSTRUCT_PROCESS.NO = [PDRS_INST_PROCESS_PK]
-            LEFT JOIN
-            (
-              SELECT
-                [FCLT_PK] AS NO
-                ,[FCLT_NAME] AS 설비명
-                ,[FCLT_LINE] AS 라인
-                ,[FCLT_SIZE] AS 규격
-              FROM [QMES2022].[dbo].[MASTER_FACILITY_TB]
-            ) AS RESULT_FACILITY ON RESULT_FACILITY.NO = [PDRS_FACILITY_PK]
-            LEFT JOIN
-            (
-              SELECT
-                [USER_ID] AS 아이디,
-                [USER_NAME] AS 이름,
-                [USER_PHONE] AS 연락처,
-                [USER_EMAIL] AS 이메일,
-                [USER_DEPART] AS 부서명,
-                [USER_POSITION] AS 직책,
-                [USER_RANK] AS 직급
-              FROM [QMES2022].[dbo].[MASTER_USER_TB]
-            ) AS RESULT_USER ON RESULT_USER.아이디 = [PDRS_USER_ID]
-          ) AS PRODUCE_RESULT ON PRODUCE_RESULT.NO = [PCISP_PRODUCE_RESULT_PK]
-        ) AS PROCESS_INSPECT ON PROCESS_INSPECT.NO = [ITRC_PROCESS_INSPECT_PK]
-      ) AS ITEM_RECEIVE ON ITEM_RECEIVE.NO = [ITPC_ITEM_RECEIVE_PK]
-      WHERE ITEM_RECEIVE.품목구분 = '반제품'
-      ORDER BY [ITPC_PK] DESC
+            [CLNT_PK] AS NO
+            ,[CLNT_NAME] AS 거래처명
+          FROM [QMES2022].[dbo].[MASTER_CLIENT_TB]
+        ) AS CLIENT ON CLIENT.NO = [ITEM_CLIENT_PK]
+      ) AS ITEM ON ITEM.NO = [ISPCI_ITEM_PK]
+      WHERE ITEM.품목구분 = '반제품'
+      ORDER BY [ISPCI_PK] DESC
     `);
 
     // 로그기록 저장
@@ -300,244 +133,77 @@ router.post("/", async (req, res) => {
       sql =
         `
         SELECT
-          NO AS NO, 구분 AS 구분, 지시공정자재NO AS 지시공정자재NO, 공정 AS 공정, 품목입고NO AS 품목입고NO,
-          입고코드 AS 입고코드, 품목구분 AS 품목구분, 품번 AS 품번, 품명 AS 품명, 규격 AS 규격, 단위 AS 단위,
-          수량 AS 수량, 불출일시 AS 불출일시, 비고 AS 비고, 등록자 AS 등록자, 등록일시 AS 등록일시
+          NO AS NO, 구분 AS 구분, 작업지시공정NO AS 작업지시공정NO, 작업코드 AS 작업코드, 공정 AS 공정,
+          품목NO AS 품목NO, LOT코드 AS LOT코드, 품목구분 AS 품목구분, 품번 AS 품번, 품명 AS 품명, 규격 AS 규격,
+          단위 AS 단위, 수량 AS 수량, 불출일시 AS 불출일시, 비고 AS 비고, 등록자 AS 등록자, 등록일시 AS 등록일시
         FROM(
           SELECT
-            [ITPC_PK] AS NO
-            ,[ITPC_DIV] AS 구분
-            ,[ITPC_INST_PRCS_ITEM_PK] AS 지시공정자재NO
-            ,INST_PRCS_ITEM.공정명 AS 공정
-            ,[ITPC_ITEM_RECEIVE_PK] AS 품목입고NO
-            ,ITEM_RECEIVE.입고코드 AS 입고코드
-            ,ITEM_RECEIVE.품목구분 AS 품목구분
-            ,ITEM_RECEIVE.품번 AS 품번
-            ,ITEM_RECEIVE.품명 AS 품명
-            ,ITEM_RECEIVE.규격 AS 규격
-            ,ITEM_RECEIVE.단위 AS 단위
-            ,[ITPC_AMOUNT] AS 수량
-            ,[ITPC_DT] AS 불출일시
-            ,[ITPC_NOTE] AS 비고
-            ,[ITPC_REGIST_NM] AS 등록자
-            ,[ITPC_REGIST_DT] AS 등록일시
-          FROM [QMES2022].[dbo].[MANAGE_ITEM_PROCESS_TB]
+            [ISPCI_PK] AS NO
+            ,[ISPCI_DIV] AS 구분
+            ,[ISPCI_INSTRUCT_PROCESS_PK] AS 작업지시공정NO
+            ,INSTRUCT_PROCESS.작업코드 AS 작업코드
+            ,INSTRUCT_PROCESS.공정명 AS 공정
+            ,[ISPCI_ITEM_PK] AS 품목NO
+            ,[ISPCI_LOTCODE] AS LOT코드
+            ,ITEM.품목구분 AS 품목구분
+            ,ITEM.품번 AS 품번
+            ,ITEM.품명 AS 품명
+            ,ITEM.규격 AS 규격
+            ,ITEM.단위 AS 단위
+            ,[ISPCI_AMOUNT] AS 수량
+            ,CONVERT(varchar, [ISPCI_DT], 20) AS 불출일시
+            ,[ISPCI_NOTE] AS 비고
+            ,[ISPCI_REGIST_NM] AS 등록자
+            ,[ISPCI_REGIST_DT] AS 등록일시
+          FROM [QMES2022].[dbo].[MANAGE_INSTRUCT_PROCESS_ITEM_TB]
           LEFT JOIN
           (
             SELECT
-              [ISPCI_PK] AS NO
-              ,[ISPCI_INSTRUCT_PROCESS_PK] AS 지시공정NO
-              ,INST_PROCESS.공정명 AS 공정명
-            FROM [QMES2022].[dbo].[MANAGE_INSTRUCT_PROCESS_ITEM_TB]
+              [ISPC_PK] AS NO
+              ,[ISPC_WORK_INSTRUCT_PK] AS 작업지시NO
+              ,WORK_INSTRUCT.작업코드 AS 작업코드
+              ,[ISPC_PROCESS_PK] AS 공정NO
+              ,PROCESS.공정명 AS 공정명
+            FROM [QMES2022].[dbo].[MANAGE_INSTRUCT_PROCESS_TB]
             LEFT JOIN
             (
               SELECT
-                [ISPC_PK] AS NO
-                ,[ISPC_PROCESS_PK] AS 공정NO
-                ,ISPC_PROCESS.공정명 AS 공정명
-              FROM [QMES2022].[dbo].[MANAGE_INSTRUCT_PROCESS_TB]
-              LEFT JOIN
-              (
-                SELECT
-                  [PRCS_PK] AS NO
-                  ,[PRCS_NAME] AS 공정명
-                FROM [QMES2022].[dbo].[MASTER_PROCESS_TB]
-              ) AS ISPC_PROCESS ON ISPC_PROCESS.NO = [ISPC_PROCESS_PK]
-            ) AS INST_PROCESS ON INST_PROCESS.NO = [ISPCI_INSTRUCT_PROCESS_PK]
-          ) AS INST_PRCS_ITEM ON INST_PRCS_ITEM.NO = [ITPC_INST_PRCS_ITEM_PK]
+                [WKIS_PK] AS NO
+                ,[WKIS_CODE] AS 작업코드
+              FROM [QMES2022].[dbo].[MANAGE_WORK_INSTRUCT_TB]
+            ) AS WORK_INSTRUCT ON WORK_INSTRUCT.NO = [ISPC_WORK_INSTRUCT_PK]
+            LEFT JOIN
+            (
+              SELECT
+                [PRCS_PK] AS NO
+                ,[PRCS_NAME] AS 공정명
+              FROM [QMES2022].[dbo].[MASTER_PROCESS_TB]
+            ) AS PROCESS ON PROCESS.NO = [ISPC_PROCESS_PK]
+          ) AS INSTRUCT_PROCESS ON INSTRUCT_PROCESS.NO = [ISPCI_INSTRUCT_PROCESS_PK]
           LEFT JOIN
           (
             SELECT
-              [ITRC_PK] AS NO
-              ,[ITRC_PRODUCE_RESULT_PK] AS 생산실적NO
-              ,[ITRC_PROCESS_INSPECT_PK] AS 공정검사NO
-              ,[ITRC_DEFECT_REWORK_PK] AS 불량재작업NO
-              ,[ITRC_IMPORT_INSPECT_PK] AS 수입검사NO
-              ,[ITRC_DIV] AS 구분
-              ,CONVERT(VARCHAR, [ITRC_DT], 20) AS 입고일시
-              ,[ITRC_CODE] AS 입고코드
-              ,COALESCE(IMPORT_INSPECT.발주품목구분, PROCESS_INSPECT.품목구분) AS 품목구분
-              ,COALESCE(IMPORT_INSPECT.발주품번, PROCESS_INSPECT.품번) AS 품번
-              ,COALESCE(IMPORT_INSPECT.발주품명, PROCESS_INSPECT.품명) AS 품명
-              ,COALESCE(IMPORT_INSPECT.발주규격, PROCESS_INSPECT.규격) AS 규격
-              ,COALESCE(IMPORT_INSPECT.발주단위, PROCESS_INSPECT.단위) AS 단위
-              ,[ITRC_AMOUNT] AS 입고수
-              ,CONVERT(VARCHAR,[ITRC_EXPIRE_DATE], 23) AS 유효일자
-              ,[ITRC_NOTE] AS 비고
-              ,[ITRC_REGIST_NM] AS 등록자
-              ,[ITRC_REGIST_DT] AS 등록일시
-            FROM [QMES2022].[dbo].[MANAGE_ITEM_RECEIVE_TB]
+              [ITEM_PK] AS NO
+              ,[ITEM_CLIENT_PK] AS 거래처NO
+              ,CLIENT.거래처명 AS 거래처명
+              ,[ITEM_DIV] AS 품목구분
+              ,[ITEM_PRODUCT_NUM] AS 품번
+              ,[ITEM_NAME] AS 품명
+              ,[ITEM_CAR] AS 차종
+              ,[ITEM_SIZE] AS 규격
+              ,[ITEM_UNIT] AS 단위
+              ,[ITEM_SAFE] AS 안전재고
+              ,[ITEM_COST] AS 단가
+            FROM [QMES2022].[dbo].[MASTER_ITEM_TB]
             LEFT JOIN
             (
               SELECT
-                [IPISP_PK] AS NO
-                ,[IPISP_ORDER_PK] AS 발주NO
-                ,ORDERORDER.발주코드 AS 발주코드
-                ,ORDERORDER.품목구분 AS 발주품목구분
-                ,ORDERORDER.품번 AS 발주품번
-                ,ORDERORDER.품명 AS 발주품명
-                ,ORDERORDER.규격 AS 발주규격
-                ,ORDERORDER.단위 AS 발주단위
-                ,[IPISP_DIV] AS 구분
-                ,[IPISP_SAMPLE_AMT] AS 샘플수량
-                ,[IPISP_RECEIVE_AMT] AS 입고수량
-                ,[IPISP_RESULT] AS 결과
-                ,[IPISP_INFO] AS 전달사항
-              FROM [QMES2022].[dbo].[MANAGE_IMPORT_INSPECT_TB]
-              LEFT JOIN
-              (
-                SELECT
-                  [ORDR_PK] AS NO
-                  ,[ORDR_ACCEPT_PK] AS 수주NO
-                  ,[ORDR_CODE] AS 발주코드
-                  ,[ORDR_DIV] AS 발주구분
-                  ,CONVERT(varchar, [ORDR_DATE], 23) AS 발주일자
-                  ,[ORDR_CLIENT_PK] AS 거래처NO
-                  ,CLIENT.거래처명 AS 거래처명
-                  ,[ORDR_ITEM_PK] AS 품목NO
-                  ,ITEM.품목구분 AS 품목구분
-                  ,ITEM.품번 AS 품번
-                  ,ITEM.품명 AS 품명
-                  ,ITEM.규격 AS 규격
-                  ,ITEM.단위 AS 단위
-                  ,[ORDR_AMOUNT] AS 수량
-                FROM [QMES2022].[dbo].[MANAGE_ORDER_TB]
-                LEFT JOIN
-                (
-                  SELECT
-                    [CLNT_PK] AS NO
-                    ,[CLNT_NAME] AS 거래처명
-                  FROM [QMES2022].[dbo].[MASTER_CLIENT_TB]
-                ) AS CLIENT ON CLIENT.NO = [ORDR_CLIENT_PK]
-                LEFT JOIN
-                (
-                  SELECT
-                    [ITEM_PK] AS NO
-                    ,[ITEM_DIV] AS 품목구분
-                    ,[ITEM_PRODUCT_NUM] AS 품번
-                    ,[ITEM_NAME] AS 품명
-                    ,[ITEM_SIZE] AS 규격
-                    ,[ITEM_UNIT] AS 단위
-                  FROM [QMES2022].[dbo].[MASTER_ITEM_TB]
-                ) AS ITEM ON ITEM.NO = [ORDR_ITEM_PK]
-              ) AS ORDERORDER ON ORDERORDER.NO = [IPISP_ORDER_PK]
-            ) AS IMPORT_INSPECT ON IMPORT_INSPECT.NO = [ITRC_IMPORT_INSPECT_PK]
-            LEFT JOIN
-            (
-              SELECT
-                [PCISP_PK] AS NO
-                ,[PCISP_PRODUCE_RESULT_PK] AS 생산실적NO
-                ,PRODUCE_RESULT.작업코드 AS 작업코드
-                ,PRODUCE_RESULT.공정 AS 공정
-                ,PRODUCE_RESULT.품목구분 AS 품목구분
-                ,PRODUCE_RESULT.품번 AS 품번
-                ,PRODUCE_RESULT.품명 AS 품명
-                ,PRODUCE_RESULT.규격 AS 규격
-                ,PRODUCE_RESULT.단위 AS 단위
-                ,PRODUCE_RESULT.특이사항 AS 특이사항
-                ,[PCISP_DIV] AS 구분
-                ,[PCISP_SAMPLE_AMT] AS 샘플수량
-                ,[PCISP_RECEIVE_AMT] AS 입고수량
-                ,[PCISP_RESULT] AS 결과
-              FROM [QMES2022].[dbo].[MANAGE_PROCESS_INSPECT_TB]
-              LEFT JOIN
-              (
-                SELECT
-                  [PDRS_PK] AS NO
-                  ,[PDRS_INST_PROCESS_PK] AS 지시공정NO
-                  ,INSTRUCT_PROCESS.작업코드 AS 작업코드
-                  ,INSTRUCT_PROCESS.품목구분 AS 품목구분
-                  ,INSTRUCT_PROCESS.품번 AS 품번
-                  ,INSTRUCT_PROCESS.품명 AS 품명
-                  ,INSTRUCT_PROCESS.규격 AS 규격
-                  ,INSTRUCT_PROCESS.단위 AS 단위
-                  ,INSTRUCT_PROCESS.공정명 AS 공정
-                  ,INSTRUCT_PROCESS.시작일 AS 시작일
-                  ,[PDRS_USER_ID] AS 작업자ID
-                  ,RESULT_USER.이름 AS 작업자
-                  ,[PDRS_FACILITY_PK] AS 설비NO
-                  ,RESULT_FACILITY.설비명 AS 설비명
-                  ,CONVERT(VARCHAR, [PDRS_START_DT], 20) AS 시작일시
-                  ,CONVERT(VARCHAR, [PDRS_END_DT], 20) AS 종료일시
-                  ,[PDRS_REPORT] AS 특이사항
-                FROM [QMES2022].[dbo].[MANAGE_PRODUCE_RESULT_TB]
-                LEFT JOIN
-                (
-                  SELECT
-                    [ISPC_PK] AS NO
-                    ,[ISPC_WORK_INSTRUCT_PK] AS 작업지시NO
-                    ,WORK_INSTRUCT.코드 AS 작업코드
-                    ,[ISPC_ITEM_PK] AS 품목NO
-                    ,ITEM.구분 AS 품목구분
-                    ,ITEM.품번 AS 품번
-                    ,ITEM.품명 AS 품명
-                    ,ITEM.규격 AS 규격
-                    ,ITEM.단위 AS 단위
-                    ,[ISPC_AMOUNT] AS 지시수량
-                    ,WORK_INSTRUCT.시작일 AS 시작일
-                    ,[ISPC_PROCESS_PK] AS 공정NO
-                    ,PROCESS.공정명 AS 공정명
-                    ,[ISPC_CONDITION] AS 진행상황
-                  FROM [QMES2022].[dbo].[MANAGE_INSTRUCT_PROCESS_TB]
-                  LEFT JOIN
-                  (
-                    SELECT
-                      [WKIS_PK] AS NO
-                      ,[WKIS_CODE] AS 코드
-                      ,[WKIS_PRODUCE_PLAN_PK] AS 생산계획NO
-                      ,[WKIS_ITEM_PK] AS 품목NO
-                      ,[WKIS_AMOUNT] AS 수량
-                      ,LEFT([WKIS_START_DATE],10) AS 시작일
-                    FROM [QMES2022].[dbo].[MANAGE_WORK_INSTRUCT_TB]
-                  ) AS WORK_INSTRUCT ON WORK_INSTRUCT.NO = [ISPC_WORK_INSTRUCT_PK]
-                  LEFT JOIN
-                  (
-                    SELECT
-                      [PRCS_PK] AS NO
-                      ,[PRCS_CODE] AS 코드
-                      ,[PRCS_DIV] AS 구분
-                      ,[PRCS_NAME] AS 공정명
-                      ,[PRCS_CONTENT] AS 내용
-                      ,[PRCS_FACILITY] AS 설비
-                    FROM [QMES2022].[dbo].[MASTER_PROCESS_TB]
-                  ) AS PROCESS ON PROCESS.NO = [ISPC_PROCESS_PK]
-                  LEFT JOIN
-                  (
-                    SELECT
-                      [ITEM_PK] AS NO
-                      ,[ITEM_DIV] AS 구분
-                      ,[ITEM_PRODUCT_NUM] AS 품번
-                      ,[ITEM_NAME] AS 품명
-                      ,[ITEM_SIZE] AS 규격
-                      ,[ITEM_UNIT] AS 단위
-                    FROM [QMES2022].[dbo].[MASTER_ITEM_TB]
-                  ) AS ITEM ON ITEM.NO = [ISPC_ITEM_PK]
-                ) AS INSTRUCT_PROCESS ON INSTRUCT_PROCESS.NO = [PDRS_INST_PROCESS_PK]
-                LEFT JOIN
-                (
-                  SELECT
-                    [FCLT_PK] AS NO
-                    ,[FCLT_NAME] AS 설비명
-                    ,[FCLT_LINE] AS 라인
-                    ,[FCLT_SIZE] AS 규격
-                  FROM [QMES2022].[dbo].[MASTER_FACILITY_TB]
-                ) AS RESULT_FACILITY ON RESULT_FACILITY.NO = [PDRS_FACILITY_PK]
-                LEFT JOIN
-                (
-                  SELECT
-                    [USER_ID] AS 아이디,
-                    [USER_NAME] AS 이름,
-                    [USER_PHONE] AS 연락처,
-                    [USER_EMAIL] AS 이메일,
-                    [USER_DEPART] AS 부서명,
-                    [USER_POSITION] AS 직책,
-                    [USER_RANK] AS 직급
-                  FROM [QMES2022].[dbo].[MASTER_USER_TB]
-                ) AS RESULT_USER ON RESULT_USER.아이디 = [PDRS_USER_ID]
-              ) AS PRODUCE_RESULT ON PRODUCE_RESULT.NO = [PCISP_PRODUCE_RESULT_PK]
-            ) AS PROCESS_INSPECT ON PROCESS_INSPECT.NO = [ITRC_PROCESS_INSPECT_PK]
-          ) AS ITEM_RECEIVE ON ITEM_RECEIVE.NO = [ITPC_ITEM_RECEIVE_PK]
-          WHERE ITEM_RECEIVE.품목구분 = '반제품'
+                [CLNT_PK] AS NO
+                ,[CLNT_NAME] AS 거래처명
+              FROM [QMES2022].[dbo].[MASTER_CLIENT_TB]
+            ) AS CLIENT ON CLIENT.NO = [ITEM_CLIENT_PK]
+          ) AS ITEM ON ITEM.NO = [ISPCI_ITEM_PK]
+          WHERE ITEM.품목구분 = '반제품'
         ) AS RESULT
         WHERE (1=1)
         AND CONVERT(varchar, CONVERT(datetime, 불출일시), 12) >= ` +
@@ -547,7 +213,9 @@ router.post("/", async (req, res) => {
         req.body.endDate +
         `
         AND ( 구분 like concat('%',@input,'%')
-        OR 입고코드 like concat('%',@input,'%')
+        OR 작업코드 like concat('%',@input,'%')
+        OR 공정 like concat('%',@input,'%')
+        OR LOT코드 like concat('%',@input,'%')
         OR 품목구분 like concat('%',@input,'%')
         OR 품번 like concat('%',@input,'%')
         OR 품명 like concat('%',@input,'%')
@@ -566,244 +234,77 @@ router.post("/", async (req, res) => {
       sql =
         `
         SELECT
-          NO AS NO, 구분 AS 구분, 지시공정자재NO AS 지시공정자재NO, 공정 AS 공정, 품목입고NO AS 품목입고NO,
-          입고코드 AS 입고코드, 품목구분 AS 품목구분, 품번 AS 품번, 품명 AS 품명, 규격 AS 규격, 단위 AS 단위,
-          수량 AS 수량, 불출일시 AS 불출일시, 비고 AS 비고, 등록자 AS 등록자, 등록일시 AS 등록일시
+          NO AS NO, 구분 AS 구분, 작업지시공정NO AS 작업지시공정NO, 작업코드 AS 작업코드, 공정 AS 공정,
+          품목NO AS 품목NO, LOT코드 AS LOT코드, 품목구분 AS 품목구분, 품번 AS 품번, 품명 AS 품명, 규격 AS 규격,
+          단위 AS 단위, 수량 AS 수량, 불출일시 AS 불출일시, 비고 AS 비고, 등록자 AS 등록자, 등록일시 AS 등록일시
         FROM(
           SELECT
-            [ITPC_PK] AS NO
-            ,[ITPC_DIV] AS 구분
-            ,[ITPC_INST_PRCS_ITEM_PK] AS 지시공정자재NO
-            ,INST_PRCS_ITEM.공정명 AS 공정
-            ,[ITPC_ITEM_RECEIVE_PK] AS 품목입고NO
-            ,ITEM_RECEIVE.입고코드 AS 입고코드
-            ,ITEM_RECEIVE.품목구분 AS 품목구분
-            ,ITEM_RECEIVE.품번 AS 품번
-            ,ITEM_RECEIVE.품명 AS 품명
-            ,ITEM_RECEIVE.규격 AS 규격
-            ,ITEM_RECEIVE.단위 AS 단위
-            ,[ITPC_AMOUNT] AS 수량
-            ,[ITPC_DT] AS 불출일시
-            ,[ITPC_NOTE] AS 비고
-            ,[ITPC_REGIST_NM] AS 등록자
-            ,[ITPC_REGIST_DT] AS 등록일시
-          FROM [QMES2022].[dbo].[MANAGE_ITEM_PROCESS_TB]
+            [ISPCI_PK] AS NO
+            ,[ISPCI_DIV] AS 구분
+            ,[ISPCI_INSTRUCT_PROCESS_PK] AS 작업지시공정NO
+            ,INSTRUCT_PROCESS.작업코드 AS 작업코드
+            ,INSTRUCT_PROCESS.공정명 AS 공정
+            ,[ISPCI_ITEM_PK] AS 품목NO
+            ,[ISPCI_LOTCODE] AS LOT코드
+            ,ITEM.품목구분 AS 품목구분
+            ,ITEM.품번 AS 품번
+            ,ITEM.품명 AS 품명
+            ,ITEM.규격 AS 규격
+            ,ITEM.단위 AS 단위
+            ,[ISPCI_AMOUNT] AS 수량
+            ,CONVERT(varchar, [ISPCI_DT], 20) AS 불출일시
+            ,[ISPCI_NOTE] AS 비고
+            ,[ISPCI_REGIST_NM] AS 등록자
+            ,[ISPCI_REGIST_DT] AS 등록일시
+          FROM [QMES2022].[dbo].[MANAGE_INSTRUCT_PROCESS_ITEM_TB]
           LEFT JOIN
           (
             SELECT
-              [ISPCI_PK] AS NO
-              ,[ISPCI_INSTRUCT_PROCESS_PK] AS 지시공정NO
-              ,INST_PROCESS.공정명 AS 공정명
-            FROM [QMES2022].[dbo].[MANAGE_INSTRUCT_PROCESS_ITEM_TB]
+              [ISPC_PK] AS NO
+              ,[ISPC_WORK_INSTRUCT_PK] AS 작업지시NO
+              ,WORK_INSTRUCT.작업코드 AS 작업코드
+              ,[ISPC_PROCESS_PK] AS 공정NO
+              ,PROCESS.공정명 AS 공정명
+            FROM [QMES2022].[dbo].[MANAGE_INSTRUCT_PROCESS_TB]
             LEFT JOIN
             (
               SELECT
-                [ISPC_PK] AS NO
-                ,[ISPC_PROCESS_PK] AS 공정NO
-                ,ISPC_PROCESS.공정명 AS 공정명
-              FROM [QMES2022].[dbo].[MANAGE_INSTRUCT_PROCESS_TB]
-              LEFT JOIN
-              (
-                SELECT
-                  [PRCS_PK] AS NO
-                  ,[PRCS_NAME] AS 공정명
-                FROM [QMES2022].[dbo].[MASTER_PROCESS_TB]
-              ) AS ISPC_PROCESS ON ISPC_PROCESS.NO = [ISPC_PROCESS_PK]
-            ) AS INST_PROCESS ON INST_PROCESS.NO = [ISPCI_INSTRUCT_PROCESS_PK]
-          ) AS INST_PRCS_ITEM ON INST_PRCS_ITEM.NO = [ITPC_INST_PRCS_ITEM_PK]
+                [WKIS_PK] AS NO
+                ,[WKIS_CODE] AS 작업코드
+              FROM [QMES2022].[dbo].[MANAGE_WORK_INSTRUCT_TB]
+            ) AS WORK_INSTRUCT ON WORK_INSTRUCT.NO = [ISPC_WORK_INSTRUCT_PK]
+            LEFT JOIN
+            (
+              SELECT
+                [PRCS_PK] AS NO
+                ,[PRCS_NAME] AS 공정명
+              FROM [QMES2022].[dbo].[MASTER_PROCESS_TB]
+            ) AS PROCESS ON PROCESS.NO = [ISPC_PROCESS_PK]
+          ) AS INSTRUCT_PROCESS ON INSTRUCT_PROCESS.NO = [ISPCI_INSTRUCT_PROCESS_PK]
           LEFT JOIN
           (
             SELECT
-              [ITRC_PK] AS NO
-              ,[ITRC_PRODUCE_RESULT_PK] AS 생산실적NO
-              ,[ITRC_PROCESS_INSPECT_PK] AS 공정검사NO
-              ,[ITRC_DEFECT_REWORK_PK] AS 불량재작업NO
-              ,[ITRC_IMPORT_INSPECT_PK] AS 수입검사NO
-              ,[ITRC_DIV] AS 구분
-              ,CONVERT(VARCHAR, [ITRC_DT], 20) AS 입고일시
-              ,[ITRC_CODE] AS 입고코드
-              ,COALESCE(IMPORT_INSPECT.발주품목구분, PROCESS_INSPECT.품목구분) AS 품목구분
-              ,COALESCE(IMPORT_INSPECT.발주품번, PROCESS_INSPECT.품번) AS 품번
-              ,COALESCE(IMPORT_INSPECT.발주품명, PROCESS_INSPECT.품명) AS 품명
-              ,COALESCE(IMPORT_INSPECT.발주규격, PROCESS_INSPECT.규격) AS 규격
-              ,COALESCE(IMPORT_INSPECT.발주단위, PROCESS_INSPECT.단위) AS 단위
-              ,[ITRC_AMOUNT] AS 입고수
-              ,CONVERT(VARCHAR,[ITRC_EXPIRE_DATE], 23) AS 유효일자
-              ,[ITRC_NOTE] AS 비고
-              ,[ITRC_REGIST_NM] AS 등록자
-              ,[ITRC_REGIST_DT] AS 등록일시
-            FROM [QMES2022].[dbo].[MANAGE_ITEM_RECEIVE_TB]
+              [ITEM_PK] AS NO
+              ,[ITEM_CLIENT_PK] AS 거래처NO
+              ,CLIENT.거래처명 AS 거래처명
+              ,[ITEM_DIV] AS 품목구분
+              ,[ITEM_PRODUCT_NUM] AS 품번
+              ,[ITEM_NAME] AS 품명
+              ,[ITEM_CAR] AS 차종
+              ,[ITEM_SIZE] AS 규격
+              ,[ITEM_UNIT] AS 단위
+              ,[ITEM_SAFE] AS 안전재고
+              ,[ITEM_COST] AS 단가
+            FROM [QMES2022].[dbo].[MASTER_ITEM_TB]
             LEFT JOIN
             (
               SELECT
-                [IPISP_PK] AS NO
-                ,[IPISP_ORDER_PK] AS 발주NO
-                ,ORDERORDER.발주코드 AS 발주코드
-                ,ORDERORDER.품목구분 AS 발주품목구분
-                ,ORDERORDER.품번 AS 발주품번
-                ,ORDERORDER.품명 AS 발주품명
-                ,ORDERORDER.규격 AS 발주규격
-                ,ORDERORDER.단위 AS 발주단위
-                ,[IPISP_DIV] AS 구분
-                ,[IPISP_SAMPLE_AMT] AS 샘플수량
-                ,[IPISP_RECEIVE_AMT] AS 입고수량
-                ,[IPISP_RESULT] AS 결과
-                ,[IPISP_INFO] AS 전달사항
-              FROM [QMES2022].[dbo].[MANAGE_IMPORT_INSPECT_TB]
-              LEFT JOIN
-              (
-                SELECT
-                  [ORDR_PK] AS NO
-                  ,[ORDR_ACCEPT_PK] AS 수주NO
-                  ,[ORDR_CODE] AS 발주코드
-                  ,[ORDR_DIV] AS 발주구분
-                  ,CONVERT(varchar, [ORDR_DATE], 23) AS 발주일자
-                  ,[ORDR_CLIENT_PK] AS 거래처NO
-                  ,CLIENT.거래처명 AS 거래처명
-                  ,[ORDR_ITEM_PK] AS 품목NO
-                  ,ITEM.품목구분 AS 품목구분
-                  ,ITEM.품번 AS 품번
-                  ,ITEM.품명 AS 품명
-                  ,ITEM.규격 AS 규격
-                  ,ITEM.단위 AS 단위
-                  ,[ORDR_AMOUNT] AS 수량
-                FROM [QMES2022].[dbo].[MANAGE_ORDER_TB]
-                LEFT JOIN
-                (
-                  SELECT
-                    [CLNT_PK] AS NO
-                    ,[CLNT_NAME] AS 거래처명
-                  FROM [QMES2022].[dbo].[MASTER_CLIENT_TB]
-                ) AS CLIENT ON CLIENT.NO = [ORDR_CLIENT_PK]
-                LEFT JOIN
-                (
-                  SELECT
-                    [ITEM_PK] AS NO
-                    ,[ITEM_DIV] AS 품목구분
-                    ,[ITEM_PRODUCT_NUM] AS 품번
-                    ,[ITEM_NAME] AS 품명
-                    ,[ITEM_SIZE] AS 규격
-                    ,[ITEM_UNIT] AS 단위
-                  FROM [QMES2022].[dbo].[MASTER_ITEM_TB]
-                ) AS ITEM ON ITEM.NO = [ORDR_ITEM_PK]
-              ) AS ORDERORDER ON ORDERORDER.NO = [IPISP_ORDER_PK]
-            ) AS IMPORT_INSPECT ON IMPORT_INSPECT.NO = [ITRC_IMPORT_INSPECT_PK]
-            LEFT JOIN
-            (
-              SELECT
-                [PCISP_PK] AS NO
-                ,[PCISP_PRODUCE_RESULT_PK] AS 생산실적NO
-                ,PRODUCE_RESULT.작업코드 AS 작업코드
-                ,PRODUCE_RESULT.공정 AS 공정
-                ,PRODUCE_RESULT.품목구분 AS 품목구분
-                ,PRODUCE_RESULT.품번 AS 품번
-                ,PRODUCE_RESULT.품명 AS 품명
-                ,PRODUCE_RESULT.규격 AS 규격
-                ,PRODUCE_RESULT.단위 AS 단위
-                ,PRODUCE_RESULT.특이사항 AS 특이사항
-                ,[PCISP_DIV] AS 구분
-                ,[PCISP_SAMPLE_AMT] AS 샘플수량
-                ,[PCISP_RECEIVE_AMT] AS 입고수량
-                ,[PCISP_RESULT] AS 결과
-              FROM [QMES2022].[dbo].[MANAGE_PROCESS_INSPECT_TB]
-              LEFT JOIN
-              (
-                SELECT
-                  [PDRS_PK] AS NO
-                  ,[PDRS_INST_PROCESS_PK] AS 지시공정NO
-                  ,INSTRUCT_PROCESS.작업코드 AS 작업코드
-                  ,INSTRUCT_PROCESS.품목구분 AS 품목구분
-                  ,INSTRUCT_PROCESS.품번 AS 품번
-                  ,INSTRUCT_PROCESS.품명 AS 품명
-                  ,INSTRUCT_PROCESS.규격 AS 규격
-                  ,INSTRUCT_PROCESS.단위 AS 단위
-                  ,INSTRUCT_PROCESS.공정명 AS 공정
-                  ,INSTRUCT_PROCESS.시작일 AS 시작일
-                  ,[PDRS_USER_ID] AS 작업자ID
-                  ,RESULT_USER.이름 AS 작업자
-                  ,[PDRS_FACILITY_PK] AS 설비NO
-                  ,RESULT_FACILITY.설비명 AS 설비명
-                  ,CONVERT(VARCHAR, [PDRS_START_DT], 20) AS 시작일시
-                  ,CONVERT(VARCHAR, [PDRS_END_DT], 20) AS 종료일시
-                  ,[PDRS_REPORT] AS 특이사항
-                FROM [QMES2022].[dbo].[MANAGE_PRODUCE_RESULT_TB]
-                LEFT JOIN
-                (
-                  SELECT
-                    [ISPC_PK] AS NO
-                    ,[ISPC_WORK_INSTRUCT_PK] AS 작업지시NO
-                    ,WORK_INSTRUCT.코드 AS 작업코드
-                    ,[ISPC_ITEM_PK] AS 품목NO
-                    ,ITEM.구분 AS 품목구분
-                    ,ITEM.품번 AS 품번
-                    ,ITEM.품명 AS 품명
-                    ,ITEM.규격 AS 규격
-                    ,ITEM.단위 AS 단위
-                    ,[ISPC_AMOUNT] AS 지시수량
-                    ,WORK_INSTRUCT.시작일 AS 시작일
-                    ,[ISPC_PROCESS_PK] AS 공정NO
-                    ,PROCESS.공정명 AS 공정명
-                    ,[ISPC_CONDITION] AS 진행상황
-                  FROM [QMES2022].[dbo].[MANAGE_INSTRUCT_PROCESS_TB]
-                  LEFT JOIN
-                  (
-                    SELECT
-                      [WKIS_PK] AS NO
-                      ,[WKIS_CODE] AS 코드
-                      ,[WKIS_PRODUCE_PLAN_PK] AS 생산계획NO
-                      ,[WKIS_ITEM_PK] AS 품목NO
-                      ,[WKIS_AMOUNT] AS 수량
-                      ,LEFT([WKIS_START_DATE],10) AS 시작일
-                    FROM [QMES2022].[dbo].[MANAGE_WORK_INSTRUCT_TB]
-                  ) AS WORK_INSTRUCT ON WORK_INSTRUCT.NO = [ISPC_WORK_INSTRUCT_PK]
-                  LEFT JOIN
-                  (
-                    SELECT
-                      [PRCS_PK] AS NO
-                      ,[PRCS_CODE] AS 코드
-                      ,[PRCS_DIV] AS 구분
-                      ,[PRCS_NAME] AS 공정명
-                      ,[PRCS_CONTENT] AS 내용
-                      ,[PRCS_FACILITY] AS 설비
-                    FROM [QMES2022].[dbo].[MASTER_PROCESS_TB]
-                  ) AS PROCESS ON PROCESS.NO = [ISPC_PROCESS_PK]
-                  LEFT JOIN
-                  (
-                    SELECT
-                      [ITEM_PK] AS NO
-                      ,[ITEM_DIV] AS 구분
-                      ,[ITEM_PRODUCT_NUM] AS 품번
-                      ,[ITEM_NAME] AS 품명
-                      ,[ITEM_SIZE] AS 규격
-                      ,[ITEM_UNIT] AS 단위
-                    FROM [QMES2022].[dbo].[MASTER_ITEM_TB]
-                  ) AS ITEM ON ITEM.NO = [ISPC_ITEM_PK]
-                ) AS INSTRUCT_PROCESS ON INSTRUCT_PROCESS.NO = [PDRS_INST_PROCESS_PK]
-                LEFT JOIN
-                (
-                  SELECT
-                    [FCLT_PK] AS NO
-                    ,[FCLT_NAME] AS 설비명
-                    ,[FCLT_LINE] AS 라인
-                    ,[FCLT_SIZE] AS 규격
-                  FROM [QMES2022].[dbo].[MASTER_FACILITY_TB]
-                ) AS RESULT_FACILITY ON RESULT_FACILITY.NO = [PDRS_FACILITY_PK]
-                LEFT JOIN
-                (
-                  SELECT
-                    [USER_ID] AS 아이디,
-                    [USER_NAME] AS 이름,
-                    [USER_PHONE] AS 연락처,
-                    [USER_EMAIL] AS 이메일,
-                    [USER_DEPART] AS 부서명,
-                    [USER_POSITION] AS 직책,
-                    [USER_RANK] AS 직급
-                  FROM [QMES2022].[dbo].[MASTER_USER_TB]
-                ) AS RESULT_USER ON RESULT_USER.아이디 = [PDRS_USER_ID]
-              ) AS PRODUCE_RESULT ON PRODUCE_RESULT.NO = [PCISP_PRODUCE_RESULT_PK]
-            ) AS PROCESS_INSPECT ON PROCESS_INSPECT.NO = [ITRC_PROCESS_INSPECT_PK]
-          ) AS ITEM_RECEIVE ON ITEM_RECEIVE.NO = [ITPC_ITEM_RECEIVE_PK]
-          WHERE ITEM_RECEIVE.품목구분 = '반제품'
+                [CLNT_PK] AS NO
+                ,[CLNT_NAME] AS 거래처명
+              FROM [QMES2022].[dbo].[MASTER_CLIENT_TB]
+            ) AS CLIENT ON CLIENT.NO = [ITEM_CLIENT_PK]
+          ) AS ITEM ON ITEM.NO = [ISPCI_ITEM_PK]
+          WHERE ITEM.품목구분 = '반제품'
         ) AS RESULT
         WHERE (1=1)
         AND CONVERT(varchar, CONVERT(datetime, 불출일시), 12) >= ` +
@@ -854,878 +355,334 @@ router.post("/", async (req, res) => {
   }
 });
 
-// 등록
-router.post("/insert", async (req, res) => {
-  try {
-    const Pool = await pool;
-    await Pool.request()
-      .input("수주NO", req.body.data.수주NO ?? null)
-      .input("발주코드", req.body.data.발주코드 ?? "")
-      .input("발주구분", req.body.data.발주구분 ?? "")
-      .input("발주일자", req.body.data.발주일자 ?? "")
-      .input("거래처NO", req.body.data.거래처NO ?? null)
-      .input("품목NO", req.body.data.품목NO ?? null)
-      .input("발주수량", req.body.data.발주수량 ?? "")
-      .input("단가", req.body.data.단가 ?? "")
-      .input("공급가액", req.body.data.공급가액 ?? "")
-      .input("세액", req.body.data.세액 ?? "")
-      .input("납기일", req.body.data.납기일 ?? "")
-      .input("도착지주소", req.body.data.도착지주소 ?? "")
-      .input("기타", req.body.data.기타 ?? "")
-      .input("비고", req.body.data.비고 ?? "")
-      .input("등록자", req.body.user ?? "")
-      .input(
-        "등록일시",
-        moment().tz("Asia/Seoul").format("YYYY-MM-DD HH:mm:ss")
-      ).query(`
-        INSERT INTO [QMES2022].[dbo].[MANAGE_ORDER_TB]
-          ([ORDR_ACCEPT_PK]
-          ,[ORDR_CODE]
-          ,[ORDR_DIV]
-          ,[ORDR_DATE]
-          ,[ORDR_CLIENT_PK]
-          ,[ORDR_ITEM_PK]
-          ,[ORDR_AMOUNT]
-          ,[ORDR_UNIT_COST]
-          ,[ORDR_SUPPLY_COST]
-          ,[ORDR_TAX_COST]
-          ,[ORDR_ALLIVE_DATE]
-          ,[ORDR_ALLIVE_ADDRESS]
-          ,[ORDR_ETC]
-          ,[ORDR_NOTE]
-          ,[ORDR_REGIST_NM]
-          ,[ORDR_REGIST_DT])
-            VALUES
-          (@수주NO,@발주코드,@발주구분,@발주일자,@거래처NO,@품목NO,@발주수량,@단가,@공급가액,@세액,@납기일,@도착지주소,
-            @기타,@비고,@등록자,@등록일시)
-    `);
+// // 등록
+// router.post("/insert", async (req, res) => {
+//   try {
+//     const Pool = await pool;
+//     await Pool.request()
+//       .input("수주NO", req.body.data.수주NO ?? null)
+//       .input("발주코드", req.body.data.발주코드 ?? "")
+//       .input("발주구분", req.body.data.발주구분 ?? "")
+//       .input("발주일자", req.body.data.발주일자 ?? "")
+//       .input("거래처NO", req.body.data.거래처NO ?? null)
+//       .input("품목NO", req.body.data.품목NO ?? null)
+//       .input("발주수량", req.body.data.발주수량 ?? "")
+//       .input("단가", req.body.data.단가 ?? "")
+//       .input("공급가액", req.body.data.공급가액 ?? "")
+//       .input("세액", req.body.data.세액 ?? "")
+//       .input("납기일", req.body.data.납기일 ?? "")
+//       .input("도착지주소", req.body.data.도착지주소 ?? "")
+//       .input("기타", req.body.data.기타 ?? "")
+//       .input("비고", req.body.data.비고 ?? "")
+//       .input("등록자", req.body.user ?? "")
+//       .input(
+//         "등록일시",
+//         moment().tz("Asia/Seoul").format("YYYY-MM-DD HH:mm:ss")
+//       ).query(`
+//         INSERT INTO [QMES2022].[dbo].[MANAGE_ORDER_TB]
+//           ([ORDR_ACCEPT_PK]
+//           ,[ORDR_CODE]
+//           ,[ORDR_DIV]
+//           ,[ORDR_DATE]
+//           ,[ORDR_CLIENT_PK]
+//           ,[ORDR_ITEM_PK]
+//           ,[ORDR_AMOUNT]
+//           ,[ORDR_UNIT_COST]
+//           ,[ORDR_SUPPLY_COST]
+//           ,[ORDR_TAX_COST]
+//           ,[ORDR_ALLIVE_DATE]
+//           ,[ORDR_ALLIVE_ADDRESS]
+//           ,[ORDR_ETC]
+//           ,[ORDR_NOTE]
+//           ,[ORDR_REGIST_NM]
+//           ,[ORDR_REGIST_DT])
+//             VALUES
+//           (@수주NO,@발주코드,@발주구분,@발주일자,@거래처NO,@품목NO,@발주수량,@단가,@공급가액,@세액,@납기일,@도착지주소,
+//             @기타,@비고,@등록자,@등록일시)
+//     `);
 
-    // 로그기록 저장
-    await logSend(
-      (type = "등록"),
-      (ct = JSON.stringify(req.body.data) + " 을 등록."),
-      (amount = 1),
-      (user = req.body.user ?? "")
-    );
+//     // 로그기록 저장
+//     await logSend(
+//       (type = "등록"),
+//       (ct = JSON.stringify(req.body.data) + " 을 등록."),
+//       (amount = 1),
+//       (user = req.body.user ?? "")
+//     );
 
-    res.send("등록완료");
-  } catch (err) {
-    // 로그기록 저장
-    await logSend(
-      (type = "에러"),
-      (ct = err.message ?? ""),
-      (amount = 0),
-      (user = req.body.user ?? "")
-    );
-    res.status(500);
-    res.send(err.message);
-  }
-});
+//     res.send("등록완료");
+//   } catch (err) {
+//     // 로그기록 저장
+//     await logSend(
+//       (type = "에러"),
+//       (ct = err.message ?? ""),
+//       (amount = 0),
+//       (user = req.body.user ?? "")
+//     );
+//     res.status(500);
+//     res.send(err.message);
+//   }
+// });
 
-// 한번에 등록
-router.post("/insertAll", async (req, res) => {
-  try {
-    const Pool = await pool;
-    for (var i = 0; i < req.body.data.length; i++) {
-      await Pool.request()
-        .input("수주NO", req.body.data[i].수주NO ?? null)
-        .input("발주코드", req.body.data[i].발주코드 ?? "")
-        .input("발주구분", req.body.data[i].발주구분 ?? "")
-        .input("발주일자", req.body.data[i].발주일자 ?? "")
-        .input("거래처NO", req.body.data[i].거래처NO ?? null)
-        .input("품목NO", req.body.data[i].품목NO ?? null)
-        .input("발주수량", req.body.data[i].발주수량 ?? "")
-        .input("단가", req.body.data[i].단가 ?? "")
-        .input("공급가액", req.body.data[i].공급가액 ?? "")
-        .input("세액", req.body.data[i].세액 ?? "")
-        .input("납기일", req.body.data[i].납기일 ?? "")
-        .input("도착지주소", req.body.data[i].도착지주소 ?? "")
-        .input("기타", req.body.data[i].기타 ?? "")
-        .input("비고", req.body.data[i].비고 ?? "")
-        .input("등록자", req.body.user ?? "")
-        .input(
-          "등록일시",
-          moment().tz("Asia/Seoul").format("YYYY-MM-DD HH:mm:ss")
-        ).query(`
-        INSERT INTO [QMES2022].[dbo].[MANAGE_ORDER_TB]
-          ([ORDR_ACCEPT_PK]
-          ,[ORDR_CODE]
-          ,[ORDR_DIV]
-          ,[ORDR_DATE]
-          ,[ORDR_CLIENT_PK]
-          ,[ORDR_ITEM_PK]
-          ,[ORDR_AMOUNT]
-          ,[ORDR_UNIT_COST]
-          ,[ORDR_SUPPLY_COST]
-          ,[ORDR_TAX_COST]
-          ,[ORDR_ALLIVE_DATE]
-          ,[ORDR_ALLIVE_ADDRESS]
-          ,[ORDR_ETC]
-          ,[ORDR_NOTE]
-          ,[ORDR_REGIST_NM]
-          ,[ORDR_REGIST_DT])
-            VALUES
-          (@수주NO,@발주코드,@발주구분,@발주일자,@거래처NO,@품목NO,@발주수량,@단가,@공급가액,@세액,@납기일,@도착지주소,
-            @기타,@비고,@등록자,@등록일시)
-      `);
+// // 한번에 등록
+// router.post("/insertAll", async (req, res) => {
+//   try {
+//     const Pool = await pool;
+//     for (var i = 0; i < req.body.data.length; i++) {
+//       await Pool.request()
+//         .input("수주NO", req.body.data[i].수주NO ?? null)
+//         .input("발주코드", req.body.data[i].발주코드 ?? "")
+//         .input("발주구분", req.body.data[i].발주구분 ?? "")
+//         .input("발주일자", req.body.data[i].발주일자 ?? "")
+//         .input("거래처NO", req.body.data[i].거래처NO ?? null)
+//         .input("품목NO", req.body.data[i].품목NO ?? null)
+//         .input("발주수량", req.body.data[i].발주수량 ?? "")
+//         .input("단가", req.body.data[i].단가 ?? "")
+//         .input("공급가액", req.body.data[i].공급가액 ?? "")
+//         .input("세액", req.body.data[i].세액 ?? "")
+//         .input("납기일", req.body.data[i].납기일 ?? "")
+//         .input("도착지주소", req.body.data[i].도착지주소 ?? "")
+//         .input("기타", req.body.data[i].기타 ?? "")
+//         .input("비고", req.body.data[i].비고 ?? "")
+//         .input("등록자", req.body.user ?? "")
+//         .input(
+//           "등록일시",
+//           moment().tz("Asia/Seoul").format("YYYY-MM-DD HH:mm:ss")
+//         ).query(`
+//         INSERT INTO [QMES2022].[dbo].[MANAGE_ORDER_TB]
+//           ([ORDR_ACCEPT_PK]
+//           ,[ORDR_CODE]
+//           ,[ORDR_DIV]
+//           ,[ORDR_DATE]
+//           ,[ORDR_CLIENT_PK]
+//           ,[ORDR_ITEM_PK]
+//           ,[ORDR_AMOUNT]
+//           ,[ORDR_UNIT_COST]
+//           ,[ORDR_SUPPLY_COST]
+//           ,[ORDR_TAX_COST]
+//           ,[ORDR_ALLIVE_DATE]
+//           ,[ORDR_ALLIVE_ADDRESS]
+//           ,[ORDR_ETC]
+//           ,[ORDR_NOTE]
+//           ,[ORDR_REGIST_NM]
+//           ,[ORDR_REGIST_DT])
+//             VALUES
+//           (@수주NO,@발주코드,@발주구분,@발주일자,@거래처NO,@품목NO,@발주수량,@단가,@공급가액,@세액,@납기일,@도착지주소,
+//             @기타,@비고,@등록자,@등록일시)
+//       `);
 
-      // 로그기록 저장
-      await logSend(
-        (type = "등록"),
-        (ct = JSON.stringify(req.body.data[i]) + " 을 등록."),
-        (amount = 1),
-        (user = req.body.user ?? "")
-      );
-    }
-    res.send("등록완료");
-  } catch (err) {
-    // 로그기록 저장
-    await logSend(
-      (type = "에러"),
-      (ct = err.message ?? ""),
-      (amount = 0),
-      (user = req.body.user ?? "")
-    );
-    res.status(500);
-    res.send(err.message);
-  }
-});
+//       // 로그기록 저장
+//       await logSend(
+//         (type = "등록"),
+//         (ct = JSON.stringify(req.body.data[i]) + " 을 등록."),
+//         (amount = 1),
+//         (user = req.body.user ?? "")
+//       );
+//     }
+//     res.send("등록완료");
+//   } catch (err) {
+//     // 로그기록 저장
+//     await logSend(
+//       (type = "에러"),
+//       (ct = err.message ?? ""),
+//       (amount = 0),
+//       (user = req.body.user ?? "")
+//     );
+//     res.status(500);
+//     res.send(err.message);
+//   }
+// });
 
-// 수정
-router.post("/edit", async (req, res) => {
-  try {
-    const Pool = await pool;
-    await Pool.request()
-      .input("NO", req.body.data.NO ?? 0)
-      .input("수주NO", req.body.data.수주NO ?? null)
-      .input("발주코드", req.body.data.발주코드 ?? "")
-      .input("발주구분", req.body.data.발주구분 ?? "")
-      .input("발주일자", req.body.data.발주일자 ?? "")
-      .input("거래처NO", req.body.data.거래처NO ?? null)
-      .input("품목NO", req.body.data.품목NO ?? null)
-      .input("발주수량", req.body.data.발주수량 ?? "")
-      .input("단가", req.body.data.단가 ?? "")
-      .input("공급가액", req.body.data.공급가액 ?? "")
-      .input("세액", req.body.data.세액 ?? "")
-      .input("납기일", req.body.data.납기일 ?? "")
-      .input("도착지주소", req.body.data.도착지주소 ?? "")
-      .input("기타", req.body.data.기타 ?? "")
-      .input("비고", req.body.data.비고 ?? "")
-      .input("등록자", req.body.user ?? "")
-      .input(
-        "등록일시",
-        moment().tz("Asia/Seoul").format("YYYY-MM-DD HH:mm:ss")
-      ).query(`
-        UPDATE [QMES2022].[dbo].[MANAGE_ORDER_TB]
-          SET 
-          [ORDR_ACCEPT_PK] = @수주NO
-          ,[ORDR_CODE] = @발주코드
-          ,[ORDR_DIV] = @발주구분
-          ,[ORDR_DATE] = @발주일자
-          ,[ORDR_CLIENT_PK] = @거래처NO
-          ,[ORDR_ITEM_PK] = @품목NO
-          ,[ORDR_AMOUNT] = @발주수량
-          ,[ORDR_UNIT_COST] = @단가
-          ,[ORDR_SUPPLY_COST] = @공급가액
-          ,[ORDR_TAX_COST] = @세액
-          ,[ORDR_ALLIVE_DATE] = @납기일
-          ,[ORDR_ALLIVE_ADDRESS] = @도착지주소
-          ,[ORDR_ETC] = @기타
-          ,[ORDR_NOTE] = @비고
-          ,[ORDR_REGIST_NM] = @등록자
-          ,[ORDR_REGIST_DT] = @등록일시
-        WHERE [ORDR_PK] = @NO
-    `);
+// // 수정
+// router.post("/edit", async (req, res) => {
+//   try {
+//     const Pool = await pool;
+//     await Pool.request()
+//       .input("NO", req.body.data.NO ?? 0)
+//       .input("수주NO", req.body.data.수주NO ?? null)
+//       .input("발주코드", req.body.data.발주코드 ?? "")
+//       .input("발주구분", req.body.data.발주구분 ?? "")
+//       .input("발주일자", req.body.data.발주일자 ?? "")
+//       .input("거래처NO", req.body.data.거래처NO ?? null)
+//       .input("품목NO", req.body.data.품목NO ?? null)
+//       .input("발주수량", req.body.data.발주수량 ?? "")
+//       .input("단가", req.body.data.단가 ?? "")
+//       .input("공급가액", req.body.data.공급가액 ?? "")
+//       .input("세액", req.body.data.세액 ?? "")
+//       .input("납기일", req.body.data.납기일 ?? "")
+//       .input("도착지주소", req.body.data.도착지주소 ?? "")
+//       .input("기타", req.body.data.기타 ?? "")
+//       .input("비고", req.body.data.비고 ?? "")
+//       .input("등록자", req.body.user ?? "")
+//       .input(
+//         "등록일시",
+//         moment().tz("Asia/Seoul").format("YYYY-MM-DD HH:mm:ss")
+//       ).query(`
+//         UPDATE [QMES2022].[dbo].[MANAGE_ORDER_TB]
+//           SET
+//           [ORDR_ACCEPT_PK] = @수주NO
+//           ,[ORDR_CODE] = @발주코드
+//           ,[ORDR_DIV] = @발주구분
+//           ,[ORDR_DATE] = @발주일자
+//           ,[ORDR_CLIENT_PK] = @거래처NO
+//           ,[ORDR_ITEM_PK] = @품목NO
+//           ,[ORDR_AMOUNT] = @발주수량
+//           ,[ORDR_UNIT_COST] = @단가
+//           ,[ORDR_SUPPLY_COST] = @공급가액
+//           ,[ORDR_TAX_COST] = @세액
+//           ,[ORDR_ALLIVE_DATE] = @납기일
+//           ,[ORDR_ALLIVE_ADDRESS] = @도착지주소
+//           ,[ORDR_ETC] = @기타
+//           ,[ORDR_NOTE] = @비고
+//           ,[ORDR_REGIST_NM] = @등록자
+//           ,[ORDR_REGIST_DT] = @등록일시
+//         WHERE [ORDR_PK] = @NO
+//     `);
 
-    // 로그기록 저장
-    await logSend(
-      (type = "수정"),
-      (ct = JSON.stringify(req.body.data) + " 으로 수정."),
-      (amount = 1),
-      (user = req.body.user ?? "")
-    );
+//     // 로그기록 저장
+//     await logSend(
+//       (type = "수정"),
+//       (ct = JSON.stringify(req.body.data) + " 으로 수정."),
+//       (amount = 1),
+//       (user = req.body.user ?? "")
+//     );
 
-    res.send("수정완료");
-  } catch (err) {
-    // 로그기록 저장
-    await logSend(
-      (type = "에러"),
-      (ct = err.message ?? ""),
-      (amount = 0),
-      (user = req.body.user ?? "")
-    );
-    res.status(500);
-    res.send(err.message);
-  }
-});
+//     res.send("수정완료");
+//   } catch (err) {
+//     // 로그기록 저장
+//     await logSend(
+//       (type = "에러"),
+//       (ct = err.message ?? ""),
+//       (amount = 0),
+//       (user = req.body.user ?? "")
+//     );
+//     res.status(500);
+//     res.send(err.message);
+//   }
+// });
 
-// 삭제
-router.post("/delete", async (req, res) => {
-  try {
-    const Pool = await pool;
-    for (var i = 0; i < req.body.data.length; i++) {
-      const result = await Pool.request().input("key", req.body.data[i]).query(`
-        SELECT
-          [ORDR_PK] AS NO
-          ,[ORDR_ACCEPT_PK] AS 수주NO
-          ,ACCEPT.코드 AS 수주코드
-          ,[ORDR_CODE] AS 발주코드
-          ,[ORDR_DIV] AS 발주구분
-          ,[ORDR_DATE] AS 발주일자
-          ,[ORDR_CLIENT_PK] AS 거래처NO
-          ,CLIENT.거래처명 AS 거래처명
-          ,[ORDR_ITEM_PK] AS 품목NO
-          ,ITEM.품목구분 AS 품목구분
-          ,ITEM.품번 AS 품번
-          ,ITEM.품명 AS 품명
-          ,[ORDR_AMOUNT] AS 발주수량
-          ,(SELECT COALESCE(SUM(CONVERT(numeric,ITRC_AMOUNT)),0) FROM [QMES2022].[dbo].[MANAGE_ITEM_RECEIVE_TB] WHERE [ITRC_IMPORT_INSPECT_PK] IN (SELECT IPISP_PK FROM [QMES2022].[dbo].[MANAGE_IMPORT_INSPECT_TB] WHERE [IPISP_ORDER_PK] = ORDR_PK)) AS 입고수량
-          ,[ORDR_UNIT_COST] AS 단가
-          ,[ORDR_SUPPLY_COST] AS 공급가액
-          ,[ORDR_TAX_COST] AS 세액
-          ,[ORDR_ALLIVE_DATE] AS 납기일
-          ,[ORDR_ALLIVE_ADDRESS] AS 도착지주소
-          ,[ORDR_ETC] AS 기타
-          ,[ORDR_NOTE] AS 비고
-          ,[ORDR_REGIST_NM] AS 등록자
-          ,[ORDR_REGIST_DT] AS 등록일시
-        FROM [QMES2022].[dbo].[MANAGE_ORDER_TB]
-        LEFT JOIN
-        (
-          SELECT
-            [ACPT_PK] AS NO
-            ,LEFT([ACPT_DATE],10) AS 수주일
-            ,[ACPT_CODE] AS 코드
-            ,[ACPT_CODE_NUM] AS 코드순번
-            ,[ACPT_DIV] AS 구분
-            ,[ACPT_CLIENT_PK] AS 거래처NO
-            ,CLIENT.거래처명 AS 거래처명
-            ,[ACPT_TEL] AS 연락처
-            ,[ACPT_ITEM_PK] AS 품목NO
-            ,ITEM.품목구분 AS 품목구분
-            ,ITEM.품번 AS 품번
-            ,ITEM.품명 AS 품명
-            ,[ACPT_AMOUNT] AS 수량
-            ,[ACPT_UNIT_COST] AS 단가
-            ,[ACPT_SUPPLY_COST] AS 공급가액
-            ,[ACPT_TAX_COST] AS 세액
-            ,[ACPT_PAY_CONDITION] AS 결제조건
-            ,LEFT([ACPT_PAY_DATE],10) AS 결제예정일
-            ,LEFT([ACPT_DELIVERY_DATE],10) AS 납기일
-            ,[ACPT_DELIVERY_ADDRESS] AS 도착지주소
-            ,[ACPT_ETC] AS 기타
-            ,[ACPT_NOTE] AS 비고
-            ,[ACPT_REGIST_NM] AS 등록자
-            ,[ACPT_REGIST_DT] AS 등록일시
-          FROM [QMES2022].[dbo].[MANAGE_ACCEPT_TB]
-          LEFT JOIN
-          (
-            SELECT
-              [CLNT_PK] AS NO
-              ,[CLNT_NAME] AS 거래처명
-            FROM [QMES2022].[dbo].[MASTER_CLIENT_TB]
-          ) AS CLIENT ON CLIENT.NO = [ACPT_CLIENT_PK]
-          LEFT JOIN
-          (
-            SELECT
-              [ITEM_PK] AS NO
-              ,[ITEM_DIV] AS 품목구분
-              ,[ITEM_PRODUCT_NUM] AS 품번
-              ,[ITEM_NAME] AS 품명
-            FROM [QMES2022].[dbo].[MASTER_ITEM_TB]
-          ) AS ITEM ON ITEM.NO = [ACPT_ITEM_PK]
-        ) AS ACCEPT ON ACCEPT.NO = [ORDR_ACCEPT_PK]
-        LEFT JOIN
-        (
-          SELECT
-            [CLNT_PK] AS NO
-            ,[CLNT_NAME] AS 거래처명
-          FROM [QMES2022].[dbo].[MASTER_CLIENT_TB]
-        ) AS CLIENT ON CLIENT.NO = [ORDR_CLIENT_PK]
-        LEFT JOIN
-        (
-          SELECT
-            [ITEM_PK] AS NO
-            ,[ITEM_DIV] AS 품목구분
-            ,[ITEM_PRODUCT_NUM] AS 품번
-            ,[ITEM_NAME] AS 품명
-          FROM [QMES2022].[dbo].[MASTER_ITEM_TB]
-        ) AS ITEM ON ITEM.NO = [ORDR_ITEM_PK]
-        WHERE [ORDR_PK] = @key
-      `);
+// // 삭제
+// router.post("/delete", async (req, res) => {
+//   try {
+//     const Pool = await pool;
+//     for (var i = 0; i < req.body.data.length; i++) {
+//       const result = await Pool.request().input("key", req.body.data[i]).query(`
+//         SELECT
+//           [ORDR_PK] AS NO
+//           ,[ORDR_ACCEPT_PK] AS 수주NO
+//           ,ACCEPT.코드 AS 수주코드
+//           ,[ORDR_CODE] AS 발주코드
+//           ,[ORDR_DIV] AS 발주구분
+//           ,[ORDR_DATE] AS 발주일자
+//           ,[ORDR_CLIENT_PK] AS 거래처NO
+//           ,CLIENT.거래처명 AS 거래처명
+//           ,[ORDR_ITEM_PK] AS 품목NO
+//           ,ITEM.품목구분 AS 품목구분
+//           ,ITEM.품번 AS 품번
+//           ,ITEM.품명 AS 품명
+//           ,[ORDR_AMOUNT] AS 발주수량
+//           ,(SELECT COALESCE(SUM(CONVERT(numeric,ITRC_AMOUNT)),0) FROM [QMES2022].[dbo].[MANAGE_ITEM_RECEIVE_TB] WHERE [ITRC_IMPORT_INSPECT_PK] IN (SELECT IPISP_PK FROM [QMES2022].[dbo].[MANAGE_IMPORT_INSPECT_TB] WHERE [IPISP_ORDER_PK] = ORDR_PK)) AS 입고수량
+//           ,[ORDR_UNIT_COST] AS 단가
+//           ,[ORDR_SUPPLY_COST] AS 공급가액
+//           ,[ORDR_TAX_COST] AS 세액
+//           ,[ORDR_ALLIVE_DATE] AS 납기일
+//           ,[ORDR_ALLIVE_ADDRESS] AS 도착지주소
+//           ,[ORDR_ETC] AS 기타
+//           ,[ORDR_NOTE] AS 비고
+//           ,[ORDR_REGIST_NM] AS 등록자
+//           ,[ORDR_REGIST_DT] AS 등록일시
+//         FROM [QMES2022].[dbo].[MANAGE_ORDER_TB]
+//         LEFT JOIN
+//         (
+//           SELECT
+//             [ACPT_PK] AS NO
+//             ,LEFT([ACPT_DATE],10) AS 수주일
+//             ,[ACPT_CODE] AS 코드
+//             ,[ACPT_CODE_NUM] AS 코드순번
+//             ,[ACPT_DIV] AS 구분
+//             ,[ACPT_CLIENT_PK] AS 거래처NO
+//             ,CLIENT.거래처명 AS 거래처명
+//             ,[ACPT_TEL] AS 연락처
+//             ,[ACPT_ITEM_PK] AS 품목NO
+//             ,ITEM.품목구분 AS 품목구분
+//             ,ITEM.품번 AS 품번
+//             ,ITEM.품명 AS 품명
+//             ,[ACPT_AMOUNT] AS 수량
+//             ,[ACPT_UNIT_COST] AS 단가
+//             ,[ACPT_SUPPLY_COST] AS 공급가액
+//             ,[ACPT_TAX_COST] AS 세액
+//             ,[ACPT_PAY_CONDITION] AS 결제조건
+//             ,LEFT([ACPT_PAY_DATE],10) AS 결제예정일
+//             ,LEFT([ACPT_DELIVERY_DATE],10) AS 납기일
+//             ,[ACPT_DELIVERY_ADDRESS] AS 도착지주소
+//             ,[ACPT_ETC] AS 기타
+//             ,[ACPT_NOTE] AS 비고
+//             ,[ACPT_REGIST_NM] AS 등록자
+//             ,[ACPT_REGIST_DT] AS 등록일시
+//           FROM [QMES2022].[dbo].[MANAGE_ACCEPT_TB]
+//           LEFT JOIN
+//           (
+//             SELECT
+//               [CLNT_PK] AS NO
+//               ,[CLNT_NAME] AS 거래처명
+//             FROM [QMES2022].[dbo].[MASTER_CLIENT_TB]
+//           ) AS CLIENT ON CLIENT.NO = [ACPT_CLIENT_PK]
+//           LEFT JOIN
+//           (
+//             SELECT
+//               [ITEM_PK] AS NO
+//               ,[ITEM_DIV] AS 품목구분
+//               ,[ITEM_PRODUCT_NUM] AS 품번
+//               ,[ITEM_NAME] AS 품명
+//             FROM [QMES2022].[dbo].[MASTER_ITEM_TB]
+//           ) AS ITEM ON ITEM.NO = [ACPT_ITEM_PK]
+//         ) AS ACCEPT ON ACCEPT.NO = [ORDR_ACCEPT_PK]
+//         LEFT JOIN
+//         (
+//           SELECT
+//             [CLNT_PK] AS NO
+//             ,[CLNT_NAME] AS 거래처명
+//           FROM [QMES2022].[dbo].[MASTER_CLIENT_TB]
+//         ) AS CLIENT ON CLIENT.NO = [ORDR_CLIENT_PK]
+//         LEFT JOIN
+//         (
+//           SELECT
+//             [ITEM_PK] AS NO
+//             ,[ITEM_DIV] AS 품목구분
+//             ,[ITEM_PRODUCT_NUM] AS 품번
+//             ,[ITEM_NAME] AS 품명
+//           FROM [QMES2022].[dbo].[MASTER_ITEM_TB]
+//         ) AS ITEM ON ITEM.NO = [ORDR_ITEM_PK]
+//         WHERE [ORDR_PK] = @key
+//       `);
 
-      await Pool.request()
-        .input("key", req.body.data[i])
-        .query(
-          `DELETE FROM [QMES2022].[dbo].[MANAGE_ORDER_TB] WHERE [ORDR_PK] = @key`
-        );
+//       await Pool.request()
+//         .input("key", req.body.data[i])
+//         .query(
+//           `DELETE FROM [QMES2022].[dbo].[MANAGE_ORDER_TB] WHERE [ORDR_PK] = @key`
+//         );
 
-      // 로그기록 저장
-      await logSend(
-        (type = "삭제"),
-        (ct = JSON.stringify(result.recordset) + " 을 삭제."),
-        (amount = 1),
-        (user = req.body.user ?? "")
-      );
-    }
-    res.send("삭제완료");
-  } catch (err) {
-    // 로그기록 저장
-    await logSend(
-      (type = "에러"),
-      (ct = err.message ?? ""),
-      (amount = 0),
-      (user = req.body.user ?? "")
-    );
-    res.status(500);
-    res.send(err.message);
-  }
-});
+//       // 로그기록 저장
+//       await logSend(
+//         (type = "삭제"),
+//         (ct = JSON.stringify(result.recordset) + " 을 삭제."),
+//         (amount = 1),
+//         (user = req.body.user ?? "")
+//       );
+//     }
+//     res.send("삭제완료");
+//   } catch (err) {
+//     // 로그기록 저장
+//     await logSend(
+//       (type = "에러"),
+//       (ct = err.message ?? ""),
+//       (amount = 0),
+//       (user = req.body.user ?? "")
+//     );
+//     res.status(500);
+//     res.send(err.message);
+//   }
+// });
 
 // ########################################   나머지 기능   #############################################################
-
-// 수주 데이터
-router.get("/accept", async (req, res) => {
-  try {
-    const Pool = await pool;
-    const result = await Pool.request().query(`
-      SELECT
-        [ACPT_PK] AS NO
-        ,LEFT([ACPT_DATE],10) AS 수주일
-        ,[ACPT_CODE] AS 코드
-        ,[ACPT_CODE_NUM] AS 코드순번
-        ,[ACPT_DIV] AS 구분
-        ,[ACPT_CLIENT_PK] AS 거래처NO
-        ,CLIENT.거래처명 AS 거래처명
-        ,[ACPT_TEL] AS 연락처
-        ,[ACPT_ITEM_PK] AS 품목NO
-        ,ITEM.품목구분 AS 품목구분
-        ,ITEM.품번 AS 품번
-        ,ITEM.품명 AS 품명
-        ,[ACPT_AMOUNT] AS 수량
-        ,[ACPT_UNIT_COST] AS 단가
-        ,[ACPT_SUPPLY_COST] AS 공급가액
-        ,[ACPT_TAX_COST] AS 세액
-        ,[ACPT_PAY_CONDITION] AS 결제조건
-        ,LEFT([ACPT_PAY_DATE],10) AS 결제예정일
-        ,LEFT([ACPT_DELIVERY_DATE],10) AS 납기일
-        ,[ACPT_DELIVERY_ADDRESS] AS 도착지주소
-        ,[ACPT_ETC] AS 기타
-        ,[ACPT_NOTE] AS 비고
-        ,[ACPT_REGIST_NM] AS 등록자
-        ,[ACPT_REGIST_DT] AS 등록일시
-      FROM [QMES2022].[dbo].[MANAGE_ACCEPT_TB]
-      LEFT JOIN
-      (
-        SELECT
-          [CLNT_PK] AS NO
-          ,[CLNT_NAME] AS 거래처명
-        FROM [QMES2022].[dbo].[MASTER_CLIENT_TB]
-      ) AS CLIENT ON CLIENT.NO = [ACPT_CLIENT_PK]
-      LEFT JOIN
-      (
-        SELECT
-          [ITEM_PK] AS NO
-          ,[ITEM_DIV] AS 품목구분
-          ,[ITEM_PRODUCT_NUM] AS 품번
-          ,[ITEM_NAME] AS 품명
-        FROM [QMES2022].[dbo].[MASTER_ITEM_TB]
-      ) AS ITEM ON ITEM.NO = [ACPT_ITEM_PK]
-      ORDER BY [ACPT_PK] DESC
-    `);
-
-    res.send(JSON.stringify(result.recordset));
-  } catch (err) {
-    res.status(500);
-    res.send(err.message);
-  }
-});
-
-router.post("/accept", async (req, res) => {
-  try {
-    var sql = "";
-    if (req.body.searchKey == "전체") {
-      sql =
-        `
-        SELECT
-          NO AS NO, 수주일 AS 수주일, 코드 AS 코드, 코드순번 AS 코드순번, 구분 AS 구분, 거래처NO AS 거래처NO,
-          거래처명 AS 거래처명, 연락처 AS 연락처, 품목NO AS 품목NO, 품목구분 AS 품목구분, 품번 AS 품번, 품명 AS 품명,
-          수량 AS 수량, 단가 AS 단가, 공급가액 AS 공급가액, 세액 AS 세액, 결제조건 AS 결제조건, 결제예정일 AS 결제예정일,
-          납기일 AS 납기일, 도착지주소 AS 도착지주소, 기타 AS 기타, 비고 AS 비고, 등록자 AS 등록자, 등록일시 AS 등록일시
-        FROM(
-          SELECT
-            [ACPT_PK] AS NO
-            ,LEFT([ACPT_DATE],10) AS 수주일
-            ,[ACPT_CODE] AS 코드
-            ,[ACPT_CODE_NUM] AS 코드순번
-            ,[ACPT_DIV] AS 구분
-            ,[ACPT_CLIENT_PK] AS 거래처NO
-            ,CLIENT.거래처명 AS 거래처명
-            ,[ACPT_TEL] AS 연락처
-            ,[ACPT_ITEM_PK] AS 품목NO
-            ,ITEM.품목구분 AS 품목구분
-            ,ITEM.품번 AS 품번
-            ,ITEM.품명 AS 품명
-            ,[ACPT_AMOUNT] AS 수량
-            ,[ACPT_UNIT_COST] AS 단가
-            ,[ACPT_SUPPLY_COST] AS 공급가액
-            ,[ACPT_TAX_COST] AS 세액
-            ,[ACPT_PAY_CONDITION] AS 결제조건
-            ,LEFT([ACPT_PAY_DATE],10) AS 결제예정일
-            ,LEFT([ACPT_DELIVERY_DATE],10) AS 납기일
-            ,[ACPT_DELIVERY_ADDRESS] AS 도착지주소
-            ,[ACPT_ETC] AS 기타
-            ,[ACPT_NOTE] AS 비고
-            ,[ACPT_REGIST_NM] AS 등록자
-            ,[ACPT_REGIST_DT] AS 등록일시
-          FROM [QMES2022].[dbo].[MANAGE_ACCEPT_TB]
-          LEFT JOIN
-          (
-            SELECT
-              [CLNT_PK] AS NO
-              ,[CLNT_NAME] AS 거래처명
-            FROM [QMES2022].[dbo].[MASTER_CLIENT_TB]
-          ) AS CLIENT ON CLIENT.NO = [ACPT_CLIENT_PK]
-          LEFT JOIN
-          (
-            SELECT
-              [ITEM_PK] AS NO
-              ,[ITEM_DIV] AS 품목구분
-              ,[ITEM_PRODUCT_NUM] AS 품번
-              ,[ITEM_NAME] AS 품명
-            FROM [QMES2022].[dbo].[MASTER_ITEM_TB]
-          ) AS ITEM ON ITEM.NO = [ACPT_ITEM_PK]
-        ) AS RESULT
-        WHERE (1=1)
-        AND ( 수주일 like concat('%',@input,'%')
-        OR 코드 like concat('%',@input,'%')
-        OR 코드순번 like concat('%',@input,'%')
-        OR 구분 like concat('%',@input,'%')
-        OR 거래처명 like concat('%',@input,'%')
-        OR 품목구분 like concat('%',@input,'%')
-        OR 품번 like concat('%',@input,'%')
-        OR 품명 like concat('%',@input,'%')
-        OR 수량 like concat('%',@input,'%')
-        OR 단가 like concat('%',@input,'%')
-        OR 공급가액 like concat('%',@input,'%')
-        OR 세액 like concat('%',@input,'%')
-        OR 납기일 like concat('%',@input,'%')
-        OR 비고 like concat('%',@input,'%'))
-        ORDER BY ` +
-        req.body.sortKey +
-        ` ` +
-        req.body.sortOrder +
-        `
-      `;
-    } else {
-      sql =
-        `
-        SELECT
-          NO AS NO, 수주일 AS 수주일, 코드 AS 코드, 코드순번 AS 코드순번, 구분 AS 구분, 거래처NO AS 거래처NO,
-          거래처명 AS 거래처명, 연락처 AS 연락처, 품목NO AS 품목NO, 품목구분 AS 품목구분, 품번 AS 품번, 품명 AS 품명,
-          수량 AS 수량, 단가 AS 단가, 공급가액 AS 공급가액, 세액 AS 세액, 결제조건 AS 결제조건, 결제예정일 AS 결제예정일,
-          납기일 AS 납기일, 도착지주소 AS 도착지주소, 기타 AS 기타, 비고 AS 비고, 등록자 AS 등록자, 등록일시 AS 등록일시
-        FROM(
-          SELECT
-            [ACPT_PK] AS NO
-            ,LEFT([ACPT_DATE],10) AS 수주일
-            ,[ACPT_CODE] AS 코드
-            ,[ACPT_CODE_NUM] AS 코드순번
-            ,[ACPT_DIV] AS 구분
-            ,[ACPT_CLIENT_PK] AS 거래처NO
-            ,CLIENT.거래처명 AS 거래처명
-            ,[ACPT_TEL] AS 연락처
-            ,[ACPT_ITEM_PK] AS 품목NO
-            ,ITEM.품목구분 AS 품목구분
-            ,ITEM.품번 AS 품번
-            ,ITEM.품명 AS 품명
-            ,[ACPT_AMOUNT] AS 수량
-            ,[ACPT_UNIT_COST] AS 단가
-            ,[ACPT_SUPPLY_COST] AS 공급가액
-            ,[ACPT_TAX_COST] AS 세액
-            ,[ACPT_PAY_CONDITION] AS 결제조건
-            ,LEFT([ACPT_PAY_DATE],10) AS 결제예정일
-            ,LEFT([ACPT_DELIVERY_DATE],10) AS 납기일
-            ,[ACPT_DELIVERY_ADDRESS] AS 도착지주소
-            ,[ACPT_ETC] AS 기타
-            ,[ACPT_NOTE] AS 비고
-            ,[ACPT_REGIST_NM] AS 등록자
-            ,[ACPT_REGIST_DT] AS 등록일시
-          FROM [QMES2022].[dbo].[MANAGE_ACCEPT_TB]
-          LEFT JOIN
-          (
-            SELECT
-              [CLNT_PK] AS NO
-              ,[CLNT_NAME] AS 거래처명
-            FROM [QMES2022].[dbo].[MASTER_CLIENT_TB]
-          ) AS CLIENT ON CLIENT.NO = [ACPT_CLIENT_PK]
-          LEFT JOIN
-          (
-            SELECT
-              [ITEM_PK] AS NO
-              ,[ITEM_DIV] AS 품목구분
-              ,[ITEM_PRODUCT_NUM] AS 품번
-              ,[ITEM_NAME] AS 품명
-            FROM [QMES2022].[dbo].[MASTER_ITEM_TB]
-          ) AS ITEM ON ITEM.NO = [ACPT_ITEM_PK]
-        ) AS RESULT
-        WHERE (1=1)
-        AND ` +
-        req.body.searchKey +
-        ` like concat('%',@input,'%')
-        ORDER BY ` +
-        req.body.sortKey +
-        ` ` +
-        req.body.sortOrder +
-        `
-      `;
-    }
-
-    const Pool = await pool;
-    const result = await Pool.request()
-      .input("input", req.body.searchInput)
-      .query(sql);
-
-    res.send(JSON.stringify(result.recordset));
-  } catch (err) {
-    res.status(500);
-    res.send(err.message);
-  }
-});
-
-// 거래처 데이터
-router.get("/client", async (req, res) => {
-  try {
-    const Pool = await pool;
-    const result = await Pool.request().query(`
-      SELECT
-      [CLNT_PK] AS NO
-      ,[CLNT_CODE] AS 코드
-      ,[CLNT_DIV] AS 구분
-      ,[CLNT_NAME] AS 거래처명
-      ,[CLNT_BUSINESS_NO] AS 사업자번호
-      ,[CLNT_ADDRESS] AS 주소
-      ,[CLNT_TEL] AS 전화번호
-      ,[CLNT_PHONE] AS 휴대폰번호
-      ,[CLNT_FAX] AS 팩스
-      ,[CLNT_EMAIL] AS 이메일
-      ,[CLNT_AGENT] AS 담당자
-      ,[CLNT_NOTE] AS 비고
-      ,[CLNT_REGIST_NM] AS 등록자
-      ,[CLNT_REGIST_DT] AS 등록일시
-      FROM [QMES2022].[dbo].[MASTER_CLIENT_TB]
-      ORDER BY [CLNT_PK] DESC
-    `);
-
-    res.send(JSON.stringify(result.recordset));
-  } catch (err) {
-    res.status(500);
-    res.send(err.message);
-  }
-});
-router.post("/client", async (req, res) => {
-  try {
-    var sql = "";
-    if (req.body.searchKey == "전체") {
-      sql =
-        `
-        SELECT
-          NO AS NO, 코드 AS 코드, 구분 AS 구분, 거래처명 AS 거래처명, 사업자번호 AS 사업자번호,
-          주소 AS 주소, 전화번호 AS 전화번호, 휴대폰번호 AS 휴대폰번호, 팩스 AS 팩스,
-          이메일 AS 이메일, 담당자 AS 담당자, 비고 AS 비고, 등록자 AS 등록자, 등록일시 AS 등록일시
-        FROM(
-        SELECT
-          [CLNT_PK] AS NO
-          ,[CLNT_CODE] AS 코드
-          ,[CLNT_DIV] AS 구분
-          ,[CLNT_NAME] AS 거래처명
-          ,[CLNT_BUSINESS_NO] AS 사업자번호
-          ,[CLNT_ADDRESS] AS 주소
-          ,[CLNT_TEL] AS 전화번호
-          ,[CLNT_PHONE] AS 휴대폰번호
-          ,[CLNT_FAX] AS 팩스
-          ,[CLNT_EMAIL] AS 이메일
-          ,[CLNT_AGENT] AS 담당자
-          ,[CLNT_NOTE] AS 비고
-          ,[CLNT_REGIST_NM] AS 등록자
-          ,[CLNT_REGIST_DT] AS 등록일시
-          FROM [QMES2022].[dbo].[MASTER_CLIENT_TB]
-        ) AS RESULT
-        WHERE (1=1)
-        AND ( 코드 like concat('%',@input,'%')
-        OR 구분 like concat('%',@input,'%')
-        OR 거래처명 like concat('%',@input,'%')
-        OR 사업자번호 like concat('%',@input,'%')
-        OR 주소 like concat('%',@input,'%')
-        OR 전화번호 like concat('%',@input,'%')
-        OR 휴대폰번호 like concat('%',@input,'%')
-        OR 팩스 like concat('%',@input,'%')
-        OR 이메일 like concat('%',@input,'%')
-        OR 담당자 like concat('%',@input,'%')
-        OR 비고 like concat('%',@input,'%'))
-        ORDER BY ` +
-        req.body.sortKey +
-        ` ` +
-        req.body.sortOrder +
-        `
-      `;
-    } else {
-      sql =
-        `
-        SELECT
-          NO AS NO, 코드 AS 코드, 구분 AS 구분, 거래처명 AS 거래처명, 사업자번호 AS 사업자번호,
-          주소 AS 주소, 전화번호 AS 전화번호, 휴대폰번호 AS 휴대폰번호, 팩스 AS 팩스,
-          이메일 AS 이메일, 담당자 AS 담당자, 비고 AS 비고, 등록자 AS 등록자, 등록일시 AS 등록일시
-        FROM(
-        SELECT
-          [CLNT_PK] AS NO
-          ,[CLNT_CODE] AS 코드
-          ,[CLNT_DIV] AS 구분
-          ,[CLNT_NAME] AS 거래처명
-          ,[CLNT_BUSINESS_NO] AS 사업자번호
-          ,[CLNT_ADDRESS] AS 주소
-          ,[CLNT_TEL] AS 전화번호
-          ,[CLNT_PHONE] AS 휴대폰번호
-          ,[CLNT_FAX] AS 팩스
-          ,[CLNT_EMAIL] AS 이메일
-          ,[CLNT_AGENT] AS 담당자
-          ,[CLNT_NOTE] AS 비고
-          ,[CLNT_REGIST_NM] AS 등록자
-          ,[CLNT_REGIST_DT] AS 등록일시
-          FROM [QMES2022].[dbo].[MASTER_CLIENT_TB]
-        ) AS RESULT
-        WHERE (1=1)
-        AND ` +
-        req.body.searchKey +
-        ` like concat('%',@input,'%')
-        ORDER BY ` +
-        req.body.sortKey +
-        ` ` +
-        req.body.sortOrder +
-        `
-      `;
-    }
-
-    const Pool = await pool;
-    const result = await Pool.request()
-      .input("input", req.body.searchInput)
-      .query(sql);
-
-    res.send(JSON.stringify(result.recordset));
-  } catch (err) {
-    res.status(500);
-    res.send(err.message);
-  }
-});
-
-// 품목 조회
-router.get("/product", async (req, res) => {
-  try {
-    const Pool = await pool;
-    const result = await Pool.request().query(`
-      SELECT
-        [ITEM_PK] AS NO
-        ,[ITEM_CLIENT_PK] AS 거래처NO
-        ,[ITEM_DIV] AS 구분
-        ,[ITEM_PRODUCT_NUM] AS 품번
-        ,[ITEM_NAME] AS 품명
-        ,[ITEM_CAR] AS 차종
-        ,[ITEM_SIZE] AS 규격
-        ,[ITEM_UNIT] AS 단위
-        ,[ITEM_SAFE] AS 안전재고
-        ,[ITEM_COST] AS 단가
-        ,[ITEM_NOTE] AS 비고
-        ,[ITEM_REGIST_NM] AS 등록자
-        ,[ITEM_REGIST_DT] AS 등록일시
-      FROM [QMES2022].[dbo].[MASTER_ITEM_TB] 
-      ORDER BY [ITEM_PK] DESC
-    `);
-    res.send(JSON.stringify(result.recordset));
-  } catch (err) {
-    res.status(500);
-    res.send(err.message);
-  }
-});
-
-router.post("/product", async (req, res) => {
-  try {
-    var sql = "";
-    if (req.body.searchKey == "전체") {
-      sql =
-        `
-        SELECT
-          NO AS NO, 거래처NO AS 거래처NO, 구분 AS 구분, 품번 AS 품번, 품명 AS 품명, 차종 AS 차종,
-          규격 AS 규격, 단위 AS 단위, 안전재고 AS 안전재고, 단가 AS 단가, 비고 AS 비고,
-          등록자 AS 등록자, 등록일시 AS 등록일시
-        FROM(
-          SELECT
-            [ITEM_PK] AS NO
-            ,[ITEM_CLIENT_PK] AS 거래처NO
-            ,CLIENT.거래처명 AS 거래처명
-            ,[ITEM_DIV] AS 구분
-            ,[ITEM_PRODUCT_NUM] AS 품번
-            ,[ITEM_NAME] AS 품명
-            ,[ITEM_CAR] AS 차종
-            ,[ITEM_SIZE] AS 규격
-            ,[ITEM_UNIT] AS 단위
-            ,[ITEM_SAFE] AS 안전재고
-            ,[ITEM_COST] AS 단가
-            ,[ITEM_NOTE] AS 비고
-            ,[ITEM_REGIST_NM] AS 등록자
-            ,[ITEM_REGIST_DT] AS 등록일시
-          FROM [QMES2022].[dbo].[MASTER_ITEM_TB]
-          LEFT JOIN
-          (
-            SELECT
-              [CLNT_PK] AS NO
-              ,[CLNT_NAME] AS 거래처명
-            FROM [QMES2022].[dbo].[MASTER_CLIENT_TB]
-          ) AS CLIENT ON CLIENT.NO = [ITEM_CLIENT_PK]
-        ) AS RESULT
-        WHERE (1=1)
-        AND ( 구분 like concat('%',@input,'%')
-        OR 품번 like concat('%',@input,'%')
-        OR 품명 like concat('%',@input,'%')
-        OR 차종 like concat('%',@input,'%')
-        OR 규격 like concat('%',@input,'%')
-        OR 단위 like concat('%',@input,'%')
-        OR 안전재고 like concat('%',@input,'%')
-        OR 단가 like concat('%',@input,'%')
-        OR 비고 like concat('%',@input,'%'))
-        ORDER BY ` +
-        req.body.sortKey +
-        ` ` +
-        req.body.sortOrder +
-        `
-      `;
-    } else {
-      sql =
-        `
-        SELECT
-          NO AS NO, 거래처NO AS 거래처NO, 구분 AS 구분, 품번 AS 품번, 품명 AS 품명, 차종 AS 차종,
-          규격 AS 규격, 단위 AS 단위, 안전재고 AS 안전재고, 단가 AS 단가, 비고 AS 비고,
-          등록자 AS 등록자, 등록일시 AS 등록일시
-        FROM(
-          SELECT
-            [ITEM_PK] AS NO
-            ,[ITEM_CLIENT_PK] AS 거래처NO
-            ,CLIENT.거래처명 AS 거래처명
-            ,[ITEM_DIV] AS 구분
-            ,[ITEM_PRODUCT_NUM] AS 품번
-            ,[ITEM_NAME] AS 품명
-            ,[ITEM_CAR] AS 차종
-            ,[ITEM_SIZE] AS 규격
-            ,[ITEM_UNIT] AS 단위
-            ,[ITEM_SAFE] AS 안전재고
-            ,[ITEM_COST] AS 단가
-            ,[ITEM_NOTE] AS 비고
-            ,[ITEM_REGIST_NM] AS 등록자
-            ,[ITEM_REGIST_DT] AS 등록일시
-          FROM [QMES2022].[dbo].[MASTER_ITEM_TB] 
-          LEFT JOIN
-          (
-            SELECT
-              [CLNT_PK] AS NO
-              ,[CLNT_NAME] AS 거래처명
-            FROM [QMES2022].[dbo].[MASTER_CLIENT_TB]
-          ) AS CLIENT ON CLIENT.NO = [ITEM_CLIENT_PK]
-        ) AS RESULT
-        WHERE (1=1)
-        AND ` +
-        req.body.searchKey +
-        ` like concat('%',@input,'%')
-        ORDER BY ` +
-        req.body.sortKey +
-        ` ` +
-        req.body.sortOrder +
-        `
-      `;
-    }
-
-    const Pool = await pool;
-    const result = await Pool.request()
-      .input("input", req.body.searchInput)
-      .query(sql);
-
-    res.send(JSON.stringify(result.recordset));
-  } catch (err) {
-    res.status(500);
-    res.send(err.message);
-  }
-});
-
-// 품질관리 수입검사에 검사요청
-router.post("/incoming_request/insert", async (req, res) => {
-  try {
-    const Pool = await pool;
-    await Pool.request()
-      .input("발주NO", req.body.data.발주NO ?? null)
-      .input("구분", req.body.data.구분 ?? "")
-      .input("샘플수량", req.body.data.샘플수량 ?? "")
-      .input("입고수량", req.body.data.입고수량 ?? "")
-      .input("결과", req.body.data.결과 ?? "")
-      .input("내용1", req.body.data.내용1 ?? "")
-      .input("내용2", req.body.data.내용2 ?? "")
-      .input("내용3", req.body.data.내용3 ?? "")
-      .input("내용4", req.body.data.내용4 ?? "")
-      .input("내용5", req.body.data.내용5 ?? "")
-      .input("내용6", req.body.data.내용6 ?? "")
-      .input("내용7", req.body.data.내용7 ?? "")
-      .input("내용8", req.body.data.내용8 ?? "")
-      .input("내용9", req.body.data.내용9 ?? "")
-      .input("내용10", req.body.data.내용10 ?? "")
-      .input("전달사항", req.body.data.전달사항 ?? "")
-      .input("비고", req.body.data.비고 ?? "")
-      .input("등록자", req.body.user ?? "")
-      .input(
-        "등록일시",
-        moment().tz("Asia/Seoul").format("YYYY-MM-DD HH:mm:ss")
-      ).query(`
-        INSERT INTO [QMES2022].[dbo].[MANAGE_IMPORT_INSPECT_TB]
-          ([IPISP_ORDER_PK]
-          ,[IPISP_DIV]
-          ,[IPISP_SAMPLE_AMT]
-          ,[IPISP_RECEIVE_AMT]
-          ,[IPISP_RESULT]
-          ,[IPISP_CONTENT1]
-          ,[IPISP_CONTENT2]
-          ,[IPISP_CONTENT3]
-          ,[IPISP_CONTENT4]
-          ,[IPISP_CONTENT5]
-          ,[IPISP_CONTENT6]
-          ,[IPISP_CONTENT7]
-          ,[IPISP_CONTENT8]
-          ,[IPISP_CONTENT9]
-          ,[IPISP_CONTENT10]
-          ,[IPISP_INFO]
-          ,[IPISP_NOTE]
-          ,[IPISP_REGIST_NM]
-          ,[IPISP_REGIST_DT])
-        VALUES
-          (@발주NO,@구분,@샘플수량,@입고수량,@결과,@내용1,@내용2,@내용3,@내용4,@내용5,
-            @내용6,@내용7,@내용8,@내용9,@내용10,@전달사항,@비고,@등록자,@등록일시)
-    `);
-
-    // 로그기록 저장
-    await logSend(
-      (type = "수입검사요청"),
-      (ct = JSON.stringify(req.body.data) + " 을 수입검사요청."),
-      (amount = 1),
-      (user = req.body.user ?? "")
-    );
-
-    res.send("등록완료");
-  } catch (err) {
-    // 로그기록 저장
-    await logSend(
-      (type = "에러"),
-      (ct = err.message ?? ""),
-      (amount = 0),
-      (user = req.body.user ?? "")
-    );
-    res.status(500);
-    res.send(err.message);
-  }
-});
 
 module.exports = router;
