@@ -18,6 +18,10 @@ const stockStockRawRouter = require("./stock/stockStockRaw");
 const stockStockHalfRouter = require("./stock/stockStockHalf");
 const stockStockFinRouter = require("./stock/stockStockFin");
 
+const stockStockLOTRawRouter = require("./stock/stockStockLOTRaw");
+const stockStockLOTHalfRouter = require("./stock/stockStockLOTHalf");
+const stockStockLOTFinRouter = require("./stock/stockStockLOTFin");
+
 router.use((req, res, next) => {
   // console.log("middleware for test!");
   next();
@@ -51,5 +55,12 @@ router.use("/stock/raw", stockStockRawRouter);
 router.use("/stock/half", stockStockHalfRouter);
 // 재고관리 / 완제품 재고현황 - router/stock/stockStockFin.js
 router.use("/stock/fin", stockStockFinRouter);
+
+// 재고관리 / 원부자재 LOT별 재고현황 - router/stock/stockStockLOTRaw.js
+router.use("/stock/lot/raw", stockStockLOTRawRouter);
+// 재고관리 / 반제품 LOT별 재고현황 - router/stock/stockStockLOTHalf.js
+router.use("/stock/lot/half", stockStockLOTHalfRouter);
+// 재고관리 / 완제품 LOT별 재고현황 - router/stock/stockStockLOTFin.js
+router.use("/stock/lot/fin", stockStockLOTFinRouter);
 
 module.exports = router;

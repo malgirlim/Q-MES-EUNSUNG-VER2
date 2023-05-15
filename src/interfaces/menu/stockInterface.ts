@@ -86,7 +86,7 @@ export interface StockProcess {
   재공수?: string;
 }
 
-// 재고 관리 - 재고현황
+// 재고 관리 - 품목별 재고현황
 export interface StockStock {
   [attribute: string]: any | undefined;
   품목NO?: number;
@@ -103,4 +103,23 @@ export interface StockStock {
   기말재공재고?: string;
   기말재고?: string;
   안전재고?: string;
+}
+
+// 재고 관리 - LOT별 재고현황
+export interface StockStockLOT {
+  [attribute: string]: any | undefined;
+  품목NO?: number;
+  LOT코드?: string;
+  품목구분?: string;
+  품번?: string;
+  품명?: string;
+  규격?: string;
+  단위?: string;
+  기초재공재고?: string;
+  기초재고?: string;
+  입고?: string;
+  재공?: string;
+  사용?: string;
+  기말재공재고?: string;
+  기말재고?: string;
 }

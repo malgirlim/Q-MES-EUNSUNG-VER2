@@ -101,10 +101,13 @@ const itemInit: ProductionTaskProcessItem = {
   NO: undefined,
   작업지시공정NONO: undefined,
   작업지시공정NO: undefined,
-  품목입고NO: undefined,
+  품목NO: undefined,
+  LOT코드: undefined,
   품목구분: undefined,
   품번: undefined,
   품명: undefined,
+  규격: undefined,
+  단위: undefined,
   수량: undefined,
   비고: undefined,
 };
@@ -164,6 +167,7 @@ const insertData = async () => {
   // console.log(taskInsertData.value);
   // console.log(processlist.value);
   // console.log(itemlist.value);
+
   // 가장 먼저 작업지시 정보를 저장한다.
   await task.insertData(taskInsertData.value);
 
