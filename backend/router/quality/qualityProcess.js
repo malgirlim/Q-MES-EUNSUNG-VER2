@@ -1283,8 +1283,13 @@ router.post("/itemreceive/insert", async (req, res) => {
       .input("공정검사NO", req.body.data.공정검사NO ?? null)
       .input("불량재작업NO", req.body.data.불량재작업NO ?? null)
       .input("수입검사NO", req.body.data.수입검사NO ?? null)
+      .input("품목NO", req.body.data.품목NO ?? null)
       .input("구분", req.body.data.구분 ?? "")
-      .input("입고일시", req.body.data.입고일시 ?? "")
+      .input(
+        "입고일시",
+        moment(req.body.data.입고일시).format("YYYY-MM-DD HH:mm:ss") ??
+          moment().tz("Asia/Seoul").format("YYYY-MM-DD HH:mm:ss")
+      )
       .input("입고코드", req.body.data.입고코드 ?? "")
       .input("입고수", req.body.data.입고수 ?? "")
       .input("유효일자", req.body.data.유효일자 ?? "")
@@ -1299,6 +1304,7 @@ router.post("/itemreceive/insert", async (req, res) => {
           ,[ITRC_PROCESS_INSPECT_PK]
           ,[ITRC_DEFECT_REWORK_PK]
           ,[ITRC_IMPORT_INSPECT_PK]
+          ,[ITRC_ITEM_PK]
           ,[ITRC_DIV]
           ,[ITRC_CODE]
           ,[ITRC_AMOUNT]
@@ -1308,7 +1314,11 @@ router.post("/itemreceive/insert", async (req, res) => {
           ,[ITRC_REGIST_NM]
           ,[ITRC_REGIST_DT])
             VALUES
-          (@생산실적NO,@공정검사NO,@불량재작업NO,@수입검사NO,@구분,@입고코드,@입고수,@입고일시,@유효일자,@비고,@등록자,@등록일시)
+          (@생산실적NO,@공정검사NO,@불량재작업NO,@수입검사NO,
+            (SELECT [ISPC_ITEM_PK] FROM [QMES2022].[dbo].[MANAGE_INSTRUCT_PROCESS_TB] WHERE [ISPC_PK] =
+              (SELECT [PDRS_INST_PROCESS_PK] FROM [QMES2022].[dbo].[MANAGE_PRODUCE_RESULT_TB] WHERE [PDRS_PK] =
+                (SELECT [PCISP_PRODUCE_RESULT_PK] FROM [QMES2022].[dbo].[MANAGE_PROCESS_INSPECT_TB] WHERE [PCISP_PK] = @공정검사NO))),
+            @구분,@입고코드,@입고수,@입고일시,@유효일자,@비고,@등록자,@등록일시)
     `);
 
     // 로그기록 저장

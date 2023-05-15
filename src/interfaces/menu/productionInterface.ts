@@ -65,15 +65,17 @@ export interface ProductionTaskProcess {
 export interface ProductionTaskProcessItem {
   [attribute: string]: any | undefined;
   NO?: number;
+  구분?: string;
   작업지시공정NO?: number;
-  품목입고NO?: number;
-  입고코드?: string;
+  품목NO?: number;
+  LOT코드?: string;
   품목구분?: string;
   품번?: string;
   품명?: string;
   규격?: string;
   단위?: string;
   수량?: string;
+  일시?: string;
   비고?: string;
   등록자?: string;
   등록일시?: string;
@@ -138,15 +140,17 @@ export interface ProductionResult {
 export interface ProductionResultUseItem {
   [attribute: string]: any | undefined;
   NO?: number;
-  생산실적NO?: number;
-  품목재공NO?: number;
-  코드?: string;
   구분?: string;
+  생산실적NO?: number;
+  품목NO?: number;
+  LOT코드?: string;
+  품목구분?: string;
+  품번?: string;
   품명?: string;
   규격?: string;
   단위?: string;
   수량?: string;
-  사용일시?: string;
+  일시?: string;
   비고?: string;
   등록자?: string;
   등록일시?: string;

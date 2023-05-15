@@ -6,6 +6,7 @@ export interface StockItemReceive {
   공정검사NO?: number;
   불량재작업NO?: number;
   수입검사NO?: number;
+  품목NO?: number;
   구분?: string;
   입고일시?: string;
   입고코드?: string;
@@ -26,9 +27,11 @@ export interface StockItemProcess {
   [attribute: string]: any | undefined;
   NO?: number;
   구분?: string;
-  지시공정자재NO?: number;
-  품목입고NO?: number;
-  입고코드?: string;
+  작업지시공정NO?: number;
+  작업코드?: string;
+  공정?: string;
+  품목NO?: number;
+  LOT코드?: string;
   품목구분?: string;
   품번?: string;
   품명?: string;
@@ -45,9 +48,13 @@ export interface StockItemProcess {
 export interface StockItemRelease {
   [attribute: string]: any | undefined;
   NO?: number;
+  구분?: string;
   생산실적NO?: number;
-  품목재공NO?: number;
-  코드?: string;
+  작업지시공정NO?: number;
+  작업코드?: string;
+  공정?: string;
+  품목NO?: number;
+  LOT코드?: string;
   품목구분?: string;
   품번?: string;
   품명?: string;
@@ -64,22 +71,25 @@ export interface StockItemRelease {
 export interface StockProcess {
   [attribute: string]: any | undefined;
   NO?: number;
-  지시공정자재NO?: number;
+  작업지시공정NO?: number;
   작업코드?: string;
   공정?: string;
-  품목입고NO?: number;
-  입고코드?: string;
+  LOT코드?: string;
+  품목NO?: number;
   품목구분?: string;
   품번?: string;
   품명?: string;
   규격?: string;
   단위?: string;
-  재공수량?: string;
+  불출수?: string;
+  사용수?: string;
+  재공수?: string;
 }
 
 // 재고 관리 - 재고현황
 export interface StockStock {
   [attribute: string]: any | undefined;
+  품목NO?: number;
   품목구분?: string;
   품번?: string;
   품명?: string;

@@ -47,13 +47,15 @@ const table_setting = {
   순번: { name: "순번", style: "width: 50px; text-align: center;" },
   항목1: { name: "작업코드", style: "width: 50px; text-align: center;" },
   항목2: { name: "공정", style: "width: 50px; text-align: center;" },
-  항목3: { name: "입고코드", style: "width: 50px; text-align: center;" },
+  항목3: { name: "LOT코드", style: "width: 50px; text-align: center;" },
   항목4: { name: "품목구분", style: "width: 50px; text-align: center;" },
   항목5: { name: "품번", style: "width: 50px; text-align: center;" },
   항목6: { name: "품명", style: "width: 5px; text-align: center;" },
   항목7: { name: "규격", style: "width: 5px; text-align: center;" },
   항목8: { name: "단위", style: "width: 5px; text-align: center;" },
-  항목9: { name: "재공수량", style: "width: 5px; text-align: center;" },
+  항목9: { name: "불출수", style: "width: 5px; text-align: center;" },
+  항목10: { name: "사용수", style: "width: 5px; text-align: center;" },
+  항목11: { name: "재공수", style: "width: 5px; text-align: center;" },
   상세보기: { name: "정보", style: "width: 50px; text-align: center;" },
   편집: { name: "편집", style: "width: 50px; text-align: center;" },
 };
@@ -612,6 +614,18 @@ const onFileImport = (event: any) => {
                 </Table.Th>
                 <Table.Th
                   class="text-center border-b-0 whitespace-nowrap font-bold"
+                  :style="table_setting.항목10.style"
+                >
+                  {{ table_setting.항목10.name }}
+                </Table.Th>
+                <Table.Th
+                  class="text-center border-b-0 whitespace-nowrap font-bold"
+                  :style="table_setting.항목11.style"
+                >
+                  {{ table_setting.항목11.name }}
+                </Table.Th>
+                <Table.Th
+                  class="text-center border-b-0 whitespace-nowrap font-bold"
                   :style="table_setting.상세보기.style"
                 >
                   {{ table_setting.상세보기.name }}
@@ -696,6 +710,18 @@ const onFileImport = (event: any) => {
                   :style="table_setting.항목9.style"
                 >
                   <div>{{ todo[table_setting.항목9.name] }}</div>
+                </Table.Td>
+                <Table.Td
+                  class="first:rounded-l-md last:rounded-r-md text-center bg-white border-b-0 dark:bg-darkmode-600 shadow-[20px_3px_20px_#0000000b]"
+                  :style="table_setting.항목10.style"
+                >
+                  <div>{{ todo[table_setting.항목10.name] }}</div>
+                </Table.Td>
+                <Table.Td
+                  class="first:rounded-l-md last:rounded-r-md text-center bg-white border-b-0 dark:bg-darkmode-600 shadow-[20px_3px_20px_#0000000b]"
+                  :style="table_setting.항목11.style"
+                >
+                  <div>{{ todo[table_setting.항목11.name] }}</div>
                 </Table.Td>
                 <Table.Td
                   class="first:rounded-l-md last:rounded-r-md text-center bg-white border-b-0 dark:bg-darkmode-600 shadow-[20px_3px_20px_#0000000b] py-0 relative before:block before:w-px before:h-8 before:bg-slate-200 before:absolute before:left-0 before:inset-y-0 before:my-auto before:dark:bg-darkmode-400"

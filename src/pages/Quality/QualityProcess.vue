@@ -890,7 +890,7 @@ const checkDataFunction = async () => {
         <Tab.Panels class="mt-5">
           <Tab.Panel class="leading-relaxed">
             <div style="text-align: left">
-              <div class="mt-3">
+              <!-- <div class="mt-3">
                 <FormLabel htmlFor="vertical-form-3">발주코드</FormLabel>
                 <FormInput
                   id="vertical-form-3"
@@ -899,7 +899,7 @@ const checkDataFunction = async () => {
                   placeholder="여기를 클릭하여 발주코드를 등록하세요"
                   @click="setOrderModal(true)"
                 />
-              </div>
+              </div> -->
               <div class="mt-3">
                 <FormLabel htmlFor="vertical-form-4">구분</FormLabel>
                 <FormInput
