@@ -413,7 +413,7 @@ const table_setting_process = {
   항목4: { name: "작업자", style: "width: 50px; text-align: center;" },
   항목5: { name: "품번", style: "width: 50px; text-align: center;" },
   항목6: { name: "품명", style: "width: 150px; text-align: center;" },
-  항목7: { name: "진행상황", style: "width: 50px; text-align: center;" },
+  항목7: { name: "진행상황", style: "width: 150px; text-align: center;" },
   항목8: { name: "항목8", style: "width: 50px; text-align: center;" },
   상세보기: { name: "정보", style: "width: 100px; text-align: center;" },
   편집: { name: "편집", style: "width: 100px; text-align: center;" },
@@ -1229,14 +1229,40 @@ const deleteDataFunction_ProcessItem = async () => {
                       <Table.Td
                         :class="[
                           'first:rounded-l-md last:rounded-r-md text-center bg-white border-b-0 dark:bg-darkmode-600 shadow-[20px_3px_20px_#0000000b]',
-                          { 'bg-warning': radioSelect_Process == todo.NO },
-                          { 'text-danger': todo.진행상황 == '작업대기' },
-                          { 'text-indigo-500': todo.진행상황 == '작업중' },
-                          { 'text-success': todo.진행상황 == '작업완료' },
+                          { 'text-gray-500': todo.진행상황 == '작업보류' },
+                          { 'text-danger': todo.진행상황 == '작업반려' },
+                          { 'text-black': todo.진행상황 == '작업미확인' },
+                          { 'text-orange-500': todo.진행상황 == '작업대기' },
+                          { 'text-success': todo.진행상황 == '작업중' },
+                          { 'text-blue-600': todo.진행상황 == '작업완료' },
                         ]"
                         :style="table_setting_process.항목7.style"
                       >
-                        <div>{{ todo[table_setting_process.항목7.name] }}</div>
+                        <div class="flex items-center">
+                          <div>
+                            <Lucide
+                              class="w-4 h-4 mr-1"
+                              :icon="
+                                todo.진행상황 == '작업보류'
+                                  ? 'MinusCircle'
+                                  : todo.진행상황 == '작업반려'
+                                  ? 'XCircle'
+                                  : todo.진행상황 == '작업미확인'
+                                  ? 'HelpCircle'
+                                  : todo.진행상황 == '작업대기'
+                                  ? 'PauseCircle'
+                                  : todo.진행상황 == '작업중'
+                                  ? 'PlayCircle'
+                                  : todo.진행상황 == '작업완료'
+                                  ? 'CheckCircle'
+                                  : 'AlertCircle'
+                              "
+                            />
+                          </div>
+                          <div>
+                            {{ todo[table_setting_process.항목7.name] }}
+                          </div>
+                        </div>
                       </Table.Td>
 
                       <Table.Td
@@ -1966,7 +1992,7 @@ const deleteDataFunction_ProcessItem = async () => {
                     value=""
                     selected
                   >
-                    === 추가 선택 ===
+                    === 선택 ===
                   </option>
                   <option
                     :value="p.NO"
@@ -2016,7 +2042,7 @@ const deleteDataFunction_ProcessItem = async () => {
                     value=""
                     selected
                   >
-                    === 추가 선택 ===
+                    === 선택 ===
                   </option>
                   <option
                     :value="p.아이디"
@@ -2027,6 +2053,21 @@ const deleteDataFunction_ProcessItem = async () => {
                     직책:{{ p.직책 }} # 직급:{{ p.직급 }}
                   </option>
                 </select>
+              </div>
+              <div class="mt-3">
+                <FormLabel htmlFor="vertical-form-11">진행상황</FormLabel>
+                <FormSelect
+                  type="text"
+                  :value="editModalData_Process.진행상황"
+                  v-model="editModalData_Process.진행상황"
+                >
+                  <option>작업미확인</option>
+                  <option>작업대기</option>
+                  <option>작업중</option>
+                  <option>작업완료</option>
+                  <option>작업반려</option>
+                  <option>작업보류</option>
+                </FormSelect>
               </div>
             </div>
           </Tab.Panel>

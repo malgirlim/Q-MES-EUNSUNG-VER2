@@ -84,9 +84,9 @@ const table_setting = {
   항목9: { name: "단위", style: "width: 50px; text-align: center;" },
   항목10: { name: "지시수량", style: "width: 50px; text-align: center;" },
   항목11: { name: "생산양품수량", style: "width: 50px; text-align: center;" },
-  항목12: { name: "진행상황", style: "width: 50px; text-align: center;" },
+  항목12: { name: "진행상황", style: "width: 110px; text-align: center;" },
   투입자재: { name: "투입자재", style: "width: 50px; text-align: center;" },
-  진행: { name: "진행등록", style: "width: 100px; text-align: center;" },
+  진행: { name: "진행등록", style: "width: 120px; text-align: center;" },
   상세보기: { name: "정보", style: "width: 50px; text-align: center;" },
   편집: { name: "편집", style: "width: 150px; text-align: center;" },
 };
@@ -346,11 +346,30 @@ const task_process_item = useSendApi<ProductionTaskProcessItem>(
   ref(100)
 );
 
+// ############################################### 작업상태 변경하기 ###############################################
+// ########################## 작업반려 Modal ##########################
+const TaskReturnModal = ref(false);
+const setTaskReturnModal = (value: boolean) => {
+  if (user_level >= 3) {
+    TaskReturnModal.value = value;
+  } else {
+    toast.warning("액세스 권한이 없습니다.\n관리자에게 문의하세요.");
+  }
+};
 // ########################## 작업수락 Modal ##########################
 const TaskAcceptModal = ref(false);
 const setTaskAcceptModal = (value: boolean) => {
   if (user_level >= 3) {
     TaskAcceptModal.value = value;
+  } else {
+    toast.warning("액세스 권한이 없습니다.\n관리자에게 문의하세요.");
+  }
+};
+// ########################## 작업시작 Modal ##########################
+const TaskStartModal = ref(false);
+const setTaskStartModal = (value: boolean) => {
+  if (user_level >= 3) {
+    TaskStartModal.value = value;
   } else {
     toast.warning("액세스 권한이 없습니다.\n관리자에게 문의하세요.");
   }
@@ -1397,13 +1416,40 @@ const importNonwork = (no: any) => {
                     <Table.Td
                       :class="[
                         'first:rounded-l-md last:rounded-r-md text-center bg-white border-b-0 dark:bg-darkmode-600 shadow-[20px_3px_20px_#0000000b]',
-                        { 'text-danger': todo.진행상황 == '작업대기' },
-                        { 'text-indigo-500': todo.진행상황 == '작업중' },
-                        { 'text-success': todo.진행상황 == '작업완료' },
+                        { 'text-gray-500': todo.진행상황 == '작업보류' },
+                        { 'text-danger': todo.진행상황 == '작업반려' },
+                        { 'text-black': todo.진행상황 == '작업미확인' },
+                        { 'text-orange-500': todo.진행상황 == '작업대기' },
+                        { 'text-success': todo.진행상황 == '작업중' },
+                        { 'text-blue-600': todo.진행상황 == '작업완료' },
                       ]"
                       :style="table_setting.항목12.style"
                     >
-                      <div>{{ todo[table_setting.항목12.name] }}</div>
+                      <div class="flex items-center">
+                        <div>
+                          <Lucide
+                            class="w-5 h-5 mr-1"
+                            :icon="
+                              todo.진행상황 == '작업보류'
+                                ? 'MinusCircle'
+                                : todo.진행상황 == '작업반려'
+                                ? 'XCircle'
+                                : todo.진행상황 == '작업미확인'
+                                ? 'HelpCircle'
+                                : todo.진행상황 == '작업대기'
+                                ? 'PauseCircle'
+                                : todo.진행상황 == '작업중'
+                                ? 'PlayCircle'
+                                : todo.진행상황 == '작업완료'
+                                ? 'CheckCircle'
+                                : 'AlertCircle'
+                            "
+                          />
+                        </div>
+                        <div>
+                          {{ todo[table_setting.항목12.name] }}
+                        </div>
+                      </div>
                     </Table.Td>
                     <Table.Td
                       class="first:rounded-l-md last:rounded-r-md text-center bg-white border-b-0 dark:bg-darkmode-600 shadow-[20px_3px_20px_#0000000b] py-0 relative before:block before:w-px before:h-8 before:bg-slate-200 before:absolute before:left-0 before:inset-y-0 before:my-auto before:dark:bg-darkmode-400"
@@ -1434,13 +1480,18 @@ const importNonwork = (no: any) => {
                       <div
                         class="flex items-center justify-center text-danger"
                         v-if="
-                          todo.진행상황 != '작업중' &&
-                          todo.진행상황 != '작업완료'
+                          todo.진행상황 == '작업보류' ||
+                          todo.진행상황 == '작업완료' ||
+                          todo.진행상황 == '작업반려'
                         "
+                      ></div>
+                      <div
+                        class="flex items-center justify-center text-danger"
+                        v-if="todo.진행상황 == '작업미확인'"
                       >
-                        <a
-                          class="flex items-center mr-3"
-                          href="#"
+                        <Button
+                          class="flex items-center mr-2 h-8"
+                          variant="primary"
                           @click="
                             () => {
                               editModalData = todo;
@@ -1449,16 +1500,47 @@ const importNonwork = (no: any) => {
                           "
                         >
                           <Lucide icon="PlayCircle" class="w-4 h-4 mr-1" />
-                          작업수락
-                        </a>
+                          수락
+                        </Button>
+                        <Button
+                          class="flex items-center h-8"
+                          variant="danger"
+                          @click="
+                            () => {
+                              editModalData = todo;
+                              setTaskReturnModal(true);
+                            }
+                          "
+                        >
+                          <Lucide icon="XCircle" class="w-4 h-4 mr-1" />
+                          반려
+                        </Button>
                       </div>
                       <div
-                        class="flex items-center justify-center text-indigo-500"
+                        class="flex items-center justify-center text-white"
+                        v-if="todo.진행상황 == '작업대기'"
+                      >
+                        <Button
+                          class="flex items-center text-white h-8"
+                          variant="success"
+                          @click="
+                            () => {
+                              editModalData = todo;
+                              setTaskStartModal(true);
+                            }
+                          "
+                        >
+                          <Lucide icon="PlayCircle" class="w-4 h-4 mr-1" />
+                          작업시작
+                        </Button>
+                      </div>
+                      <div
+                        class="flex items-center justify-center text-white"
                         v-if="todo.진행상황 == '작업중'"
                       >
-                        <a
-                          class="flex items-center mr-3"
-                          href="#"
+                        <Button
+                          class="flex items-center text-white h-8"
+                          variant="facebook"
                           @click="
                             () => {
                               editModalData = todo;
@@ -1468,35 +1550,8 @@ const importNonwork = (no: any) => {
                         >
                           <Lucide icon="Pencil" class="w-4 h-4 mr-1" />
                           실적입력
-                        </a>
+                        </Button>
                       </div>
-                      <div
-                        class="flex items-center justify-center text-success"
-                        v-if="todo.진행상황 == '작업완료'"
-                      >
-                        <a
-                          class="flex items-center mr-3"
-                          href="#"
-                          @click="
-                            () => {
-                              editModalData = todo;
-                              setResultModal(true);
-                            }
-                          "
-                        >
-                          <Lucide icon="Pencil" class="w-4 h-4 mr-1" />
-                          실적입력
-                        </a>
-                      </div>
-                      <!-- <div
-                        class="flex items-center justify-center text-success"
-                        v-if="todo.진행상황 == '작업완료'"
-                      >
-                        <a class="flex items-center mr-3" as="a">
-                          <Lucide icon="Check" class="w-4 h-4 mr-1" />
-                          진행완료
-                        </a>
-                      </div> -->
                     </Table.Td>
                   </Table.Tr>
                 </Table.Tbody>
@@ -1636,6 +1691,66 @@ const importNonwork = (no: any) => {
   #########################################################################################################################
    -->
 
+  <!-- BEGIN: 작업반려 Modal -->
+  <Dialog
+    :open="TaskReturnModal"
+    @close="
+      () => {
+        setTaskReturnModal(false);
+      }
+    "
+    :initialFocus="deleteButtonRef"
+  >
+    <Dialog.Panel>
+      <div class="p-5 text-center">
+        <Lucide icon="XCircle" class="w-16 h-16 mx-auto mt-3 text-danger" />
+        <div class="mt-5 text-3xl">반려</div>
+        <div class="mt-2 text-slate-500">작업을 반려하시겠습니까?</div>
+        <div style="text-align: left">
+          <div class="mt-3">
+            <FormLabel htmlFor="vertical-form-3">반려사유</FormLabel>
+            <FormInput
+              id="vertical-form-3"
+              type="text"
+              v-model="editModalData.비고"
+              placeholder="여기에 반려사유을 입력해주세요"
+            />
+          </div>
+        </div>
+      </div>
+      <div class="px-5 pb-8 text-center">
+        <Button
+          variant="outline-secondary"
+          type="button"
+          @click="
+            () => {
+              setTaskReturnModal(false);
+            }
+          "
+          class="w-24 mr-1"
+        >
+          취소
+        </Button>
+        <Button
+          variant="danger"
+          type="button"
+          class="w-24"
+          ref="deleteButtonRef"
+          @click="
+            () => {
+              editModalData.진행상황 = '작업반려';
+              dataManager.editData(editModalData);
+              setTaskReturnModal(false);
+            }
+          "
+        >
+          반려
+        </Button>
+      </div>
+    </Dialog.Panel>
+  </Dialog>
+  <!-- END: 작업반려 Modal -->
+
   <!-- BEGIN: 작업수락 Modal -->
   <Dialog
     :open="TaskAcceptModal"
@@ -1672,7 +1787,7 @@ const importNonwork = (no: any) => {
           ref="deleteButtonRef"
           @click="
             () => {
-              editModalData.진행상황 = '작업중';
+              editModalData.진행상황 = '작업대기';
               dataManager.editData(editModalData);
               setTaskAcceptModal(false);
             }
@@ -1684,6 +1799,55 @@ const importNonwork = (no: any) => {
     </Dialog.Panel>
   </Dialog>
   <!-- END: 작업수락 Modal -->
+
+  <!-- BEGIN: 작업시작 Modal -->
+  <Dialog
+    :open="TaskStartModal"
+    @close="
+      () => {
+        setTaskStartModal(false);
+      }
+    "
+    :initialFocus="deleteButtonRef"
+  >
+    <Dialog.Panel>
+      <div class="p-5 text-center">
+        <Lucide icon="PlayCircle" class="w-16 h-16 mx-auto mt-3 text-success" />
+        <div class="mt-5 text-3xl">시작</div>
+        <div class="mt-2 text-slate-500">작업을 시작하시겠습니까?</div>
+      </div>
+      <div class="px-5 pb-8 text-center">
+        <Button
+          variant="outline-secondary"
+          type="button"
+          @click="
+            () => {
+              setTaskStartModal(false);
+            }
+          "
+          class="w-24 mr-1"
+        >
+          취소
+        </Button>
+        <Button
+          variant="success"
+          type="button"
+          class="w-24 text-white"
+          ref="deleteButtonRef"
+          @click="
+            () => {
+              editModalData.진행상황 = '작업중';
+              dataManager.editData(editModalData);
+              setTaskStartModal(false);
+            }
+          "
+        >
+          시작
+        </Button>
+      </div>
+    </Dialog.Panel>
+  </Dialog>
+  <!-- END: 작업시작 Modal -->
 
   <!-- #########################################################################################################################
   #########################################################################################################################
