@@ -1230,7 +1230,7 @@ const deleteDataFunction_ProcessItem = async () => {
                         :class="[
                           'first:rounded-l-md last:rounded-r-md text-center bg-white border-b-0 dark:bg-darkmode-600 shadow-[20px_3px_20px_#0000000b]',
                           { 'bg-warning': radioSelect_Process == todo.NO },
-                          { 'text-danger': todo.진행상황 == '생산대기' },
+                          { 'text-danger': todo.진행상황 == '작업대기' },
                           { 'text-indigo-500': todo.진행상황 == '작업중' },
                           { 'text-success': todo.진행상황 == '작업완료' },
                         ]"

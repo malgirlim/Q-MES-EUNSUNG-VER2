@@ -380,7 +380,7 @@ router.post("/insert", async (req, res) => {
       .input("작업자ID", req.body.data.작업자ID ?? "")
       .input("품목NO", req.body.data.품목NO ?? null)
       .input("수량", req.body.data.수량 ?? "")
-      .input("진행상황", req.body.data.진행상황 ?? "생산대기")
+      .input("진행상황", req.body.data.진행상황 ?? "작업대기")
       .input("비고", req.body.data.비고 ?? "")
       .input("등록자", req.body.user ?? "")
       .input(
@@ -438,7 +438,7 @@ router.post("/insertAll", async (req, res) => {
         .input("작업자ID", req.body.data[i].작업자ID ?? "")
         .input("품목NO", req.body.data[i].품목NO ?? null)
         .input("수량", req.body.data[i].수량 ?? "")
-        .input("진행상황", req.body.data[i].진행상황 ?? "생산대기")
+        .input("진행상황", req.body.data[i].진행상황 ?? "작업대기")
         .input("비고", req.body.data[i].비고 ?? "")
         .input("등록자", req.body.user ?? "")
         .input(
@@ -496,7 +496,7 @@ router.post("/edit", async (req, res) => {
       .input("작업자ID", req.body.data.작업자ID ?? "")
       .input("품목NO", req.body.data.품목NO ?? null)
       .input("수량", req.body.data.수량 ?? "")
-      .input("진행상황", req.body.data.진행상황 ?? "생산대기")
+      .input("진행상황", req.body.data.진행상황 ?? "작업대기")
       .input("비고", req.body.data.비고 ?? "")
       .input("등록자", req.body.user ?? "")
       .input(

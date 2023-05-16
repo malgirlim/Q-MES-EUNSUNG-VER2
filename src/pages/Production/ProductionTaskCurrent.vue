@@ -1397,7 +1397,7 @@ const importNonwork = (no: any) => {
                     <Table.Td
                       :class="[
                         'first:rounded-l-md last:rounded-r-md text-center bg-white border-b-0 dark:bg-darkmode-600 shadow-[20px_3px_20px_#0000000b]',
-                        { 'text-danger': todo.진행상황 == '생산대기' },
+                        { 'text-danger': todo.진행상황 == '작업대기' },
                         { 'text-indigo-500': todo.진행상황 == '작업중' },
                         { 'text-success': todo.진행상황 == '작업완료' },
                       ]"
@@ -1558,7 +1558,7 @@ const importNonwork = (no: any) => {
           <Table.Thead>
             <Table.Tr class="text-center">
               <Table.Th> 순번 </Table.Th>
-              <Table.Th> 입고코드 </Table.Th>
+              <Table.Th> LOT코드 </Table.Th>
               <Table.Th> 품목코드 </Table.Th>
               <Table.Th> 품목구분 </Table.Th>
               <Table.Th> 품명 </Table.Th>
@@ -1575,7 +1575,7 @@ const importNonwork = (no: any) => {
               :key="todo.NO"
             >
               <Table.Td> {{ index + 1 }} </Table.Td>
-              <Table.Td> {{ todo.입고코드 }} </Table.Td>
+              <Table.Td> {{ todo.LOT코드 }} </Table.Td>
               <Table.Td> {{ todo.품번 }} </Table.Td>
               <Table.Td> {{ todo.품목구분 }} </Table.Td>
               <Table.Td> {{ todo.품명 }} </Table.Td>

@@ -4,8 +4,8 @@ import Lucide from "../../../base-components/Lucide";
 
 // 임시 작업지시 데이터
 
-const task_status = "생산대기";
-const task_status_tmp = "생산중";
+const task_status = "작업대기";
+const task_status_tmp = "작업중";
 const task_qty_current = "0";
 const task_qty = "10,000";
 const task_qty_std = "개";
@@ -56,8 +56,8 @@ const task_qty_std = "개";
             <td class="border-b-2 border-r-2 border-success h-20">
               <div
                 :class="[
-                  { 'text-danger': task_status_tmp == '생산대기' },
-                  { 'text-indigo-500': task_status_tmp == '생산중' },
+                  { 'text-danger': task_status_tmp == '작업대기' },
+                  { 'text-indigo-500': task_status_tmp == '작업중' },
                 ]"
               >
                 {{ task_status_tmp }}
@@ -67,7 +67,7 @@ const task_qty_std = "개";
               </div>
             </td>
             <td class="border-b-2 border-r-2 border-success h-20">
-              <div v-if="task_status_tmp == '생산대기'">
+              <div v-if="task_status_tmp == '작업대기'">
                 <Button variant="primary"
                   ><Lucide class="w-8 h-8 mx-auto" icon="CheckSquare"
                 /></Button>
@@ -95,8 +95,8 @@ const task_qty_std = "개";
             <td class="border-b-2 border-r-2 border-success h-20">
               <div
                 :class="[
-                  { 'text-danger': task_status == '생산대기' },
-                  { 'text-indigo-500': task_status == '생산중' },
+                  { 'text-danger': task_status == '작업대기' },
+                  { 'text-indigo-500': task_status == '작업중' },
                 ]"
               >
                 {{ task_status }}
@@ -106,7 +106,7 @@ const task_qty_std = "개";
               </div>
             </td>
             <td class="border-b-2 border-r-2 border-success h-20">
-              <div v-if="task_status == '생산대기'">
+              <div v-if="task_status == '작업대기'">
                 <Button variant="primary"
                   ><Lucide class="w-8 h-8 mx-auto" icon="CheckSquare"
                 /></Button>
