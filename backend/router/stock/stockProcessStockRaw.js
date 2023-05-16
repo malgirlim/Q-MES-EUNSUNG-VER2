@@ -61,9 +61,9 @@ router.get("/", async (req, res) => {
             ,ITEM.품명 AS 품명
             ,ITEM.규격 AS 규격
             ,ITEM.단위 AS 단위
-            ,불출.수량 AS 불출수
-            ,사용.수량 AS 사용수
-            ,불출.수량 - 사용.수량 AS 재공수
+            ,COALESCE(불출.수량,0) AS 불출수
+            ,COALESCE(사용.수량,0) AS 사용수
+            ,COALESCE(불출.수량,0) - COALESCE(사용.수량,0) AS 재공수
           FROM
           (
             SELECT
@@ -181,9 +181,9 @@ router.post("/", async (req, res) => {
             ,ITEM.품명 AS 품명
             ,ITEM.규격 AS 규격
             ,ITEM.단위 AS 단위
-            ,불출.수량 AS 불출수
-            ,사용.수량 AS 사용수
-            ,불출.수량 - 사용.수량 AS 재공수
+            ,COALESCE(불출.수량,0) AS 불출수
+            ,COALESCE(사용.수량,0) AS 사용수
+            ,COALESCE(불출.수량,0) - COALESCE(사용.수량,0) AS 재공수
           FROM
           (
             SELECT
@@ -296,9 +296,9 @@ router.post("/", async (req, res) => {
             ,ITEM.품명 AS 품명
             ,ITEM.규격 AS 규격
             ,ITEM.단위 AS 단위
-            ,불출.수량 AS 불출수
-            ,사용.수량 AS 사용수
-            ,불출.수량 - 사용.수량 AS 재공수
+            ,COALESCE(불출.수량,0) AS 불출수
+            ,COALESCE(사용.수량,0) AS 사용수
+            ,COALESCE(불출.수량,0) - COALESCE(사용.수량,0) AS 재공수
           FROM
           (
             SELECT

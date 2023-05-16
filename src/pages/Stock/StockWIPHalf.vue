@@ -45,7 +45,7 @@ const dataManager = useSendApi<StockItemProcess>(url, currentPage, rowsPerPage);
 const table_setting = {
   체크박스: { name: "체크박스", style: "width: 50px" },
   순번: { name: "순번", style: "width: 50px; text-align: center;" },
-  항목1: { name: "작업지시공정NO", style: "width: 50px; text-align: center;" },
+  항목1: { name: "구분", style: "width: 50px; text-align: center;" },
   항목2: { name: "불출일시", style: "width: 50px; text-align: center;" },
   항목3: { name: "작업코드", style: "width: 50px; text-align: center;" },
   항목4: { name: "공정", style: "width: 50px; text-align: center;" },

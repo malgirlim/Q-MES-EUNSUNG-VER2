@@ -1520,7 +1520,7 @@ router.get("/stocklot", async (req, res) => {
     const Pool = await pool;
     const result = await Pool.request().query(`
       SELECT
-        품목NO AS 품목No
+        품목NO AS 품목NO
 		    ,LOT코드 AS LOT코드
         ,품목구분 AS 품목구분
         ,품번 AS 품번
@@ -1658,7 +1658,7 @@ router.post("/stocklot", async (req, res) => {
       sql =
         `
         SELECT
-          NO AS 품목No
+          NO AS 품목NO
           ,LOT코드 AS LOT코드
           ,품목구분 AS 품목구분
           ,품번 AS 품번
@@ -1813,7 +1813,7 @@ router.post("/stocklot", async (req, res) => {
       sql =
         `
         SELECT
-          NO AS 품목No
+          NO AS 품목NO
           ,LOT코드 AS LOT코드
           ,품목구분 AS 품목구분
           ,품번 AS 품번

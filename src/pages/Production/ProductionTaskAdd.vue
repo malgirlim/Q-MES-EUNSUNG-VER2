@@ -407,13 +407,13 @@ const table_setting_process = {
   체크박스: { name: "체크박스", style: "width: 50px" },
   선택: { name: "선택", style: "width: 50px; text-align: center;" },
   순번: { name: "순번", style: "width: 50px; text-align: center;" },
-  항목1: { name: "공정명", style: "width: 50px; text-align: center;" },
-  항목2: { name: "설비명", style: "width: 50px; text-align: center;" },
-  항목3: { name: "작업자", style: "width: 50px; text-align: center;" },
-  항목4: { name: "품번", style: "width: 50px; text-align: center;" },
-  항목5: { name: "품명", style: "width: 50px; text-align: center;" },
-  항목6: { name: "진행상황", style: "width: 50px; text-align: center;" },
-  항목7: { name: "항목7", style: "width: 50px; text-align: center;" },
+  항목1: { name: "작업구분", style: "width: 50px; text-align: center;" },
+  항목2: { name: "공정명", style: "width: 50px; text-align: center;" },
+  항목3: { name: "설비명", style: "width: 50px; text-align: center;" },
+  항목4: { name: "작업자", style: "width: 50px; text-align: center;" },
+  항목5: { name: "품번", style: "width: 50px; text-align: center;" },
+  항목6: { name: "품명", style: "width: 150px; text-align: center;" },
+  항목7: { name: "진행상황", style: "width: 50px; text-align: center;" },
   항목8: { name: "항목8", style: "width: 50px; text-align: center;" },
   상세보기: { name: "정보", style: "width: 100px; text-align: center;" },
   편집: { name: "편집", style: "width: 100px; text-align: center;" },
@@ -484,7 +484,7 @@ const task_process_item = useSendApi<ProductionTaskProcessItem>(
 const table_setting_process_item = {
   체크박스: { name: "체크박스", style: "width: 50px" },
   순번: { name: "순번", style: "width: 50px; text-align: center;" },
-  항목1: { name: "입고코드", style: "width: 100px; text-align: center;" },
+  항목1: { name: "LOT코드", style: "width: 100px; text-align: center;" },
   항목2: { name: "품목구분", style: "width: 100px; text-align: center;" },
   항목3: { name: "품번", style: "width: 150px; text-align: center;" },
   항목4: { name: "품명", style: "width: 100px; text-align: center;" },
@@ -775,7 +775,7 @@ const deleteDataFunction_ProcessItem = async () => {
           <div class="col-span-12 overflow-auto intro-y lg:overflow-visible">
             <div
               class="mr-3"
-              style="overflow-y: scroll; overflow-x: hidden; height: 580px"
+              style="overflow-y: scroll; overflow-x: hidden; height: 250px"
             >
               <Table class="border-spacing-y-[8px] border-separate -mt-2">
                 <Table.Thead
@@ -1125,6 +1125,12 @@ const deleteDataFunction_ProcessItem = async () => {
 
                       <Table.Th
                         class="text-center border-b-0 whitespace-nowrap font-bold"
+                        :style="table_setting_process.항목7.style"
+                      >
+                        {{ table_setting_process.항목7.name }}
+                      </Table.Th>
+                      <Table.Th
+                        class="text-center border-b-0 whitespace-nowrap font-bold"
                         :style="table_setting_process.편집.style"
                       >
                         {{ table_setting_process.편집.name }}
@@ -1215,13 +1221,22 @@ const deleteDataFunction_ProcessItem = async () => {
                         :class="[
                           'first:rounded-l-md last:rounded-r-md text-center bg-white border-b-0 dark:bg-darkmode-600 shadow-[20px_3px_20px_#0000000b]',
                           { 'bg-warning': radioSelect_Process == todo.NO },
-                          { 'text-danger': todo.진행상황 == '생산대기' },
-                          { 'text-indigo-500': todo.진행상황 == '작업중' },
-                          { 'text-success': todo.진행상황 == '작업완료' },
                         ]"
                         :style="table_setting_process.항목6.style"
                       >
                         <div>{{ todo[table_setting_process.항목6.name] }}</div>
+                      </Table.Td>
+                      <Table.Td
+                        :class="[
+                          'first:rounded-l-md last:rounded-r-md text-center bg-white border-b-0 dark:bg-darkmode-600 shadow-[20px_3px_20px_#0000000b]',
+                          { 'bg-warning': radioSelect_Process == todo.NO },
+                          { 'text-danger': todo.진행상황 == '생산대기' },
+                          { 'text-indigo-500': todo.진행상황 == '작업중' },
+                          { 'text-success': todo.진행상황 == '작업완료' },
+                        ]"
+                        :style="table_setting_process.항목7.style"
+                      >
+                        <div>{{ todo[table_setting_process.항목7.name] }}</div>
                       </Table.Td>
 
                       <Table.Td
