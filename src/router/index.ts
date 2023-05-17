@@ -9,6 +9,15 @@ import Login from "../pages/Login.vue";
 import LoginKiosk from "../pages/LoginKiosk.vue";
 import FacilitySelect from "../pages/kiosk/FacilitySelect.vue";
 import KioskFacility1 from "../pages/kiosk/Facility1.vue";
+import KioskFacility2 from "../pages/kiosk/Facility2.vue";
+import KioskFacility3 from "../pages/kiosk/Facility3.vue";
+import KioskFacility4 from "../pages/kiosk/Facility4.vue";
+import KioskFacility5 from "../pages/kiosk/Facility5.vue";
+import KioskFacility6 from "../pages/kiosk/Facility6.vue";
+import KioskFacility7 from "../pages/kiosk/Facility7.vue";
+import KioskFacility8 from "../pages/kiosk/Facility8.vue";
+import KioskFacility9 from "../pages/kiosk/Facility9.vue";
+import KioskFacility10 from "../pages/kiosk/Facility10.vue";
 
 import ShareNotice from "../pages/share/ShareNotice.vue";
 
@@ -122,6 +131,42 @@ const routes = [
   {
     path: "/kiosk/facility1",
     component: KioskFacility1,
+  },
+  {
+    path: "/kiosk/facility2",
+    component: KioskFacility2,
+  },
+  {
+    path: "/kiosk/facility3",
+    component: KioskFacility3,
+  },
+  {
+    path: "/kiosk/facility4",
+    component: KioskFacility4,
+  },
+  {
+    path: "/kiosk/facility5",
+    component: KioskFacility5,
+  },
+  {
+    path: "/kiosk/facility6",
+    component: KioskFacility6,
+  },
+  {
+    path: "/kiosk/facility7",
+    component: KioskFacility7,
+  },
+  {
+    path: "/kiosk/facility8",
+    component: KioskFacility8,
+  },
+  {
+    path: "/kiosk/facility9",
+    component: KioskFacility9,
+  },
+  {
+    path: "/kiosk/facility10",
+    component: KioskFacility10,
   },
   {
     path: "/",
