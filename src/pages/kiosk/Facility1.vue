@@ -8,6 +8,7 @@ import Lucide from "../../base-components/Lucide";
 import LoadingIcon from "../../base-components/LoadingIcon";
 import { Dialog } from "../../base-components/Headless";
 import Table from "../../base-components/Table";
+import { FormSelect } from "../../base-components/Form";
 
 import moment from "moment";
 import { toast } from "vue3-toastify";
@@ -22,6 +23,7 @@ import CheckList from "../../components/Common/Kiosk/CheckList.vue";
 import NonOPAdd from "../../components/Common/Kiosk/NonOPAdd.vue";
 import BadAdd from "../../components/Common/Kiosk/BadAdd.vue";
 import ItemAdd from "../../components/Common/Kiosk/ItemAdd.vue";
+import WorkerChange from "../../components/Common/Kiosk/WorkerChange.vue";
 
 onMounted(async () => {
   setInterval(() => {
@@ -155,6 +157,18 @@ const itemAddModal = ref(false);
 const setItemAddModal = (value: boolean) => {
   itemAddModal.value = value;
 };
+
+/* 작업자변경 Modal */
+const workerChangeModal = ref(false);
+const setWorkerChangeModal = (value: boolean) => {
+  workerChangeModal.value = value;
+};
+
+/* 작업종료 Modal */
+const taskFinishModal = ref(false);
+const setTaskFinishModal = (value: boolean) => {
+  taskFinishModal.value = value;
+};
 </script>
 
 <template>
@@ -240,9 +254,17 @@ const setItemAddModal = (value: boolean) => {
           variant="pending"
           @click="setItemAddModal(true)"
           ><strong>투입자재변경</strong></Button
-        ><Button class="mr-5 h-14 w-44 text-2xl" as="a" variant="primary"
+        ><Button
+          class="mr-5 h-14 w-44 text-2xl"
+          as="a"
+          variant="primary"
+          @click="setWorkerChangeModal(true)"
           ><strong>작업자변경</strong></Button
-        ><Button class="h-14 w-44 text-2xl" as="a" variant="danger"
+        ><Button
+          class="h-14 w-44 text-2xl"
+          as="a"
+          variant="danger"
+          @click="setTaskFinishModal(true)"
           ><strong>작업종료</strong></Button
         >
       </div>
@@ -717,11 +739,12 @@ const setItemAddModal = (value: boolean) => {
   <Dialog :open="taskStartModal" size="lg" @close="setTaskStartModal(false)">
     <Dialog.Panel>
       <div class="p-5 text-center">
-        <Lucide icon="Play" class="w-32 h-32 mx-auto mt-3 text-success" />
-        <div class="mt-10 text-3xl">작업을 시작하시겠습니까?</div>
+        <Lucide icon="Play" class="w-24 h-24 mx-auto mt-3 text-success" />
+        <div class="mt-5 text-3xl"><strong>작업 시작</strong></div>
+        <div class="mt-3 text-xl">작업 시작 전 점검 목록을 확인해주세요.</div>
       </div>
 
-      <div class="mt-10 px-5 pb-8 text-center">
+      <div class="mt-5 px-5 pb-8 text-center">
         <Button
           variant="primary"
           type="button"
@@ -732,7 +755,7 @@ const setItemAddModal = (value: boolean) => {
           "
           class="w-48 text-2xl mr-10"
         >
-          확인
+          시작
         </Button>
         <Button
           variant="outline-primary"
@@ -751,11 +774,12 @@ const setItemAddModal = (value: boolean) => {
   <Dialog :open="nonOPModal" size="lg" @close="setNonOPModal(false)">
     <Dialog.Panel>
       <div class="p-5 text-center">
-        <Lucide icon="Pause" class="w-32 h-32 mx-auto mt-3 text-[#D9821C]" />
-        <div class="mt-10 text-3xl">비가동 전환하시겠습니까?</div>
+        <Lucide icon="Pause" class="w-24 h-24 mx-auto mt-3 text-[#D9821C]" />
+        <div class="mt-5 text-3xl"><strong>비가동 전환</strong></div>
+        <div class="mt-3 text-xl">장비가 비가동으로 전환됩니다.</div>
       </div>
 
-      <div class="mt-10 px-5 pb-8 text-center">
+      <div class="mt-5 px-5 pb-8 text-center">
         <Button
           variant="primary"
           type="button"
@@ -767,7 +791,7 @@ const setItemAddModal = (value: boolean) => {
           "
           class="w-48 text-2xl mr-10"
         >
-          확인
+          전환
         </Button>
         <Button
           variant="outline-primary"
@@ -875,6 +899,81 @@ const setItemAddModal = (value: boolean) => {
     </Dialog.Panel>
   </Dialog>
   <!-- END: 불량변경 Modal -->
+
+  <!-- BEGIN: 작업자 변경 Modal -->
+  <Dialog
+    :open="workerChangeModal"
+    size="lg"
+    @close="setWorkerChangeModal(false)"
+  >
+    <Dialog.Panel>
+      <div class="p-5 text-center">
+        <Lucide icon="Users" class="w-24 h-24 mx-auto mt-3 text-primary" />
+        <div class="mt-5 text-3xl"><strong>작업자 변경</strong></div>
+        <div class="mt-3 text-xl">변경할 작업자를 선택해주세요.</div>
+      </div>
+      <div><WorkerChange /></div>
+
+      <div class="mt-5 px-5 pb-8 text-center">
+        <Button
+          variant="primary"
+          type="button"
+          @click="
+            () => {
+              setWorkerChangeModal(false);
+            }
+          "
+          class="w-48 text-2xl mr-10"
+        >
+          변경
+        </Button>
+        <Button
+          variant="outline-primary"
+          type="button"
+          class="w-48 text-2xl"
+          @click="setWorkerChangeModal(false)"
+        >
+          취소
+        </Button>
+      </div>
+    </Dialog.Panel>
+  </Dialog>
+  <!-- END: 작업자 변경 Modal -->
+
+  <!-- BEGIN: 작업종료 Modal -->
+  <Dialog :open="taskFinishModal" size="lg" @close="setTaskFinishModal(false)">
+    <Dialog.Panel>
+      <div class="p-5 text-center">
+        <Lucide icon="Play" class="w-24 h-24 mx-auto mt-3 text-success" />
+        <div class="mt-5 text-3xl"><strong>작업 시작</strong></div>
+        <div class="mt-3 text-xl">작업 시작 전 점검 목록을 확인해주세요.</div>
+      </div>
+
+      <div class="mt-5 px-5 pb-8 text-center">
+        <Button
+          variant="primary"
+          type="button"
+          @click="
+            () => {
+              setTaskFinishModal(false);
+            }
+          "
+          class="w-48 text-2xl mr-10"
+        >
+          시작
+        </Button>
+        <Button
+          variant="outline-primary"
+          type="button"
+          class="w-48 text-2xl"
+          @click="setTaskFinishModal(false)"
+        >
+          취소
+        </Button>
+      </div>
+    </Dialog.Panel>
+  </Dialog>
+  <!-- END: 작업자 변경 Modal -->
 
   <!-- BEGIN: 로그아웃 확인 Modal -->
   <Dialog :open="logoutModal" size="lg" @close="setLogoutModal(false)">

@@ -46,62 +46,147 @@ watch([num], (newValue, oldValue) => {
 <template>
   <div class="p-7">
     <div class="grid grid-cols-5 gap-2 text-2xl">
-      <div class="col-span-2">
-        <div
-          class="mx-auto h-10 py-1 border-l-2 border-r-2 border-t-2 border-[#D9821C] bg-slate-200 text-xl text-center"
-          style="width: 608px"
-        >
-          <strong>불량 등록 목록</strong>
-        </div>
-        <div
-          class="pl-7 pr-3 text-xl"
-          style="height: 554px; overflow-y: scroll; overflow-x: hidden"
-        >
-          <table class="w-full">
-            <thead
-              class="border-b-2 border-[#D9821C] bg-slate-200 h-10"
-              style="position: sticky; top: 0px; z-index: 2"
-            >
-              <th
-                class="border-l-2 border-t-2 border-r-2 border-[#D9821C] w-24"
+      <div class="col-span-4">
+        <div>
+          <div
+            class="mx-auto h-10 py-1 border-l-2 border-r-2 border-t-2 border-[#D9821C] bg-slate-200 text-xl text-center"
+            style="width: 1280px"
+          >
+            <strong>불량 유형 선택</strong>
+          </div>
+          <div
+            class="pl-7 pr-3 text-xl"
+            style="height: 234px; overflow-y: scroll; overflow-x: hidden"
+          >
+            <table class="w-full">
+              <thead
+                class="border-b-2 border-[#D9821C] bg-slate-200 h-10"
+                style="position: sticky; top: 0px; z-index: 2"
               >
-                코드
-              </th>
-              <th class="border-t-2 border-r-2 border-[#D9821C] w-24">구분</th>
-              <th class="border-t-2 border-r-2 border-[#D9821C] w-20">
-                불량명
-              </th>
-              <th class="border-t-2 border-r-2 border-[#D9821C] w-28">내용</th>
-              <th class="border-t-2 border-r-2 border-[#D9821C] w-16">수량</th>
-              <th class="border-t-2 border-r-2 border-[#D9821C] w-20">삭제</th>
-            </thead>
-            <tbody>
-              <tr class="text-center" v-for="i in Array(10).fill('10')">
-                <td
-                  class="border-l-2 border-b-2 border-r-2 border-[#D9821C] h-16"
+                <th
+                  class="border-l-2 border-t-2 border-r-2 border-[#D9821C] w-24"
                 >
-                  BA0023
-                </td>
-                <td class="border-b-2 border-r-2 border-[#D9821C] h-10">
-                  소재불량
-                </td>
-                <td class="border-b-2 border-r-2 border-[#D9821C] h-10">
-                  오염
-                </td>
-                <td class="border-b-2 border-r-2 border-[#D9821C] h-10">
-                  원단오염
-                </td>
-                <td class="border-b-2 border-r-2 border-[#D9821C] h-10">
-                  10,000
-                </td>
-                <td class="border-b-2 border-r-2 border-[#D9821C] h-10">
-                  <Button class="h-10" variant="danger"
-                    ><Lucide class="w-6 h-6 mx-auto" icon="Trash2"
-                  /></Button>
-                </td>
-              </tr>
-            </tbody>
-          </table>
+                  코드
+                </th>
+                <th class="border-t-2 border-r-2 border-[#D9821C] w-24">
+                  구분
+                </th>
+                <th class="border-t-2 border-r-2 border-[#D9821C] w-28">
+                  불량명
+                </th>
+                <th class="border-t-2 border-r-2 border-[#D9821C] w-28">
+                  내용
+                </th>
+                <th class="border-t-2 border-r-2 border-[#D9821C] w-20">
+                  선택
+                </th>
+              </thead>
+              <tbody>
+                <tr class="text-center" v-for="i in Array(10).fill('10')">
+                  <td
+                    class="border-l-2 border-b-2 border-r-2 border-[#D9821C] h-16"
+                  >
+                    BA0023
+                  </td>
+                  <td class="border-b-2 border-r-2 border-[#D9821C] h-10">
+                    소재불량
+                  </td>
+                  <td class="border-b-2 border-r-2 border-[#D9821C] h-10">
+                    오염
+                  </td>
+                  <td class="border-b-2 border-r-2 border-[#D9821C] h-10">
+                    원단오염
+                  </td>
+                  <td class="border-b-2 border-r-2 border-[#D9821C] h-10">
+                    <Button class="h-10 w-16" variant="primary"
+                      ><Lucide class="w-6 h-6 mx-auto" icon="CheckSquare"
+                    /></Button>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+        <div class="flex p-4">
+          <div class="flex m-auto">
+            <div><Lucide class="w-9 h-9 mr-1" icon="ChevronsDown" /></div>
+            <div><Lucide class="w-9 h-9 mr-1" icon="ChevronsDown" /></div>
+            <div><Lucide class="w-9 h-9" icon="ChevronsDown" /></div>
+          </div>
+        </div>
+        <div>
+          <div
+            class="mx-auto h-10 py-1 border-l-2 border-r-2 border-t-2 border-[#D9821C] bg-slate-200 text-xl text-center"
+            style="width: 1280px"
+          >
+            <strong>불량 등록 목록</strong>
+          </div>
+          <div
+            class="pl-7 pr-3 text-xl"
+            style="height: 234px; overflow-y: scroll; overflow-x: hidden"
+          >
+            <table class="w-full">
+              <thead
+                class="border-b-2 border-[#D9821C] bg-slate-200 h-10"
+                style="position: sticky; top: 0px; z-index: 2"
+              >
+                <th
+                  class="border-l-2 border-t-2 border-r-2 border-[#D9821C] w-24"
+                >
+                  코드
+                </th>
+                <th class="border-t-2 border-r-2 border-[#D9821C] w-24">
+                  구분
+                </th>
+                <th class="border-t-2 border-r-2 border-[#D9821C] w-20">
+                  불량명
+                </th>
+                <th class="border-t-2 border-r-2 border-[#D9821C] w-28">
+                  내용
+                </th>
+                <th class="border-t-2 border-r-2 border-[#D9821C] w-28">
+                  수량
+                </th>
+                <th class="border-t-2 border-r-2 border-[#D9821C] w-20">
+                  수량수정
+                </th>
+                <th class="border-t-2 border-r-2 border-[#D9821C] w-20">
+                  삭제
+                </th>
+              </thead>
+              <tbody>
+                <tr class="text-center" v-for="i in Array(10).fill('10')">
+                  <td
+                    class="border-l-2 border-b-2 border-r-2 border-[#D9821C] h-16"
+                  >
+                    BA0023
+                  </td>
+                  <td class="border-b-2 border-r-2 border-[#D9821C] h-10">
+                    소재불량
+                  </td>
+                  <td class="border-b-2 border-r-2 border-[#D9821C] h-10">
+                    오염
+                  </td>
+                  <td class="border-b-2 border-r-2 border-[#D9821C] h-10">
+                    원단오염
+                  </td>
+                  <td class="border-b-2 border-r-2 border-[#D9821C] h-10">
+                    24
+                  </td>
+                  <td class="border-b-2 border-r-2 border-[#D9821C] h-10">
+                    <Button class="h-10 w-16" variant="pending"
+                      ><Lucide class="w-6 h-6 mx-auto" icon="Edit"
+                    /></Button>
+                  </td>
+                  <td class="border-b-2 border-r-2 border-[#D9821C] h-10">
+                    <Button class="h-10 w-16" variant="danger"
+                      ><Lucide class="w-6 h-6 mx-auto" icon="Trash2"
+                    /></Button>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
         </div>
       </div>
       <div class="col-span-1">
@@ -115,7 +200,7 @@ watch([num], (newValue, oldValue) => {
                   <th
                     class="text-center border-r-2 border-[#D9821C] bg-slate-200 font-bold w-40"
                   >
-                    불량수
+                    수량 수정
                   </th>
                 </tr>
               </thead>
@@ -130,11 +215,8 @@ watch([num], (newValue, oldValue) => {
                   class="text-center border-b-2 border-l-2 border-r-2 border-[#D9821C] h-10"
                 >
                   <td class="p-5">
-                    <Button class="w-32 h-16 text-2xl" variant="primary"
-                      ><Lucide
-                        class="w-9 h-9 mb-0.5"
-                        icon="ChevronsLeft"
-                      />등록</Button
+                    <Button class="w-32 h-16 text-2xl" variant="pending"
+                      >입력</Button
                     >
                   </td>
                 </tr>
@@ -145,7 +227,7 @@ watch([num], (newValue, oldValue) => {
         <div
           class="mt-4 h-10 py-1 border-l-2 border-r-2 border-t-2 border-[#D9821C] bg-slate-200 text-xl text-center"
         >
-          <strong>불량수 입력</strong>
+          <strong>수량 입력</strong>
         </div>
         <div class="h-10 border-2 border-[#D9821C]" style="height: 279px">
           <div class="grid grid-cols-3 mt-4">
@@ -194,112 +276,6 @@ watch([num], (newValue, oldValue) => {
               /></Button>
             </div>
           </div>
-        </div>
-      </div>
-      <div class="col-span-2">
-        <div
-          class="mx-auto h-10 py-1 border-l-2 border-r-2 border-t-2 border-[#D9821C] bg-slate-200 text-xl text-center"
-          style="width: 608px"
-        >
-          <strong>불량 유형 선택</strong>
-        </div>
-        <div
-          class="pl-7 pr-3 text-xl"
-          style="height: 362px; overflow-y: scroll; overflow-x: hidden"
-        >
-          <table class="w-full">
-            <thead
-              class="border-b-2 border-[#D9821C] bg-slate-200 h-10"
-              style="position: sticky; top: 0px; z-index: 2"
-            >
-              <th
-                class="border-l-2 border-t-2 border-r-2 border-[#D9821C] w-24"
-              >
-                코드
-              </th>
-              <th class="border-t-2 border-r-2 border-[#D9821C] w-24">구분</th>
-              <th class="border-t-2 border-r-2 border-[#D9821C] w-20">
-                불량명
-              </th>
-              <th class="border-t-2 border-r-2 border-[#D9821C] w-28">내용</th>
-              <th class="border-t-2 border-r-2 border-[#D9821C] w-20">선택</th>
-            </thead>
-            <tbody>
-              <tr class="text-center" v-for="i in Array(10).fill('10')">
-                <td
-                  class="border-l-2 border-b-2 border-r-2 border-[#D9821C] h-16"
-                >
-                  BA0023
-                </td>
-                <td class="border-b-2 border-r-2 border-[#D9821C] h-10">
-                  소재불량
-                </td>
-                <td class="border-b-2 border-r-2 border-[#D9821C] h-10">
-                  오염
-                </td>
-                <td class="border-b-2 border-r-2 border-[#D9821C] h-10">
-                  원단오염
-                </td>
-
-                <td class="border-b-2 border-r-2 border-[#D9821C] h-10">
-                  <Button class="h-10" variant="primary"
-                    ><Lucide class="w-6 h-6 mx-auto" icon="CheckSquare"
-                  /></Button>
-                </td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
-        <div class="pl-7 pr-7 mt-3 text-xl">
-          <div
-            class="h-10 py-1 border-l-2 border-r-2 border-t-2 border-[#D9821C] bg-slate-200 text-xl text-center"
-          >
-            <strong>선택된 불량 유형</strong>
-          </div>
-          <table class="w-full">
-            <tbody>
-              <tr
-                class="border-t-2 border-l-2 border-b-2 border-[#D9821C] h-10"
-              >
-                <td
-                  class="text-center border-r-2 border-[#D9821C] bg-slate-200 font-bold w-40"
-                >
-                  코드
-                </td>
-                <td class="pl-2 border-r-2 border-[#D9821C] text-left">
-                  BA0023
-                </td>
-              </tr>
-              <tr class="border-b-2 border-l-2 border-[#D9821C] h-10">
-                <td
-                  class="text-center border-r-2 border-[#D9821C] bg-slate-200 font-bold"
-                >
-                  구분
-                </td>
-                <td class="pl-2 border-r-2 border-[#D9821C] text-left">
-                  소재불량
-                </td>
-              </tr>
-              <tr class="border-b-2 border-[#D9821C] h-10">
-                <td
-                  class="text-center border-l-2 border-r-2 border-[#D9821C] bg-slate-200 font-bold"
-                >
-                  불량명
-                </td>
-                <td class="pl-2 border-r-2 border-[#D9821C] text-left">오염</td>
-              </tr>
-              <tr class="border-b-2 border-[#D9821C] h-10">
-                <td
-                  class="text-center border-l-2 border-r-2 border-[#D9821C] bg-slate-200 font-bold"
-                >
-                  내용
-                </td>
-                <td class="pl-2 border-r-2 border-[#D9821C] text-left">
-                  원단오염
-                </td>
-              </tr>
-            </tbody>
-          </table>
         </div>
       </div>
     </div>
