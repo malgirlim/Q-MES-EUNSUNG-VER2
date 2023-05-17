@@ -84,9 +84,9 @@ const table_setting = {
   항목9: { name: "단위", style: "width: 50px; text-align: center;" },
   항목10: { name: "지시수량", style: "width: 50px; text-align: center;" },
   항목11: { name: "생산양품수량", style: "width: 50px; text-align: center;" },
-  항목12: { name: "진행상황", style: "width: 50px; text-align: center;" },
+  항목12: { name: "진행상황", style: "width: 110px; text-align: center;" },
   투입자재: { name: "투입자재", style: "width: 50px; text-align: center;" },
-  진행: { name: "진행등록", style: "width: 100px; text-align: center;" },
+  진행: { name: "진행등록", style: "width: 120px; text-align: center;" },
   상세보기: { name: "정보", style: "width: 50px; text-align: center;" },
   편집: { name: "편집", style: "width: 150px; text-align: center;" },
 };
@@ -346,11 +346,39 @@ const task_process_item = useSendApi<ProductionTaskProcessItem>(
   ref(100)
 );
 
+// ############################################### 작업상태 변경하기 ###############################################
+// ########################## 작업반려 Modal ##########################
+const TaskReturnModal = ref(false);
+const setTaskReturnModal = (value: boolean) => {
+  if (user_level >= 3) {
+    TaskReturnModal.value = value;
+  } else {
+    toast.warning("액세스 권한이 없습니다.\n관리자에게 문의하세요.");
+  }
+};
 // ########################## 작업수락 Modal ##########################
 const TaskAcceptModal = ref(false);
 const setTaskAcceptModal = (value: boolean) => {
   if (user_level >= 3) {
     TaskAcceptModal.value = value;
+  } else {
+    toast.warning("액세스 권한이 없습니다.\n관리자에게 문의하세요.");
+  }
+};
+// ########################## 작업취소 Modal ##########################
+const TaskCancelModal = ref(false);
+const setTaskCancelModal = (value: boolean) => {
+  if (user_level >= 3) {
+    TaskCancelModal.value = value;
+  } else {
+    toast.warning("액세스 권한이 없습니다.\n관리자에게 문의하세요.");
+  }
+};
+// ########################## 작업시작 Modal ##########################
+const TaskStartModal = ref(false);
+const setTaskStartModal = (value: boolean) => {
+  if (user_level >= 3) {
+    TaskStartModal.value = value;
   } else {
     toast.warning("액세스 권한이 없습니다.\n관리자에게 문의하세요.");
   }
@@ -390,27 +418,46 @@ const setResultModal = (value: boolean) => {
       useitemlist.value.push({
         ...useItemInit,
         NO: maxNO + 2,
-        품목재공NO: task_modal_itemProcess.dataAll.value.filter(
-          (c) => c.지시공정자재NO == processitem.NO
-        )[0].NO,
-        재고코드: task_modal_itemProcess.dataAll.value.filter(
-          (c) => c.지시공정자재NO == processitem.NO
-        )[0].입고코드,
+        품목NO: task_modal_itemProcess.dataAll.value.filter(
+          (c) =>
+            c.작업지시공정NO == processitem.작업지시공정NO &&
+            c.LOT코드 == processitem.LOT코드
+        )[0].품목NO,
+        LOT코드: task_modal_itemProcess.dataAll.value.filter(
+          (c) =>
+            c.작업지시공정NO == processitem.작업지시공정NO &&
+            c.LOT코드 == processitem.LOT코드
+        )[0].LOT코드,
         품목구분: task_modal_itemProcess.dataAll.value.filter(
-          (c) => c.지시공정자재NO == processitem.NO
+          (c) =>
+            c.작업지시공정NO == processitem.작업지시공정NO &&
+            c.LOT코드 == processitem.LOT코드
         )[0].품목구분,
+        품번: task_modal_itemProcess.dataAll.value.filter(
+          (c) =>
+            c.작업지시공정NO == processitem.작업지시공정NO &&
+            c.LOT코드 == processitem.LOT코드
+        )[0].품번,
         품명: task_modal_itemProcess.dataAll.value.filter(
-          (c) => c.지시공정자재NO == processitem.NO
+          (c) =>
+            c.작업지시공정NO == processitem.작업지시공정NO &&
+            c.LOT코드 == processitem.LOT코드
         )[0].품명,
         규격: task_modal_itemProcess.dataAll.value.filter(
-          (c) => c.지시공정자재NO == processitem.NO
+          (c) =>
+            c.작업지시공정NO == processitem.작업지시공정NO &&
+            c.LOT코드 == processitem.LOT코드
         )[0].규격,
         단위: task_modal_itemProcess.dataAll.value.filter(
-          (c) => c.지시공정자재NO == processitem.NO
+          (c) =>
+            c.작업지시공정NO == processitem.작업지시공정NO &&
+            c.LOT코드 == processitem.LOT코드
         )[0].단위,
         수량: task_modal_itemProcess.dataAll.value.filter(
-          (c) => c.지시공정자재NO == processitem.NO
-        )[0].재공수량,
+          (c) =>
+            c.작업지시공정NO == processitem.작업지시공정NO &&
+            c.LOT코드 == processitem.LOT코드
+        )[0].재공수,
       });
     }
     defectlist.value = [];
@@ -418,11 +465,6 @@ const setResultModal = (value: boolean) => {
   } else {
     toast.warning("액세스 권한이 없습니다.\n관리자에게 문의하세요.");
   }
-};
-// 실적입력 확인 모달
-const resultCheckModal = ref(false);
-const setResultCheckModal = (value: boolean) => {
-  resultCheckModal.value = value;
 };
 // 생산실적 등록할 곳
 const url_result = "/api/production/task/current/result";
@@ -449,6 +491,53 @@ const task_current_resultnonwork = useSendApi<ProductionResultNonWork>(
   ref(1),
   ref(10)
 );
+// ########################## 작업중지확인 Modal ##########################
+// 실적입력 확인 모달
+const resultStopCheckModal = ref(false);
+const setResultStopCheckModal = (value: boolean) => {
+  resultStopCheckModal.value = value;
+};
+// 생산실적 등록
+const resultStopInsert = async () => {
+  // console.log(productionResult.value);
+  // console.log(useitemlist.value);
+  // console.log(defectlist.value);
+  // console.log(nonworklist.value);
+  try {
+    await task_current_result.insertData(productionResult.value);
+    await task_current_resultuseitem.insertAllData(useitemlist.value);
+    await task_current_resultdefect.insertAllData(defectlist.value);
+    await task_current_resultnonwork.insertAllData(nonworklist.value);
+
+    // 만약 데이터가 잘 들어갔으면 작업완료로 변경
+    editModalData.진행상황 = "작업대기";
+    dataManager.editData(editModalData);
+
+    setResultStopCheckModal(false);
+    setResultModal(false);
+
+    dataManager.loadDatas();
+  } catch (err: any) {
+    console.log("실적입력 실패");
+  }
+};
+// ########################## 작업완료확인 Modal ##########################
+// 실적입력 확인 모달
+const resultCheckModal = ref(false);
+const setResultCheckModal = (value: boolean) => {
+  resultCheckModal.value = value;
+
+  // 만약 생산양품수량이 지시수량보다 적다면 false로
+  if (
+    Number(productionResult.value.생산수) -
+      Number(productionResult.value.불량수) <
+    Number(productionResult.value.지시수량)
+  ) {
+    resultCheckBox.value = false;
+  } else resultCheckBox.value = true;
+};
+// 생산양품수량이 지시수량보다 적을 때 체크박스 확인하기
+const resultCheckBox = ref(false);
 // 생산실적 등록
 const resultInsert = async () => {
   // console.log(productionResult.value);
@@ -461,16 +550,9 @@ const resultInsert = async () => {
     await task_current_resultdefect.insertAllData(defectlist.value);
     await task_current_resultnonwork.insertAllData(nonworklist.value);
 
-    // 만약 데이터가 잘 들어갔으면 생산수량이 지시수량을 넘어가면 작업완료로 변경
-    if (
-      Number(editModalData.지시수량) <=
-      Number(editModalData.생산양품수량) +
-        (Number(productionResult.value.생산수) -
-          Number(productionResult.value.불량수))
-    ) {
-      editModalData.진행상황 = "작업완료";
-      dataManager.editData(editModalData);
-    }
+    // 만약 데이터가 잘 들어갔으면 작업완료로 변경
+    editModalData.진행상황 = "작업완료";
+    dataManager.editData(editModalData);
 
     setResultCheckModal(false);
     setResultModal(false);
@@ -511,8 +593,8 @@ const productionResult: ProductionResult = ref({
 const useItemInit: ProductionResultUseItem = {
   NO: undefined,
   생산실적NO: undefined,
-  품목재공NO: undefined,
-  재고코드: undefined,
+  품목NO: undefined,
+  LOT코드: undefined,
   품목구분: undefined,
   품명: undefined,
   규격: undefined,
@@ -789,12 +871,14 @@ const table_setting_itemProcess = {
   순번: { name: "순번", style: "width: 50px; text-align: center;" },
   항목1: { name: "작업코드", style: "width: 50px; text-align: center;" },
   항목2: { name: "공정", style: "width: 50px; text-align: center;" },
-  항목3: { name: "입고코드", style: "width: 50px; text-align: center;" },
+  항목3: { name: "LOT코드", style: "width: 50px; text-align: center;" },
   항목4: { name: "품목구분", style: "width: 50px; text-align: center;" },
   항목5: { name: "품명", style: "width: 50px; text-align: center;" },
   항목6: { name: "규격", style: "width: 50px; text-align: center;" },
   항목7: { name: "단위", style: "width: 50px; text-align: center;" },
-  항목8: { name: "재공수량", style: "width: 50px; text-align: center;" },
+  항목8: { name: "불출수", style: "width: 50px; text-align: center;" },
+  항목9: { name: "사용수", style: "width: 50px; text-align: center;" },
+  항목10: { name: "재공수", style: "width: 50px; text-align: center;" },
 };
 
 // ########################## 조회기간 설정 ##########################
@@ -833,26 +917,38 @@ const setItemProcessModal = (value: boolean, no: any) => {
 };
 
 // 모달에서 선택한 품목을 itemProcesslist에 넣기
-const importItemProcess = (no: any) => {
+const importItemProcess = (작업지시공정no: any, lot코드: any) => {
   useitemlist.value.filter(
     (c) => c.NO == itemProcessModalIndex.value
-  )[0].품목재공NO = no;
+  )[0].품목NO = task_modal_itemProcess.dataAll.value.filter(
+    (c) => c.작업지시공정NO == 작업지시공정no && c.LOT코드 == lot코드
+  )[0].품목NO;
   useitemlist.value.filter(
     (c) => c.NO == itemProcessModalIndex.value
-  )[0].재고코드 = task_modal_itemProcess.dataAll.value.filter(
-    (c) => c.NO == no
-  )[0].입고코드;
+  )[0].LOT코드 = task_modal_itemProcess.dataAll.value.filter(
+    (c) => c.작업지시공정NO == 작업지시공정no && c.LOT코드 == lot코드
+  )[0].LOT코드;
   useitemlist.value.filter(
     (c) => c.NO == itemProcessModalIndex.value
   )[0].품목구분 = task_modal_itemProcess.dataAll.value.filter(
-    (c) => c.NO == no
+    (c) => c.작업지시공정NO == 작업지시공정no && c.LOT코드 == lot코드
   )[0].품목구분;
   useitemlist.value.filter((c) => c.NO == itemProcessModalIndex.value)[0].품명 =
-    task_modal_itemProcess.dataAll.value.filter((c) => c.NO == no)[0].품명;
+    task_modal_itemProcess.dataAll.value.filter(
+      (c) => c.작업지시공정NO == 작업지시공정no && c.LOT코드 == lot코드
+    )[0].품명;
   useitemlist.value.filter((c) => c.NO == itemProcessModalIndex.value)[0].규격 =
-    task_modal_itemProcess.dataAll.value.filter((c) => c.NO == no)[0].규격;
+    task_modal_itemProcess.dataAll.value.filter(
+      (c) => c.작업지시공정NO == 작업지시공정no && c.LOT코드 == lot코드
+    )[0].규격;
   useitemlist.value.filter((c) => c.NO == itemProcessModalIndex.value)[0].단위 =
-    task_modal_itemProcess.dataAll.value.filter((c) => c.NO == no)[0].단위;
+    task_modal_itemProcess.dataAll.value.filter(
+      (c) => c.작업지시공정NO == 작업지시공정no && c.LOT코드 == lot코드
+    )[0].단위;
+  useitemlist.value.filter((c) => c.NO == itemProcessModalIndex.value)[0].수량 =
+    task_modal_itemProcess.dataAll.value.filter(
+      (c) => c.작업지시공정NO == 작업지시공정no && c.LOT코드 == lot코드
+    )[0].재공수;
   itemProcessModalIndex.value = 0;
   setItemProcessModal(false, 0);
 };
@@ -1397,13 +1493,40 @@ const importNonwork = (no: any) => {
                     <Table.Td
                       :class="[
                         'first:rounded-l-md last:rounded-r-md text-center bg-white border-b-0 dark:bg-darkmode-600 shadow-[20px_3px_20px_#0000000b]',
-                        { 'text-danger': todo.진행상황 == '생산대기' },
-                        { 'text-indigo-500': todo.진행상황 == '작업중' },
-                        { 'text-success': todo.진행상황 == '작업완료' },
+                        { 'text-gray-500': todo.진행상황 == '작업보류' },
+                        { 'text-danger': todo.진행상황 == '작업반려' },
+                        { 'text-black': todo.진행상황 == '작업미확인' },
+                        { 'text-orange-500': todo.진행상황 == '작업대기' },
+                        { 'text-success': todo.진행상황 == '작업중' },
+                        { 'text-blue-600': todo.진행상황 == '작업완료' },
                       ]"
                       :style="table_setting.항목12.style"
                     >
-                      <div>{{ todo[table_setting.항목12.name] }}</div>
+                      <div class="flex items-center">
+                        <div>
+                          <Lucide
+                            class="w-5 h-5 mr-1"
+                            :icon="
+                              todo.진행상황 == '작업보류'
+                                ? 'MinusCircle'
+                                : todo.진행상황 == '작업반려'
+                                ? 'XCircle'
+                                : todo.진행상황 == '작업미확인'
+                                ? 'HelpCircle'
+                                : todo.진행상황 == '작업대기'
+                                ? 'PauseCircle'
+                                : todo.진행상황 == '작업중'
+                                ? 'PlayCircle'
+                                : todo.진행상황 == '작업완료'
+                                ? 'CheckCircle'
+                                : 'AlertCircle'
+                            "
+                          />
+                        </div>
+                        <div>
+                          {{ todo[table_setting.항목12.name] }}
+                        </div>
+                      </div>
                     </Table.Td>
                     <Table.Td
                       class="first:rounded-l-md last:rounded-r-md text-center bg-white border-b-0 dark:bg-darkmode-600 shadow-[20px_3px_20px_#0000000b] py-0 relative before:block before:w-px before:h-8 before:bg-slate-200 before:absolute before:left-0 before:inset-y-0 before:my-auto before:dark:bg-darkmode-400"
@@ -1434,13 +1557,18 @@ const importNonwork = (no: any) => {
                       <div
                         class="flex items-center justify-center text-danger"
                         v-if="
-                          todo.진행상황 != '작업중' &&
-                          todo.진행상황 != '작업완료'
+                          todo.진행상황 == '작업보류' ||
+                          todo.진행상황 == '작업완료' ||
+                          todo.진행상황 == '작업반려'
                         "
+                      ></div>
+                      <div
+                        class="flex items-center justify-center text-danger"
+                        v-if="todo.진행상황 == '작업미확인'"
                       >
-                        <a
-                          class="flex items-center mr-3"
-                          href="#"
+                        <Button
+                          class="flex items-center mr-2 h-8"
+                          variant="primary"
                           @click="
                             () => {
                               editModalData = todo;
@@ -1449,16 +1577,60 @@ const importNonwork = (no: any) => {
                           "
                         >
                           <Lucide icon="PlayCircle" class="w-4 h-4 mr-1" />
-                          작업수락
-                        </a>
+                          수락
+                        </Button>
+                        <Button
+                          class="flex items-center h-8"
+                          variant="danger"
+                          @click="
+                            () => {
+                              editModalData = todo;
+                              setTaskReturnModal(true);
+                            }
+                          "
+                        >
+                          <Lucide icon="XCircle" class="w-4 h-4 mr-1" />
+                          반려
+                        </Button>
                       </div>
                       <div
-                        class="flex items-center justify-center text-indigo-500"
+                        class="flex items-center justify-center text-white"
+                        v-if="todo.진행상황 == '작업대기'"
+                      >
+                        <Button
+                          class="flex items-center text-white h-8 mr-2"
+                          variant="success"
+                          @click="
+                            () => {
+                              editModalData = todo;
+                              setTaskStartModal(true);
+                            }
+                          "
+                        >
+                          <Lucide icon="PlayCircle" class="w-4 h-4 mr-1" />
+                          시작
+                        </Button>
+                        <Button
+                          class="flex items-center text-white h-8"
+                          variant="danger"
+                          @click="
+                            () => {
+                              editModalData = todo;
+                              setTaskCancelModal(true);
+                            }
+                          "
+                        >
+                          <Lucide icon="XCircle" class="w-4 h-4 mr-1" />
+                          취소
+                        </Button>
+                      </div>
+                      <div
+                        class="flex items-center justify-center text-white"
                         v-if="todo.진행상황 == '작업중'"
                       >
-                        <a
-                          class="flex items-center mr-3"
-                          href="#"
+                        <Button
+                          class="flex items-center text-white h-8"
+                          variant="facebook"
                           @click="
                             () => {
                               editModalData = todo;
@@ -1468,35 +1640,8 @@ const importNonwork = (no: any) => {
                         >
                           <Lucide icon="Pencil" class="w-4 h-4 mr-1" />
                           실적입력
-                        </a>
+                        </Button>
                       </div>
-                      <div
-                        class="flex items-center justify-center text-success"
-                        v-if="todo.진행상황 == '작업완료'"
-                      >
-                        <a
-                          class="flex items-center mr-3"
-                          href="#"
-                          @click="
-                            () => {
-                              editModalData = todo;
-                              setResultModal(true);
-                            }
-                          "
-                        >
-                          <Lucide icon="Pencil" class="w-4 h-4 mr-1" />
-                          실적입력
-                        </a>
-                      </div>
-                      <!-- <div
-                        class="flex items-center justify-center text-success"
-                        v-if="todo.진행상황 == '작업완료'"
-                      >
-                        <a class="flex items-center mr-3" as="a">
-                          <Lucide icon="Check" class="w-4 h-4 mr-1" />
-                          진행완료
-                        </a>
-                      </div> -->
                     </Table.Td>
                   </Table.Tr>
                 </Table.Tbody>
@@ -1558,7 +1703,7 @@ const importNonwork = (no: any) => {
           <Table.Thead>
             <Table.Tr class="text-center">
               <Table.Th> 순번 </Table.Th>
-              <Table.Th> 입고코드 </Table.Th>
+              <Table.Th> LOT코드 </Table.Th>
               <Table.Th> 품목코드 </Table.Th>
               <Table.Th> 품목구분 </Table.Th>
               <Table.Th> 품명 </Table.Th>
@@ -1575,7 +1720,7 @@ const importNonwork = (no: any) => {
               :key="todo.NO"
             >
               <Table.Td> {{ index + 1 }} </Table.Td>
-              <Table.Td> {{ todo.입고코드 }} </Table.Td>
+              <Table.Td> {{ todo.LOT코드 }} </Table.Td>
               <Table.Td> {{ todo.품번 }} </Table.Td>
               <Table.Td> {{ todo.품목구분 }} </Table.Td>
               <Table.Td> {{ todo.품명 }} </Table.Td>
@@ -1636,6 +1781,66 @@ const importNonwork = (no: any) => {
   #########################################################################################################################
    -->
 
+  <!-- BEGIN: 작업반려 Modal -->
+  <Dialog
+    :open="TaskReturnModal"
+    @close="
+      () => {
+        setTaskReturnModal(false);
+      }
+    "
+    :initialFocus="deleteButtonRef"
+  >
+    <Dialog.Panel>
+      <div class="p-5 text-center">
+        <Lucide icon="XCircle" class="w-16 h-16 mx-auto mt-3 text-danger" />
+        <div class="mt-5 text-3xl">반려</div>
+        <div class="mt-2 text-slate-500">작업을 반려하시겠습니까?</div>
+        <div style="text-align: left">
+          <div class="mt-3">
+            <FormLabel htmlFor="vertical-form-3">반려사유</FormLabel>
+            <FormInput
+              id="vertical-form-3"
+              type="text"
+              v-model="editModalData.비고"
+              placeholder="여기에 반려사유을 입력해주세요"
+            />
+          </div>
+        </div>
+      </div>
+      <div class="px-5 pb-8 text-center">
+        <Button
+          variant="outline-secondary"
+          type="button"
+          @click="
+            () => {
+              setTaskReturnModal(false);
+            }
+          "
+          class="w-24 mr-1"
+        >
+          취소
+        </Button>
+        <Button
+          variant="danger"
+          type="button"
+          class="w-24"
+          ref="deleteButtonRef"
+          @click="
+            () => {
+              editModalData.진행상황 = '작업반려';
+              dataManager.editData(editModalData);
+              setTaskReturnModal(false);
+            }
+          "
+        >
+          작업반려
+        </Button>
+      </div>
+    </Dialog.Panel>
+  </Dialog>
+  <!-- END: 작업반려 Modal -->
+
   <!-- BEGIN: 작업수락 Modal -->
   <Dialog
     :open="TaskAcceptModal"
@@ -1672,18 +1877,127 @@ const importNonwork = (no: any) => {
           ref="deleteButtonRef"
           @click="
             () => {
-              editModalData.진행상황 = '작업중';
+              editModalData.진행상황 = '작업대기';
               dataManager.editData(editModalData);
               setTaskAcceptModal(false);
             }
           "
         >
-          수락
+          작업수락
         </Button>
       </div>
     </Dialog.Panel>
   </Dialog>
   <!-- END: 작업수락 Modal -->
+
+  <!-- BEGIN: 작업반려 Modal -->
+  <Dialog
+    :open="TaskCancelModal"
+    @close="
+      () => {
+        setTaskCancelModal(false);
+      }
+    "
+    :initialFocus="deleteButtonRef"
+  >
+    <Dialog.Panel>
+      <div class="p-5 text-center">
+        <Lucide icon="XCircle" class="w-16 h-16 mx-auto mt-3 text-danger" />
+        <div class="mt-5 text-3xl">취소</div>
+        <div class="mt-2 text-slate-500">작업을 취소하시겠습니까?</div>
+        <!-- <div style="text-align: left">
+          <div class="mt-3">
+            <FormLabel htmlFor="vertical-form-3">반려사유</FormLabel>
+            <FormInput
+              id="vertical-form-3"
+              type="text"
+              v-model="editModalData.비고"
+              placeholder="여기에 반려사유을 입력해주세요"
+            />
+          </div>
+        </div> -->
+      </div>
+      <div class="px-5 pb-8 text-center">
+        <Button
+          variant="outline-secondary"
+          type="button"
+          @click="
+            () => {
+              setTaskCancelModal(false);
+            }
+          "
+          class="w-24 mr-1"
+        >
+          취소
+        </Button>
+        <Button
+          variant="danger"
+          type="button"
+          class="w-24"
+          ref="deleteButtonRef"
+          @click="
+            () => {
+              editModalData.진행상황 = '작업미확인';
+              dataManager.editData(editModalData);
+              setTaskCancelModal(false);
+            }
+          "
+        >
+          작업취소
+        </Button>
+      </div>
+    </Dialog.Panel>
+  </Dialog>
+  <!-- END: 작업취소 Modal -->
+
+  <!-- BEGIN: 작업시작 Modal -->
+  <Dialog
+    :open="TaskStartModal"
+    @close="
+      () => {
+        setTaskStartModal(false);
+      }
+    "
+    :initialFocus="deleteButtonRef"
+  >
+    <Dialog.Panel>
+      <div class="p-5 text-center">
+        <Lucide icon="PlayCircle" class="w-16 h-16 mx-auto mt-3 text-success" />
+        <div class="mt-5 text-3xl">시작</div>
+        <div class="mt-2 text-slate-500">작업을 시작하시겠습니까?</div>
+      </div>
+      <div class="px-5 pb-8 text-center">
+        <Button
+          variant="outline-secondary"
+          type="button"
+          @click="
+            () => {
+              setTaskStartModal(false);
+            }
+          "
+          class="w-24 mr-1"
+        >
+          취소
+        </Button>
+        <Button
+          variant="success"
+          type="button"
+          class="w-24 text-white"
+          ref="deleteButtonRef"
+          @click="
+            () => {
+              editModalData.진행상황 = '작업중';
+              dataManager.editData(editModalData);
+              setTaskStartModal(false);
+            }
+          "
+        >
+          작업시작
+        </Button>
+      </div>
+    </Dialog.Panel>
+  </Dialog>
+  <!-- END: 작업시작 Modal -->
 
   <!-- #########################################################################################################################
   #########################################################################################################################
@@ -1947,7 +2261,7 @@ const importNonwork = (no: any) => {
                   <Table.Th
                     class="bg-gray-300"
                     style="border-right-width: 1px; width: 150px"
-                    ><strong>재고코드</strong>
+                    ><strong>LOT코드</strong>
                   </Table.Th>
                   <Table.Th
                     class="bg-gray-300"
@@ -1995,8 +2309,8 @@ const importNonwork = (no: any) => {
                       ><FormInput
                         type="text"
                         formInputSize="sm"
-                        :value="useitem.재고코드"
-                        v-model="useitem.재고코드"
+                        :value="useitem.LOT코드"
+                        v-model="useitem.LOT코드"
                         @click="setItemProcessModal(true, useitem.NO)"
                       ></FormInput>
                     </Table.Td>
@@ -2040,6 +2354,7 @@ const importNonwork = (no: any) => {
                       ><FormInput
                         type="number"
                         formInputSize="sm"
+                        :value="useitem.수량"
                         v-model="useitem.수량"
                       ></FormInput>
                     </Table.Td>
@@ -2279,9 +2594,22 @@ const importNonwork = (no: any) => {
         </Tab.Panels>
       </Tab.Group>
 
-      <div class="p-3 text-center">
+      <div class="p-5 text-center">
         <Button
-          variant="outline-primary"
+          variant="pending"
+          as="a"
+          type="button"
+          @click="
+            () => {
+              setResultStopCheckModal(true);
+            }
+          "
+          class="w-24 mr-5"
+        >
+          작업중지
+        </Button>
+        <Button
+          variant="facebook"
           as="a"
           type="button"
           @click="
@@ -2291,10 +2619,10 @@ const importNonwork = (no: any) => {
           "
           class="w-24 mr-5"
         >
-          등록
+          작업완료
         </Button>
         <Button
-          variant="outline-danger"
+          variant="danger"
           as="a"
           type="button"
           @click="
@@ -2311,7 +2639,60 @@ const importNonwork = (no: any) => {
   </Dialog>
   <!-- END: 실적입력 Modal Content -->
 
-  <!-- BEGIN: 실적입력확인 Modal -->
+  <!-- BEGIN: 작업중지확인 Modal -->
+  <Dialog
+    :open="resultStopCheckModal"
+    @close="
+      () => {
+        setResultStopCheckModal(false);
+      }
+    "
+  >
+    <Dialog.Panel>
+      <div class="p-5 text-center">
+        <Lucide
+          icon="PauseCircle"
+          class="w-16 h-16 mx-auto mt-3 text-pending"
+        />
+        <!-- <div class="mt-5 text-3xl">작업 중지</div> -->
+        <div class="mt-5 text-2xl">작업을 중지하시겠습니까?</div>
+        <div class="mt-3 text-xl">
+          작성된 내용이 저장되고<br />
+          생산대기 상태로 전환됩니다.
+        </div>
+      </div>
+      <div class="px-5 pb-8 text-center">
+        <Button
+          variant="pending"
+          type="button"
+          class="w-24 mr-3"
+          ref="deleteButtonRef"
+          @click="
+            () => {
+              resultStopInsert();
+            }
+          "
+        >
+          작업중지
+        </Button>
+        <Button
+          variant="outline-secondary"
+          type="button"
+          @click="
+            () => {
+              setResultStopCheckModal(false);
+            }
+          "
+          class="w-24"
+        >
+          취소
+        </Button>
+      </div>
+    </Dialog.Panel>
+  </Dialog>
+  <!-- END: 작업중지확인 Modal -->
+
+  <!-- BEGIN: 작업완료확인 Modal -->
   <Dialog
     :open="resultCheckModal"
     @close="
@@ -2326,10 +2707,53 @@ const importNonwork = (no: any) => {
           icon="CheckCircle"
           class="w-16 h-16 mx-auto mt-3 text-primary"
         />
-        <div class="mt-5 text-3xl">실적 등록</div>
-        <div class="mt-2 text-slate-500">실적을 등록하시겠습니까?</div>
+        <!-- <div class="mt-5 text-3xl">작업 완료</div> -->
+        <div class="mt-5 text-2xl">작업을 완료하시겠습니까?</div>
+        <div
+          class="mt-5 text-xl text-danger border-2 border-danger p-2"
+          v-if="
+            Number(productionResult.생산수) - Number(productionResult.불량수) <
+            Number(productionResult.지시수량)
+          "
+        >
+          <div class="flex">
+            <div class="flex mx-auto items-center">
+              <Lucide
+                icon="AlertTriangle"
+                class="w-5 h-5 text-danger mr-0.5 mb-0.5"
+              />경고
+            </div>
+          </div>
+          <div class="mt-1">생산 양품수량이 지시수량보다 적습니다.</div>
+          <div class="mt-1">
+            <input
+              class="mr-2 transition-all duration-100 ease-in-out shadow-sm border-slate-200 cursor-pointer rounded focus:ring-4 focus:ring-offset-0 focus:ring-primary focus:ring-opacity-20 [&[type='checkbox']]:checked:bg-primary [&[type='checkbox']]:checked:border-primary [&[type='checkbox']]:checked:border-opacity-10 [&:disabled:not(:checked)]:bg-slate-100 [&:disabled:not(:checked)]:cursor-not-allowed [&:disabled:checked]:opacity-70 [&:disabled:checked]:cursor-not-allowed"
+              id="resultcheckbox"
+              type="checkbox"
+              :value="resultCheckBox"
+              v-model="resultCheckBox"
+            /><label class="text-black">확인</label>
+          </div>
+        </div>
+        <div class="mt-5 text-xl">
+          작성된 내용이 저장되고<br />작업완료 상태로 전환됩니다.
+        </div>
       </div>
       <div class="px-5 pb-8 text-center">
+        <Button
+          :disabled="!resultCheckBox"
+          variant="facebook"
+          type="button"
+          class="w-24 mr-3"
+          ref="deleteButtonRef"
+          @click="
+            () => {
+              resultInsert();
+            }
+          "
+        >
+          작업완료
+        </Button>
         <Button
           variant="outline-secondary"
           type="button"
@@ -2338,27 +2762,14 @@ const importNonwork = (no: any) => {
               setResultCheckModal(false);
             }
           "
-          class="w-24 mr-1"
+          class="w-24"
         >
           취소
-        </Button>
-        <Button
-          variant="primary"
-          type="button"
-          class="w-24"
-          ref="deleteButtonRef"
-          @click="
-            () => {
-              resultInsert();
-            }
-          "
-        >
-          등록
         </Button>
       </div>
     </Dialog.Panel>
   </Dialog>
-  <!-- END: 작업수락 Modal -->
+  <!-- END: 작업완료확인 Modal -->
 
   <!-- #########################################################################################################################
   #########################################################################################################################
@@ -2894,7 +3305,7 @@ const importNonwork = (no: any) => {
     <Dialog.Panel class="p-10 text-center">
       <!--ItemProcess Modal 내용 시작-->
       <div class="mb-3" style="font-weight: bold; font-size: x-large">
-        품목재공 리스트
+        품목재공현황 리스트
       </div>
       <div class="grid grid-cols-12 gap-1 mt-1">
         <div
@@ -3083,6 +3494,18 @@ const importNonwork = (no: any) => {
                   >
                     {{ table_setting_itemProcess.항목8.name }}
                   </Table.Th>
+                  <Table.Th
+                    class="text-center border-b-0 whitespace-nowrap"
+                    :style="table_setting_itemProcess.항목9.style"
+                  >
+                    {{ table_setting_itemProcess.항목9.name }}
+                  </Table.Th>
+                  <Table.Th
+                    class="text-center border-b-0 whitespace-nowrap"
+                    :style="table_setting_itemProcess.항목10.style"
+                  >
+                    {{ table_setting_itemProcess.항목10.name }}
+                  </Table.Th>
                 </Table.Tr>
               </Table.Thead>
               <Table.Tbody style="position: relative; z-index: 1">
@@ -3094,7 +3517,9 @@ const importNonwork = (no: any) => {
                   <Table.Td
                     class="first:rounded-l-md last:rounded-r-md text-center border-b-2 dark:bg-darkmode-600"
                     :style="table_setting_itemProcess.순번.style"
-                    @click="importItemProcess(todo.NO)"
+                    @click="
+                      importItemProcess(todo.작업지시공정NO, todo.LOT코드)
+                    "
                   >
                     <div>
                       {{
@@ -3107,58 +3532,92 @@ const importNonwork = (no: any) => {
                   <Table.Td
                     class="first:rounded-l-md last:rounded-r-md text-center border-b-2 dark:bg-darkmode-600"
                     :style="table_setting_itemProcess.항목1.style"
-                    @click="importItemProcess(todo.NO)"
+                    @click="
+                      importItemProcess(todo.작업지시공정NO, todo.LOT코드)
+                    "
                   >
                     <div>{{ todo[table_setting_itemProcess.항목1.name] }}</div>
                   </Table.Td>
                   <Table.Td
                     class="first:rounded-l-md last:rounded-r-md text-center border-b-2 dark:bg-darkmode-600"
                     :style="table_setting_itemProcess.항목2.style"
-                    @click="importItemProcess(todo.NO)"
+                    @click="
+                      importItemProcess(todo.작업지시공정NO, todo.LOT코드)
+                    "
                   >
                     <div>{{ todo[table_setting_itemProcess.항목2.name] }}</div>
                   </Table.Td>
                   <Table.Td
                     class="first:rounded-l-md last:rounded-r-md text-center border-b-2 dark:bg-darkmode-600"
                     :style="table_setting_itemProcess.항목3.style"
-                    @click="importItemProcess(todo.NO)"
+                    @click="
+                      importItemProcess(todo.작업지시공정NO, todo.LOT코드)
+                    "
                   >
                     <div>{{ todo[table_setting_itemProcess.항목3.name] }}</div>
                   </Table.Td>
                   <Table.Td
                     class="first:rounded-l-md last:rounded-r-md text-center border-b-2 dark:bg-darkmode-600"
                     :style="table_setting_itemProcess.항목4.style"
-                    @click="importItemProcess(todo.NO)"
+                    @click="
+                      importItemProcess(todo.작업지시공정NO, todo.LOT코드)
+                    "
                   >
                     <div>{{ todo[table_setting_itemProcess.항목4.name] }}</div>
                   </Table.Td>
                   <Table.Td
                     class="first:rounded-l-md last:rounded-r-md text-center border-b-2 dark:bg-darkmode-600"
                     :style="table_setting_itemProcess.항목5.style"
-                    @click="importItemProcess(todo.NO)"
+                    @click="
+                      importItemProcess(todo.작업지시공정NO, todo.LOT코드)
+                    "
                   >
                     <div>{{ todo[table_setting_itemProcess.항목5.name] }}</div>
                   </Table.Td>
                   <Table.Td
                     class="first:rounded-l-md last:rounded-r-md text-center border-b-2 dark:bg-darkmode-600"
                     :style="table_setting_itemProcess.항목6.style"
-                    @click="importItemProcess(todo.NO)"
+                    @click="
+                      importItemProcess(todo.작업지시공정NO, todo.LOT코드)
+                    "
                   >
                     <div>{{ todo[table_setting_itemProcess.항목6.name] }}</div>
                   </Table.Td>
                   <Table.Td
                     class="first:rounded-l-md last:rounded-r-md text-center border-b-2 dark:bg-darkmode-600"
                     :style="table_setting_itemProcess.항목7.style"
-                    @click="importItemProcess(todo.NO)"
+                    @click="
+                      importItemProcess(todo.작업지시공정NO, todo.LOT코드)
+                    "
                   >
                     <div>{{ todo[table_setting_itemProcess.항목7.name] }}</div>
                   </Table.Td>
                   <Table.Td
                     class="first:rounded-l-md last:rounded-r-md text-center border-b-2 dark:bg-darkmode-600"
                     :style="table_setting_itemProcess.항목8.style"
-                    @click="importItemProcess(todo.NO)"
+                    @click="
+                      importItemProcess(todo.작업지시공정NO, todo.LOT코드)
+                    "
                   >
                     <div>{{ todo[table_setting_itemProcess.항목8.name] }}</div>
+                  </Table.Td>
+                  <Table.Td
+                    class="first:rounded-l-md last:rounded-r-md text-center border-b-2 dark:bg-darkmode-600"
+                    :style="table_setting_itemProcess.항목9.style"
+                    @click="
+                      importItemProcess(todo.작업지시공정NO, todo.LOT코드)
+                    "
+                  >
+                    <div>{{ todo[table_setting_itemProcess.항목9.name] }}</div>
+                  </Table.Td>
+                  <Table.Td
+                    class="first:rounded-l-md last:rounded-r-md text-center border-b-2 dark:bg-darkmode-600"
+                    :style="table_setting_itemProcess.항목10.style"
+                    @click="
+                      importItemProcess(todo.작업지시공정NO, todo.LOT코드)
+                    "
+                  >
+                    <div>{{ todo[table_setting_itemProcess.항목10.name] }}</div>
                   </Table.Td>
                 </Table.Tr>
               </Table.Tbody>

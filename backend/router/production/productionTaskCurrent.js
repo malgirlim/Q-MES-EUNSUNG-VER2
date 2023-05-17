@@ -45,10 +45,10 @@ router.get("/", async (req, res) => {
         ,ITEM.규격 AS 규격
         ,ITEM.단위 AS 단위
         ,[ISPC_AMOUNT] AS 지시수량
-		    ,(SELECT COALESCE(SUM(CONVERT(numeric,[PDRS_PRODUCE_AMT])),0) - SUM(PDDF.불량수)
+		    ,(SELECT SUM(CONVERT(numeric,COALESCE([PDRS_PRODUCE_AMT],0))) - COALESCE(SUM(PDDF.불량수),0)
           FROM [QMES2022].[dbo].[MANAGE_PRODUCE_RESULT_TB]
           LEFT JOIN
-          (SELECT [PDDF_PRODUCE_RESULT_PK], COALESCE(SUM(CONVERT(numeric,[PDDF_AMOUNT])),0) AS 불량수
+          (SELECT [PDDF_PRODUCE_RESULT_PK], SUM(CONVERT(numeric,COALESCE([PDDF_AMOUNT],0))) AS 불량수
           FROM [QMES2022].[dbo].[MANAGE_PRODUCE_DEFECT_TB]
 		      GROUP BY [PDDF_PRODUCE_RESULT_PK]
           ) AS PDDF ON PDDF.[PDDF_PRODUCE_RESULT_PK] = [PDRS_PK]
@@ -199,10 +199,10 @@ router.post("/", async (req, res) => {
             ,ITEM.규격 AS 규격
             ,ITEM.단위 AS 단위
             ,[ISPC_AMOUNT] AS 지시수량
-            ,(SELECT COALESCE(SUM(CONVERT(numeric,[PDRS_PRODUCE_AMT])),0) - SUM(PDDF.불량수)
+            ,(SELECT SUM(CONVERT(numeric,COALESCE([PDRS_PRODUCE_AMT],0))) - COALESCE(SUM(PDDF.불량수),0)
               FROM [QMES2022].[dbo].[MANAGE_PRODUCE_RESULT_TB]
               LEFT JOIN
-              (SELECT [PDDF_PRODUCE_RESULT_PK], COALESCE(SUM(CONVERT(numeric,[PDDF_AMOUNT])),0) AS 불량수
+              (SELECT [PDDF_PRODUCE_RESULT_PK], SUM(CONVERT(numeric,COALESCE([PDDF_AMOUNT],0))) AS 불량수
               FROM [QMES2022].[dbo].[MANAGE_PRODUCE_DEFECT_TB]
               GROUP BY [PDDF_PRODUCE_RESULT_PK]
               ) AS PDDF ON PDDF.[PDDF_PRODUCE_RESULT_PK] = [PDRS_PK]
@@ -353,10 +353,10 @@ router.post("/", async (req, res) => {
             ,ITEM.규격 AS 규격
             ,ITEM.단위 AS 단위
             ,[ISPC_AMOUNT] AS 지시수량
-            ,(SELECT COALESCE(SUM(CONVERT(numeric,[PDRS_PRODUCE_AMT])),0) - SUM(PDDF.불량수)
+            ,(SELECT SUM(CONVERT(numeric,COALESCE([PDRS_PRODUCE_AMT],0))) - COALESCE(SUM(PDDF.불량수),0)
               FROM [QMES2022].[dbo].[MANAGE_PRODUCE_RESULT_TB]
               LEFT JOIN
-              (SELECT [PDDF_PRODUCE_RESULT_PK], COALESCE(SUM(CONVERT(numeric,[PDDF_AMOUNT])),0) AS 불량수
+              (SELECT [PDDF_PRODUCE_RESULT_PK], SUM(CONVERT(numeric,COALESCE([PDDF_AMOUNT],0))) AS 불량수
               FROM [QMES2022].[dbo].[MANAGE_PRODUCE_DEFECT_TB]
               GROUP BY [PDDF_PRODUCE_RESULT_PK]
               ) AS PDDF ON PDDF.[PDDF_PRODUCE_RESULT_PK] = [PDRS_PK]
@@ -521,7 +521,7 @@ router.post("/edit", async (req, res) => {
       .input("작업자ID", req.body.data.작업자ID ?? "")
       .input("품목NO", req.body.data.품목NO ?? null)
       .input("지시수량", req.body.data.지시수량 ?? "")
-      .input("진행상황", req.body.data.진행상황 ?? "생산대기")
+      .input("진행상황", req.body.data.진행상황 ?? "작업대기")
       .input("비고", req.body.data.비고 ?? "")
       .input("등록자", req.body.user ?? "")
       .input(
@@ -576,7 +576,7 @@ router.get("/processitem", async (req, res) => {
         ,[ISPCI_INSTRUCT_PROCESS_PK] AS 작업지시공정NO
         ,[ISPCI_ITEM_PK] AS 품목NO
         ,[ISPCI_LOTCODE] AS LOT코드
-        ,ITEM.품목구분 AS 품목구분
+        ,ITEM.구분 AS 품목구분
         ,ITEM.품번 AS 품번
         ,ITEM.품명 AS 품명
         ,ITEM.규격 AS 규격
@@ -627,8 +627,16 @@ router.post("/result/insert", async (req, res) => {
       .input("지시공정NO", req.body.data.지시공정NO ?? null)
       .input("작업자ID", req.body.data.작업자ID ?? "")
       .input("설비NO", req.body.data.설비NO ?? null)
-      .input("시작일시", req.body.data.시작일시 ?? "")
-      .input("종료일시", req.body.data.종료일시 ?? "")
+      .input(
+        "시작일시",
+        moment(req.body.data.시작일시).format("YYYY-MM-DD HH:mm:ss") ??
+          moment().tz("Asia/Seoul").format("YYYY-MM-DD HH:mm:ss")
+      )
+      .input(
+        "종료일시",
+        moment(req.body.data.종료일시).format("YYYY-MM-DD HH:mm:ss") ??
+          moment().tz("Asia/Seoul").format("YYYY-MM-DD HH:mm:ss")
+      )
       .input("생산수", req.body.data.생산수 ?? "")
       .input("특이사항", req.body.data.특이사항 ?? "")
       .input("비고", req.body.data.비고 ?? "")
@@ -822,8 +830,16 @@ router.post("/resultnonwork/insertAll", async (req, res) => {
     for (var i = 0; i < req.body.data.length; i++) {
       await Pool.request()
         .input("비가동NO", req.body.data[i].비가동NO ?? null)
-        .input("시작일시", req.body.data[i].시작일시 ?? "")
-        .input("종료일시", req.body.data[i].종료일시 ?? "")
+        .input(
+          "시작일시",
+          moment(req.body.data[i].시작일시).format("YYYY-MM-DD HH:mm:ss") ??
+            moment().tz("Asia/Seoul").format("YYYY-MM-DD HH:mm:ss")
+        )
+        .input(
+          "종료일시",
+          moment(req.body.data[i].종료일시).format("YYYY-MM-DD HH:mm:ss") ??
+            moment().tz("Asia/Seoul").format("YYYY-MM-DD HH:mm:ss")
+        )
         .input("비고", req.body.data[i].비고 ?? "")
         .input("등록자", req.body.user ?? "")
         .input(

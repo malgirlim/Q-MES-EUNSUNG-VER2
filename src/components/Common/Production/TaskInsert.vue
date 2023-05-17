@@ -29,7 +29,10 @@ import {
   ProductionTaskProcess,
   ProductionTaskProcessItem,
 } from "../../../interfaces/menu/productionInterface";
-import { StockItemReceive } from "../../../interfaces/menu/stockInterface";
+import {
+  StockItemReceive,
+  StockStockLOT,
+} from "../../../interfaces/menu/stockInterface";
 import PaginationComponent from "../../../components/Pagination/PaginationComponent.vue"; // 페이징설정
 
 // 페이지 로딩 시 시작
@@ -79,6 +82,7 @@ const taskInsertData: ProductionTask = ref({
 // 작업지시공정 등록 변수
 const processInit: ProductionTaskProcess = {
   NO: undefined,
+  작업구분: undefined,
   작업지시NO: undefined,
   공정NO: undefined,
   공정명: undefined,
@@ -101,16 +105,21 @@ const itemInit: ProductionTaskProcessItem = {
   NO: undefined,
   작업지시공정NONO: undefined,
   작업지시공정NO: undefined,
-  품목입고NO: undefined,
+  품목NO: undefined,
+  LOT코드: undefined,
   품목구분: undefined,
   품번: undefined,
   품명: undefined,
+  규격: undefined,
+  단위: undefined,
   수량: undefined,
   비고: undefined,
 };
 
 // 공정 리스트를 저장할 곳client
-let processlist = ref<ProductionTaskProcess[]>([{ ...processInit, NO: 1 }]);
+let processlist = ref<ProductionTaskProcess[]>([
+  { ...processInit, NO: 1, 작업구분: "내부생산" },
+]);
 // 공정 리스트 행 추가
 const processAddRows = () => {
   // NO에서 가장 큰 숫자를 찾기
@@ -120,6 +129,7 @@ const processAddRows = () => {
   processlist.value.push({
     ...processInit,
     NO: maxNO + 2,
+    작업구분: "내부생산",
     수량: taskInsertData.value.수량,
   });
 
@@ -164,6 +174,7 @@ const insertData = async () => {
   // console.log(taskInsertData.value);
   // console.log(processlist.value);
   // console.log(itemlist.value);
+
   // 가장 먼저 작업지시 정보를 저장한다.
   await task.insertData(taskInsertData.value);
 
@@ -635,22 +646,43 @@ const setItemReceiveModal = (value: boolean, no: any) => {
 
 // 모달에서 선택한 품목을 itemReceivelist에 넣기
 const importItemReceive = (no: any) => {
+  // 품목NO
+  itemlist.value.filter((c) => c.NO === itemReceiveModalIndex.value)[0].품목NO =
+    task_modal_itemReceive.dataAll.value.filter(
+      (c) => c.LOT코드 == no
+    )[0]?.품목NO;
+  // LOT코드
   itemlist.value.filter(
-    (c) => c.NO == itemReceiveModalIndex.value
-  )[0].품목입고NO = no;
+    (c) => c.NO === itemReceiveModalIndex.value
+  )[0].LOT코드 = task_modal_itemReceive.dataAll.value.filter(
+    (c) => c.LOT코드 == no
+  )[0]?.LOT코드;
+  // 품번
   itemlist.value.filter((c) => c.NO === itemReceiveModalIndex.value)[0].품번 =
-    task_modal_itemReceive.dataAll.value.filter((c) => c.NO == no)[0]?.입고코드;
+    task_modal_itemReceive.dataAll.value.filter(
+      (c) => c.LOT코드 == no
+    )[0]?.품번;
+  // 품목구분
   itemlist.value.filter(
     (c) => c.NO === itemReceiveModalIndex.value
   )[0].품목구분 = task_modal_itemReceive.dataAll.value.filter(
-    (c) => c.NO == no
+    (c) => c.LOT코드 == no
   )[0]?.품목구분;
+  // 품명
   itemlist.value.filter((c) => c.NO === itemReceiveModalIndex.value)[0].품명 =
-    task_modal_itemReceive.dataAll.value.filter((c) => c.NO == no)[0]?.품명;
+    task_modal_itemReceive.dataAll.value.filter(
+      (c) => c.LOT코드 == no
+    )[0]?.품명;
+  // 규격
   itemlist.value.filter((c) => c.NO === itemReceiveModalIndex.value)[0].규격 =
-    task_modal_itemReceive.dataAll.value.filter((c) => c.NO == no)[0]?.규격;
+    task_modal_itemReceive.dataAll.value.filter(
+      (c) => c.LOT코드 == no
+    )[0]?.규격;
+  // 단위
   itemlist.value.filter((c) => c.NO === itemReceiveModalIndex.value)[0].단위 =
-    task_modal_itemReceive.dataAll.value.filter((c) => c.NO == no)[0]?.단위;
+    task_modal_itemReceive.dataAll.value.filter(
+      (c) => c.LOT코드 == no
+    )[0]?.단위;
   itemReceiveModalIndex.value = 0;
   setItemReceiveModal(false, 0);
 };
@@ -663,8 +695,8 @@ const pageChangeFirst_itemReceive = () => {
 };
 
 // 품목 데이터 설정
-const url_task_modal_itemReceive = "/api/production/task/modal/itemreceive";
-const task_modal_itemReceive = useSendApi<StockItemReceive>(
+const url_task_modal_itemReceive = "/api/production/task/modal/stocklot";
+const task_modal_itemReceive = useSendApi<StockStockLOT>(
   url_task_modal_itemReceive,
   currentPage_itemReceive,
   rowsPerPage_itemReceive
@@ -673,14 +705,19 @@ const task_modal_itemReceive = useSendApi<StockItemReceive>(
 // 테이블항목 설정 및 가로크기 조정
 const table_setting_itemReceive = {
   순번: { name: "순번", style: "width: 50px; text-align: center;" },
-  항목1: { name: "구분", style: "width: 50px; text-align: center;" },
-  항목2: { name: "입고코드", style: "width: 200px; text-align: center;" },
-  항목3: { name: "품명", style: "width: 50px; text-align: center;" },
-  항목4: { name: "규격", style: "width: 50px; text-align: center;" },
-  항목5: { name: "단위", style: "width: 50px; text-align: center;" },
-  항목6: { name: "항목6", style: "width: 50px; text-align: center;" },
-  항목7: { name: "항목7", style: "width: 50px; text-align: center;" },
-  항목8: { name: "항목8", style: "width: 50px; text-align: center;" },
+  항목1: { name: "LOT코드", style: "width: 50px; text-align: center;" },
+  항목2: { name: "품목구분", style: "width: 50px; text-align: center;" },
+  항목3: { name: "품번", style: "width: 50px; text-align: center;" },
+  항목4: { name: "품명", style: "width: 50px; text-align: center;" },
+  항목5: { name: "규격", style: "width: 50px; text-align: center;" },
+  항목6: { name: "단위", style: "width: 50px; text-align: center;" },
+  항목7: { name: "기초재공재고", style: "width: 50px; text-align: center;" },
+  항목8: { name: "기초재고", style: "width: 50px; text-align: center;" },
+  항목9: { name: "입고", style: "width: 50px; text-align: center;" },
+  항목10: { name: "재공", style: "width: 50px; text-align: center;" },
+  항목11: { name: "사용", style: "width: 50px; text-align: center;" },
+  항목12: { name: "기말재공재고", style: "width: 50px; text-align: center;" },
+  항목13: { name: "기말재고", style: "width: 50px; text-align: center;" },
 };
 
 // ########################## 조회기간 설정 ##########################
@@ -903,6 +940,11 @@ const search_itemReceive = () => {
             <Table.Th
               class="bg-gray-300"
               style="border-right-width: 1px; width: 200px"
+              ><strong>작업구분</strong>
+            </Table.Th>
+            <Table.Th
+              class="bg-gray-300"
+              style="border-right-width: 1px; width: 200px"
               ><strong>공정명</strong>
             </Table.Th>
             <Table.Th
@@ -948,6 +990,18 @@ const search_itemReceive = () => {
           </Table.Tbody>
           <Table.Tbody>
             <Table.Tr>
+              <Table.Td
+                class="px-1 py-1 text-center"
+                style="border-right-width: 1px"
+                ><FormSelect
+                  type="text"
+                  formInputSize="sm"
+                  :value="process.작업구분"
+                  v-model="process.작업구분"
+                  ><option>내부생산</option>
+                  <option>외주</option>
+                </FormSelect>
+              </Table.Td>
               <Table.Td
                 class="px-1 py-1 text-center"
                 style="border-right-width: 1px"
@@ -1179,7 +1233,7 @@ const search_itemReceive = () => {
                   type="text"
                   formInputSize="sm"
                   placeholder="여기를 클릭하여 품목을 등록해주세요"
-                  :value="item.품번"
+                  :value="item.LOT코드"
                   @click="setItemReceiveModal(true, item.NO)"
                 ></FormInput>
               </Table.Td>
@@ -2859,7 +2913,7 @@ const search_itemReceive = () => {
     <Dialog.Panel class="p-10 text-center">
       <!--ItemReceive Modal 내용 시작-->
       <div class="mb-3" style="font-weight: bold; font-size: x-large">
-        품목입고 리스트
+        품목(LOT별) 재고 리스트
       </div>
       <div class="grid grid-cols-12 gap-1 mt-1">
         <div
@@ -3030,18 +3084,66 @@ const search_itemReceive = () => {
                   >
                     {{ table_setting_itemReceive.항목5.name }}
                   </Table.Th>
+                  <Table.Th
+                    class="text-center border-b-0 whitespace-nowrap"
+                    :style="table_setting_itemReceive.항목6.style"
+                  >
+                    {{ table_setting_itemReceive.항목6.name }}
+                  </Table.Th>
+                  <Table.Th
+                    class="text-center border-b-0 whitespace-nowrap"
+                    :style="table_setting_itemReceive.항목7.style"
+                  >
+                    {{ table_setting_itemReceive.항목7.name }}
+                  </Table.Th>
+                  <Table.Th
+                    class="text-center border-b-0 whitespace-nowrap"
+                    :style="table_setting_itemReceive.항목8.style"
+                  >
+                    {{ table_setting_itemReceive.항목8.name }}
+                  </Table.Th>
+                  <Table.Th
+                    class="text-center border-b-0 whitespace-nowrap"
+                    :style="table_setting_itemReceive.항목9.style"
+                  >
+                    {{ table_setting_itemReceive.항목9.name }}
+                  </Table.Th>
+                  <Table.Th
+                    class="text-center border-b-0 whitespace-nowrap"
+                    :style="table_setting_itemReceive.항목10.style"
+                  >
+                    {{ table_setting_itemReceive.항목10.name }}
+                  </Table.Th>
+                  <Table.Th
+                    class="text-center border-b-0 whitespace-nowrap"
+                    :style="table_setting_itemReceive.항목11.style"
+                  >
+                    {{ table_setting_itemReceive.항목11.name }}
+                  </Table.Th>
+                  <Table.Th
+                    class="text-center border-b-0 whitespace-nowrap"
+                    :style="table_setting_itemReceive.항목12.style"
+                  >
+                    {{ table_setting_itemReceive.항목12.name }}
+                  </Table.Th>
+                  <Table.Th
+                    class="text-center border-b-0 whitespace-nowrap"
+                    :style="table_setting_itemReceive.항목13.style"
+                  >
+                    {{ table_setting_itemReceive.항목13.name }}
+                  </Table.Th>
                 </Table.Tr>
               </Table.Thead>
               <Table.Tbody style="position: relative; z-index: 1">
                 <Table.Tr
                   v-for="(todo, index) in task_modal_itemReceive.datas.value"
-                  :key="todo.NO"
+                  :key="todo.LOT코드"
                   class="intro-x hover:bg-gray-200 active:bg-gray-300 cursor-pointer"
                 >
                   <Table.Td
                     class="first:rounded-l-md last:rounded-r-md text-center border-b-2 dark:bg-darkmode-600"
                     :style="table_setting_itemReceive.순번.style"
-                    @click="importItemReceive(todo.NO)"
+                    @click="importItemReceive(todo.LOT코드)"
                   >
                     <div>
                       {{
@@ -3054,37 +3156,93 @@ const search_itemReceive = () => {
                   <Table.Td
                     class="first:rounded-l-md last:rounded-r-md text-center border-b-2 dark:bg-darkmode-600"
                     :style="table_setting_itemReceive.항목1.style"
-                    @click="importItemReceive(todo.NO)"
+                    @click="importItemReceive(todo.LOT코드)"
                   >
                     <div>{{ todo[table_setting_itemReceive.항목1.name] }}</div>
                   </Table.Td>
                   <Table.Td
                     class="first:rounded-l-md last:rounded-r-md text-center border-b-2 dark:bg-darkmode-600"
                     :style="table_setting_itemReceive.항목2.style"
-                    @click="importItemReceive(todo.NO)"
+                    @click="importItemReceive(todo.LOT코드)"
                   >
                     <div>{{ todo[table_setting_itemReceive.항목2.name] }}</div>
                   </Table.Td>
                   <Table.Td
                     class="first:rounded-l-md last:rounded-r-md text-center border-b-2 dark:bg-darkmode-600"
                     :style="table_setting_itemReceive.항목3.style"
-                    @click="importItemReceive(todo.NO)"
+                    @click="importItemReceive(todo.LOT코드)"
                   >
                     <div>{{ todo[table_setting_itemReceive.항목3.name] }}</div>
                   </Table.Td>
                   <Table.Td
                     class="first:rounded-l-md last:rounded-r-md text-center border-b-2 dark:bg-darkmode-600"
                     :style="table_setting_itemReceive.항목4.style"
-                    @click="importItemReceive(todo.NO)"
+                    @click="importItemReceive(todo.LOT코드)"
                   >
                     <div>{{ todo[table_setting_itemReceive.항목4.name] }}</div>
                   </Table.Td>
                   <Table.Td
                     class="first:rounded-l-md last:rounded-r-md text-center border-b-2 dark:bg-darkmode-600"
                     :style="table_setting_itemReceive.항목5.style"
-                    @click="importItemReceive(todo.NO)"
+                    @click="importItemReceive(todo.LOT코드)"
                   >
                     <div>{{ todo[table_setting_itemReceive.항목5.name] }}</div>
+                  </Table.Td>
+                  <Table.Td
+                    class="first:rounded-l-md last:rounded-r-md text-center border-b-2 dark:bg-darkmode-600"
+                    :style="table_setting_itemReceive.항목6.style"
+                    @click="importItemReceive(todo.LOT코드)"
+                  >
+                    <div>{{ todo[table_setting_itemReceive.항목6.name] }}</div>
+                  </Table.Td>
+                  <Table.Td
+                    class="first:rounded-l-md last:rounded-r-md text-center border-b-2 dark:bg-darkmode-600"
+                    :style="table_setting_itemReceive.항목7.style"
+                    @click="importItemReceive(todo.LOT코드)"
+                  >
+                    <div>{{ todo[table_setting_itemReceive.항목7.name] }}</div>
+                  </Table.Td>
+                  <Table.Td
+                    class="first:rounded-l-md last:rounded-r-md text-center border-b-2 dark:bg-darkmode-600"
+                    :style="table_setting_itemReceive.항목8.style"
+                    @click="importItemReceive(todo.LOT코드)"
+                  >
+                    <div>{{ todo[table_setting_itemReceive.항목8.name] }}</div>
+                  </Table.Td>
+                  <Table.Td
+                    class="first:rounded-l-md last:rounded-r-md text-center border-b-2 dark:bg-darkmode-600"
+                    :style="table_setting_itemReceive.항목9.style"
+                    @click="importItemReceive(todo.LOT코드)"
+                  >
+                    <div>{{ todo[table_setting_itemReceive.항목9.name] }}</div>
+                  </Table.Td>
+                  <Table.Td
+                    class="first:rounded-l-md last:rounded-r-md text-center border-b-2 dark:bg-darkmode-600"
+                    :style="table_setting_itemReceive.항목10.style"
+                    @click="importItemReceive(todo.LOT코드)"
+                  >
+                    <div>{{ todo[table_setting_itemReceive.항목10.name] }}</div>
+                  </Table.Td>
+                  <Table.Td
+                    class="first:rounded-l-md last:rounded-r-md text-center border-b-2 dark:bg-darkmode-600"
+                    :style="table_setting_itemReceive.항목11.style"
+                    @click="importItemReceive(todo.LOT코드)"
+                  >
+                    <div>{{ todo[table_setting_itemReceive.항목11.name] }}</div>
+                  </Table.Td>
+                  <Table.Td
+                    class="first:rounded-l-md last:rounded-r-md text-center border-b-2 dark:bg-darkmode-600"
+                    :style="table_setting_itemReceive.항목12.style"
+                    @click="importItemReceive(todo.LOT코드)"
+                  >
+                    <div>{{ todo[table_setting_itemReceive.항목12.name] }}</div>
+                  </Table.Td>
+                  <Table.Td
+                    class="first:rounded-l-md last:rounded-r-md text-center border-b-2 dark:bg-darkmode-600"
+                    :style="table_setting_itemReceive.항목13.style"
+                    @click="importItemReceive(todo.LOT코드)"
+                  >
+                    <div>{{ todo[table_setting_itemReceive.항목13.name] }}</div>
                   </Table.Td>
                 </Table.Tr>
               </Table.Tbody>

@@ -41,6 +41,7 @@ export interface ProductionTask {
 export interface ProductionTaskProcess {
   [attribute: string]: any | undefined;
   NO?: number;
+  작업구분?: string;
   작업지시NO?: number;
   공정NO?: number;
   공정명?: string;

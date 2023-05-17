@@ -36,6 +36,7 @@ router.get("/", async (req, res) => {
     const result = await Pool.request().query(`
       SELECT
         [ISPC_PK] AS NO
+        ,[ISPC_DIV] AS 작업구분
         ,[ISPC_WORK_INSTRUCT_PK] AS 작업지시NO
         ,[ISPC_PROCESS_PK] AS 공정NO
         ,PROCESS.공정명 AS 공정명
@@ -143,12 +144,13 @@ router.post("/", async (req, res) => {
       sql =
         `
         SELECT
-          NO AS NO, 작업지시NO AS 작업지시NO, 공정NO AS 공정NO, 공정명 AS 공정명, 설비NO AS 설비NO, 설비명 AS 설비명,
+          NO AS NO, 작업구분 AS 작업구분, 작업지시NO AS 작업지시NO, 공정NO AS 공정NO, 공정명 AS 공정명, 설비NO AS 설비NO, 설비명 AS 설비명,
           작업자ID AS 작업자ID, 작업자 AS 작업자, 품목NO AS 품목NO, 품번 AS 품번, 구분 AS 구분, 품명 AS 품명, 규격 AS 규격,
           단위 AS 단위, 수량 AS 수량, 진행상황 AS 진행상황, 비고 AS 비고, 등록자 AS 등록자, 등록일시 AS 등록일시
         FROM(
           SELECT
             [ISPC_PK] AS NO
+            ,[ISPC_DIV] AS 작업구분
             ,[ISPC_WORK_INSTRUCT_PK] AS 작업지시NO
             ,[ISPC_PROCESS_PK] AS 공정NO
             ,PROCESS.공정명 AS 공정명
@@ -240,12 +242,13 @@ router.post("/", async (req, res) => {
       sql =
         `
         SELECT
-          NO AS NO, 작업지시NO AS 작업지시NO, 공정NO AS 공정NO, 공정명 AS 공정명, 설비NO AS 설비NO, 설비명 AS 설비명,
+          NO AS NO, 작업구분 AS 작업구분, 작업지시NO AS 작업지시NO, 공정NO AS 공정NO, 공정명 AS 공정명, 설비NO AS 설비NO, 설비명 AS 설비명,
           작업자ID AS 작업자ID, 작업자 AS 작업자, 품목NO AS 품목NO, 품번 AS 품번, 구분 AS 구분, 품명 AS 품명, 규격 AS 규격,
           단위 AS 단위, 수량 AS 수량, 진행상황 AS 진행상황, 비고 AS 비고, 등록자 AS 등록자, 등록일시 AS 등록일시
         FROM(
           SELECT
             [ISPC_PK] AS NO
+            ,[ISPC_DIV] AS 작업구분
             ,[ISPC_WORK_INSTRUCT_PK] AS 작업지시NO
             ,[ISPC_PROCESS_PK] AS 공정NO
             ,PROCESS.공정명 AS 공정명
@@ -370,13 +373,14 @@ router.post("/insert", async (req, res) => {
   try {
     const Pool = await pool;
     await Pool.request()
+      .input("작업구분", req.body.data.작업구분 ?? "")
       .input("작업지시NO", req.body.data.작업지시NO ?? null)
       .input("공정NO", req.body.data.공정NO ?? null)
       .input("설비NO", req.body.data.설비NO ?? null)
       .input("작업자ID", req.body.data.작업자ID ?? "")
       .input("품목NO", req.body.data.품목NO ?? null)
       .input("수량", req.body.data.수량 ?? "")
-      .input("진행상황", req.body.data.진행상황 ?? "생산대기")
+      .input("진행상황", req.body.data.진행상황 ?? "작업대기")
       .input("비고", req.body.data.비고 ?? "")
       .input("등록자", req.body.user ?? "")
       .input(
@@ -384,7 +388,8 @@ router.post("/insert", async (req, res) => {
         moment().tz("Asia/Seoul").format("YYYY-MM-DD HH:mm:ss")
       ).query(`
         INSERT INTO [QMES2022].[dbo].[MANAGE_INSTRUCT_PROCESS_TB]
-          ([ISPC_WORK_INSTRUCT_PK]
+          ([ISPC_DIV]
+          ,[ISPC_WORK_INSTRUCT_PK]
           ,[ISPC_PROCESS_PK]
           ,[ISPC_FACILITY_PK]
           ,[ISPC_USER_ID]
@@ -395,7 +400,7 @@ router.post("/insert", async (req, res) => {
           ,[ISPC_REGIST_NM]
           ,[ISPC_REGIST_DT])
         VALUES
-          (@작업지시NO,@공정NO,@설비NO,@작업자ID,@품목NO,@수량,@진행상황,@비고,@등록자,@등록일시)
+          (@작업구분,@작업지시NO,@공정NO,@설비NO,@작업자ID,@품목NO,@수량,@진행상황,@비고,@등록자,@등록일시)
     `);
 
     // 로그기록 저장
@@ -426,13 +431,14 @@ router.post("/insertAll", async (req, res) => {
     const Pool = await pool;
     for (var i = 0; i < req.body.data.length; i++) {
       await Pool.request()
+        .input("작업구분", req.body.data[i].작업구분 ?? "")
         .input("작업지시NO", req.body.data[i].작업지시NO ?? null)
         .input("공정NO", req.body.data[i].공정NO ?? null)
         .input("설비NO", req.body.data[i].설비NO ?? null)
         .input("작업자ID", req.body.data[i].작업자ID ?? "")
         .input("품목NO", req.body.data[i].품목NO ?? null)
         .input("수량", req.body.data[i].수량 ?? "")
-        .input("진행상황", req.body.data[i].진행상황 ?? "생산대기")
+        .input("진행상황", req.body.data[i].진행상황 ?? "작업대기")
         .input("비고", req.body.data[i].비고 ?? "")
         .input("등록자", req.body.user ?? "")
         .input(
@@ -440,7 +446,8 @@ router.post("/insertAll", async (req, res) => {
           moment().tz("Asia/Seoul").format("YYYY-MM-DD HH:mm:ss")
         ).query(`
         INSERT INTO [QMES2022].[dbo].[MANAGE_INSTRUCT_PROCESS_TB]
-          ([ISPC_WORK_INSTRUCT_PK]
+          ([ISPC_DIV]
+          ,[ISPC_WORK_INSTRUCT_PK]
           ,[ISPC_PROCESS_PK]
           ,[ISPC_FACILITY_PK]
           ,[ISPC_USER_ID]
@@ -451,7 +458,7 @@ router.post("/insertAll", async (req, res) => {
           ,[ISPC_REGIST_NM]
           ,[ISPC_REGIST_DT])
         VALUES
-          (@작업지시NO,@공정NO,@설비NO,@작업자ID,@품목NO,@수량,@진행상황,@비고,@등록자,@등록일시)
+          (@작업구분,@작업지시NO,@공정NO,@설비NO,@작업자ID,@품목NO,@수량,@진행상황,@비고,@등록자,@등록일시)
       `);
 
       // 로그기록 저장
@@ -482,13 +489,14 @@ router.post("/edit", async (req, res) => {
     const Pool = await pool;
     await Pool.request()
       .input("NO", req.body.data.NO ?? 0)
+      .input("작업구분", req.body.data.작업구분 ?? "")
       .input("작업지시NO", req.body.data.작업지시NO ?? null)
       .input("공정NO", req.body.data.공정NO ?? null)
       .input("설비NO", req.body.data.설비NO ?? null)
       .input("작업자ID", req.body.data.작업자ID ?? "")
       .input("품목NO", req.body.data.품목NO ?? null)
       .input("수량", req.body.data.수량 ?? "")
-      .input("진행상황", req.body.data.진행상황 ?? "생산대기")
+      .input("진행상황", req.body.data.진행상황 ?? "작업대기")
       .input("비고", req.body.data.비고 ?? "")
       .input("등록자", req.body.user ?? "")
       .input(
@@ -496,8 +504,9 @@ router.post("/edit", async (req, res) => {
         moment().tz("Asia/Seoul").format("YYYY-MM-DD HH:mm:ss")
       ).query(`
         UPDATE [QMES2022].[dbo].[MANAGE_INSTRUCT_PROCESS_TB]
-          SET 
-          [ISPC_WORK_INSTRUCT_PK] = @작업지시NO
+          SET
+          [ISPC_DIV] = @작업구분 
+          ,[ISPC_WORK_INSTRUCT_PK] = @작업지시NO
           ,[ISPC_PROCESS_PK] = @공정NO
           ,[ISPC_FACILITY_PK] = @설비NO
           ,[ISPC_USER_ID] = @작업자ID
@@ -540,6 +549,7 @@ router.post("/delete", async (req, res) => {
       const result = await Pool.request().input("key", req.body.data[i]).query(`
         SELECT
           [ISPC_PK] AS NO
+          ,[ISPC_DIV] AS 작업구분
           ,[ISPC_WORK_INSTRUCT_PK] AS 작업지시NO
           ,[ISPC_PROCESS_PK] AS 공정NO
           ,PROCESS.공정명 AS 공정명
