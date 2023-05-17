@@ -105,13 +105,13 @@ const task_modal_user = useSendApi<MasterUser>(
   ref(1),
   ref(10)
 );
-// 품목입고 데이터 설정
-const url_task_modal_itemReceive = "/api/production/task/modal/itemreceive";
-const task_modal_itemReceive = useSendApi<StockItemReceive>(
-  url_task_modal_itemReceive,
-  ref(1),
-  ref(10)
-);
+// // 품목입고 데이터 설정
+// const url_task_modal_itemReceive = "/api/production/task/modal/itemreceive";
+// const task_modal_itemReceive = useSendApi<StockItemReceive>(
+//   url_task_modal_itemReceive,
+//   ref(1),
+//   ref(10)
+// );
 // v-tom (모달 실시간 데이터 변동) 에 필요한 함수
 const vTom = {
   mounted(el: any, binding: any, vnode: any) {
@@ -502,8 +502,14 @@ let insertModalData_ProcessItem: ProductionTaskProcessItem;
 const insertModal_ProcessItem = ref(false);
 const setInsertModal_ProcessItem = (value: boolean) => {
   if (user_level >= 3) {
-    insertModal_ProcessItem.value = value;
-    insertModalData_ProcessItem = { 작업지시공정NO: radioSelect_Process.value }; // 변수 초기화
+    if (radioSelect_Process.value > 0) {
+      insertModal_ProcessItem.value = value;
+      insertModalData_ProcessItem = {
+        작업지시공정NO: radioSelect_Process.value,
+      }; // 변수 초기화
+    } else {
+      toast.warning("공정을 선택해주세요.");
+    }
   } else {
     toast.warning("액세스 권한이 없습니다.\n관리자에게 문의하세요.");
   }
@@ -570,6 +576,116 @@ const deleteDataFunction_ProcessItem = async () => {
     radioSelect_Process.value,
     "",
     ""
+  );
+};
+
+// ############################################### 품목입고 가져오기 ###############################################
+// 품목등록 모달 설정
+const itemReceiveModal = ref(false);
+const itemReceiveModalIndex = ref(0);
+const setItemReceiveModal = (value: boolean, no: any) => {
+  itemReceiveModal.value = value;
+  itemReceiveModalIndex.value = no;
+};
+
+// 모달에서 선택한 품목을 itemReceivelist에 넣기
+const importItemReceive = (no: any) => {
+  // 품목NO
+  insertModalData_ProcessItem.품목NO =
+    task_modal_itemReceive.dataAll.value.filter(
+      (c) => c.LOT코드 == no
+    )[0]?.품목NO;
+  // LOT코드
+  insertModalData_ProcessItem.LOT코드 =
+    task_modal_itemReceive.dataAll.value.filter(
+      (c) => c.LOT코드 == no
+    )[0]?.LOT코드;
+  // 품번
+  insertModalData_ProcessItem.품번 =
+    task_modal_itemReceive.dataAll.value.filter(
+      (c) => c.LOT코드 == no
+    )[0]?.품번;
+  // 품목구분
+  insertModalData_ProcessItem.품목구분 =
+    task_modal_itemReceive.dataAll.value.filter(
+      (c) => c.LOT코드 == no
+    )[0]?.품목구분;
+  // 품명
+  insertModalData_ProcessItem.품명 =
+    task_modal_itemReceive.dataAll.value.filter(
+      (c) => c.LOT코드 == no
+    )[0]?.품명;
+  // 규격
+  insertModalData_ProcessItem.규격 =
+    task_modal_itemReceive.dataAll.value.filter(
+      (c) => c.LOT코드 == no
+    )[0]?.규격;
+  // 단위
+  insertModalData_ProcessItem.단위 =
+    task_modal_itemReceive.dataAll.value.filter(
+      (c) => c.LOT코드 == no
+    )[0]?.단위;
+  itemReceiveModalIndex.value = 0;
+  setItemReceiveModal(false, 0);
+};
+
+// 페이징기능
+const currentPage_itemReceive = ref(1); // 현재페이지
+const rowsPerPage_itemReceive = ref(10); // 한 페이지에 보여질 데이터 갯수
+const pageChangeFirst_itemReceive = () => {
+  currentPage_itemReceive.value = 1; // 데이터 갯수 변경 시 1페이지로 이동
+};
+
+// 품목 데이터 설정
+const url_task_modal_itemReceive = "/api/production/task/modal/stocklot";
+const task_modal_itemReceive = useSendApi<StockStockLOT>(
+  url_task_modal_itemReceive,
+  currentPage_itemReceive,
+  rowsPerPage_itemReceive
+);
+
+// 테이블항목 설정 및 가로크기 조정
+const table_setting_itemReceive = {
+  순번: { name: "순번", style: "width: 50px; text-align: center;" },
+  항목1: { name: "LOT코드", style: "width: 50px; text-align: center;" },
+  항목2: { name: "품목구분", style: "width: 50px; text-align: center;" },
+  항목3: { name: "품번", style: "width: 50px; text-align: center;" },
+  항목4: { name: "품명", style: "width: 50px; text-align: center;" },
+  항목5: { name: "규격", style: "width: 50px; text-align: center;" },
+  항목6: { name: "단위", style: "width: 50px; text-align: center;" },
+  항목7: { name: "기초재공재고", style: "width: 50px; text-align: center;" },
+  항목8: { name: "기초재고", style: "width: 50px; text-align: center;" },
+  항목9: { name: "입고", style: "width: 50px; text-align: center;" },
+  항목10: { name: "재공", style: "width: 50px; text-align: center;" },
+  항목11: { name: "사용", style: "width: 50px; text-align: center;" },
+  항목12: { name: "기말재공재고", style: "width: 50px; text-align: center;" },
+  항목13: { name: "기말재고", style: "width: 50px; text-align: center;" },
+};
+
+// ########################## 조회기간 설정 ##########################
+const searchDate_itemReceive = ref("전체기간");
+// ########################## 품목 조회  ##########################
+const searchKey_itemReceive = ref("전체");
+const searchInput_itemReceive = ref("");
+const sortKey_itemReceive = ref("등록일");
+const sortOrder_itemReceive = ref("내림차순");
+const sortOrderToggle_itemReceive = () => {
+  sortOrder_itemReceive.value =
+    sortOrder_itemReceive.value == "내림차순" ? "오름차순" : "내림차순";
+};
+//  정렬기준이 변경되면 실행
+watch([sortKey_itemReceive, sortOrder_itemReceive], (newValue, oldValue) => {
+  search_itemReceive();
+  pageChangeFirst_itemReceive();
+});
+const search_itemReceive = () => {
+  // console.log(searchKey.value, searchInput.value);
+  task_modal_itemReceive.searchDatas(
+    searchDate_itemReceive.value,
+    searchKey_itemReceive.value,
+    searchInput_itemReceive.value,
+    sortKey_itemReceive.value,
+    sortOrder_itemReceive.value
   );
 };
 </script>
@@ -1229,6 +1345,7 @@ const deleteDataFunction_ProcessItem = async () => {
                       <Table.Td
                         :class="[
                           'first:rounded-l-md last:rounded-r-md text-center bg-white border-b-0 dark:bg-darkmode-600 shadow-[20px_3px_20px_#0000000b]',
+                          { 'bg-warning': radioSelect_Process == todo.NO },
                           { 'text-gray-500': todo.진행상황 == '작업보류' },
                           { 'text-danger': todo.진행상황 == '작업반려' },
                           { 'text-black': todo.진행상황 == '작업미확인' },
@@ -2167,7 +2284,11 @@ const deleteDataFunction_ProcessItem = async () => {
 ######################################################################################################################### -->
 
   <!-- BEGIN: Insert Modal Content -->
-  <Dialog size="md" :open="insertModal_ProcessItem">
+  <Dialog
+    size="md"
+    :open="insertModal_ProcessItem"
+    :key="insertModalData_ProcessItem?.LOT코드"
+  >
     <Dialog.Panel class="p-10 text-center">
       <!--추가 Modal 내용 시작-->
       <div class="mb-5" style="font-weight: bold">등록</div>
@@ -2183,7 +2304,7 @@ const deleteDataFunction_ProcessItem = async () => {
         <Tab.Panels class="mt-5">
           <Tab.Panel class="leading-relaxed">
             <div style="text-align: left">
-              <div class="mt-3">
+              <!-- <div class="mt-3">
                 <FormLabel htmlFor="vertical-form-2">품목</FormLabel>
                 <select v-tom v-model="insertModalData_ProcessItem.품목입고NO">
                   <option value="" selected>=== 선택 ===</option>
@@ -2200,6 +2321,66 @@ const deleteDataFunction_ProcessItem = async () => {
                     }}
                   </option>
                 </select>
+              </div> -->
+              <div class="mt-3">
+                <FormLabel htmlFor="vertical-form-4">LOT코드</FormLabel>
+                <FormInput
+                  id="vertical-form-4"
+                  type="text"
+                  v-model="insertModalData_ProcessItem.LOT코드"
+                  @click="setItemReceiveModal(true, 0)"
+                  placeholder=""
+                />
+              </div>
+              <div class="mt-3">
+                <FormLabel htmlFor="vertical-form-4">품목구분</FormLabel>
+                <FormInput
+                  id="vertical-form-4"
+                  type="text"
+                  v-model="insertModalData_ProcessItem.품목구분"
+                  placeholder=""
+                  readonly
+                />
+              </div>
+              <div class="mt-3">
+                <FormLabel htmlFor="vertical-form-4">품번</FormLabel>
+                <FormInput
+                  id="vertical-form-4"
+                  type="text"
+                  v-model="insertModalData_ProcessItem.품번"
+                  placeholder=""
+                  readonly
+                />
+              </div>
+              <div class="mt-3">
+                <FormLabel htmlFor="vertical-form-4">품명</FormLabel>
+                <FormInput
+                  id="vertical-form-4"
+                  type="text"
+                  v-model="insertModalData_ProcessItem.품명"
+                  placeholder=""
+                  readonly
+                />
+              </div>
+              <div class="mt-3">
+                <FormLabel htmlFor="vertical-form-4">규격</FormLabel>
+                <FormInput
+                  id="vertical-form-4"
+                  type="text"
+                  v-model="insertModalData_ProcessItem.규격"
+                  placeholder=""
+                  readonly
+                />
+              </div>
+              <div class="mt-3">
+                <FormLabel htmlFor="vertical-form-4">단위</FormLabel>
+                <FormInput
+                  id="vertical-form-4"
+                  type="text"
+                  v-model="insertModalData_ProcessItem.단위"
+                  placeholder=""
+                  readonly
+                />
               </div>
               <div class="mt-3">
                 <FormLabel htmlFor="vertical-form-4">수량</FormLabel>
@@ -2482,4 +2663,376 @@ const deleteDataFunction_ProcessItem = async () => {
     </Dialog.Panel>
   </Dialog>
   <!-- END: 수주서 확인 Modal -->
+
+  <!-- #######################################################################################################################
+  #######################################################################################################################
+  ####################################################################################################################### -->
+
+  <!-- BEGIN: ItemReceive Modal Content -->
+  <Dialog
+    size="xxl"
+    :open="itemReceiveModal"
+    @close="setItemReceiveModal(false, 0)"
+  >
+    <Dialog.Panel class="p-10 text-center">
+      <!--ItemReceive Modal 내용 시작-->
+      <div class="mb-3" style="font-weight: bold; font-size: x-large">
+        품목(LOT별) 재고 리스트
+      </div>
+      <div class="grid grid-cols-12 gap-1 mt-1">
+        <div
+          class="flex flex-wrap itemlist-center col-span-12 mt-2 mb-2 intro-y sm:flex-nowrap"
+        >
+          <div class="hidden mx-auto md:block text-slate-500"></div>
+          <div class="ml-2">
+            <FormSelect
+              v-model="searchKey_itemReceive"
+              class="w-30 mt-3 !box sm:mt-0"
+            >
+              <option>전체</option>
+              <option>거래처명</option>
+              <option>사업자번호</option>
+              <option>주소</option>
+              <option>비고</option>
+            </FormSelect>
+          </div>
+          <div class="w-full mt-3 sm:w-auto sm:mt-0 sm:ml-auto md:ml-2">
+            <div class="relative w-56 text-slate-500">
+              <FormInput
+                type="text"
+                class="w-56 pr-10 !box"
+                v-model="searchInput_itemReceive"
+                @keyup.enter="
+                  () => {
+                    search_itemReceive();
+                    pageChangeFirst_itemReceive();
+                  }
+                "
+                placeholder="검색어를 입력해주세요"
+              />
+              <button
+                @click="
+                  () => {
+                    search_itemReceive();
+                    pageChangeFirst_itemReceive();
+                  }
+                "
+              >
+                <Lucide
+                  icon="Search"
+                  class="absolute inset-y-0 right-0 w-4 h-4 my-auto mr-3"
+                />
+              </button>
+            </div>
+          </div>
+        </div>
+        <!-- BEGIN: Pagination-->
+        <div
+          class="flex flex-wrap itemlist-center col-span-12 mt-0 intro-y sm:flex-nowrap"
+        >
+          <div>
+            <FormSelect
+              v-model="sortKey_itemReceive"
+              class="w-30 mt-3 !box sm:mt-0"
+            >
+              <option>등록일</option>
+              <option>거래처명</option>
+              <option>사업자번호</option>
+              <option>주소</option>
+            </FormSelect>
+          </div>
+          <div class="ml-3">
+            <Button
+              class="shadow-md"
+              as="a"
+              variant="outline-primary"
+              v-if="sortOrder_itemReceive == '오름차순'"
+              @click="sortOrderToggle_itemReceive"
+            >
+              <Lucide icon="SortAsc" class="w-4 h-4 mr-1" />
+
+              {{ sortOrder_itemReceive }}</Button
+            >
+            <Button
+              class="shadow-md"
+              as="a"
+              variant="outline-danger"
+              v-if="sortOrder_itemReceive == '내림차순'"
+              @click="sortOrderToggle_itemReceive"
+            >
+              <Lucide icon="SortDesc" class="w-4 h-4 mr-1" />
+
+              {{ sortOrder_itemReceive }}</Button
+            >
+          </div>
+          <div class="ml-5">
+            <FormSelect
+              class="w-20 mt-3 !box sm:mt-0"
+              v-model="rowsPerPage_itemReceive"
+              @change="pageChangeFirst_itemReceive"
+            >
+              <option>10</option>
+              <option>25</option>
+              <option>50</option>
+              <option>100</option>
+              <option :value="task_modal_itemReceive.dataCount.value">
+                전체
+              </option>
+            </FormSelect>
+          </div>
+          <div>
+            <PaginationComponent
+              class="pagination-component"
+              v-model="currentPage_itemReceive"
+              :numberOfPages="task_modal_itemReceive.numberOfPages.value"
+            />
+          </div>
+          <div class="hidden mx-auto md:block text-slate-500"></div>
+          <div>
+            <span class="mr-3"
+              >[ {{ task_modal_itemReceive.dataCount }}개 데이터 조회됨 ]
+            </span>
+            <span class="mr-4">
+              [ {{ currentPage_itemReceive }} /
+              {{ task_modal_itemReceive.numberOfPages }} 페이지 ]</span
+            >
+          </div>
+        </div>
+        <!-- END: Pagination-->
+        <!-- BEGIN: Data List -->
+        <!-- style="height: calc(100vh - 350px)" : 브라우저 화면 창크기에 맞게 변경됨 -->
+        <div class="col-span-12 overflow-auto intro-y lg:overflow-visible">
+          <div
+            class="mr-3"
+            style="overflow-y: scroll; overflow-x: hidden; height: 580px"
+          >
+            <Table class="border-spacing-y-[6px] border-separate -mt-2">
+              <Table.Thead
+                class="bg-slate-100"
+                style="position: sticky; top: 0px; z-index: 2"
+              >
+                <Table.Tr>
+                  <Table.Th
+                    class="text-center border-b-0 whitespace-nowrap"
+                    :style="table_setting_itemReceive.순번.style"
+                  >
+                    {{ table_setting_itemReceive.순번.name }}
+                  </Table.Th>
+                  <Table.Th
+                    class="text-center border-b-0 whitespace-nowrap"
+                    :style="table_setting_itemReceive.항목1.style"
+                  >
+                    {{ table_setting_itemReceive.항목1.name }}
+                  </Table.Th>
+                  <Table.Th
+                    class="text-center border-b-0 whitespace-nowrap"
+                    :style="table_setting_itemReceive.항목2.style"
+                  >
+                    {{ table_setting_itemReceive.항목2.name }}
+                  </Table.Th>
+                  <Table.Th
+                    class="text-center border-b-0 whitespace-nowrap"
+                    :style="table_setting_itemReceive.항목3.style"
+                  >
+                    {{ table_setting_itemReceive.항목3.name }}
+                  </Table.Th>
+                  <Table.Th
+                    class="text-center border-b-0 whitespace-nowrap"
+                    :style="table_setting_itemReceive.항목4.style"
+                  >
+                    {{ table_setting_itemReceive.항목4.name }}
+                  </Table.Th>
+                  <Table.Th
+                    class="text-center border-b-0 whitespace-nowrap"
+                    :style="table_setting_itemReceive.항목5.style"
+                  >
+                    {{ table_setting_itemReceive.항목5.name }}
+                  </Table.Th>
+                  <Table.Th
+                    class="text-center border-b-0 whitespace-nowrap"
+                    :style="table_setting_itemReceive.항목6.style"
+                  >
+                    {{ table_setting_itemReceive.항목6.name }}
+                  </Table.Th>
+                  <Table.Th
+                    class="text-center border-b-0 whitespace-nowrap"
+                    :style="table_setting_itemReceive.항목7.style"
+                  >
+                    {{ table_setting_itemReceive.항목7.name }}
+                  </Table.Th>
+                  <Table.Th
+                    class="text-center border-b-0 whitespace-nowrap"
+                    :style="table_setting_itemReceive.항목8.style"
+                  >
+                    {{ table_setting_itemReceive.항목8.name }}
+                  </Table.Th>
+                  <Table.Th
+                    class="text-center border-b-0 whitespace-nowrap"
+                    :style="table_setting_itemReceive.항목9.style"
+                  >
+                    {{ table_setting_itemReceive.항목9.name }}
+                  </Table.Th>
+                  <Table.Th
+                    class="text-center border-b-0 whitespace-nowrap"
+                    :style="table_setting_itemReceive.항목10.style"
+                  >
+                    {{ table_setting_itemReceive.항목10.name }}
+                  </Table.Th>
+                  <Table.Th
+                    class="text-center border-b-0 whitespace-nowrap"
+                    :style="table_setting_itemReceive.항목11.style"
+                  >
+                    {{ table_setting_itemReceive.항목11.name }}
+                  </Table.Th>
+                  <Table.Th
+                    class="text-center border-b-0 whitespace-nowrap"
+                    :style="table_setting_itemReceive.항목12.style"
+                  >
+                    {{ table_setting_itemReceive.항목12.name }}
+                  </Table.Th>
+                  <Table.Th
+                    class="text-center border-b-0 whitespace-nowrap"
+                    :style="table_setting_itemReceive.항목13.style"
+                  >
+                    {{ table_setting_itemReceive.항목13.name }}
+                  </Table.Th>
+                </Table.Tr>
+              </Table.Thead>
+              <Table.Tbody style="position: relative; z-index: 1">
+                <Table.Tr
+                  v-for="(todo, index) in task_modal_itemReceive.datas.value"
+                  :key="todo.LOT코드"
+                  class="intro-x hover:bg-gray-200 active:bg-gray-300 cursor-pointer"
+                >
+                  <Table.Td
+                    class="first:rounded-l-md last:rounded-r-md text-center border-b-2 dark:bg-darkmode-600"
+                    :style="table_setting_itemReceive.순번.style"
+                    @click="importItemReceive(todo.LOT코드)"
+                  >
+                    <div>
+                      {{
+                        index +
+                        1 +
+                        (currentPage_itemReceive - 1) * rowsPerPage_itemReceive
+                      }}
+                    </div>
+                  </Table.Td>
+                  <Table.Td
+                    class="first:rounded-l-md last:rounded-r-md text-center border-b-2 dark:bg-darkmode-600"
+                    :style="table_setting_itemReceive.항목1.style"
+                    @click="importItemReceive(todo.LOT코드)"
+                  >
+                    <div>{{ todo[table_setting_itemReceive.항목1.name] }}</div>
+                  </Table.Td>
+                  <Table.Td
+                    class="first:rounded-l-md last:rounded-r-md text-center border-b-2 dark:bg-darkmode-600"
+                    :style="table_setting_itemReceive.항목2.style"
+                    @click="importItemReceive(todo.LOT코드)"
+                  >
+                    <div>{{ todo[table_setting_itemReceive.항목2.name] }}</div>
+                  </Table.Td>
+                  <Table.Td
+                    class="first:rounded-l-md last:rounded-r-md text-center border-b-2 dark:bg-darkmode-600"
+                    :style="table_setting_itemReceive.항목3.style"
+                    @click="importItemReceive(todo.LOT코드)"
+                  >
+                    <div>{{ todo[table_setting_itemReceive.항목3.name] }}</div>
+                  </Table.Td>
+                  <Table.Td
+                    class="first:rounded-l-md last:rounded-r-md text-center border-b-2 dark:bg-darkmode-600"
+                    :style="table_setting_itemReceive.항목4.style"
+                    @click="importItemReceive(todo.LOT코드)"
+                  >
+                    <div>{{ todo[table_setting_itemReceive.항목4.name] }}</div>
+                  </Table.Td>
+                  <Table.Td
+                    class="first:rounded-l-md last:rounded-r-md text-center border-b-2 dark:bg-darkmode-600"
+                    :style="table_setting_itemReceive.항목5.style"
+                    @click="importItemReceive(todo.LOT코드)"
+                  >
+                    <div>{{ todo[table_setting_itemReceive.항목5.name] }}</div>
+                  </Table.Td>
+                  <Table.Td
+                    class="first:rounded-l-md last:rounded-r-md text-center border-b-2 dark:bg-darkmode-600"
+                    :style="table_setting_itemReceive.항목6.style"
+                    @click="importItemReceive(todo.LOT코드)"
+                  >
+                    <div>{{ todo[table_setting_itemReceive.항목6.name] }}</div>
+                  </Table.Td>
+                  <Table.Td
+                    class="first:rounded-l-md last:rounded-r-md text-center border-b-2 dark:bg-darkmode-600"
+                    :style="table_setting_itemReceive.항목7.style"
+                    @click="importItemReceive(todo.LOT코드)"
+                  >
+                    <div>{{ todo[table_setting_itemReceive.항목7.name] }}</div>
+                  </Table.Td>
+                  <Table.Td
+                    class="first:rounded-l-md last:rounded-r-md text-center border-b-2 dark:bg-darkmode-600"
+                    :style="table_setting_itemReceive.항목8.style"
+                    @click="importItemReceive(todo.LOT코드)"
+                  >
+                    <div>{{ todo[table_setting_itemReceive.항목8.name] }}</div>
+                  </Table.Td>
+                  <Table.Td
+                    class="first:rounded-l-md last:rounded-r-md text-center border-b-2 dark:bg-darkmode-600"
+                    :style="table_setting_itemReceive.항목9.style"
+                    @click="importItemReceive(todo.LOT코드)"
+                  >
+                    <div>{{ todo[table_setting_itemReceive.항목9.name] }}</div>
+                  </Table.Td>
+                  <Table.Td
+                    class="first:rounded-l-md last:rounded-r-md text-center border-b-2 dark:bg-darkmode-600"
+                    :style="table_setting_itemReceive.항목10.style"
+                    @click="importItemReceive(todo.LOT코드)"
+                  >
+                    <div>{{ todo[table_setting_itemReceive.항목10.name] }}</div>
+                  </Table.Td>
+                  <Table.Td
+                    class="first:rounded-l-md last:rounded-r-md text-center border-b-2 dark:bg-darkmode-600"
+                    :style="table_setting_itemReceive.항목11.style"
+                    @click="importItemReceive(todo.LOT코드)"
+                  >
+                    <div>{{ todo[table_setting_itemReceive.항목11.name] }}</div>
+                  </Table.Td>
+                  <Table.Td
+                    class="first:rounded-l-md last:rounded-r-md text-center border-b-2 dark:bg-darkmode-600"
+                    :style="table_setting_itemReceive.항목12.style"
+                    @click="importItemReceive(todo.LOT코드)"
+                  >
+                    <div>{{ todo[table_setting_itemReceive.항목12.name] }}</div>
+                  </Table.Td>
+                  <Table.Td
+                    class="first:rounded-l-md last:rounded-r-md text-center border-b-2 dark:bg-darkmode-600"
+                    :style="table_setting_itemReceive.항목13.style"
+                    @click="importItemReceive(todo.LOT코드)"
+                  >
+                    <div>{{ todo[table_setting_itemReceive.항목13.name] }}</div>
+                  </Table.Td>
+                </Table.Tr>
+              </Table.Tbody>
+            </Table>
+            <div
+              class="text-center mt-20"
+              v-if="task_modal_itemReceive.dataCount.value == 0"
+            >
+              저장된 데이터가 없습니다.
+            </div>
+          </div>
+        </div>
+        <!-- END: Data List -->
+      </div>
+      <div style="text-align: left">
+        <div class="mt-5 text-right">
+          <Button
+            class="mr-2 shadow-md"
+            variant="outline-primary"
+            @click="setItemReceiveModal(false, 0)"
+            >취소</Button
+          >
+        </div>
+      </div>
+      <!--Modal 내용 끝-->
+    </Dialog.Panel>
+  </Dialog>
+  <!-- END: ItemReceive Modal Content -->
 </template>

@@ -150,8 +150,8 @@ const table_setting_nonwork = {
 const table_setting_useitem = {
   체크박스: { name: "체크박스", style: "width: 50px" },
   순번: { name: "순번", style: "width: 20px; text-align: center;" },
-  항목1: { name: "코드", style: "width: 100px; text-align: center;" },
-  항목2: { name: "구분", style: "width: 100px; text-align: center;" },
+  항목1: { name: "LOT코드", style: "width: 100px; text-align: center;" },
+  항목2: { name: "품목구분", style: "width: 100px; text-align: center;" },
   항목3: { name: "품명", style: "width: 150px; text-align: center;" },
   항목4: { name: "규격", style: "width: 100px; text-align: center;" },
   항목5: { name: "단위", style: "width: 50px; text-align: center;" },
@@ -715,12 +715,14 @@ const table_setting_itemProcess = {
   순번: { name: "순번", style: "width: 50px; text-align: center;" },
   항목1: { name: "작업코드", style: "width: 50px; text-align: center;" },
   항목2: { name: "공정", style: "width: 50px; text-align: center;" },
-  항목3: { name: "입고코드", style: "width: 50px; text-align: center;" },
+  항목3: { name: "LOT코드", style: "width: 50px; text-align: center;" },
   항목4: { name: "품목구분", style: "width: 50px; text-align: center;" },
   항목5: { name: "품명", style: "width: 50px; text-align: center;" },
   항목6: { name: "규격", style: "width: 50px; text-align: center;" },
   항목7: { name: "단위", style: "width: 50px; text-align: center;" },
-  항목8: { name: "재공수량", style: "width: 50px; text-align: center;" },
+  항목8: { name: "불출수", style: "width: 50px; text-align: center;" },
+  항목9: { name: "사용수", style: "width: 50px; text-align: center;" },
+  항목10: { name: "재공수", style: "width: 50px; text-align: center;" },
 };
 
 // ########################## 조회기간 설정 ##########################
@@ -757,26 +759,32 @@ const setItemProcessModal = (value: boolean) => {
 };
 
 // 모달에서 선택한 품목을 itemProcesslist에 넣기
-const importItemProcess = (no: any) => {
-  insertModalData_Useitem.품목재공NO = no;
-  insertModalData_Useitem.코드 = task_modal_itemProcess.dataAll.value.filter(
-    (c) => c.NO == no
-  )[0].입고코드;
-  insertModalData_Useitem.구분 = task_modal_itemProcess.dataAll.value.filter(
-    (c) => c.NO == no
-  )[0].품목구분;
+const importItemProcess = (작업지시공정no: any, lot코드: any) => {
+  insertModalData_Useitem.품목NO = task_modal_itemProcess.dataAll.value.filter(
+    (c) => c.작업지시공정NO == 작업지시공정no && c.LOT코드 == lot코드
+  )[0].품목NO;
+  insertModalData_Useitem.LOT코드 = task_modal_itemProcess.dataAll.value.filter(
+    (c) => c.작업지시공정NO == 작업지시공정no && c.LOT코드 == lot코드
+  )[0].LOT코드;
+  insertModalData_Useitem.품목구분 =
+    task_modal_itemProcess.dataAll.value.filter(
+      (c) => c.작업지시공정NO == 작업지시공정no && c.LOT코드 == lot코드
+    )[0].품목구분;
+  insertModalData_Useitem.품번 = task_modal_itemProcess.dataAll.value.filter(
+    (c) => c.작업지시공정NO == 작업지시공정no && c.LOT코드 == lot코드
+  )[0].품번;
   insertModalData_Useitem.품명 = task_modal_itemProcess.dataAll.value.filter(
-    (c) => c.NO == no
+    (c) => c.작업지시공정NO == 작업지시공정no && c.LOT코드 == lot코드
   )[0].품명;
   insertModalData_Useitem.규격 = task_modal_itemProcess.dataAll.value.filter(
-    (c) => c.NO == no
+    (c) => c.작업지시공정NO == 작업지시공정no && c.LOT코드 == lot코드
   )[0].규격;
   insertModalData_Useitem.단위 = task_modal_itemProcess.dataAll.value.filter(
-    (c) => c.NO == no
+    (c) => c.작업지시공정NO == 작업지시공정no && c.LOT코드 == lot코드
   )[0].단위;
   insertModalData_Useitem.수량 = task_modal_itemProcess.dataAll.value.filter(
-    (c) => c.NO == no
-  )[0].재공수량;
+    (c) => c.작업지시공정NO == 작업지시공정no && c.LOT코드 == lot코드
+  )[0].재공수;
   setItemProcessModal(false);
 };
 
@@ -2283,26 +2291,26 @@ const importNonwork = (no: any) => {
   <Dialog
     size="md"
     :open="insertModal_Useitem"
-    :key="insertModalData_Useitem?.코드"
+    :key="insertModalData_Useitem?.LOT코드"
   >
     <Dialog.Panel class="p-10 text-center">
       <div class="mb-5" style="font-weight: bold">투입 자재 등록</div>
 
       <div style="text-align: left">
         <div class="mt-3">
-          <FormLabel htmlFor="vertical-form-4">코드</FormLabel>
+          <FormLabel htmlFor="vertical-form-4">LOT코드</FormLabel>
           <FormInput
             type="text"
-            v-model="insertModalData_Useitem.코드"
+            v-model="insertModalData_Useitem.LOT코드"
             @click="setItemProcessModal(true)"
             placeholder=""
           />
         </div>
         <div class="mt-3">
-          <FormLabel htmlFor="vertical-form-4">구분</FormLabel>
+          <FormLabel htmlFor="vertical-form-4">품목구분</FormLabel>
           <FormInput
             type="text"
-            v-model="insertModalData_Useitem.구분"
+            v-model="insertModalData_Useitem.품목구분"
             placeholder=""
             readonly
           />
@@ -3293,6 +3301,18 @@ const importNonwork = (no: any) => {
                   >
                     {{ table_setting_itemProcess.항목8.name }}
                   </Table.Th>
+                  <Table.Th
+                    class="text-center border-b-0 whitespace-nowrap"
+                    :style="table_setting_itemProcess.항목9.style"
+                  >
+                    {{ table_setting_itemProcess.항목9.name }}
+                  </Table.Th>
+                  <Table.Th
+                    class="text-center border-b-0 whitespace-nowrap"
+                    :style="table_setting_itemProcess.항목10.style"
+                  >
+                    {{ table_setting_itemProcess.항목10.name }}
+                  </Table.Th>
                 </Table.Tr>
               </Table.Thead>
               <Table.Tbody style="position: relative; z-index: 1">
@@ -3317,58 +3337,92 @@ const importNonwork = (no: any) => {
                   <Table.Td
                     class="first:rounded-l-md last:rounded-r-md text-center border-b-2 dark:bg-darkmode-600"
                     :style="table_setting_itemProcess.항목1.style"
-                    @click="importItemProcess(todo.NO)"
+                    @click="
+                      importItemProcess(todo.작업지시공정NO, todo.LOT코드)
+                    "
                   >
                     <div>{{ todo[table_setting_itemProcess.항목1.name] }}</div>
                   </Table.Td>
                   <Table.Td
                     class="first:rounded-l-md last:rounded-r-md text-center border-b-2 dark:bg-darkmode-600"
                     :style="table_setting_itemProcess.항목2.style"
-                    @click="importItemProcess(todo.NO)"
+                    @click="
+                      importItemProcess(todo.작업지시공정NO, todo.LOT코드)
+                    "
                   >
                     <div>{{ todo[table_setting_itemProcess.항목2.name] }}</div>
                   </Table.Td>
                   <Table.Td
                     class="first:rounded-l-md last:rounded-r-md text-center border-b-2 dark:bg-darkmode-600"
                     :style="table_setting_itemProcess.항목3.style"
-                    @click="importItemProcess(todo.NO)"
+                    @click="
+                      importItemProcess(todo.작업지시공정NO, todo.LOT코드)
+                    "
                   >
                     <div>{{ todo[table_setting_itemProcess.항목3.name] }}</div>
                   </Table.Td>
                   <Table.Td
                     class="first:rounded-l-md last:rounded-r-md text-center border-b-2 dark:bg-darkmode-600"
                     :style="table_setting_itemProcess.항목4.style"
-                    @click="importItemProcess(todo.NO)"
+                    @click="
+                      importItemProcess(todo.작업지시공정NO, todo.LOT코드)
+                    "
                   >
                     <div>{{ todo[table_setting_itemProcess.항목4.name] }}</div>
                   </Table.Td>
                   <Table.Td
                     class="first:rounded-l-md last:rounded-r-md text-center border-b-2 dark:bg-darkmode-600"
                     :style="table_setting_itemProcess.항목5.style"
-                    @click="importItemProcess(todo.NO)"
+                    @click="
+                      importItemProcess(todo.작업지시공정NO, todo.LOT코드)
+                    "
                   >
                     <div>{{ todo[table_setting_itemProcess.항목5.name] }}</div>
                   </Table.Td>
                   <Table.Td
                     class="first:rounded-l-md last:rounded-r-md text-center border-b-2 dark:bg-darkmode-600"
                     :style="table_setting_itemProcess.항목6.style"
-                    @click="importItemProcess(todo.NO)"
+                    @click="
+                      importItemProcess(todo.작업지시공정NO, todo.LOT코드)
+                    "
                   >
                     <div>{{ todo[table_setting_itemProcess.항목6.name] }}</div>
                   </Table.Td>
                   <Table.Td
                     class="first:rounded-l-md last:rounded-r-md text-center border-b-2 dark:bg-darkmode-600"
                     :style="table_setting_itemProcess.항목7.style"
-                    @click="importItemProcess(todo.NO)"
+                    @click="
+                      importItemProcess(todo.작업지시공정NO, todo.LOT코드)
+                    "
                   >
                     <div>{{ todo[table_setting_itemProcess.항목7.name] }}</div>
                   </Table.Td>
                   <Table.Td
                     class="first:rounded-l-md last:rounded-r-md text-center border-b-2 dark:bg-darkmode-600"
                     :style="table_setting_itemProcess.항목8.style"
-                    @click="importItemProcess(todo.NO)"
+                    @click="
+                      importItemProcess(todo.작업지시공정NO, todo.LOT코드)
+                    "
                   >
                     <div>{{ todo[table_setting_itemProcess.항목8.name] }}</div>
+                  </Table.Td>
+                  <Table.Td
+                    class="first:rounded-l-md last:rounded-r-md text-center border-b-2 dark:bg-darkmode-600"
+                    :style="table_setting_itemProcess.항목9.style"
+                    @click="
+                      importItemProcess(todo.작업지시공정NO, todo.LOT코드)
+                    "
+                  >
+                    <div>{{ todo[table_setting_itemProcess.항목9.name] }}</div>
+                  </Table.Td>
+                  <Table.Td
+                    class="first:rounded-l-md last:rounded-r-md text-center border-b-2 dark:bg-darkmode-600"
+                    :style="table_setting_itemProcess.항목10.style"
+                    @click="
+                      importItemProcess(todo.작업지시공정NO, todo.LOT코드)
+                    "
+                  >
+                    <div>{{ todo[table_setting_itemProcess.항목10.name] }}</div>
                   </Table.Td>
                 </Table.Tr>
               </Table.Tbody>

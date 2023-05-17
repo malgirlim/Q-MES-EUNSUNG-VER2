@@ -151,6 +151,7 @@ router.get("/", async (req, res) => {
           ,[ITEM_UNIT] AS 단위
         FROM [QMES2022].[dbo].[MASTER_ITEM_TB]
       ) AS ITEM ON ITEM.NO = [ISPC_ITEM_PK]
+      WHERE [ISPC_DIV] != '외주'
       ORDER BY [ISPC_PK] DESC
     `);
 
@@ -305,6 +306,7 @@ router.post("/", async (req, res) => {
               ,[ITEM_UNIT] AS 단위
             FROM [QMES2022].[dbo].[MASTER_ITEM_TB]
           ) AS ITEM ON ITEM.NO = [ISPC_ITEM_PK]
+          WHERE [ISPC_DIV] != '외주'
         ) AS RESULT
         WHERE (1=1)
         AND CONVERT(varchar, CONVERT(datetime, 시작일), 12) >= ` +
@@ -459,6 +461,7 @@ router.post("/", async (req, res) => {
               ,[ITEM_UNIT] AS 단위
             FROM [QMES2022].[dbo].[MASTER_ITEM_TB]
           ) AS ITEM ON ITEM.NO = [ISPC_ITEM_PK]
+          WHERE [ISPC_DIV] != '외주'
         ) AS RESULT
         WHERE (1=1)
         AND CONVERT(varchar, CONVERT(datetime, 시작일), 12) >= ` +
