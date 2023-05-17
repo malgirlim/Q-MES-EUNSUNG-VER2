@@ -94,7 +94,7 @@ const year = ref(moment().format("YYYY"));
       </div>
     </div>
     <div
-      class="p-3 mt-5 mb-5 border-2 border-[#3a437c] text-center text-3xl rounded-md bg-white intro-y"
+      class="p-3 mt-5 mb-5 font-bold border-2 border-[#3a437c] text-center text-4xl rounded-md bg-white intro-y"
     >
       설비 선택
     </div>
@@ -115,6 +115,7 @@ const year = ref(moment().format("YYYY"));
           product="제품2"
           worker="고범석"
           time="2023-05-11 12:34"
+          @click="$router.push('/kiosk/facility2/')"
         />
         <FacilityCard
           name="인쇄기3"
@@ -122,6 +123,7 @@ const year = ref(moment().format("YYYY"));
           product="제품3"
           worker="윤호상"
           time="2023-05-11 12:34"
+          @click="$router.push('/kiosk/facility3/')"
         />
         <FacilityCard
           name="인쇄기4"
@@ -129,6 +131,7 @@ const year = ref(moment().format("YYYY"));
           product="제품4"
           worker="강민철"
           time="2023-05-11 12:34"
+          @click="$router.push('/kiosk/facility4/')"
         />
       </div>
       <div class="grid grid-cols-4 gap-6 mt-10">
@@ -138,6 +141,7 @@ const year = ref(moment().format("YYYY"));
           product="제품5"
           worker="김주현"
           time="2023-05-11 12:34"
+          @click="$router.push('/kiosk/facility5/')"
         />
         <FacilityCard
           name="인쇄기6"
@@ -145,6 +149,7 @@ const year = ref(moment().format("YYYY"));
           product="제품6"
           worker="송은아"
           time="2023-05-11 12:34"
+          @click="$router.push('/kiosk/facility6/')"
         />
         <FacilityCard
           name="인쇄기7"
@@ -152,6 +157,7 @@ const year = ref(moment().format("YYYY"));
           product="제품7"
           worker="사은미"
           time="2023-05-11 12:34"
+          @click="$router.push('/kiosk/facility7/')"
         />
         <FacilityCard
           name="인쇄기8"
@@ -159,6 +165,7 @@ const year = ref(moment().format("YYYY"));
           product="제품8"
           worker="이훈노"
           time="2023-05-11 12:34"
+          @click="$router.push('/kiosk/facility8/')"
         />
       </div>
       <div class="grid grid-cols-4 gap-6 mt-10">
@@ -168,6 +175,7 @@ const year = ref(moment().format("YYYY"));
           product="제품9"
           worker="최순우"
           time="2023-05-11 12:34"
+          @click="$router.push('/kiosk/facility9/')"
         />
         <FacilityCard
           name="제판기"
@@ -175,6 +183,7 @@ const year = ref(moment().format("YYYY"));
           product="제품10"
           worker="손정일"
           time="2023-05-11 12:34"
+          @click="$router.push('/kiosk/facility10/')"
         />
       </div>
     </div>

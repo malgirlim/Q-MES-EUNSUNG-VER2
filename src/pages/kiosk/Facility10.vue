@@ -321,7 +321,7 @@ const setTaskFinishModal = (value: boolean) => {
         </div>
       </div>
       <div class="cols-span-1 text-center text-2xl">
-        <strong>인쇄기1 설비 작업현황</strong>
+        <strong>제판기 설비 작업현황</strong>
       </div>
       <div class="flex items-center cols-span-1 text-right text-lg">
         <div class="flex ml-auto items-center mr-3">
@@ -497,7 +497,7 @@ const setTaskFinishModal = (value: boolean) => {
                   <td class="border-r-2 border-success bg-slate-200 font-bold">
                     설비명
                   </td>
-                  <td class="pl-2 text-left">인쇄기1</td>
+                  <td class="pl-2 text-left">제판기</td>
                 </tr>
                 <tr class="border-b-2 border-success h-9">
                   <td class="border-r-2 border-success bg-slate-200 font-bold">
@@ -682,7 +682,7 @@ const setTaskFinishModal = (value: boolean) => {
   <Dialog :open="taskListModal" size="xxl" @close="setTaskListModal(false)">
     <Dialog.Panel>
       <div class="p-3 text-center">
-        <div class="mt-8 text-4xl"><strong>인쇄기1 작업지시목록</strong></div>
+        <div class="mt-8 text-4xl"><strong>제판기 작업지시목록</strong></div>
       </div>
       <div><TaskList /></div>
 
