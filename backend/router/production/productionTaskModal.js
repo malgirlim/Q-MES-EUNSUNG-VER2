@@ -1000,157 +1000,94 @@ router.get("/itemprocessstock", async (req, res) => {
     const Pool = await pool;
     const result = await Pool.request().query(`
         SELECT
-          NO AS NO, 지시공정자재NO AS 지시공정자재NO, 작업코드 AS 작업코드, 공정 AS 공정, 품목입고NO AS 품목입고NO,
-          품목구분 AS 품목구분, 입고코드 AS 입고코드, 품번 AS 품번, 품명 AS 품명, 규격 AS 규격, 단위 AS 단위, 재공수량 AS 재공수량
-        FROM(
+          작업지시공정NO AS 작업지시공정NO
+          ,작업코드 AS 작업코드
+          ,공정 AS 공정
+          ,LOT코드 AS LOT코드
+          ,품목NO AS 품목NO
+          ,품목구분 AS 품목구분
+          ,품번 AS 품번
+          ,품명 AS 품명
+          ,규격 AS 규격
+          ,단위 AS 단위
+          ,불출수 AS 불출수
+          ,사용수 AS 사용수
+          ,재공수 AS 재공수
+        FROM
+        (
           SELECT
-            [ITPC_PK] AS NO
-            ,[ITPC_INST_PRCS_ITEM_PK] AS 지시공정자재NO
-            ,INST_PRCS_ITEM.작업코드 AS 작업코드
-            ,INST_PRCS_ITEM.공정명 AS 공정
-            ,[ITPC_ITEM_RECEIVE_PK] AS 품목입고NO
-            ,ITEM_RECEIVE.입고코드 AS 입고코드
-            ,ITEM_RECEIVE.품목구분 AS 품목구분
-            ,ITEM_RECEIVE.품번 AS 품번
-            ,ITEM_RECEIVE.품명 AS 품명
-            ,ITEM_RECEIVE.규격 AS 규격
-            ,ITEM_RECEIVE.단위 AS 단위
-            ,COALESCE(CONVERT(numeric, [ITPC_AMOUNT]), 0) - (SELECT COALESCE(SUM(CONVERT(numeric,[PDUI_AMOUNT])),0) FROM [QMES2022].[dbo].[MANAGE_PRODUCE_USE_ITEM_TB] WHERE [PDUI_ITEM_PROCESS_PK] = [ITPC_PK]) AS 재공수량
-          FROM [QMES2022].[dbo].[MANAGE_ITEM_PROCESS_TB]
-          LEFT JOIN
+            불출.작업지시공정NO AS 작업지시공정NO
+            ,INSTRUCT_PROCESS.작업코드 AS 작업코드
+            ,INSTRUCT_PROCESS.공정명 AS 공정
+            ,불출.품목NO AS 품목NO
+            ,불출.LOT코드 AS LOT코드
+            ,ITEM.품목구분 AS 품목구분
+            ,ITEM.품번 AS 품번
+            ,ITEM.품명 AS 품명
+            ,ITEM.규격 AS 규격
+            ,ITEM.단위 AS 단위
+            ,COALESCE(불출.수량,0) AS 불출수
+            ,COALESCE(사용.수량,0) AS 사용수
+            ,COALESCE(불출.수량,0) - COALESCE(사용.수량,0) AS 재공수
+          FROM
           (
             SELECT
-              [ISPCI_PK] AS NO
-              ,[ISPCI_INSTRUCT_PROCESS_PK] AS 지시공정NO
-              ,INST_PROCESS.작업코드 AS 작업코드
-              ,INST_PROCESS.공정명 AS 공정명
+              [ISPCI_INSTRUCT_PROCESS_PK] AS 작업지시공정NO
+              ,[ISPCI_ITEM_PK] AS 품목NO
+              ,[ISPCI_LOTCODE] AS LOT코드
+              ,SUM(CONVERT(numeric, COALESCE([ISPCI_AMOUNT],0))) AS 수량
             FROM [QMES2022].[dbo].[MANAGE_INSTRUCT_PROCESS_ITEM_TB]
-            LEFT JOIN
-            (
-              SELECT
-                [ISPC_PK] AS NO
-                ,[ISPC_WORK_INSTRUCT_PK] AS 작업지시NO
-                ,WORK_INSTRUCT.작업코드 AS 작업코드
-                ,[ISPC_PROCESS_PK] AS 공정NO
-                ,ISPC_PROCESS.공정명 AS 공정명
-              FROM [QMES2022].[dbo].[MANAGE_INSTRUCT_PROCESS_TB]
-              LEFT JOIN
-              (
-                SELECT
-                  [WKIS_PK] AS NO
-                  ,[WKIS_CODE] AS 작업코드
-                FROM [QMES2022].[dbo].[MANAGE_WORK_INSTRUCT_TB]
-              ) AS WORK_INSTRUCT ON WORK_INSTRUCT.NO = [ISPC_WORK_INSTRUCT_PK]
-              LEFT JOIN
-              (
-                SELECT
-                  [PRCS_PK] AS NO
-                  ,[PRCS_NAME] AS 공정명
-                FROM [QMES2022].[dbo].[MASTER_PROCESS_TB]
-              ) AS ISPC_PROCESS ON ISPC_PROCESS.NO = [ISPC_PROCESS_PK]
-            ) AS INST_PROCESS ON INST_PROCESS.NO = [ISPCI_INSTRUCT_PROCESS_PK]
-          ) AS INST_PRCS_ITEM ON INST_PRCS_ITEM.NO = [ITPC_INST_PRCS_ITEM_PK]
+            WHERE (1 = 1)
+            AND CONVERT(varchar, [ISPCI_DT], 12) >= '000101'
+            AND CONVERT(varchar, [ISPCI_DT], 12) <= '990101'
+            GROUP BY [ISPCI_INSTRUCT_PROCESS_PK], [ISPCI_ITEM_PK], [ISPCI_LOTCODE]
+          ) AS 불출
           LEFT JOIN
           (
             SELECT
-              [ITRC_PK] AS NO
-              ,[ITRC_CODE] AS 입고코드
-              ,COALESCE(IMPORT_INSPECT.발주품목구분, PROCESS_INSPECT.품목구분) AS 품목구분
-              ,COALESCE(IMPORT_INSPECT.발주품번, PROCESS_INSPECT.품번) AS 품번
-              ,COALESCE(IMPORT_INSPECT.발주품명, PROCESS_INSPECT.품명) AS 품명
-              ,COALESCE(IMPORT_INSPECT.발주규격, PROCESS_INSPECT.규격) AS 규격
-              ,COALESCE(IMPORT_INSPECT.발주단위, PROCESS_INSPECT.단위) AS 단위
-            FROM [QMES2022].[dbo].[MANAGE_ITEM_RECEIVE_TB]
+              PRODUCE_RESULT.작업지시공정NO AS 작업지시공정NO
+              ,[PDUI_ITEM_PK] AS 품목NO
+              ,[PDUI_LOTCODE] AS LOT코드
+              ,SUM(CONVERT(numeric, COALESCE([PDUI_AMOUNT],0))) AS 수량
+            FROM [QMES2022].[dbo].[MANAGE_PRODUCE_USE_ITEM_TB]
             LEFT JOIN
             (
               SELECT
-                [IPISP_PK] AS NO
-                ,[IPISP_ORDER_PK] AS 발주NO
-                ,ORDERORDER.발주코드 AS 발주코드
-                ,ORDERORDER.품목구분 AS 발주품목구분
-                ,ORDERORDER.품번 AS 발주품번
-                ,ORDERORDER.품명 AS 발주품명
-                ,ORDERORDER.규격 AS 발주규격
-                ,ORDERORDER.단위 AS 발주단위
-              FROM [QMES2022].[dbo].[MANAGE_IMPORT_INSPECT_TB]
-              LEFT JOIN
-              (
-                SELECT
-                  [ORDR_PK] AS NO
-                  ,[ORDR_ACCEPT_PK] AS 수주NO
-                  ,[ORDR_CODE] AS 발주코드
-                  ,[ORDR_ITEM_PK] AS 품목NO
-                  ,ITEM.품목구분 AS 품목구분
-                  ,ITEM.품번 AS 품번
-                  ,ITEM.품명 AS 품명
-                  ,ITEM.규격 AS 규격
-                  ,ITEM.단위 AS 단위
-                FROM [QMES2022].[dbo].[MANAGE_ORDER_TB]
-                LEFT JOIN
-                (
-                  SELECT
-                    [ITEM_PK] AS NO
-                    ,[ITEM_DIV] AS 품목구분
-                    ,[ITEM_PRODUCT_NUM] AS 품번
-                    ,[ITEM_NAME] AS 품명
-                    ,[ITEM_SIZE] AS 규격
-                    ,[ITEM_UNIT] AS 단위
-                  FROM [QMES2022].[dbo].[MASTER_ITEM_TB]
-                ) AS ITEM ON ITEM.NO = [ORDR_ITEM_PK]
-              ) AS ORDERORDER ON ORDERORDER.NO = [IPISP_ORDER_PK]
-            ) AS IMPORT_INSPECT ON IMPORT_INSPECT.NO = [ITRC_IMPORT_INSPECT_PK]
-            LEFT JOIN
-            (
-              SELECT
-                [PCISP_PK] AS NO
-                ,[PCISP_PRODUCE_RESULT_PK] AS 생산실적NO
-                ,PRODUCE_RESULT.품목구분 AS 품목구분
-                ,PRODUCE_RESULT.품번 AS 품번
-                ,PRODUCE_RESULT.품명 AS 품명
-                ,PRODUCE_RESULT.규격 AS 규격
-                ,PRODUCE_RESULT.단위 AS 단위
-              FROM [QMES2022].[dbo].[MANAGE_PROCESS_INSPECT_TB]
-              LEFT JOIN
-              (
-                SELECT
-                  [PDRS_PK] AS NO
-                  ,[PDRS_INST_PROCESS_PK] AS 지시공정NO
-                  ,INSTRUCT_PROCESS.품목구분 AS 품목구분
-                  ,INSTRUCT_PROCESS.품번 AS 품번
-                  ,INSTRUCT_PROCESS.품명 AS 품명
-                  ,INSTRUCT_PROCESS.규격 AS 규격
-                  ,INSTRUCT_PROCESS.단위 AS 단위
-                FROM [QMES2022].[dbo].[MANAGE_PRODUCE_RESULT_TB]
-                LEFT JOIN
-                (
-                  SELECT
-                    [ISPC_PK] AS NO
-                    ,[ISPC_WORK_INSTRUCT_PK] AS 작업지시NO
-                    ,[ISPC_ITEM_PK] AS 품목NO
-                    ,ITEM.구분 AS 품목구분
-                    ,ITEM.품번 AS 품번
-                    ,ITEM.품명 AS 품명
-                    ,ITEM.규격 AS 규격
-                    ,ITEM.단위 AS 단위
-                  FROM [QMES2022].[dbo].[MANAGE_INSTRUCT_PROCESS_TB]
-                  LEFT JOIN
-                  (
-                    SELECT
-                      [ITEM_PK] AS NO
-                      ,[ITEM_DIV] AS 구분
-                      ,[ITEM_PRODUCT_NUM] AS 품번
-                      ,[ITEM_NAME] AS 품명
-                      ,[ITEM_SIZE] AS 규격
-                      ,[ITEM_UNIT] AS 단위
-                    FROM [QMES2022].[dbo].[MASTER_ITEM_TB]
-                  ) AS ITEM ON ITEM.NO = [ISPC_ITEM_PK]
-                ) AS INSTRUCT_PROCESS ON INSTRUCT_PROCESS.NO = [PDRS_INST_PROCESS_PK]
-              ) AS PRODUCE_RESULT ON PRODUCE_RESULT.NO = [PCISP_PRODUCE_RESULT_PK]
-            ) AS PROCESS_INSPECT ON PROCESS_INSPECT.NO = [ITRC_PROCESS_INSPECT_PK]
-          ) AS ITEM_RECEIVE ON ITEM_RECEIVE.NO = [ITPC_ITEM_RECEIVE_PK]
+                [PDRS_PK] AS NO
+                ,[PDRS_INST_PROCESS_PK] AS 작업지시공정NO
+              FROM [QMES2022].[dbo].[MANAGE_PRODUCE_RESULT_TB]
+            ) AS PRODUCE_RESULT ON PRODUCE_RESULT.NO = [PDUI_PRODUCE_RESULT_PK]
+            WHERE (1 = 1)
+            AND CONVERT(varchar, [PDUI_DT], 12) >= '000101'
+            AND CONVERT(varchar, [PDUI_DT], 12) <= '990101'
+            GROUP BY PRODUCE_RESULT.작업지시공정NO, [PDUI_ITEM_PK], [PDUI_LOTCODE]
+          ) AS 사용 ON 사용.작업지시공정NO = 불출.작업지시공정NO AND 사용.품목NO = 불출.품목NO AND 사용.LOT코드 = 불출.LOT코드
+          LEFT JOIN
+          (
+            SELECT
+              [ISPC_PK] AS NO
+              ,(SELECT [WKIS_CODE] FROM [QMES2022].[dbo].[MANAGE_WORK_INSTRUCT_TB] WHERE [WKIS_PK] = [ISPC_WORK_INSTRUCT_PK]) AS 작업코드
+              ,(SELECT [PRCS_NAME] FROM [QMES2022].[dbo].[MASTER_PROCESS_TB] WHERE [PRCS_PK] = [ISPC_PROCESS_PK]) AS 공정명
+            FROM [QMES2022].[dbo].[MANAGE_INSTRUCT_PROCESS_TB]
+          ) AS INSTRUCT_PROCESS ON INSTRUCT_PROCESS.NO = 불출.작업지시공정NO
+          LEFT JOIN
+          (
+            SELECT
+              [ITEM_PK] AS NO
+              ,(SELECT [CLNT_NAME] FROM [QMES2022].[dbo].[MASTER_CLIENT_TB] WHERE [CLNT_PK] = [ITEM_CLIENT_PK]) AS 거래처명
+              ,[ITEM_DIV] AS 품목구분
+              ,[ITEM_PRODUCT_NUM] AS 품번
+              ,[ITEM_NAME] AS 품명
+              ,[ITEM_CAR] AS 차종
+              ,[ITEM_SIZE] AS 규격
+              ,[ITEM_UNIT] AS 단위
+              ,[ITEM_SAFE] AS 안전재고
+              ,[ITEM_COST] AS 단가
+            FROM [QMES2022].[dbo].[MASTER_ITEM_TB]
+          ) AS ITEM ON ITEM.NO = 불출.품목NO
         ) AS RESULT
-        WHERE 재공수량 > 0
-        ORDER BY 공정 ASC
+        WHERE 재공수 != 0
+        ORDER BY 작업코드 ASC
     `);
 
     res.send(JSON.stringify(result.recordset));
@@ -1167,160 +1104,105 @@ router.post("/itemprocessstock", async (req, res) => {
       sql =
         `
         SELECT
-          NO AS NO, 지시공정자재NO AS 지시공정자재NO, 작업코드 AS 작업코드, 공정 AS 공정, 품목입고NO AS 품목입고NO,
-          품목구분 AS 품목구분, 입고코드 AS 입고코드, 품번 AS 품번, 품명 AS 품명, 규격 AS 규격, 단위 AS 단위, 재공수량 AS 재공수량
-        FROM(
+          작업지시공정NO AS 작업지시공정NO
+          ,작업코드 AS 작업코드
+          ,공정 AS 공정
+          ,LOT코드 AS LOT코드
+          ,품목NO AS 품목NO
+          ,품목구분 AS 품목구분
+          ,품번 AS 품번
+          ,품명 AS 품명
+          ,규격 AS 규격
+          ,단위 AS 단위
+          ,불출수 AS 불출수
+          ,사용수 AS 사용수
+          ,재공수 AS 재공수
+        FROM
+        (
           SELECT
-            [ITPC_PK] AS NO
-            ,[ITPC_INST_PRCS_ITEM_PK] AS 지시공정자재NO
-            ,INST_PRCS_ITEM.작업코드 AS 작업코드
-            ,INST_PRCS_ITEM.공정명 AS 공정
-            ,[ITPC_ITEM_RECEIVE_PK] AS 품목입고NO
-            ,ITEM_RECEIVE.입고코드 AS 입고코드
-            ,ITEM_RECEIVE.품목구분 AS 품목구분
-            ,ITEM_RECEIVE.품번 AS 품번
-            ,ITEM_RECEIVE.품명 AS 품명
-            ,ITEM_RECEIVE.규격 AS 규격
-            ,ITEM_RECEIVE.단위 AS 단위
-            ,COALESCE(CONVERT(numeric, [ITPC_AMOUNT]), 0) - (SELECT COALESCE(SUM(CONVERT(numeric,[PDUI_AMOUNT])),0) FROM [QMES2022].[dbo].[MANAGE_PRODUCE_USE_ITEM_TB] WHERE [PDUI_ITEM_PROCESS_PK] = [ITPC_PK]) AS 재공수량
-          FROM [QMES2022].[dbo].[MANAGE_ITEM_PROCESS_TB]
-          LEFT JOIN
+            불출.작업지시공정NO AS 작업지시공정NO
+            ,INSTRUCT_PROCESS.작업코드 AS 작업코드
+            ,INSTRUCT_PROCESS.공정명 AS 공정
+            ,불출.품목NO AS 품목NO
+            ,불출.LOT코드 AS LOT코드
+            ,ITEM.품목구분 AS 품목구분
+            ,ITEM.품번 AS 품번
+            ,ITEM.품명 AS 품명
+            ,ITEM.규격 AS 규격
+            ,ITEM.단위 AS 단위
+            ,COALESCE(불출.수량,0) AS 불출수
+            ,COALESCE(사용.수량,0) AS 사용수
+            ,COALESCE(불출.수량,0) - COALESCE(사용.수량,0) AS 재공수
+          FROM
           (
             SELECT
-              [ISPCI_PK] AS NO
-              ,[ISPCI_INSTRUCT_PROCESS_PK] AS 지시공정NO
-              ,INST_PROCESS.작업코드 AS 작업코드
-              ,INST_PROCESS.공정명 AS 공정명
+              [ISPCI_INSTRUCT_PROCESS_PK] AS 작업지시공정NO
+              ,[ISPCI_ITEM_PK] AS 품목NO
+              ,[ISPCI_LOTCODE] AS LOT코드
+              ,SUM(CONVERT(numeric, COALESCE([ISPCI_AMOUNT],0))) AS 수량
             FROM [QMES2022].[dbo].[MANAGE_INSTRUCT_PROCESS_ITEM_TB]
-            LEFT JOIN
-            (
-              SELECT
-                [ISPC_PK] AS NO
-                ,[ISPC_WORK_INSTRUCT_PK] AS 작업지시NO
-                ,WORK_INSTRUCT.작업코드 AS 작업코드
-                ,[ISPC_PROCESS_PK] AS 공정NO
-                ,ISPC_PROCESS.공정명 AS 공정명
-              FROM [QMES2022].[dbo].[MANAGE_INSTRUCT_PROCESS_TB]
-              LEFT JOIN
-              (
-                SELECT
-                  [WKIS_PK] AS NO
-                  ,[WKIS_CODE] AS 작업코드
-                FROM [QMES2022].[dbo].[MANAGE_WORK_INSTRUCT_TB]
-              ) AS WORK_INSTRUCT ON WORK_INSTRUCT.NO = [ISPC_WORK_INSTRUCT_PK]
-              LEFT JOIN
-              (
-                SELECT
-                  [PRCS_PK] AS NO
-                  ,[PRCS_NAME] AS 공정명
-                FROM [QMES2022].[dbo].[MASTER_PROCESS_TB]
-              ) AS ISPC_PROCESS ON ISPC_PROCESS.NO = [ISPC_PROCESS_PK]
-            ) AS INST_PROCESS ON INST_PROCESS.NO = [ISPCI_INSTRUCT_PROCESS_PK]
-          ) AS INST_PRCS_ITEM ON INST_PRCS_ITEM.NO = [ITPC_INST_PRCS_ITEM_PK]
+            WHERE (1 = 1)
+            AND CONVERT(varchar, [ISPCI_DT], 12) >= ` +
+        req.body.startDate +
+        `
+            AND CONVERT(varchar, [ISPCI_DT], 12) <= ` +
+        req.body.endDate +
+        `
+            GROUP BY [ISPCI_INSTRUCT_PROCESS_PK], [ISPCI_ITEM_PK], [ISPCI_LOTCODE]
+          ) AS 불출
           LEFT JOIN
           (
             SELECT
-              [ITRC_PK] AS NO
-              ,[ITRC_CODE] AS 입고코드
-              ,COALESCE(IMPORT_INSPECT.발주품목구분, PROCESS_INSPECT.품목구분) AS 품목구분
-              ,COALESCE(IMPORT_INSPECT.발주품번, PROCESS_INSPECT.품번) AS 품번
-              ,COALESCE(IMPORT_INSPECT.발주품명, PROCESS_INSPECT.품명) AS 품명
-              ,COALESCE(IMPORT_INSPECT.발주규격, PROCESS_INSPECT.규격) AS 규격
-              ,COALESCE(IMPORT_INSPECT.발주단위, PROCESS_INSPECT.단위) AS 단위
-            FROM [QMES2022].[dbo].[MANAGE_ITEM_RECEIVE_TB]
+              PRODUCE_RESULT.작업지시공정NO AS 작업지시공정NO
+              ,[PDUI_ITEM_PK] AS 품목NO
+              ,[PDUI_LOTCODE] AS LOT코드
+              ,SUM(CONVERT(numeric, COALESCE([PDUI_AMOUNT],0))) AS 수량
+            FROM [QMES2022].[dbo].[MANAGE_PRODUCE_USE_ITEM_TB]
             LEFT JOIN
             (
               SELECT
-                [IPISP_PK] AS NO
-                ,[IPISP_ORDER_PK] AS 발주NO
-                ,ORDERORDER.발주코드 AS 발주코드
-                ,ORDERORDER.품목구분 AS 발주품목구분
-                ,ORDERORDER.품번 AS 발주품번
-                ,ORDERORDER.품명 AS 발주품명
-                ,ORDERORDER.규격 AS 발주규격
-                ,ORDERORDER.단위 AS 발주단위
-              FROM [QMES2022].[dbo].[MANAGE_IMPORT_INSPECT_TB]
-              LEFT JOIN
-              (
-                SELECT
-                  [ORDR_PK] AS NO
-                  ,[ORDR_ACCEPT_PK] AS 수주NO
-                  ,[ORDR_CODE] AS 발주코드
-                  ,[ORDR_ITEM_PK] AS 품목NO
-                  ,ITEM.품목구분 AS 품목구분
-                  ,ITEM.품번 AS 품번
-                  ,ITEM.품명 AS 품명
-                  ,ITEM.규격 AS 규격
-                  ,ITEM.단위 AS 단위
-                FROM [QMES2022].[dbo].[MANAGE_ORDER_TB]
-                LEFT JOIN
-                (
-                  SELECT
-                    [ITEM_PK] AS NO
-                    ,[ITEM_DIV] AS 품목구분
-                    ,[ITEM_PRODUCT_NUM] AS 품번
-                    ,[ITEM_NAME] AS 품명
-                    ,[ITEM_SIZE] AS 규격
-                    ,[ITEM_UNIT] AS 단위
-                  FROM [QMES2022].[dbo].[MASTER_ITEM_TB]
-                ) AS ITEM ON ITEM.NO = [ORDR_ITEM_PK]
-              ) AS ORDERORDER ON ORDERORDER.NO = [IPISP_ORDER_PK]
-            ) AS IMPORT_INSPECT ON IMPORT_INSPECT.NO = [ITRC_IMPORT_INSPECT_PK]
-            LEFT JOIN
-            (
-              SELECT
-                [PCISP_PK] AS NO
-                ,[PCISP_PRODUCE_RESULT_PK] AS 생산실적NO
-                ,PRODUCE_RESULT.품목구분 AS 품목구분
-                ,PRODUCE_RESULT.품번 AS 품번
-                ,PRODUCE_RESULT.품명 AS 품명
-                ,PRODUCE_RESULT.규격 AS 규격
-                ,PRODUCE_RESULT.단위 AS 단위
-              FROM [QMES2022].[dbo].[MANAGE_PROCESS_INSPECT_TB]
-              LEFT JOIN
-              (
-                SELECT
-                  [PDRS_PK] AS NO
-                  ,[PDRS_INST_PROCESS_PK] AS 지시공정NO
-                  ,INSTRUCT_PROCESS.품목구분 AS 품목구분
-                  ,INSTRUCT_PROCESS.품번 AS 품번
-                  ,INSTRUCT_PROCESS.품명 AS 품명
-                  ,INSTRUCT_PROCESS.규격 AS 규격
-                  ,INSTRUCT_PROCESS.단위 AS 단위
-                FROM [QMES2022].[dbo].[MANAGE_PRODUCE_RESULT_TB]
-                LEFT JOIN
-                (
-                  SELECT
-                    [ISPC_PK] AS NO
-                    ,[ISPC_WORK_INSTRUCT_PK] AS 작업지시NO
-                    ,[ISPC_ITEM_PK] AS 품목NO
-                    ,ITEM.구분 AS 품목구분
-                    ,ITEM.품번 AS 품번
-                    ,ITEM.품명 AS 품명
-                    ,ITEM.규격 AS 규격
-                    ,ITEM.단위 AS 단위
-                  FROM [QMES2022].[dbo].[MANAGE_INSTRUCT_PROCESS_TB]
-                  LEFT JOIN
-                  (
-                    SELECT
-                      [ITEM_PK] AS NO
-                      ,[ITEM_DIV] AS 구분
-                      ,[ITEM_PRODUCT_NUM] AS 품번
-                      ,[ITEM_NAME] AS 품명
-                      ,[ITEM_SIZE] AS 규격
-                      ,[ITEM_UNIT] AS 단위
-                    FROM [QMES2022].[dbo].[MASTER_ITEM_TB]
-                  ) AS ITEM ON ITEM.NO = [ISPC_ITEM_PK]
-                ) AS INSTRUCT_PROCESS ON INSTRUCT_PROCESS.NO = [PDRS_INST_PROCESS_PK]
-              ) AS PRODUCE_RESULT ON PRODUCE_RESULT.NO = [PCISP_PRODUCE_RESULT_PK]
-            ) AS PROCESS_INSPECT ON PROCESS_INSPECT.NO = [ITRC_PROCESS_INSPECT_PK]
-          ) AS ITEM_RECEIVE ON ITEM_RECEIVE.NO = [ITPC_ITEM_RECEIVE_PK]
+                [PDRS_PK] AS NO
+                ,[PDRS_INST_PROCESS_PK] AS 작업지시공정NO
+              FROM [QMES2022].[dbo].[MANAGE_PRODUCE_RESULT_TB]
+            ) AS PRODUCE_RESULT ON PRODUCE_RESULT.NO = [PDUI_PRODUCE_RESULT_PK]
+            WHERE (1 = 1)
+            AND CONVERT(varchar, [PDUI_DT], 12) >= ` +
+        req.body.startDate +
+        `
+            AND CONVERT(varchar, [PDUI_DT], 12) <= ` +
+        req.body.endDate +
+        `
+            GROUP BY PRODUCE_RESULT.작업지시공정NO, [PDUI_ITEM_PK], [PDUI_LOTCODE]
+          ) AS 사용 ON 사용.작업지시공정NO = 불출.작업지시공정NO AND 사용.품목NO = 불출.품목NO AND 사용.LOT코드 = 불출.LOT코드
+          LEFT JOIN
+          (
+            SELECT
+              [ISPC_PK] AS NO
+              ,(SELECT [WKIS_CODE] FROM [QMES2022].[dbo].[MANAGE_WORK_INSTRUCT_TB] WHERE [WKIS_PK] = [ISPC_WORK_INSTRUCT_PK]) AS 작업코드
+              ,(SELECT [PRCS_NAME] FROM [QMES2022].[dbo].[MASTER_PROCESS_TB] WHERE [PRCS_PK] = [ISPC_PROCESS_PK]) AS 공정명
+            FROM [QMES2022].[dbo].[MANAGE_INSTRUCT_PROCESS_TB]
+          ) AS INSTRUCT_PROCESS ON INSTRUCT_PROCESS.NO = 불출.작업지시공정NO
+          LEFT JOIN
+          (
+            SELECT
+              [ITEM_PK] AS NO
+              ,(SELECT [CLNT_NAME] FROM [QMES2022].[dbo].[MASTER_CLIENT_TB] WHERE [CLNT_PK] = [ITEM_CLIENT_PK]) AS 거래처명
+              ,[ITEM_DIV] AS 품목구분
+              ,[ITEM_PRODUCT_NUM] AS 품번
+              ,[ITEM_NAME] AS 품명
+              ,[ITEM_CAR] AS 차종
+              ,[ITEM_SIZE] AS 규격
+              ,[ITEM_UNIT] AS 단위
+              ,[ITEM_SAFE] AS 안전재고
+              ,[ITEM_COST] AS 단가
+            FROM [QMES2022].[dbo].[MASTER_ITEM_TB]
+          ) AS ITEM ON ITEM.NO = 불출.품목NO
         ) AS RESULT
         WHERE (1=1)
-        AND 재공수량 > 0
+        AND 재공수량 != 0
         AND ( 작업코드 like concat('%',@input,'%')
         OR 공정 like concat('%',@input,'%')
-        OR 입고코드 like concat('%',@input,'%')
+        OR LOT코드 like concat('%',@input,'%')
         OR 품목구분 like concat('%',@input,'%')
         OR 품번 like concat('%',@input,'%')
         OR 품명 like concat('%',@input,'%')
@@ -1336,157 +1218,102 @@ router.post("/itemprocessstock", async (req, res) => {
       sql =
         `
         SELECT
-          NO AS NO, 지시공정자재NO AS 지시공정자재NO, 작업코드 AS 작업코드, 공정 AS 공정, 품목입고NO AS 품목입고NO,
-          품목구분 AS 품목구분, 입고코드 AS 입고코드, 품번 AS 품번, 품명 AS 품명, 규격 AS 규격, 단위 AS 단위, 재공수량 AS 재공수량
-        FROM(
+          작업지시공정NO AS 작업지시공정NO
+          ,작업코드 AS 작업코드
+          ,공정 AS 공정
+          ,LOT코드 AS LOT코드
+          ,품목NO AS 품목NO
+          ,품목구분 AS 품목구분
+          ,품번 AS 품번
+          ,품명 AS 품명
+          ,규격 AS 규격
+          ,단위 AS 단위
+          ,불출수 AS 불출수
+          ,사용수 AS 사용수
+          ,재공수 AS 재공수
+        FROM
+        (
           SELECT
-            [ITPC_PK] AS NO
-            ,[ITPC_INST_PRCS_ITEM_PK] AS 지시공정자재NO
-            ,INST_PRCS_ITEM.작업코드 AS 작업코드
-            ,INST_PRCS_ITEM.공정명 AS 공정
-            ,[ITPC_ITEM_RECEIVE_PK] AS 품목입고NO
-            ,ITEM_RECEIVE.입고코드 AS 입고코드
-            ,ITEM_RECEIVE.품목구분 AS 품목구분
-            ,ITEM_RECEIVE.품번 AS 품번
-            ,ITEM_RECEIVE.품명 AS 품명
-            ,ITEM_RECEIVE.규격 AS 규격
-            ,ITEM_RECEIVE.단위 AS 단위
-            ,COALESCE(CONVERT(numeric, [ITPC_AMOUNT]), 0) - (SELECT COALESCE(SUM(CONVERT(numeric,[PDUI_AMOUNT])),0) FROM [QMES2022].[dbo].[MANAGE_PRODUCE_USE_ITEM_TB] WHERE [PDUI_ITEM_PROCESS_PK] = [ITPC_PK]) AS 재공수량
-          FROM [QMES2022].[dbo].[MANAGE_ITEM_PROCESS_TB]
-          LEFT JOIN
+            불출.작업지시공정NO AS 작업지시공정NO
+            ,INSTRUCT_PROCESS.작업코드 AS 작업코드
+            ,INSTRUCT_PROCESS.공정명 AS 공정
+            ,불출.품목NO AS 품목NO
+            ,불출.LOT코드 AS LOT코드
+            ,ITEM.품목구분 AS 품목구분
+            ,ITEM.품번 AS 품번
+            ,ITEM.품명 AS 품명
+            ,ITEM.규격 AS 규격
+            ,ITEM.단위 AS 단위
+            ,COALESCE(불출.수량,0) AS 불출수
+            ,COALESCE(사용.수량,0) AS 사용수
+            ,COALESCE(불출.수량,0) - COALESCE(사용.수량,0) AS 재공수
+          FROM
           (
             SELECT
-              [ISPCI_PK] AS NO
-              ,[ISPCI_INSTRUCT_PROCESS_PK] AS 지시공정NO
-              ,INST_PROCESS.작업코드 AS 작업코드
-              ,INST_PROCESS.공정명 AS 공정명
+              [ISPCI_INSTRUCT_PROCESS_PK] AS 작업지시공정NO
+              ,[ISPCI_ITEM_PK] AS 품목NO
+              ,[ISPCI_LOTCODE] AS LOT코드
+              ,SUM(CONVERT(numeric, COALESCE([ISPCI_AMOUNT],0))) AS 수량
             FROM [QMES2022].[dbo].[MANAGE_INSTRUCT_PROCESS_ITEM_TB]
-            LEFT JOIN
-            (
-              SELECT
-                [ISPC_PK] AS NO
-                ,[ISPC_WORK_INSTRUCT_PK] AS 작업지시NO
-                ,WORK_INSTRUCT.작업코드 AS 작업코드
-                ,[ISPC_PROCESS_PK] AS 공정NO
-                ,ISPC_PROCESS.공정명 AS 공정명
-              FROM [QMES2022].[dbo].[MANAGE_INSTRUCT_PROCESS_TB]
-              LEFT JOIN
-              (
-                SELECT
-                  [WKIS_PK] AS NO
-                  ,[WKIS_CODE] AS 작업코드
-                FROM [QMES2022].[dbo].[MANAGE_WORK_INSTRUCT_TB]
-              ) AS WORK_INSTRUCT ON WORK_INSTRUCT.NO = [ISPC_WORK_INSTRUCT_PK]
-              LEFT JOIN
-              (
-                SELECT
-                  [PRCS_PK] AS NO
-                  ,[PRCS_NAME] AS 공정명
-                FROM [QMES2022].[dbo].[MASTER_PROCESS_TB]
-              ) AS ISPC_PROCESS ON ISPC_PROCESS.NO = [ISPC_PROCESS_PK]
-            ) AS INST_PROCESS ON INST_PROCESS.NO = [ISPCI_INSTRUCT_PROCESS_PK]
-          ) AS INST_PRCS_ITEM ON INST_PRCS_ITEM.NO = [ITPC_INST_PRCS_ITEM_PK]
+            WHERE (1 = 1)
+            AND CONVERT(varchar, [ISPCI_DT], 12) >= ` +
+        req.body.startDate +
+        `
+            AND CONVERT(varchar, [ISPCI_DT], 12) <= ` +
+        req.body.endDate +
+        `
+            GROUP BY [ISPCI_INSTRUCT_PROCESS_PK], [ISPCI_ITEM_PK], [ISPCI_LOTCODE]
+          ) AS 불출
           LEFT JOIN
           (
             SELECT
-              [ITRC_PK] AS NO
-              ,[ITRC_CODE] AS 입고코드
-              ,COALESCE(IMPORT_INSPECT.발주품목구분, PROCESS_INSPECT.품목구분) AS 품목구분
-              ,COALESCE(IMPORT_INSPECT.발주품번, PROCESS_INSPECT.품번) AS 품번
-              ,COALESCE(IMPORT_INSPECT.발주품명, PROCESS_INSPECT.품명) AS 품명
-              ,COALESCE(IMPORT_INSPECT.발주규격, PROCESS_INSPECT.규격) AS 규격
-              ,COALESCE(IMPORT_INSPECT.발주단위, PROCESS_INSPECT.단위) AS 단위
-            FROM [QMES2022].[dbo].[MANAGE_ITEM_RECEIVE_TB]
+              PRODUCE_RESULT.작업지시공정NO AS 작업지시공정NO
+              ,[PDUI_ITEM_PK] AS 품목NO
+              ,[PDUI_LOTCODE] AS LOT코드
+              ,SUM(CONVERT(numeric, COALESCE([PDUI_AMOUNT],0))) AS 수량
+            FROM [QMES2022].[dbo].[MANAGE_PRODUCE_USE_ITEM_TB]
             LEFT JOIN
             (
               SELECT
-                [IPISP_PK] AS NO
-                ,[IPISP_ORDER_PK] AS 발주NO
-                ,ORDERORDER.발주코드 AS 발주코드
-                ,ORDERORDER.품목구분 AS 발주품목구분
-                ,ORDERORDER.품번 AS 발주품번
-                ,ORDERORDER.품명 AS 발주품명
-                ,ORDERORDER.규격 AS 발주규격
-                ,ORDERORDER.단위 AS 발주단위
-              FROM [QMES2022].[dbo].[MANAGE_IMPORT_INSPECT_TB]
-              LEFT JOIN
-              (
-                SELECT
-                  [ORDR_PK] AS NO
-                  ,[ORDR_ACCEPT_PK] AS 수주NO
-                  ,[ORDR_CODE] AS 발주코드
-                  ,[ORDR_ITEM_PK] AS 품목NO
-                  ,ITEM.품목구분 AS 품목구분
-                  ,ITEM.품번 AS 품번
-                  ,ITEM.품명 AS 품명
-                  ,ITEM.규격 AS 규격
-                  ,ITEM.단위 AS 단위
-                FROM [QMES2022].[dbo].[MANAGE_ORDER_TB]
-                LEFT JOIN
-                (
-                  SELECT
-                    [ITEM_PK] AS NO
-                    ,[ITEM_DIV] AS 품목구분
-                    ,[ITEM_PRODUCT_NUM] AS 품번
-                    ,[ITEM_NAME] AS 품명
-                    ,[ITEM_SIZE] AS 규격
-                    ,[ITEM_UNIT] AS 단위
-                  FROM [QMES2022].[dbo].[MASTER_ITEM_TB]
-                ) AS ITEM ON ITEM.NO = [ORDR_ITEM_PK]
-              ) AS ORDERORDER ON ORDERORDER.NO = [IPISP_ORDER_PK]
-            ) AS IMPORT_INSPECT ON IMPORT_INSPECT.NO = [ITRC_IMPORT_INSPECT_PK]
-            LEFT JOIN
-            (
-              SELECT
-                [PCISP_PK] AS NO
-                ,[PCISP_PRODUCE_RESULT_PK] AS 생산실적NO
-                ,PRODUCE_RESULT.품목구분 AS 품목구분
-                ,PRODUCE_RESULT.품번 AS 품번
-                ,PRODUCE_RESULT.품명 AS 품명
-                ,PRODUCE_RESULT.규격 AS 규격
-                ,PRODUCE_RESULT.단위 AS 단위
-              FROM [QMES2022].[dbo].[MANAGE_PROCESS_INSPECT_TB]
-              LEFT JOIN
-              (
-                SELECT
-                  [PDRS_PK] AS NO
-                  ,[PDRS_INST_PROCESS_PK] AS 지시공정NO
-                  ,INSTRUCT_PROCESS.품목구분 AS 품목구분
-                  ,INSTRUCT_PROCESS.품번 AS 품번
-                  ,INSTRUCT_PROCESS.품명 AS 품명
-                  ,INSTRUCT_PROCESS.규격 AS 규격
-                  ,INSTRUCT_PROCESS.단위 AS 단위
-                FROM [QMES2022].[dbo].[MANAGE_PRODUCE_RESULT_TB]
-                LEFT JOIN
-                (
-                  SELECT
-                    [ISPC_PK] AS NO
-                    ,[ISPC_WORK_INSTRUCT_PK] AS 작업지시NO
-                    ,[ISPC_ITEM_PK] AS 품목NO
-                    ,ITEM.구분 AS 품목구분
-                    ,ITEM.품번 AS 품번
-                    ,ITEM.품명 AS 품명
-                    ,ITEM.규격 AS 규격
-                    ,ITEM.단위 AS 단위
-                  FROM [QMES2022].[dbo].[MANAGE_INSTRUCT_PROCESS_TB]
-                  LEFT JOIN
-                  (
-                    SELECT
-                      [ITEM_PK] AS NO
-                      ,[ITEM_DIV] AS 구분
-                      ,[ITEM_PRODUCT_NUM] AS 품번
-                      ,[ITEM_NAME] AS 품명
-                      ,[ITEM_SIZE] AS 규격
-                      ,[ITEM_UNIT] AS 단위
-                    FROM [QMES2022].[dbo].[MASTER_ITEM_TB]
-                  ) AS ITEM ON ITEM.NO = [ISPC_ITEM_PK]
-                ) AS INSTRUCT_PROCESS ON INSTRUCT_PROCESS.NO = [PDRS_INST_PROCESS_PK]
-              ) AS PRODUCE_RESULT ON PRODUCE_RESULT.NO = [PCISP_PRODUCE_RESULT_PK]
-            ) AS PROCESS_INSPECT ON PROCESS_INSPECT.NO = [ITRC_PROCESS_INSPECT_PK]
-          ) AS ITEM_RECEIVE ON ITEM_RECEIVE.NO = [ITPC_ITEM_RECEIVE_PK]
+                [PDRS_PK] AS NO
+                ,[PDRS_INST_PROCESS_PK] AS 작업지시공정NO
+              FROM [QMES2022].[dbo].[MANAGE_PRODUCE_RESULT_TB]
+            ) AS PRODUCE_RESULT ON PRODUCE_RESULT.NO = [PDUI_PRODUCE_RESULT_PK]
+            WHERE (1 = 1)
+            AND CONVERT(varchar, [PDUI_DT], 12) >= ` +
+        req.body.startDate +
+        `
+            AND CONVERT(varchar, [PDUI_DT], 12) <= ` +
+        req.body.endDate +
+        `
+            GROUP BY PRODUCE_RESULT.작업지시공정NO, [PDUI_ITEM_PK], [PDUI_LOTCODE]
+          ) AS 사용 ON 사용.작업지시공정NO = 불출.작업지시공정NO AND 사용.품목NO = 불출.품목NO AND 사용.LOT코드 = 불출.LOT코드
+          LEFT JOIN
+          (
+            SELECT
+              [ISPC_PK] AS NO
+              ,(SELECT [WKIS_CODE] FROM [QMES2022].[dbo].[MANAGE_WORK_INSTRUCT_TB] WHERE [WKIS_PK] = [ISPC_WORK_INSTRUCT_PK]) AS 작업코드
+              ,(SELECT [PRCS_NAME] FROM [QMES2022].[dbo].[MASTER_PROCESS_TB] WHERE [PRCS_PK] = [ISPC_PROCESS_PK]) AS 공정명
+            FROM [QMES2022].[dbo].[MANAGE_INSTRUCT_PROCESS_TB]
+          ) AS INSTRUCT_PROCESS ON INSTRUCT_PROCESS.NO = 불출.작업지시공정NO
+          LEFT JOIN
+          (
+            SELECT
+              [ITEM_PK] AS NO
+              ,(SELECT [CLNT_NAME] FROM [QMES2022].[dbo].[MASTER_CLIENT_TB] WHERE [CLNT_PK] = [ITEM_CLIENT_PK]) AS 거래처명
+              ,[ITEM_DIV] AS 품목구분
+              ,[ITEM_PRODUCT_NUM] AS 품번
+              ,[ITEM_NAME] AS 품명
+              ,[ITEM_CAR] AS 차종
+              ,[ITEM_SIZE] AS 규격
+              ,[ITEM_UNIT] AS 단위
+              ,[ITEM_SAFE] AS 안전재고
+              ,[ITEM_COST] AS 단가
+            FROM [QMES2022].[dbo].[MASTER_ITEM_TB]
+          ) AS ITEM ON ITEM.NO = 불출.품목NO
         ) AS RESULT
         WHERE (1=1)
-        AND 재공수량 > 0
+        AND 재공수량 != 0
         AND ` +
         req.body.searchKey +
         ` like concat('%',@input,'%')

@@ -627,8 +627,16 @@ router.post("/result/insert", async (req, res) => {
       .input("지시공정NO", req.body.data.지시공정NO ?? null)
       .input("작업자ID", req.body.data.작업자ID ?? "")
       .input("설비NO", req.body.data.설비NO ?? null)
-      .input("시작일시", req.body.data.시작일시 ?? "")
-      .input("종료일시", req.body.data.종료일시 ?? "")
+      .input(
+        "시작일시",
+        moment(req.body.data.시작일시).format("YYYY-MM-DD HH:mm:ss") ??
+          moment().tz("Asia/Seoul").format("YYYY-MM-DD HH:mm:ss")
+      )
+      .input(
+        "종료일시",
+        moment(req.body.data.종료일시).format("YYYY-MM-DD HH:mm:ss") ??
+          moment().tz("Asia/Seoul").format("YYYY-MM-DD HH:mm:ss")
+      )
       .input("생산수", req.body.data.생산수 ?? "")
       .input("특이사항", req.body.data.특이사항 ?? "")
       .input("비고", req.body.data.비고 ?? "")
@@ -822,8 +830,16 @@ router.post("/resultnonwork/insertAll", async (req, res) => {
     for (var i = 0; i < req.body.data.length; i++) {
       await Pool.request()
         .input("비가동NO", req.body.data[i].비가동NO ?? null)
-        .input("시작일시", req.body.data[i].시작일시 ?? "")
-        .input("종료일시", req.body.data[i].종료일시 ?? "")
+        .input(
+          "시작일시",
+          moment(req.body.data[i].시작일시).format("YYYY-MM-DD HH:mm:ss") ??
+            moment().tz("Asia/Seoul").format("YYYY-MM-DD HH:mm:ss")
+        )
+        .input(
+          "종료일시",
+          moment(req.body.data[i].종료일시).format("YYYY-MM-DD HH:mm:ss") ??
+            moment().tz("Asia/Seoul").format("YYYY-MM-DD HH:mm:ss")
+        )
         .input("비고", req.body.data[i].비고 ?? "")
         .input("등록자", req.body.user ?? "")
         .input(
