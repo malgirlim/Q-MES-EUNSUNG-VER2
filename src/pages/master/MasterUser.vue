@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, Ref } from "vue";
+import { ref, Ref, getCurrentInstance } from "vue";
 import Button from "../../base-components/Button";
 import { FormInput, FormSelect, FormCheck } from "../../base-components/Form";
 import Lucide from "../../base-components/Lucide";
@@ -23,7 +23,8 @@ import { MasterUser } from "../../interfaces/menu/MasterInterface";
 import { onMounted, watch } from "vue";
 import PaginationComponent from "../../components/Pagination/PaginationComponent.vue"; // 페이징설정
 
-const user_level = 4; //권한레벨
+const { proxy }: any = getCurrentInstance();
+const user_level = proxy.gstate.level.MasterUser; //권한레벨
 
 const currentPage = ref(1); // 현재페이지
 const rowsPerPage = ref(10); // 한 페이지에 보여질 데이터 갯수

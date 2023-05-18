@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, Ref, onMounted, watch } from "vue";
+import { ref, Ref, onMounted, watch, getCurrentInstance } from "vue";
 import Button from "../../base-components/Button";
 import { FormInput, FormSelect, FormCheck } from "../../base-components/Form";
 import Lucide from "../../base-components/Lucide";
@@ -26,7 +26,8 @@ import {
 // 컴포넌트 로드
 import MasterDetail from "../../components/Common/Detail/MasterFacilityPartsDetail.vue";
 
-const user_level = 4; //권한레벨
+const { proxy }: any = getCurrentInstance();
+const user_level = proxy.gstate.level.MasterFacilityParts; //권한레벨
 
 // 페이지 로딩 시 시작
 onMounted(async () => {

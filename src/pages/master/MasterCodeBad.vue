@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, Ref, onMounted, watch } from "vue";
+import { ref, Ref, onMounted, watch, getCurrentInstance } from "vue";
 import Button from "../../base-components/Button";
 import { FormInput, FormSelect, FormCheck } from "../../base-components/Form";
 import Lucide from "../../base-components/Lucide";
@@ -22,7 +22,8 @@ import { MasterDefect } from "../../interfaces/menu/MasterInterface";
 import MasterDetail from "../../components/Common/Detail/MasterCodeBadDetail.vue";
 import { toast } from "vue3-toastify";
 
-const user_level = 4; //권한레벨
+const { proxy }: any = getCurrentInstance();
+const user_level = proxy.gstate.level.MasterCodeBad; //권한레벨
 
 // 페이지 로딩 시 시작
 onMounted(async () => {

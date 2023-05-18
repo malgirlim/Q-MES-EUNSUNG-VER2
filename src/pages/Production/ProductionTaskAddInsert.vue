@@ -1,5 +1,9 @@
 <script setup lang="ts">
 import TaskInsert from "../../components/Common/Production/TaskInsert.vue";
+import { getCurrentInstance } from "vue";
+
+const { proxy }: any = getCurrentInstance();
+const user_level = proxy.gstate.level.ProductionTaskAddInsert; //권한레벨
 </script>
 
 <template>

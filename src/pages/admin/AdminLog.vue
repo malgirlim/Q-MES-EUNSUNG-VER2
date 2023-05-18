@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import _, { isArguments } from "lodash";
-import { ref, Ref } from "vue";
+import { ref, Ref, getCurrentInstance } from "vue";
 import Button from "../../base-components/Button";
 import { FormInput, FormSelect, FormCheck } from "../../base-components/Form";
 import Lucide from "../../base-components/Lucide";
@@ -25,7 +25,8 @@ import { toast } from "vue3-toastify";
 const currentPage = ref(1); // 현재페이지
 const rowsPerPage = ref(10); // 한 페이지에 보여질 데이터 갯수
 
-const user_level = 1; //권한레벨
+const { proxy }: any = getCurrentInstance();
+const user_level = proxy.gstate.level.AdminLog; //권한레벨
 
 const pageChange = () => {
   // 한 페이지에 보여질 데이터 갯수 변경 시 1페이지로 이동

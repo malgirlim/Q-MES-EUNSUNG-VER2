@@ -1,9 +1,11 @@
 <script setup lang="ts">
+import { getCurrentInstance } from "vue";
 import { toast } from "vue3-toastify";
 import Lucide from "../../base-components/Lucide";
 import OrderFacilityParts from "../../components/Common/Order/OrderFacilityParts.vue";
 
-const user_level = 4; //권한레벨
+const { proxy }: any = getCurrentInstance();
+const user_level = proxy.gstate.level.OrderFacilityParts; //권한레벨
 </script>
 
 <template>

@@ -3,7 +3,8 @@ import { toast } from "vue3-toastify";
 import Lucide from "../../base-components/Lucide";
 import OrderAdd from "../../components/Common/Order/OrderAdd.vue";
 
-const user_level = 3; //권한레벨
+const { proxy, getCurrentInstance }: any = getCurrentInstance();
+const user_level = proxy.gstate.level.OrderAdd; //권한레벨
 </script>
 
 <template>
