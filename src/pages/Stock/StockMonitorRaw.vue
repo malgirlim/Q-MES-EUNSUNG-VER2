@@ -369,7 +369,10 @@ const search_stockLot = () => {
     sortKey_stockLot.value,
     sortOrder_stockLot.value
   );
+
+  console.log(searchKey_stockLot.value);
 };
+
 // 품목등록 모달 설정
 const stockLotModal = ref(false);
 const setStockLotModal = (value: boolean) => {
@@ -829,15 +832,16 @@ const setStockLotModal = (value: boolean) => {
                       class="flex items-center mr-3"
                       href="#"
                       @click="
-                        async () => {
+                        () => {
                           editModalData = todo;
                           // setDetailModal(true);
+                          searchDate_stockLot = searchDate;
                           searchKey_stockLot = '품번';
                           searchInput_stockLot = todo.품번;
                           sortKey_stockLot = 'LOT코드';
                           sortOrder_stockLot = '오름차순';
-                          search_stockLot();
                           setStockLotModal(true);
+                          search_stockLot();
                         }
                       "
                     >
@@ -1080,10 +1084,11 @@ const setStockLotModal = (value: boolean) => {
               class="w-30 mt-3 !box sm:mt-0"
             >
               <option>전체</option>
-              <option>거래처명</option>
-              <option>사업자번호</option>
-              <option>주소</option>
-              <option>비고</option>
+              <option>LOT코드</option>
+              <option>품번</option>
+              <option>품명</option>
+              <option>규격</option>
+              <option>단위</option>
             </FormSelect>
           </div>
           <div class="w-full mt-3 sm:w-auto sm:mt-0 sm:ml-auto md:ml-2">
@@ -1125,10 +1130,11 @@ const setStockLotModal = (value: boolean) => {
               v-model="sortKey_stockLot"
               class="w-30 mt-3 !box sm:mt-0"
             >
-              <option>등록일</option>
-              <option>거래처명</option>
-              <option>사업자번호</option>
-              <option>주소</option>
+              <option>LOT코드</option>
+              <option>품번</option>
+              <option>품명</option>
+              <option>규격</option>
+              <option>단위</option>
             </FormSelect>
           </div>
           <div class="ml-3">

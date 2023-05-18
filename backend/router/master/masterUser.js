@@ -43,6 +43,7 @@ router.get("/", async (req, res) => {
         [USER_DEPART] AS 부서명,
         [USER_POSITION] AS 직책,
         [USER_RANK] AS 직급,
+        [USER_AUTH] AS 권한,
         [USER_REGIST_NM] AS 등록자,
         [USER_REGIST_DT] AS 등록일시
       FROM [QMES2022].[dbo].[MASTER_USER_TB]
@@ -79,7 +80,7 @@ router.post("/", async (req, res) => {
         `
         SELECT
           아이디 AS 아이디, 비밀번호 AS 비밀번호, 이름 AS 이름, 연락처 AS 연락처, 이메일 AS 이메일,
-          부서명 AS 부서명, 직책 AS 직책, 직급 AS 직급, 등록자 AS 등록자, 등록일시 AS 등록일시
+          부서명 AS 부서명, 직책 AS 직책, 직급 AS 직급, 권한 AS 권한, 등록자 AS 등록자, 등록일시 AS 등록일시
         FROM(
         SELECT
           [USER_ID] AS 아이디,
@@ -90,6 +91,7 @@ router.post("/", async (req, res) => {
           [USER_DEPART] AS 부서명,
           [USER_POSITION] AS 직책,
           [USER_RANK] AS 직급,
+          [USER_AUTH] AS 권한,
           [USER_REGIST_NM] AS 등록자,
           [USER_REGIST_DT] AS 등록일시
         FROM [QMES2022].[dbo].[MASTER_USER_TB]
@@ -102,7 +104,8 @@ router.post("/", async (req, res) => {
         OR 이메일 like concat('%',@input,'%')
         OR 부서명 like concat('%',@input,'%')
         OR 직책 like concat('%',@input,'%')
-        OR 직급 like concat('%',@input,'%'))
+        OR 직급 like concat('%',@input,'%')
+        OR 권한 like concat('%',@input,'%'))
         ORDER BY ` +
         (req.body.sortKey == "NO" ? "등록일시" : req.body.sortKey) +
         ` ` +
@@ -114,7 +117,7 @@ router.post("/", async (req, res) => {
         `
         SELECT
           아이디 AS 아이디, 비밀번호 AS 비밀번호, 이름 AS 이름, 연락처 AS 연락처, 이메일 AS 이메일,
-          부서명 AS 부서명, 직책 AS 직책, 직급 AS 직급, 등록자 AS 등록자, 등록일시 AS 등록일시
+          부서명 AS 부서명, 직책 AS 직책, 직급 AS 직급, 권한 AS 권한, 등록자 AS 등록자, 등록일시 AS 등록일시
         FROM(
         SELECT
           [USER_ID] AS 아이디,
@@ -125,6 +128,7 @@ router.post("/", async (req, res) => {
           [USER_DEPART] AS 부서명,
           [USER_POSITION] AS 직책,
           [USER_RANK] AS 직급,
+          [USER_AUTH] AS 권한,
           [USER_REGIST_NM] AS 등록자,
           [USER_REGIST_DT] AS 등록일시
         FROM [QMES2022].[dbo].[MASTER_USER_TB]
@@ -185,6 +189,7 @@ router.post("/insert", async (req, res) => {
       .input("부서명", req.body.data.부서명 ?? "")
       .input("직책", req.body.data.직책 ?? "")
       .input("직급", req.body.data.직급 ?? "")
+      .input("권한", req.body.data.권한 ?? "")
       .input("등록자", req.body.user ?? "")
       .input(
         "등록일시",
@@ -192,9 +197,9 @@ router.post("/insert", async (req, res) => {
       ).query(`
         INSERT INTO [QMES2022].[dbo].[MASTER_USER_TB]
           ([USER_ID],[USER_PW],[USER_NAME],[USER_PHONE],[USER_EMAIL]
-           ,[USER_DEPART],[USER_POSITION],[USER_RANK],[USER_REGIST_NM],[USER_REGIST_DT])
+           ,[USER_DEPART],[USER_POSITION],[USER_RANK],[USER_AUTH],[USER_REGIST_NM],[USER_REGIST_DT])
         VALUES
-          (@아이디,@비밀번호,@이름,@연락처,@이메일,@부서명,@직책,@직급,@등록자,@등록일시)
+          (@아이디,@비밀번호,@이름,@연락처,@이메일,@부서명,@직책,@직급,@권한,@등록자,@등록일시)
     `);
 
     // 로그기록 저장
@@ -233,6 +238,7 @@ router.post("/insertAll", async (req, res) => {
         .input("부서명", req.body.data[i].부서명 ?? "")
         .input("직책", req.body.data[i].직책 ?? "")
         .input("직급", req.body.data[i].직급 ?? "")
+        .input("권한", req.body.data[i].권한 ?? "")
         .input("등록자", req.body.user ?? "")
         .input(
           "등록일시",
@@ -240,9 +246,9 @@ router.post("/insertAll", async (req, res) => {
         ).query(`
         INSERT INTO [QMES2022].[dbo].[MASTER_USER_TB]
           ([USER_ID],[USER_PW],[USER_NAME],[USER_PHONE],[USER_EMAIL]
-           ,[USER_DEPART],[USER_POSITION],[USER_RANK],[USER_REGIST_NM],[USER_REGIST_DT])
+           ,[USER_DEPART],[USER_POSITION],[USER_RANK],[USER_AUTH],[USER_REGIST_NM],[USER_REGIST_DT])
         VALUES
-          (@아이디,@비밀번호,@이름,@연락처,@이메일,@부서명,@직책,@직급,@등록자,@등록일시)
+          (@아이디,@비밀번호,@이름,@연락처,@이메일,@부서명,@직책,@직급,@권한,@등록자,@등록일시)
       `);
 
       // 로그기록 저장
@@ -280,6 +286,7 @@ router.post("/edit", async (req, res) => {
       .input("부서명", req.body.data.부서명 ?? "")
       .input("직책", req.body.data.직책 ?? "")
       .input("직급", req.body.data.직급 ?? "")
+      .input("권한", req.body.data.권한 ?? "")
       .input("등록자", req.body.user ?? "")
       .input(
         "등록일시",
@@ -294,6 +301,7 @@ router.post("/edit", async (req, res) => {
           [USER_DEPART] = @부서명,
           [USER_POSITION] = @직책,
           [USER_RANK] = @직급,
+          [USER_AUTH] = @권한,
           [USER_REGIST_NM] = @등록자,
           [USER_REGIST_DT] = @등록일시
         WHERE [USER_ID] = @아이디
@@ -336,6 +344,7 @@ router.post("/delete", async (req, res) => {
           [USER_DEPART] AS 부서명,
           [USER_POSITION] AS 직책,
           [USER_RANK] AS 직급,
+          [USER_AUTH] AS 권한,
           [USER_REGIST_NM] AS 등록자,
           [USER_REGIST_DT] AS 등록일시
         FROM [QMES2022].[dbo].[MASTER_USER_TB]

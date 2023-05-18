@@ -18,7 +18,10 @@ import { toast } from "vue3-toastify";
 
 // API 보내는 함수 및 인터페이스 불러오기
 import { useSendApi } from "../../composables/useSendApi";
-import { StockStock } from "../../interfaces/menu/stockInterface";
+import {
+  StockStock,
+  StockStockLOT,
+} from "../../interfaces/menu/stockInterface";
 
 // 컴포넌트 로드
 import Detail from "../../components/Common/Detail/StockReceiveRawDetail.vue";
@@ -29,6 +32,7 @@ const user_level = proxy.gstate.level.StockMonitorHalf; //권한레벨
 // 페이지 로딩 시 시작
 onMounted(async () => {
   dataManager.loadDatas(); // 메인으로 쓸 데이터 불러오기
+  stock_stockLot.loadDatas(); // LOT별 품목재고현황 불러오기
 });
 
 // 페이징기능
@@ -304,6 +308,75 @@ const onFileImport = (event: any) => {
     };
     reader.readAsArrayBuffer(file);
   }
+};
+
+// ########################################### LOT별 품목 재고현황 가져오기 ###########################################
+// 페이징기능
+const currentPage_stockLot = ref(1); // 현재페이지
+const rowsPerPage_stockLot = ref(10); // 한 페이지에 보여질 데이터 갯수
+const pageChangeFirst_stockLot = () => {
+  currentPage_stockLot.value = 1; // 데이터 갯수 변경 시 1페이지로 이동
+};
+
+// 품목 데이터 설정
+const url_stock_stockLot = "/api/stock/stock/lot/half";
+const stock_stockLot = useSendApi<StockStockLOT>(
+  url_stock_stockLot,
+  currentPage_stockLot,
+  rowsPerPage_stockLot
+);
+
+// 테이블항목 설정 및 가로크기 조정
+const table_setting_stockLot = {
+  순번: { name: "순번", style: "width: 50px; text-align: center;" },
+  항목1: { name: "LOT코드", style: "width: 50px; text-align: center;" },
+  항목2: { name: "품목구분", style: "width: 50px; text-align: center;" },
+  항목3: { name: "품번", style: "width: 50px; text-align: center;" },
+  항목4: { name: "품명", style: "width: 50px; text-align: center;" },
+  항목5: { name: "규격", style: "width: 50px; text-align: center;" },
+  항목6: { name: "단위", style: "width: 50px; text-align: center;" },
+  항목7: { name: "기초재공재고", style: "width: 50px; text-align: center;" },
+  항목8: { name: "기초재고", style: "width: 50px; text-align: center;" },
+  항목9: { name: "입고", style: "width: 50px; text-align: center;" },
+  항목10: { name: "재공", style: "width: 50px; text-align: center;" },
+  항목11: { name: "사용", style: "width: 50px; text-align: center;" },
+  항목12: { name: "기말재공재고", style: "width: 50px; text-align: center;" },
+  항목13: { name: "기말재고", style: "width: 50px; text-align: center;" },
+};
+
+// ########################## 조회기간 설정 ##########################
+const searchDate_stockLot = ref("전체기간");
+// ########################## 품목 조회  ##########################
+const searchKey_stockLot = ref("전체");
+const searchInput_stockLot = ref("");
+const sortKey_stockLot = ref("등록일");
+const sortOrder_stockLot = ref("내림차순");
+const sortOrderToggle_stockLot = () => {
+  sortOrder_stockLot.value =
+    sortOrder_stockLot.value == "내림차순" ? "오름차순" : "내림차순";
+};
+//  정렬기준이 변경되면 실행
+watch([sortKey_stockLot, sortOrder_stockLot], (newValue, oldValue) => {
+  search_stockLot();
+  pageChangeFirst_stockLot();
+});
+const search_stockLot = () => {
+  // console.log(searchKey.value, searchInput.value);
+  stock_stockLot.searchDatas(
+    searchDate_stockLot.value,
+    searchKey_stockLot.value,
+    searchInput_stockLot.value,
+    sortKey_stockLot.value,
+    sortOrder_stockLot.value
+  );
+
+  console.log(searchKey_stockLot.value);
+};
+
+// 품목등록 모달 설정
+const stockLotModal = ref(false);
+const setStockLotModal = (value: boolean) => {
+  stockLotModal.value = value;
 };
 </script>
 
@@ -761,7 +834,14 @@ const onFileImport = (event: any) => {
                       @click="
                         () => {
                           editModalData = todo;
-                          setDetailModal(true);
+                          // setDetailModal(true);
+                          searchDate_stockLot = searchDate;
+                          searchKey_stockLot = '품번';
+                          searchInput_stockLot = todo.품번;
+                          sortKey_stockLot = 'LOT코드';
+                          sortOrder_stockLot = '오름차순';
+                          setStockLotModal(true);
+                          search_stockLot();
                         }
                       "
                     >
@@ -981,4 +1061,358 @@ const onFileImport = (event: any) => {
     </Dialog.Panel>
   </Dialog>
   <!-- END: 프린트 출력 Modal -->
+
+  <!-- #######################################################################################################################
+  #######################################################################################################################
+  ####################################################################################################################### -->
+
+  <!-- BEGIN: StockLot Modal Content -->
+  <Dialog size="xxl" :open="stockLotModal" @close="setStockLotModal(false)">
+    <Dialog.Panel class="p-10 text-center">
+      <!--stockLot Modal 내용 시작-->
+      <div class="mb-3" style="font-weight: bold; font-size: x-large">
+        품목(LOT별) 재고 리스트
+      </div>
+      <div class="grid grid-cols-12 gap-1 mt-1">
+        <div
+          class="flex flex-wrap itemlist-center col-span-12 mt-2 mb-2 intro-y sm:flex-nowrap"
+        >
+          <div class="hidden mx-auto md:block text-slate-500"></div>
+          <div class="ml-2">
+            <FormSelect
+              v-model="searchKey_stockLot"
+              class="w-30 mt-3 !box sm:mt-0"
+            >
+              <option>전체</option>
+              <option>LOT코드</option>
+              <option>품번</option>
+              <option>품명</option>
+              <option>규격</option>
+              <option>단위</option>
+            </FormSelect>
+          </div>
+          <div class="w-full mt-3 sm:w-auto sm:mt-0 sm:ml-auto md:ml-2">
+            <div class="relative w-56 text-slate-500">
+              <FormInput
+                type="text"
+                class="w-56 pr-10 !box"
+                v-model="searchInput_stockLot"
+                @keyup.enter="
+                  () => {
+                    search_stockLot();
+                    pageChangeFirst_stockLot();
+                  }
+                "
+                placeholder="검색어를 입력해주세요"
+              />
+              <button
+                @click="
+                  () => {
+                    search_stockLot();
+                    pageChangeFirst_stockLot();
+                  }
+                "
+              >
+                <Lucide
+                  icon="Search"
+                  class="absolute inset-y-0 right-0 w-4 h-4 my-auto mr-3"
+                />
+              </button>
+            </div>
+          </div>
+        </div>
+        <!-- BEGIN: Pagination-->
+        <div
+          class="flex flex-wrap itemlist-center col-span-12 mt-0 intro-y sm:flex-nowrap"
+        >
+          <div>
+            <FormSelect
+              v-model="sortKey_stockLot"
+              class="w-30 mt-3 !box sm:mt-0"
+            >
+              <option>LOT코드</option>
+              <option>품번</option>
+              <option>품명</option>
+              <option>규격</option>
+              <option>단위</option>
+            </FormSelect>
+          </div>
+          <div class="ml-3">
+            <Button
+              class="shadow-md"
+              as="a"
+              variant="outline-primary"
+              v-if="sortOrder_stockLot == '오름차순'"
+              @click="sortOrderToggle_stockLot"
+            >
+              <Lucide icon="SortAsc" class="w-4 h-4 mr-1" />
+
+              {{ sortOrder_stockLot }}</Button
+            >
+            <Button
+              class="shadow-md"
+              as="a"
+              variant="outline-danger"
+              v-if="sortOrder_stockLot == '내림차순'"
+              @click="sortOrderToggle_stockLot"
+            >
+              <Lucide icon="SortDesc" class="w-4 h-4 mr-1" />
+
+              {{ sortOrder_stockLot }}</Button
+            >
+          </div>
+          <div class="ml-5">
+            <FormSelect
+              class="w-20 mt-3 !box sm:mt-0"
+              v-model="rowsPerPage_stockLot"
+              @change="pageChangeFirst_stockLot"
+            >
+              <option>10</option>
+              <option>25</option>
+              <option>50</option>
+              <option>100</option>
+              <option :value="stock_stockLot.dataCount.value">전체</option>
+            </FormSelect>
+          </div>
+          <div>
+            <PaginationComponent
+              class="pagination-component"
+              v-model="currentPage_stockLot"
+              :numberOfPages="stock_stockLot.numberOfPages.value"
+            />
+          </div>
+          <div class="hidden mx-auto md:block text-slate-500"></div>
+          <div>
+            <span class="mr-3"
+              >[ {{ stock_stockLot.dataCount }}개 데이터 조회됨 ]
+            </span>
+            <span class="mr-4">
+              [ {{ currentPage_stockLot }} /
+              {{ stock_stockLot.numberOfPages }} 페이지 ]</span
+            >
+          </div>
+        </div>
+        <!-- END: Pagination-->
+        <!-- BEGIN: Data List -->
+        <!-- style="height: calc(100vh - 350px)" : 브라우저 화면 창크기에 맞게 변경됨 -->
+        <div class="col-span-12 overflow-auto intro-y lg:overflow-visible">
+          <div
+            class="mr-3"
+            style="overflow-y: scroll; overflow-x: hidden; height: 580px"
+          >
+            <Table class="border-spacing-y-[6px] border-separate -mt-2">
+              <Table.Thead
+                class="bg-slate-100"
+                style="position: sticky; top: 0px; z-index: 2"
+              >
+                <Table.Tr>
+                  <Table.Th
+                    class="text-center border-b-0 whitespace-nowrap"
+                    :style="table_setting_stockLot.순번.style"
+                  >
+                    {{ table_setting_stockLot.순번.name }}
+                  </Table.Th>
+                  <Table.Th
+                    class="text-center border-b-0 whitespace-nowrap"
+                    :style="table_setting_stockLot.항목1.style"
+                  >
+                    {{ table_setting_stockLot.항목1.name }}
+                  </Table.Th>
+                  <Table.Th
+                    class="text-center border-b-0 whitespace-nowrap"
+                    :style="table_setting_stockLot.항목2.style"
+                  >
+                    {{ table_setting_stockLot.항목2.name }}
+                  </Table.Th>
+                  <Table.Th
+                    class="text-center border-b-0 whitespace-nowrap"
+                    :style="table_setting_stockLot.항목3.style"
+                  >
+                    {{ table_setting_stockLot.항목3.name }}
+                  </Table.Th>
+                  <Table.Th
+                    class="text-center border-b-0 whitespace-nowrap"
+                    :style="table_setting_stockLot.항목4.style"
+                  >
+                    {{ table_setting_stockLot.항목4.name }}
+                  </Table.Th>
+                  <Table.Th
+                    class="text-center border-b-0 whitespace-nowrap"
+                    :style="table_setting_stockLot.항목5.style"
+                  >
+                    {{ table_setting_stockLot.항목5.name }}
+                  </Table.Th>
+                  <Table.Th
+                    class="text-center border-b-0 whitespace-nowrap"
+                    :style="table_setting_stockLot.항목6.style"
+                  >
+                    {{ table_setting_stockLot.항목6.name }}
+                  </Table.Th>
+                  <Table.Th
+                    class="text-center border-b-0 whitespace-nowrap"
+                    :style="table_setting_stockLot.항목7.style"
+                  >
+                    {{ table_setting_stockLot.항목7.name }}
+                  </Table.Th>
+                  <Table.Th
+                    class="text-center border-b-0 whitespace-nowrap"
+                    :style="table_setting_stockLot.항목8.style"
+                  >
+                    {{ table_setting_stockLot.항목8.name }}
+                  </Table.Th>
+                  <Table.Th
+                    class="text-center border-b-0 whitespace-nowrap"
+                    :style="table_setting_stockLot.항목9.style"
+                  >
+                    {{ table_setting_stockLot.항목9.name }}
+                  </Table.Th>
+                  <Table.Th
+                    class="text-center border-b-0 whitespace-nowrap"
+                    :style="table_setting_stockLot.항목10.style"
+                  >
+                    {{ table_setting_stockLot.항목10.name }}
+                  </Table.Th>
+                  <Table.Th
+                    class="text-center border-b-0 whitespace-nowrap"
+                    :style="table_setting_stockLot.항목11.style"
+                  >
+                    {{ table_setting_stockLot.항목11.name }}
+                  </Table.Th>
+                  <Table.Th
+                    class="text-center border-b-0 whitespace-nowrap"
+                    :style="table_setting_stockLot.항목12.style"
+                  >
+                    {{ table_setting_stockLot.항목12.name }}
+                  </Table.Th>
+                  <Table.Th
+                    class="text-center border-b-0 whitespace-nowrap"
+                    :style="table_setting_stockLot.항목13.style"
+                  >
+                    {{ table_setting_stockLot.항목13.name }}
+                  </Table.Th>
+                </Table.Tr>
+              </Table.Thead>
+              <Table.Tbody style="position: relative; z-index: 1">
+                <Table.Tr
+                  v-for="(todo, index) in stock_stockLot.datas.value"
+                  :key="todo.LOT코드"
+                  class="intro-x hover:bg-gray-200 active:bg-gray-300 cursor-pointer"
+                >
+                  <Table.Td
+                    class="first:rounded-l-md last:rounded-r-md text-center border-b-2 dark:bg-darkmode-600"
+                    :style="table_setting_stockLot.순번.style"
+                  >
+                    <div>
+                      {{
+                        index +
+                        1 +
+                        (currentPage_stockLot - 1) * rowsPerPage_stockLot
+                      }}
+                    </div>
+                  </Table.Td>
+                  <Table.Td
+                    class="first:rounded-l-md last:rounded-r-md text-center border-b-2 dark:bg-darkmode-600"
+                    :style="table_setting_stockLot.항목1.style"
+                  >
+                    <div>{{ todo[table_setting_stockLot.항목1.name] }}</div>
+                  </Table.Td>
+                  <Table.Td
+                    class="first:rounded-l-md last:rounded-r-md text-center border-b-2 dark:bg-darkmode-600"
+                    :style="table_setting_stockLot.항목2.style"
+                  >
+                    <div>{{ todo[table_setting_stockLot.항목2.name] }}</div>
+                  </Table.Td>
+                  <Table.Td
+                    class="first:rounded-l-md last:rounded-r-md text-center border-b-2 dark:bg-darkmode-600"
+                    :style="table_setting_stockLot.항목3.style"
+                  >
+                    <div>{{ todo[table_setting_stockLot.항목3.name] }}</div>
+                  </Table.Td>
+                  <Table.Td
+                    class="first:rounded-l-md last:rounded-r-md text-center border-b-2 dark:bg-darkmode-600"
+                    :style="table_setting_stockLot.항목4.style"
+                  >
+                    <div>{{ todo[table_setting_stockLot.항목4.name] }}</div>
+                  </Table.Td>
+                  <Table.Td
+                    class="first:rounded-l-md last:rounded-r-md text-center border-b-2 dark:bg-darkmode-600"
+                    :style="table_setting_stockLot.항목5.style"
+                  >
+                    <div>{{ todo[table_setting_stockLot.항목5.name] }}</div>
+                  </Table.Td>
+                  <Table.Td
+                    class="first:rounded-l-md last:rounded-r-md text-center border-b-2 dark:bg-darkmode-600"
+                    :style="table_setting_stockLot.항목6.style"
+                  >
+                    <div>{{ todo[table_setting_stockLot.항목6.name] }}</div>
+                  </Table.Td>
+                  <Table.Td
+                    class="first:rounded-l-md last:rounded-r-md text-center border-b-2 dark:bg-darkmode-600"
+                    :style="table_setting_stockLot.항목7.style"
+                  >
+                    <div>{{ todo[table_setting_stockLot.항목7.name] }}</div>
+                  </Table.Td>
+                  <Table.Td
+                    class="first:rounded-l-md last:rounded-r-md text-center border-b-2 dark:bg-darkmode-600"
+                    :style="table_setting_stockLot.항목8.style"
+                  >
+                    <div>{{ todo[table_setting_stockLot.항목8.name] }}</div>
+                  </Table.Td>
+                  <Table.Td
+                    class="first:rounded-l-md last:rounded-r-md text-center border-b-2 dark:bg-darkmode-600"
+                    :style="table_setting_stockLot.항목9.style"
+                  >
+                    <div>{{ todo[table_setting_stockLot.항목9.name] }}</div>
+                  </Table.Td>
+                  <Table.Td
+                    class="first:rounded-l-md last:rounded-r-md text-center border-b-2 dark:bg-darkmode-600"
+                    :style="table_setting_stockLot.항목10.style"
+                  >
+                    <div>{{ todo[table_setting_stockLot.항목10.name] }}</div>
+                  </Table.Td>
+                  <Table.Td
+                    class="first:rounded-l-md last:rounded-r-md text-center border-b-2 dark:bg-darkmode-600"
+                    :style="table_setting_stockLot.항목11.style"
+                  >
+                    <div>{{ todo[table_setting_stockLot.항목11.name] }}</div>
+                  </Table.Td>
+                  <Table.Td
+                    class="first:rounded-l-md last:rounded-r-md text-center border-b-2 dark:bg-darkmode-600"
+                    :style="table_setting_stockLot.항목12.style"
+                  >
+                    <div>{{ todo[table_setting_stockLot.항목12.name] }}</div>
+                  </Table.Td>
+                  <Table.Td
+                    class="first:rounded-l-md last:rounded-r-md text-center border-b-2 dark:bg-darkmode-600"
+                    :style="table_setting_stockLot.항목13.style"
+                  >
+                    <div>{{ todo[table_setting_stockLot.항목13.name] }}</div>
+                  </Table.Td>
+                </Table.Tr>
+              </Table.Tbody>
+            </Table>
+            <div
+              class="text-center mt-20"
+              v-if="stock_stockLot.dataCount.value == 0"
+            >
+              저장된 데이터가 없습니다.
+            </div>
+          </div>
+        </div>
+        <!-- END: Data List -->
+      </div>
+      <div style="text-align: left">
+        <div class="mt-5 text-right">
+          <Button
+            class="mr-2 shadow-md"
+            variant="outline-primary"
+            @click="setStockLotModal(false)"
+            >취소</Button
+          >
+        </div>
+      </div>
+      <!--Modal 내용 끝-->
+    </Dialog.Panel>
+  </Dialog>
+  <!-- END: StockLot Modal Content -->
 </template>
