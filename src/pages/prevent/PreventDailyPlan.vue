@@ -1,6 +1,10 @@
 <script setup lang="ts">
 import { FormInput, FormSelect, FormCheck } from "../../base-components/Form";
 import axios from "axios";
+import { getCurrentInstance } from "vue";
+
+const { proxy }: any = getCurrentInstance();
+const user_level = proxy.gstate.level.PreventDailyPlan; //권한레벨
 
 ////////////////////////////////////// 파일 업로드
 let file = "";

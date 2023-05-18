@@ -1,5 +1,8 @@
 <script setup lang="ts">
-import { ref } from "vue";
+import { ref, getCurrentInstance } from "vue";
+
+const { proxy }: any = getCurrentInstance();
+const user_level = proxy.gstate.level.PreventPlan; //권한레벨
 
 const phone = ref("");
 

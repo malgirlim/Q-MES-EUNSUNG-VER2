@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, Ref, onMounted, watch } from "vue";
+import { ref, Ref, onMounted, watch, getCurrentInstance } from "vue";
 import router from "../../router";
 import Button from "../../base-components/Button";
 import { FormInput, FormSelect, FormCheck } from "../../base-components/Form";
@@ -25,7 +25,8 @@ import { MasterClient } from "../../interfaces/menu/MasterInterface";
 import Detail from "../../components/Common/Detail/OrderCurrentDetail.vue";
 import DocumentPrint from "../../components/Common/Print/Template/Order/Main.vue";
 
-const user_level = 4; //권한레벨
+const { proxy }: any = getCurrentInstance();
+const user_level = proxy.gstate.level.OrderCurrent; //권한레벨
 
 // 페이지 로딩 시 시작
 onMounted(async () => {
