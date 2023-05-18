@@ -815,12 +815,19 @@ const menu_list = [
         </div>
         <div class="mt-3">
           <FormLabel htmlFor="vertical-form-9">권한</FormLabel>
-          <FormInput
+          <FormSelect
             id="vertical-form-8"
             type="text"
             v-model="insertModalData.권한"
-            placeholder=""
-          />
+            ><option>구매일반</option>
+            <option>구매관리자</option>
+            <option>영업일반</option>
+            <option>영업관리자</option>
+            <option>생산일반</option>
+            <option>생산관리자</option>
+            <option>품질일반</option>
+            <option>품질관리자</option></FormSelect
+          >
         </div>
         <div class="mt-5 text-right">
           <Button
@@ -942,12 +949,19 @@ const menu_list = [
         </div>
         <div class="mt-3">
           <FormLabel htmlFor="vertical-form-8">권한</FormLabel>
-          <FormInput
+          <FormSelect
             id="vertical-form-8"
             type="text"
             v-model="editModalData.권한"
-            placeholder=""
-          />
+            ><option>구매일반</option>
+            <option>구매관리자</option>
+            <option>영업일반</option>
+            <option>영업관리자</option>
+            <option>생산일반</option>
+            <option>생산관리자</option>
+            <option>품질일반</option>
+            <option>품질관리자</option></FormSelect
+          >
         </div>
       </div>
 
