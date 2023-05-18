@@ -16,7 +16,6 @@ import { toast } from "vue3-toastify";
 
 // API 보내는 함수 및 인터페이스 불러오기
 import { useSendApi } from "../../composables/useSendApi";
-import { StockUse } from "../../interfaces/menu/stockInterface";
 import { MasterUser } from "../../interfaces/menu/MasterInterface";
 
 // 페이징기능
@@ -814,6 +813,15 @@ const menu_list = [
             placeholder=""
           />
         </div>
+        <div class="mt-3">
+          <FormLabel htmlFor="vertical-form-9">권한</FormLabel>
+          <FormInput
+            id="vertical-form-8"
+            type="text"
+            v-model="insertModalData.권한"
+            placeholder=""
+          />
+        </div>
         <div class="mt-5 text-right">
           <Button
             class="mr-2 shadow-md"
@@ -929,6 +937,15 @@ const menu_list = [
             id="vertical-form-8"
             type="text"
             v-model="editModalData.직급"
+            placeholder=""
+          />
+        </div>
+        <div class="mt-3">
+          <FormLabel htmlFor="vertical-form-8">권한</FormLabel>
+          <FormInput
+            id="vertical-form-8"
+            type="text"
+            v-model="editModalData.권한"
             placeholder=""
           />
         </div>
