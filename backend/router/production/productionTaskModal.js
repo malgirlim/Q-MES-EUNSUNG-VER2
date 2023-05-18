@@ -1016,21 +1016,30 @@ router.get("/itemprocessstock", async (req, res) => {
         FROM
         (
           SELECT
-            불출.작업지시공정NO AS 작업지시공정NO
+            RESULT_MIDDLE.작업지시공정NO AS 작업지시공정NO
             ,INSTRUCT_PROCESS.작업코드 AS 작업코드
             ,INSTRUCT_PROCESS.공정명 AS 공정
-            ,불출.품목NO AS 품목NO
-            ,불출.LOT코드 AS LOT코드
+            ,RESULT_MIDDLE.품목NO AS 품목NO
+            ,RESULT_MIDDLE.LOT코드 AS LOT코드
             ,ITEM.품목구분 AS 품목구분
             ,ITEM.품번 AS 품번
             ,ITEM.품명 AS 품명
             ,ITEM.규격 AS 규격
             ,ITEM.단위 AS 단위
-            ,COALESCE(불출.수량,0) AS 불출수
-            ,COALESCE(사용.수량,0) AS 사용수
-            ,COALESCE(불출.수량,0) - COALESCE(사용.수량,0) AS 재공수
+            ,COALESCE(RESULT_MIDDLE.불출수,0) AS 불출수
+            ,COALESCE(RESULT_MIDDLE.사용수,0) AS 사용수
+            ,COALESCE(RESULT_MIDDLE.재공수,0) AS 재공수
           FROM
           (
+            SELECT
+              불출.작업지시공정NO AS 작업지시공정NO
+              ,불출.품목NO AS 품목NO
+              ,불출.LOT코드 AS LOT코드
+              ,COALESCE(불출.수량,0) AS 불출수
+              ,COALESCE(사용.수량,0) AS 사용수
+              ,COALESCE(불출.수량,0) - COALESCE(사용.수량,0) AS 재공수
+            FROM
+            (
             SELECT
               [ISPCI_INSTRUCT_PROCESS_PK] AS 작업지시공정NO
               ,[ISPCI_ITEM_PK] AS 품목NO
@@ -1041,27 +1050,71 @@ router.get("/itemprocessstock", async (req, res) => {
             AND CONVERT(varchar, [ISPCI_DT], 12) >= '000101'
             AND CONVERT(varchar, [ISPCI_DT], 12) <= '990101'
             GROUP BY [ISPCI_INSTRUCT_PROCESS_PK], [ISPCI_ITEM_PK], [ISPCI_LOTCODE]
-          ) AS 불출
-          LEFT JOIN
-          (
-            SELECT
-              PRODUCE_RESULT.작업지시공정NO AS 작업지시공정NO
-              ,[PDUI_ITEM_PK] AS 품목NO
-              ,[PDUI_LOTCODE] AS LOT코드
-              ,SUM(CONVERT(numeric, COALESCE([PDUI_AMOUNT],0))) AS 수량
-            FROM [QMES2022].[dbo].[MANAGE_PRODUCE_USE_ITEM_TB]
+            ) AS 불출
             LEFT JOIN
             (
               SELECT
+                PRODUCE_RESULT.작업지시공정NO AS 작업지시공정NO
+                ,[PDUI_ITEM_PK] AS 품목NO
+                ,[PDUI_LOTCODE] AS LOT코드
+                ,SUM(CONVERT(numeric, COALESCE([PDUI_AMOUNT],0))) AS 수량
+              FROM [QMES2022].[dbo].[MANAGE_PRODUCE_USE_ITEM_TB]
+              LEFT JOIN
+              (
+                SELECT
                 [PDRS_PK] AS NO
                 ,[PDRS_INST_PROCESS_PK] AS 작업지시공정NO
-              FROM [QMES2022].[dbo].[MANAGE_PRODUCE_RESULT_TB]
-            ) AS PRODUCE_RESULT ON PRODUCE_RESULT.NO = [PDUI_PRODUCE_RESULT_PK]
+                FROM [QMES2022].[dbo].[MANAGE_PRODUCE_RESULT_TB]
+              ) AS PRODUCE_RESULT ON PRODUCE_RESULT.NO = [PDUI_PRODUCE_RESULT_PK]
+              WHERE (1 = 1)
+              AND CONVERT(varchar, [PDUI_DT], 12) >= '000101'
+              AND CONVERT(varchar, [PDUI_DT], 12) <= '990101'
+              GROUP BY PRODUCE_RESULT.작업지시공정NO, [PDUI_ITEM_PK], [PDUI_LOTCODE]
+            ) AS 사용 ON 사용.작업지시공정NO = 불출.작업지시공정NO AND 사용.품목NO = 불출.품목NO AND 사용.LOT코드 = 불출.LOT코드
+
+            UNION
+
+            SELECT
+              사용.작업지시공정NO AS 작업지시공정NO
+              ,사용.품목NO AS 품목NO
+              ,사용.LOT코드 AS LOT코드
+              ,COALESCE(불출.수량,0) AS 불출수
+              ,COALESCE(사용.수량,0) AS 사용수
+              ,COALESCE(불출.수량,0) - COALESCE(사용.수량,0) AS 재공수
+            FROM
+            (
+              SELECT
+                PRODUCE_RESULT.작업지시공정NO AS 작업지시공정NO
+                ,[PDUI_ITEM_PK] AS 품목NO
+                ,[PDUI_LOTCODE] AS LOT코드
+                ,SUM(CONVERT(numeric, COALESCE([PDUI_AMOUNT],0))) AS 수량
+              FROM [QMES2022].[dbo].[MANAGE_PRODUCE_USE_ITEM_TB]
+              LEFT JOIN
+              (
+                SELECT
+                [PDRS_PK] AS NO
+                ,[PDRS_INST_PROCESS_PK] AS 작업지시공정NO
+                FROM [QMES2022].[dbo].[MANAGE_PRODUCE_RESULT_TB]
+              ) AS PRODUCE_RESULT ON PRODUCE_RESULT.NO = [PDUI_PRODUCE_RESULT_PK]
+              WHERE (1 = 1)
+              AND CONVERT(varchar, [PDUI_DT], 12) >= '000101'
+              AND CONVERT(varchar, [PDUI_DT], 12) <= '990101'
+              GROUP BY PRODUCE_RESULT.작업지시공정NO, [PDUI_ITEM_PK], [PDUI_LOTCODE]
+            ) AS 사용
+            LEFT JOIN
+            (
+            SELECT
+              [ISPCI_INSTRUCT_PROCESS_PK] AS 작업지시공정NO
+              ,[ISPCI_ITEM_PK] AS 품목NO
+              ,[ISPCI_LOTCODE] AS LOT코드
+              ,SUM(CONVERT(numeric, COALESCE([ISPCI_AMOUNT],0))) AS 수량
+            FROM [QMES2022].[dbo].[MANAGE_INSTRUCT_PROCESS_ITEM_TB]
             WHERE (1 = 1)
-            AND CONVERT(varchar, [PDUI_DT], 12) >= '000101'
-            AND CONVERT(varchar, [PDUI_DT], 12) <= '990101'
-            GROUP BY PRODUCE_RESULT.작업지시공정NO, [PDUI_ITEM_PK], [PDUI_LOTCODE]
-          ) AS 사용 ON 사용.작업지시공정NO = 불출.작업지시공정NO AND 사용.품목NO = 불출.품목NO AND 사용.LOT코드 = 불출.LOT코드
+            AND CONVERT(varchar, [ISPCI_DT], 12) >= '000101'
+            AND CONVERT(varchar, [ISPCI_DT], 12) <= '990101'
+            GROUP BY [ISPCI_INSTRUCT_PROCESS_PK], [ISPCI_ITEM_PK], [ISPCI_LOTCODE]
+			      ) AS 불출 ON 불출.작업지시공정NO = 사용.작업지시공정NO AND 불출.품목NO = 사용.품목NO AND 불출.LOT코드 = 사용.LOT코드
+          ) AS RESULT_MIDDLE
           LEFT JOIN
           (
             SELECT
@@ -1069,7 +1122,7 @@ router.get("/itemprocessstock", async (req, res) => {
               ,(SELECT [WKIS_CODE] FROM [QMES2022].[dbo].[MANAGE_WORK_INSTRUCT_TB] WHERE [WKIS_PK] = [ISPC_WORK_INSTRUCT_PK]) AS 작업코드
               ,(SELECT [PRCS_NAME] FROM [QMES2022].[dbo].[MASTER_PROCESS_TB] WHERE [PRCS_PK] = [ISPC_PROCESS_PK]) AS 공정명
             FROM [QMES2022].[dbo].[MANAGE_INSTRUCT_PROCESS_TB]
-          ) AS INSTRUCT_PROCESS ON INSTRUCT_PROCESS.NO = 불출.작업지시공정NO
+          ) AS INSTRUCT_PROCESS ON INSTRUCT_PROCESS.NO = RESULT_MIDDLE.작업지시공정NO
           LEFT JOIN
           (
             SELECT
@@ -1084,7 +1137,7 @@ router.get("/itemprocessstock", async (req, res) => {
               ,[ITEM_SAFE] AS 안전재고
               ,[ITEM_COST] AS 단가
             FROM [QMES2022].[dbo].[MASTER_ITEM_TB]
-          ) AS ITEM ON ITEM.NO = 불출.품목NO
+          ) AS ITEM ON ITEM.NO = RESULT_MIDDLE.품목NO
         ) AS RESULT
         WHERE 재공수 != 0
         ORDER BY 작업코드 ASC
@@ -1120,21 +1173,30 @@ router.post("/itemprocessstock", async (req, res) => {
         FROM
         (
           SELECT
-            불출.작업지시공정NO AS 작업지시공정NO
+            RESULT_MIDDLE.작업지시공정NO AS 작업지시공정NO
             ,INSTRUCT_PROCESS.작업코드 AS 작업코드
             ,INSTRUCT_PROCESS.공정명 AS 공정
-            ,불출.품목NO AS 품목NO
-            ,불출.LOT코드 AS LOT코드
+            ,RESULT_MIDDLE.품목NO AS 품목NO
+            ,RESULT_MIDDLE.LOT코드 AS LOT코드
             ,ITEM.품목구분 AS 품목구분
             ,ITEM.품번 AS 품번
             ,ITEM.품명 AS 품명
             ,ITEM.규격 AS 규격
             ,ITEM.단위 AS 단위
-            ,COALESCE(불출.수량,0) AS 불출수
-            ,COALESCE(사용.수량,0) AS 사용수
-            ,COALESCE(불출.수량,0) - COALESCE(사용.수량,0) AS 재공수
+            ,COALESCE(RESULT_MIDDLE.불출수,0) AS 불출수
+            ,COALESCE(RESULT_MIDDLE.사용수,0) AS 사용수
+            ,COALESCE(RESULT_MIDDLE.재공수,0) AS 재공수
           FROM
           (
+            SELECT
+              불출.작업지시공정NO AS 작업지시공정NO
+              ,불출.품목NO AS 품목NO
+              ,불출.LOT코드 AS LOT코드
+              ,COALESCE(불출.수량,0) AS 불출수
+              ,COALESCE(사용.수량,0) AS 사용수
+              ,COALESCE(불출.수량,0) - COALESCE(사용.수량,0) AS 재공수
+            FROM
+            (
             SELECT
               [ISPCI_INSTRUCT_PROCESS_PK] AS 작업지시공정NO
               ,[ISPCI_ITEM_PK] AS 품목NO
@@ -1149,31 +1211,83 @@ router.post("/itemprocessstock", async (req, res) => {
         req.body.endDate +
         `
             GROUP BY [ISPCI_INSTRUCT_PROCESS_PK], [ISPCI_ITEM_PK], [ISPCI_LOTCODE]
-          ) AS 불출
-          LEFT JOIN
-          (
-            SELECT
-              PRODUCE_RESULT.작업지시공정NO AS 작업지시공정NO
-              ,[PDUI_ITEM_PK] AS 품목NO
-              ,[PDUI_LOTCODE] AS LOT코드
-              ,SUM(CONVERT(numeric, COALESCE([PDUI_AMOUNT],0))) AS 수량
-            FROM [QMES2022].[dbo].[MANAGE_PRODUCE_USE_ITEM_TB]
+            ) AS 불출
             LEFT JOIN
             (
               SELECT
+                PRODUCE_RESULT.작업지시공정NO AS 작업지시공정NO
+                ,[PDUI_ITEM_PK] AS 품목NO
+                ,[PDUI_LOTCODE] AS LOT코드
+                ,SUM(CONVERT(numeric, COALESCE([PDUI_AMOUNT],0))) AS 수량
+              FROM [QMES2022].[dbo].[MANAGE_PRODUCE_USE_ITEM_TB]
+              LEFT JOIN
+              (
+                SELECT
                 [PDRS_PK] AS NO
                 ,[PDRS_INST_PROCESS_PK] AS 작업지시공정NO
-              FROM [QMES2022].[dbo].[MANAGE_PRODUCE_RESULT_TB]
-            ) AS PRODUCE_RESULT ON PRODUCE_RESULT.NO = [PDUI_PRODUCE_RESULT_PK]
-            WHERE (1 = 1)
-            AND CONVERT(varchar, [PDUI_DT], 12) >= ` +
+                FROM [QMES2022].[dbo].[MANAGE_PRODUCE_RESULT_TB]
+              ) AS PRODUCE_RESULT ON PRODUCE_RESULT.NO = [PDUI_PRODUCE_RESULT_PK]
+              WHERE (1 = 1)
+              AND CONVERT(varchar, [PDUI_DT], 12) >= ` +
         req.body.startDate +
         `
-            AND CONVERT(varchar, [PDUI_DT], 12) <= ` +
+              AND CONVERT(varchar, [PDUI_DT], 12) <= ` +
         req.body.endDate +
         `
-            GROUP BY PRODUCE_RESULT.작업지시공정NO, [PDUI_ITEM_PK], [PDUI_LOTCODE]
-          ) AS 사용 ON 사용.작업지시공정NO = 불출.작업지시공정NO AND 사용.품목NO = 불출.품목NO AND 사용.LOT코드 = 불출.LOT코드
+              GROUP BY PRODUCE_RESULT.작업지시공정NO, [PDUI_ITEM_PK], [PDUI_LOTCODE]
+            ) AS 사용 ON 사용.작업지시공정NO = 불출.작업지시공정NO AND 사용.품목NO = 불출.품목NO AND 사용.LOT코드 = 불출.LOT코드
+
+            UNION
+
+            SELECT
+              사용.작업지시공정NO AS 작업지시공정NO
+              ,사용.품목NO AS 품목NO
+              ,사용.LOT코드 AS LOT코드
+              ,COALESCE(불출.수량,0) AS 불출수
+              ,COALESCE(사용.수량,0) AS 사용수
+              ,COALESCE(불출.수량,0) - COALESCE(사용.수량,0) AS 재공수
+            FROM
+            (
+              SELECT
+                PRODUCE_RESULT.작업지시공정NO AS 작업지시공정NO
+                ,[PDUI_ITEM_PK] AS 품목NO
+                ,[PDUI_LOTCODE] AS LOT코드
+                ,SUM(CONVERT(numeric, COALESCE([PDUI_AMOUNT],0))) AS 수량
+              FROM [QMES2022].[dbo].[MANAGE_PRODUCE_USE_ITEM_TB]
+              LEFT JOIN
+              (
+                SELECT
+                [PDRS_PK] AS NO
+                ,[PDRS_INST_PROCESS_PK] AS 작업지시공정NO
+                FROM [QMES2022].[dbo].[MANAGE_PRODUCE_RESULT_TB]
+              ) AS PRODUCE_RESULT ON PRODUCE_RESULT.NO = [PDUI_PRODUCE_RESULT_PK]
+              WHERE (1 = 1)
+              AND CONVERT(varchar, [PDUI_DT], 12) >= ` +
+        req.body.startDate +
+        `
+              AND CONVERT(varchar, [PDUI_DT], 12) <= ` +
+        req.body.endDate +
+        `
+              GROUP BY PRODUCE_RESULT.작업지시공정NO, [PDUI_ITEM_PK], [PDUI_LOTCODE]
+            ) AS 사용
+            LEFT JOIN
+            (
+            SELECT
+              [ISPCI_INSTRUCT_PROCESS_PK] AS 작업지시공정NO
+              ,[ISPCI_ITEM_PK] AS 품목NO
+              ,[ISPCI_LOTCODE] AS LOT코드
+              ,SUM(CONVERT(numeric, COALESCE([ISPCI_AMOUNT],0))) AS 수량
+            FROM [QMES2022].[dbo].[MANAGE_INSTRUCT_PROCESS_ITEM_TB]
+            WHERE (1 = 1)
+            AND CONVERT(varchar, [ISPCI_DT], 12) >= ` +
+        req.body.startDate +
+        `
+            AND CONVERT(varchar, [ISPCI_DT], 12) <= ` +
+        req.body.endDate +
+        `
+            GROUP BY [ISPCI_INSTRUCT_PROCESS_PK], [ISPCI_ITEM_PK], [ISPCI_LOTCODE]
+			      ) AS 불출 ON 불출.작업지시공정NO = 사용.작업지시공정NO AND 불출.품목NO = 사용.품목NO AND 불출.LOT코드 = 사용.LOT코드
+          ) AS RESULT_MIDDLE
           LEFT JOIN
           (
             SELECT
@@ -1181,7 +1295,7 @@ router.post("/itemprocessstock", async (req, res) => {
               ,(SELECT [WKIS_CODE] FROM [QMES2022].[dbo].[MANAGE_WORK_INSTRUCT_TB] WHERE [WKIS_PK] = [ISPC_WORK_INSTRUCT_PK]) AS 작업코드
               ,(SELECT [PRCS_NAME] FROM [QMES2022].[dbo].[MASTER_PROCESS_TB] WHERE [PRCS_PK] = [ISPC_PROCESS_PK]) AS 공정명
             FROM [QMES2022].[dbo].[MANAGE_INSTRUCT_PROCESS_TB]
-          ) AS INSTRUCT_PROCESS ON INSTRUCT_PROCESS.NO = 불출.작업지시공정NO
+          ) AS INSTRUCT_PROCESS ON INSTRUCT_PROCESS.NO = RESULT_MIDDLE.작업지시공정NO
           LEFT JOIN
           (
             SELECT
@@ -1196,7 +1310,7 @@ router.post("/itemprocessstock", async (req, res) => {
               ,[ITEM_SAFE] AS 안전재고
               ,[ITEM_COST] AS 단가
             FROM [QMES2022].[dbo].[MASTER_ITEM_TB]
-          ) AS ITEM ON ITEM.NO = 불출.품목NO
+          ) AS ITEM ON ITEM.NO = RESULT_MIDDLE.품목NO
         ) AS RESULT
         WHERE (1=1)
         AND 재공수량 != 0
@@ -1234,21 +1348,30 @@ router.post("/itemprocessstock", async (req, res) => {
         FROM
         (
           SELECT
-            불출.작업지시공정NO AS 작업지시공정NO
+            RESULT_MIDDLE.작업지시공정NO AS 작업지시공정NO
             ,INSTRUCT_PROCESS.작업코드 AS 작업코드
             ,INSTRUCT_PROCESS.공정명 AS 공정
-            ,불출.품목NO AS 품목NO
-            ,불출.LOT코드 AS LOT코드
+            ,RESULT_MIDDLE.품목NO AS 품목NO
+            ,RESULT_MIDDLE.LOT코드 AS LOT코드
             ,ITEM.품목구분 AS 품목구분
             ,ITEM.품번 AS 품번
             ,ITEM.품명 AS 품명
             ,ITEM.규격 AS 규격
             ,ITEM.단위 AS 단위
-            ,COALESCE(불출.수량,0) AS 불출수
-            ,COALESCE(사용.수량,0) AS 사용수
-            ,COALESCE(불출.수량,0) - COALESCE(사용.수량,0) AS 재공수
+            ,COALESCE(RESULT_MIDDLE.불출수,0) AS 불출수
+            ,COALESCE(RESULT_MIDDLE.사용수,0) AS 사용수
+            ,COALESCE(RESULT_MIDDLE.재공수,0) AS 재공수
           FROM
           (
+            SELECT
+              불출.작업지시공정NO AS 작업지시공정NO
+              ,불출.품목NO AS 품목NO
+              ,불출.LOT코드 AS LOT코드
+              ,COALESCE(불출.수량,0) AS 불출수
+              ,COALESCE(사용.수량,0) AS 사용수
+              ,COALESCE(불출.수량,0) - COALESCE(사용.수량,0) AS 재공수
+            FROM
+            (
             SELECT
               [ISPCI_INSTRUCT_PROCESS_PK] AS 작업지시공정NO
               ,[ISPCI_ITEM_PK] AS 품목NO
@@ -1263,31 +1386,83 @@ router.post("/itemprocessstock", async (req, res) => {
         req.body.endDate +
         `
             GROUP BY [ISPCI_INSTRUCT_PROCESS_PK], [ISPCI_ITEM_PK], [ISPCI_LOTCODE]
-          ) AS 불출
-          LEFT JOIN
-          (
-            SELECT
-              PRODUCE_RESULT.작업지시공정NO AS 작업지시공정NO
-              ,[PDUI_ITEM_PK] AS 품목NO
-              ,[PDUI_LOTCODE] AS LOT코드
-              ,SUM(CONVERT(numeric, COALESCE([PDUI_AMOUNT],0))) AS 수량
-            FROM [QMES2022].[dbo].[MANAGE_PRODUCE_USE_ITEM_TB]
+            ) AS 불출
             LEFT JOIN
             (
               SELECT
+                PRODUCE_RESULT.작업지시공정NO AS 작업지시공정NO
+                ,[PDUI_ITEM_PK] AS 품목NO
+                ,[PDUI_LOTCODE] AS LOT코드
+                ,SUM(CONVERT(numeric, COALESCE([PDUI_AMOUNT],0))) AS 수량
+              FROM [QMES2022].[dbo].[MANAGE_PRODUCE_USE_ITEM_TB]
+              LEFT JOIN
+              (
+                SELECT
                 [PDRS_PK] AS NO
                 ,[PDRS_INST_PROCESS_PK] AS 작업지시공정NO
-              FROM [QMES2022].[dbo].[MANAGE_PRODUCE_RESULT_TB]
-            ) AS PRODUCE_RESULT ON PRODUCE_RESULT.NO = [PDUI_PRODUCE_RESULT_PK]
-            WHERE (1 = 1)
-            AND CONVERT(varchar, [PDUI_DT], 12) >= ` +
+                FROM [QMES2022].[dbo].[MANAGE_PRODUCE_RESULT_TB]
+              ) AS PRODUCE_RESULT ON PRODUCE_RESULT.NO = [PDUI_PRODUCE_RESULT_PK]
+              WHERE (1 = 1)
+              AND CONVERT(varchar, [PDUI_DT], 12) >= ` +
         req.body.startDate +
         `
-            AND CONVERT(varchar, [PDUI_DT], 12) <= ` +
+              AND CONVERT(varchar, [PDUI_DT], 12) <= ` +
         req.body.endDate +
         `
-            GROUP BY PRODUCE_RESULT.작업지시공정NO, [PDUI_ITEM_PK], [PDUI_LOTCODE]
-          ) AS 사용 ON 사용.작업지시공정NO = 불출.작업지시공정NO AND 사용.품목NO = 불출.품목NO AND 사용.LOT코드 = 불출.LOT코드
+              GROUP BY PRODUCE_RESULT.작업지시공정NO, [PDUI_ITEM_PK], [PDUI_LOTCODE]
+            ) AS 사용 ON 사용.작업지시공정NO = 불출.작업지시공정NO AND 사용.품목NO = 불출.품목NO AND 사용.LOT코드 = 불출.LOT코드
+
+            UNION
+
+            SELECT
+              사용.작업지시공정NO AS 작업지시공정NO
+              ,사용.품목NO AS 품목NO
+              ,사용.LOT코드 AS LOT코드
+              ,COALESCE(불출.수량,0) AS 불출수
+              ,COALESCE(사용.수량,0) AS 사용수
+              ,COALESCE(불출.수량,0) - COALESCE(사용.수량,0) AS 재공수
+            FROM
+            (
+              SELECT
+                PRODUCE_RESULT.작업지시공정NO AS 작업지시공정NO
+                ,[PDUI_ITEM_PK] AS 품목NO
+                ,[PDUI_LOTCODE] AS LOT코드
+                ,SUM(CONVERT(numeric, COALESCE([PDUI_AMOUNT],0))) AS 수량
+              FROM [QMES2022].[dbo].[MANAGE_PRODUCE_USE_ITEM_TB]
+              LEFT JOIN
+              (
+                SELECT
+                [PDRS_PK] AS NO
+                ,[PDRS_INST_PROCESS_PK] AS 작업지시공정NO
+                FROM [QMES2022].[dbo].[MANAGE_PRODUCE_RESULT_TB]
+              ) AS PRODUCE_RESULT ON PRODUCE_RESULT.NO = [PDUI_PRODUCE_RESULT_PK]
+              WHERE (1 = 1)
+              AND CONVERT(varchar, [PDUI_DT], 12) >= ` +
+        req.body.startDate +
+        `
+              AND CONVERT(varchar, [PDUI_DT], 12) <= ` +
+        req.body.endDate +
+        `
+              GROUP BY PRODUCE_RESULT.작업지시공정NO, [PDUI_ITEM_PK], [PDUI_LOTCODE]
+            ) AS 사용
+            LEFT JOIN
+            (
+            SELECT
+              [ISPCI_INSTRUCT_PROCESS_PK] AS 작업지시공정NO
+              ,[ISPCI_ITEM_PK] AS 품목NO
+              ,[ISPCI_LOTCODE] AS LOT코드
+              ,SUM(CONVERT(numeric, COALESCE([ISPCI_AMOUNT],0))) AS 수량
+            FROM [QMES2022].[dbo].[MANAGE_INSTRUCT_PROCESS_ITEM_TB]
+            WHERE (1 = 1)
+            AND CONVERT(varchar, [ISPCI_DT], 12) >= ` +
+        req.body.startDate +
+        `
+            AND CONVERT(varchar, [ISPCI_DT], 12) <= ` +
+        req.body.endDate +
+        `
+            GROUP BY [ISPCI_INSTRUCT_PROCESS_PK], [ISPCI_ITEM_PK], [ISPCI_LOTCODE]
+			      ) AS 불출 ON 불출.작업지시공정NO = 사용.작업지시공정NO AND 불출.품목NO = 사용.품목NO AND 불출.LOT코드 = 사용.LOT코드
+          ) AS RESULT_MIDDLE
           LEFT JOIN
           (
             SELECT
@@ -1295,7 +1470,7 @@ router.post("/itemprocessstock", async (req, res) => {
               ,(SELECT [WKIS_CODE] FROM [QMES2022].[dbo].[MANAGE_WORK_INSTRUCT_TB] WHERE [WKIS_PK] = [ISPC_WORK_INSTRUCT_PK]) AS 작업코드
               ,(SELECT [PRCS_NAME] FROM [QMES2022].[dbo].[MASTER_PROCESS_TB] WHERE [PRCS_PK] = [ISPC_PROCESS_PK]) AS 공정명
             FROM [QMES2022].[dbo].[MANAGE_INSTRUCT_PROCESS_TB]
-          ) AS INSTRUCT_PROCESS ON INSTRUCT_PROCESS.NO = 불출.작업지시공정NO
+          ) AS INSTRUCT_PROCESS ON INSTRUCT_PROCESS.NO = RESULT_MIDDLE.작업지시공정NO
           LEFT JOIN
           (
             SELECT
@@ -1310,7 +1485,7 @@ router.post("/itemprocessstock", async (req, res) => {
               ,[ITEM_SAFE] AS 안전재고
               ,[ITEM_COST] AS 단가
             FROM [QMES2022].[dbo].[MASTER_ITEM_TB]
-          ) AS ITEM ON ITEM.NO = 불출.품목NO
+          ) AS ITEM ON ITEM.NO = RESULT_MIDDLE.품목NO
         ) AS RESULT
         WHERE (1=1)
         AND 재공수량 != 0

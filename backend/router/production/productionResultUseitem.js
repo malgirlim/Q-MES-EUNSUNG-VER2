@@ -46,7 +46,7 @@ router.get("/", async (req, res) => {
         ,ITEM.규격 AS 규격
         ,ITEM.단위 AS 단위
         ,[PDUI_AMOUNT] AS 수량
-        ,CONVERT(varchar, [PDUI_DT] 20) AS 일시
+        ,CONVERT(varchar, [PDUI_DT], 20) AS 일시
         ,[PDUI_NOTE] AS 비고
         ,[PDUI_REGIST_NM] AS 등록자
         ,[PDUI_REGIST_DT] AS 등록일시
@@ -122,7 +122,7 @@ router.post("/", async (req, res) => {
             ,ITEM.규격 AS 규격
             ,ITEM.단위 AS 단위
             ,[PDUI_AMOUNT] AS 수량
-            ,CONVERT(varchar, [PDUI_DT] 20) AS 일시
+            ,CONVERT(varchar, [PDUI_DT], 20) AS 일시
             ,[PDUI_NOTE] AS 비고
             ,[PDUI_REGIST_NM] AS 등록자
             ,[PDUI_REGIST_DT] AS 등록일시
@@ -186,7 +186,7 @@ router.post("/", async (req, res) => {
             ,ITEM.규격 AS 규격
             ,ITEM.단위 AS 단위
             ,[PDUI_AMOUNT] AS 수량
-            ,CONVERT(varchar, [PDUI_DT] 20) AS 일시
+            ,CONVERT(varchar, [PDUI_DT], 20) AS 일시
             ,[PDUI_NOTE] AS 비고
             ,[PDUI_REGIST_NM] AS 등록자
             ,[PDUI_REGIST_DT] AS 등록일시
@@ -243,7 +243,7 @@ router.post("/", async (req, res) => {
             ,ITEM.규격 AS 규격
             ,ITEM.단위 AS 단위
             ,[PDUI_AMOUNT] AS 수량
-            ,CONVERT(varchar, [PDUI_DT] 20) AS 일시
+            ,CONVERT(varchar, [PDUI_DT], 20) AS 일시
             ,[PDUI_NOTE] AS 비고
             ,[PDUI_REGIST_NM] AS 등록자
             ,[PDUI_REGIST_DT] AS 등록일시
@@ -504,7 +504,7 @@ router.post("/delete", async (req, res) => {
           ,ITEM.규격 AS 규격
           ,ITEM.단위 AS 단위
           ,[PDUI_AMOUNT] AS 수량
-          ,CONVERT(varchar, [PDUI_DT] 20) AS 일시
+          ,CONVERT(varchar, [PDUI_DT], 20) AS 일시
           ,[PDUI_NOTE] AS 비고
           ,[PDUI_REGIST_NM] AS 등록자
           ,[PDUI_REGIST_DT] AS 등록일시

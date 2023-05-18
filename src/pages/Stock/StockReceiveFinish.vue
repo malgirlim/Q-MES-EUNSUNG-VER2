@@ -346,12 +346,12 @@ const onFileImport = (event: any) => {
           variant="linkedin"
           @click="
             () => {
-              router.push('/order/order-current');
+              router.push('/quality/process');
             }
           "
         >
           <Lucide icon="ExternalLink" class="w-4 h-4 mr-2" />
-          발주현황
+          공정검사
         </Button>
         <Button
           class="mr-3 shadow-md"
@@ -359,20 +359,7 @@ const onFileImport = (event: any) => {
           variant="linkedin"
           @click="
             () => {
-              router.push('/quality/incoming');
-            }
-          "
-        >
-          <Lucide icon="ExternalLink" class="w-4 h-4 mr-2" />
-          수입검사
-        </Button>
-        <Button
-          class="mr-3 shadow-md"
-          as="a"
-          variant="linkedin"
-          @click="
-            () => {
-              router.push('/quality/incoming');
+              router.push('/quality/process');
             }
           "
         >
