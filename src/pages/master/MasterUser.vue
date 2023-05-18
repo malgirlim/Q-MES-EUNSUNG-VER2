@@ -643,7 +643,7 @@ const menu_list = [
             >
               수정
             </Button>
-            <Button
+            <!-- <Button
               variant="outline-success"
               class="px-2 py-1 mr-2"
               @click="
@@ -654,7 +654,7 @@ const menu_list = [
               "
             >
               권한
-            </Button>
+            </Button> -->
             <Button
               variant="outline-danger"
               class="px-2 py-1 mr-2"
