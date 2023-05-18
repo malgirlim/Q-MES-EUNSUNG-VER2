@@ -312,7 +312,7 @@ const onFileImport = (event: any) => {
       <div
         class="flex flex-wrap items-center col-span-12 mt-2 mb-2 intro-y sm:flex-nowrap"
       >
-        <Button
+        <!-- <Button
           class="mr-2 shadow-md"
           as="a"
           variant="primary"
@@ -336,7 +336,33 @@ const onFileImport = (event: any) => {
           "
         >
           <Lucide icon="Trash2" class="w-4 h-4 mr-2" /> 삭제</Button
+        > -->
+        <Button
+          class="mr-3 shadow-md"
+          as="a"
+          variant="linkedin"
+          @click="
+            () => {
+              router.push('/production/task-report');
+            }
+          "
         >
+          <Lucide icon="ExternalLink" class="w-4 h-4 mr-2" />
+          생산실적
+        </Button>
+        <Button
+          class="mr-3 shadow-md"
+          as="a"
+          variant="linkedin"
+          @click="
+            () => {
+              router.push('/production/task-report');
+            }
+          "
+        >
+          <Lucide icon="ExternalLink" class="w-4 h-4 mr-2" />
+          재고조정
+        </Button>
         <div class="hidden mx-auto md:block text-slate-500"></div>
         <div class="mr-5">
           <a href="" class="flex items-center ml-auto text-primary">
@@ -533,7 +559,7 @@ const onFileImport = (event: any) => {
               style="position: sticky; top: 0px; z-index: 2"
             >
               <Table.Tr>
-                <Table.Th
+                <!-- <Table.Th
                   class="text-center border-b-0 whitespace-nowrap"
                   id="checkbox"
                   :style="table_setting.체크박스.style"
@@ -550,7 +576,7 @@ const onFileImport = (event: any) => {
                       }
                     "
                   />
-                </Table.Th>
+                </Table.Th> -->
                 <Table.Th
                   class="text-center border-b-0 whitespace-nowrap font-bold"
                   :style="table_setting.순번.style"
@@ -631,7 +657,7 @@ const onFileImport = (event: any) => {
                 :key="todo.NO"
                 class="intro-x"
               >
-                <Table.Td
+                <!-- <Table.Td
                   class="first:rounded-l-md last:rounded-r-md text-center bg-white border-b-0 dark:bg-darkmode-600 shadow-[20px_3px_20px_#0000000b]"
                   id="checkbox"
                   :style="table_setting.체크박스.style"
@@ -643,7 +669,7 @@ const onFileImport = (event: any) => {
                     :value="todo.NO"
                     v-model="checkDebug"
                   />
-                </Table.Td>
+                </Table.Td> -->
                 <Table.Td
                   class="first:rounded-l-md last:rounded-r-md text-center bg-white border-b-0 dark:bg-darkmode-600 shadow-[20px_3px_20px_#0000000b]"
                   :style="table_setting.순번.style"
