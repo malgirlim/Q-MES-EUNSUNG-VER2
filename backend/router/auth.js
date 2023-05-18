@@ -82,6 +82,7 @@ router.post("/", async (req, res) => {
         [USER_DEPART] AS part,
         [USER_POSITION] AS 직책,
         [USER_RANK] AS rank,
+        [USER_AUTH] AS auth,
         [USER_REGIST_NM] AS 등록자,
         [USER_REGIST_DT] AS 등록일시
       FROM [QMES2022].[dbo].[MASTER_USER_TB]
@@ -101,6 +102,7 @@ router.post("/", async (req, res) => {
           name: result.recordset[0].name,
           part: result.recordset[0].part,
           rank: result.recordset[0].rank,
+          auth: result.recordset[0].auth,
         },
         jwtKey,
         {

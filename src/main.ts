@@ -23,6 +23,7 @@ app.config.globalProperties.gstate = reactive({
     name: "",
     part: "",
     rank: "",
+    auth: "",
   },
   form: {
     loginId: "",

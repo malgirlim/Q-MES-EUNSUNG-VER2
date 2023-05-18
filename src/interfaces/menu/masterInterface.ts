@@ -9,6 +9,7 @@ export interface MasterUser {
   부서명?: string;
   직책?: string;
   직급?: string;
+  권한?: string;
   등록자?: string;
   등록일시?: string;
 }
