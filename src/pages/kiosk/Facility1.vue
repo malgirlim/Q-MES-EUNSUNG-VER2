@@ -1,7 +1,6 @@
 <script setup lang="ts">
-import { getCurrentInstance, onMounted, ref, Ref, watch } from "vue";
+import { getCurrentInstance, onMounted, ref, watch } from "vue";
 import _ from "lodash";
-import { FormLabel } from "../../base-components/Form";
 
 import Button from "../../base-components/Button";
 import Lucide from "../../base-components/Lucide";
@@ -9,6 +8,9 @@ import LoadingIcon from "../../base-components/LoadingIcon";
 import { Dialog } from "../../base-components/Headless";
 import Table from "../../base-components/Table";
 import { FormSelect } from "../../base-components/Form";
+import InnerImageZoom from "vue-inner-image-zoom";
+import "vue-inner-image-zoom/lib/vue-inner-image-zoom.css";
+import VueJsProgress from "vue-js-progress";
 
 import moment from "moment";
 import { toast } from "vue3-toastify";
@@ -71,7 +73,7 @@ const now = ref(moment().format("YYYY-MM-DD HH:mm:ss"));
 const year = ref(moment().format("YYYY"));
 
 // 임시데이터
-const running = "가동중";
+const running = "미가동";
 const checked = false;
 const 지시수량 = 3000;
 
@@ -177,6 +179,18 @@ const setTaskFinishModal = (value: boolean) => {
     finishCheckBox.value = false;
   else finishCheckBox.value = true;
 };
+
+/* 작업취소, 보류 Modal */
+const taskCancleModal = ref(false);
+const setTaskCancleModal = (value: boolean) => {
+  taskCancleModal.value = value;
+};
+
+/* 작업표준서 열기 Modal */
+const taskStandardModal = ref(false);
+const setTaskStandardModal = (value: boolean) => {
+  taskStandardModal.value = value;
+};
 </script>
 
 <template>
@@ -269,11 +283,20 @@ const setTaskFinishModal = (value: boolean) => {
           @click="setWorkerChangeModal(true)"
           ><strong>작업자변경</strong></Button
         ><Button
+          v-if="running != '미가동'"
           class="h-14 w-44 text-2xl"
           as="a"
           variant="danger"
           @click="setTaskFinishModal(true)"
           ><strong>작업종료</strong></Button
+        >
+        <Button
+          v-if="running == '미가동'"
+          class="h-14 w-48 text-2xl"
+          as="a"
+          variant="danger"
+          @click="setTaskCancleModal(true)"
+          ><strong>작업취소/반려</strong></Button
         >
       </div>
     </div>
@@ -379,6 +402,22 @@ const setTaskFinishModal = (value: boolean) => {
                   </td>
                   <td class="pl-2 text-left">A2 E-EGR</td>
                 </tr>
+                <tr class="border-b-2 border-success h-9">
+                  <td class="border-success bg-slate-200 font-bold" colspan="2">
+                    작업표준서
+                  </td>
+                </tr>
+                <tr class="border-b-2 border-success h-24">
+                  <td class="border-success" colspan="2">
+                    <Button
+                      class="mr-5 h-14 w-64 text-2xl text-white"
+                      as="a"
+                      variant="success"
+                      @click="setTaskStandardModal(true)"
+                      ><strong>작업표준서 열기</strong></Button
+                    >
+                  </td>
+                </tr>
               </tbody>
             </table>
           </div>
@@ -436,9 +475,17 @@ const setTaskFinishModal = (value: boolean) => {
                   <td
                     class="border-r-2 border-primary bg-slate-200 font-bold w-32"
                   >
-                    생산수
+                    지시수량
                   </td>
-                  <td class="pl-2 text-left">
+                  <td class="pl-2 text-left w-28" colspan="3">
+                    {{ 지시수량.toLocaleString() }}
+                  </td>
+                </tr>
+                <tr class="border-b-2 border-primary h-9">
+                  <td class="border-r-2 border-primary bg-slate-200 font-bold">
+                    생산수량
+                  </td>
+                  <td class="pl-2 text-left" colspan="3">
                     <div class="flex">
                       <div>{{ num_show }}</div>
                       <div v-if="num_show == '0'" class="ml-8 text-danger">
@@ -449,16 +496,49 @@ const setTaskFinishModal = (value: boolean) => {
                 </tr>
                 <tr class="border-b-2 border-primary h-9">
                   <td class="border-r-2 border-primary bg-slate-200 font-bold">
-                    불량수
+                    불량수량
                   </td>
                   <td class="pl-2 text-left">{{ num_bad }}</td>
+                  <td
+                    class="border-l-2 border-r-2 border-primary bg-slate-200 font-bold w-32"
+                  >
+                    불량건수
+                  </td>
+                  <td class="pl-2 text-left">5</td>
                 </tr>
                 <tr class="border-b-2 border-primary h-9">
                   <td class="border-r-2 border-primary bg-slate-200 font-bold">
-                    양품수
+                    양품수량
                   </td>
-                  <td class="pl-2 text-left">{{ num_good }}</td>
+                  <td class="pl-2 text-left" colspan="3">{{ num_good }}</td>
                 </tr>
+                <tr class="border-b-2 border-primary h-9">
+                  <td class="border-r-2 border-primary bg-slate-200 font-bold">
+                    비가동건수
+                  </td>
+                  <td class="pl-2 text-left" colspan="3">3</td>
+                </tr>
+                <!-- <tr class="border-b-2 border-primary h-9">
+                  <td class="border-primary bg-slate-200 font-bold" colspan="4">
+                    작업진행률
+                  </td>
+                </tr>
+                <tr>
+                  <td colspan="4">
+                    <div class="px-3">
+                      <VueJsProgress
+                        :title="
+                          (Number(num_good) / Number(지시수량)) * 100 + '%'
+                        "
+                        :percentage="82"
+                        bg="success"
+                        :delay="600"
+                        :striped="true"
+                        :animation="true"
+                      ></VueJsProgress>
+                    </div>
+                  </td>
+                </tr> -->
               </tbody>
             </table>
           </div>
@@ -1092,7 +1172,166 @@ const setTaskFinishModal = (value: boolean) => {
       </div>
     </Dialog.Panel>
   </Dialog>
-  <!-- END: 작업자 변경 Modal -->
+  <!-- END: 작업 종료 Modal -->
+
+  <!-- BEGIN: 작업 취소, 보류 Modal -->
+  <Dialog :open="taskCancleModal" size="lg" @close="setTaskCancleModal(false)">
+    <Dialog.Panel>
+      <div class="p-5 text-center">
+        <Lucide icon="CheckCircle" class="w-20 h-20 mx-auto mt-3 text-danger" />
+        <div class="mt-5 text-3xl"><strong>작업취소/반려</strong></div>
+        <div class="mt-3 text-2xl">유형을 선택해주세요.</div>
+        <div class="mt-5">
+          <div class="pl-7 pr-7 mt-5 text-xl">
+            <table class="w-full">
+              <tbody>
+                <tr class="border-t-2 border-l-2 border-b-2 border-danger h-12">
+                  <td
+                    class="text-center border-r-2 border-danger bg-slate-200 font-bold w-32"
+                  >
+                    작업취소
+                  </td>
+                </tr>
+                <tr class="border-b-2 border-danger h-12">
+                  <td
+                    class="text-center border-l-2 border-r-2 border-danger font-bold"
+                  >
+                    <div>
+                      작업 선택을 취소하고
+                      <label class="text-pending font-bold">작업미확인</label
+                      >으로 전환
+                    </div>
+                  </td>
+                </tr>
+                <tr class="border-b-2 border-danger h-20">
+                  <td
+                    class="text-center border-l-2 border-r-2 border-danger font-bold"
+                  >
+                    <Button
+                      variant="pending"
+                      type="button"
+                      @click="
+                        () => {
+                          setTaskCancleModal(false);
+                        }
+                      "
+                      class="w-40 text-2xl mb-5 mt-5"
+                    >
+                      작업취소
+                    </Button>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <div class="pl-7 pr-7 mt-5 text-xl">
+            <table class="w-full">
+              <tbody>
+                <tr class="border-t-2 border-l-2 border-b-2 border-danger h-12">
+                  <td
+                    class="text-center border-r-2 border-danger bg-slate-200 font-bold w-32"
+                  >
+                    작업반려
+                  </td>
+                </tr>
+                <tr class="border-b-2 border-danger h-12">
+                  <td
+                    class="text-center border-l-2 border-r-2 border-danger font-bold"
+                  >
+                    <div>
+                      반려 사유를 입력하고
+                      <label class="text-danger font-bold">작업반려</label>로
+                      전환
+                    </div>
+                  </td>
+                </tr>
+
+                <tr class="border-b-2 border-danger h-20">
+                  <td
+                    class="text-center border-l-2 border-r-2 border-danger font-bold"
+                  >
+                    <div class="mt-5">
+                      <FormSelect
+                        class="w-64"
+                        formSelectSize="xxl"
+                        model-value="미입력"
+                      >
+                        <option>미입력</option>
+                        <option>원자재 부족</option>
+                        <option>부자재 부족</option>
+                        <option>작업자 부족</option>
+                        <option>작업자 불일치</option>
+                        <option>기타</option>
+                      </FormSelect>
+                    </div>
+                    <div>
+                      <Button
+                        variant="danger"
+                        type="button"
+                        @click="
+                          () => {
+                            setTaskCancleModal(false);
+                          }
+                        "
+                        class="w-40 text-2xl mb-5 mt-5"
+                      >
+                        작업반려
+                      </Button>
+                    </div>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <div class="mt-5 px-5 pb-8 text-center">
+        <Button
+          variant="outline-primary"
+          type="button"
+          class="w-40 text-2xl"
+          @click="setTaskCancleModal(false)"
+        >
+          취소
+        </Button>
+      </div>
+    </Dialog.Panel>
+  </Dialog>
+  <!-- END: 작업 취소, 보류 Modal -->
+
+  <!-- BEGIN: 작업표준서 열기 Modal -->
+  <Dialog
+    :open="taskStandardModal"
+    size="xxl"
+    @close="setTaskStandardModal(false)"
+  >
+    <Dialog.Panel style="top: -8%">
+      <div
+        class="mt-5"
+        style="height: 850px; overflow-y: scroll; overflow-x: hidden"
+      >
+        <inner-image-zoom
+          src="../../src/assets/images/task_standard/G5Z24.png"
+          :zoomScale="1"
+          :hideCloseButton="true"
+          :hasSpacer="true"
+        />
+      </div>
+
+      <div class="px-5 pt-5 pb-5 text-center">
+        <Button
+          variant="outline-primary"
+          type="button"
+          class="w-48 text-2xl"
+          @click="setTaskStandardModal(false)"
+        >
+          닫기
+        </Button>
+      </div>
+    </Dialog.Panel>
+  </Dialog>
+  <!-- END: 작업표준서 열기 Modal -->
 
   <!-- BEGIN: 로그아웃 확인 Modal -->
   <Dialog :open="logoutModal" size="lg" @close="setLogoutModal(false)">
