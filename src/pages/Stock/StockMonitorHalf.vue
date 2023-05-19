@@ -837,7 +837,7 @@ const setStockLotModal = (value: boolean) => {
                           // setDetailModal(true);
                           searchDate_stockLot = searchDate;
                           searchKey_stockLot = '품번';
-                          searchInput_stockLot = todo.품번;
+                          searchInput_stockLot = todo.품번 ?? '';
                           sortKey_stockLot = 'LOT코드';
                           sortOrder_stockLot = '오름차순';
                           setStockLotModal(true);
