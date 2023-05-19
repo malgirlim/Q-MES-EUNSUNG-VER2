@@ -20,7 +20,7 @@ import { useSendApi } from "../../composables/useSendApi";
 import { InfoLog } from "../../interfaces/menu/infoInterface";
 
 const { proxy }: any = getCurrentInstance();
-const user_level = proxy.gstate.level.MasterClient; //권한레벨
+const user_level = proxy.gstate.level.AdminLog; //권한레벨
 
 // 페이지 로딩 시 시작
 onMounted(async () => {
