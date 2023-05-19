@@ -7,7 +7,7 @@ const user_level = proxy.gstate.level.PreventLifePlan; //권한레벨
 const phone = ref("");
 
 const submit = async () => {
-  const res = await fetch("/api/kakao/send", {
+  const res = await fetch("/q-api/kakao/send", {
     method: "POST",
     headers: {
       "Content-Type": "application/json",

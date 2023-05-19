@@ -304,7 +304,7 @@ const setDebugMode = () => {
         </TransitionRoot>
       </div>
       END: Search -->
-      <!-- BEGIN: Notifications
+      <!-- BEGIN: Notifications -->
       <Popover class="mr-4 intro-x sm:mr-6">
         <Popover.Button
           class="relative text-white/70 outline-none block before:content-[''] before:w-[8px] before:h-[8px] before:rounded-full before:absolute before:top-[-2px] before:right-0 before:bg-danger"
@@ -312,42 +312,47 @@ const setDebugMode = () => {
           <Lucide icon="Bell" class="w-5 h-5 dark:text-slate-500" />
         </Popover.Button>
         <Popover.Panel class="w-[280px] sm:w-[350px] p-5 mt-2">
-          <div class="mb-5 font-medium">Notifications</div>
-          <div
-            v-for="(faker, fakerKey) in _.take(fakerData, 5)"
-            :key="fakerKey"
-            :class="[
-              'cursor-pointer relative flex items-center',
-              { 'mt-5': fakerKey },
-            ]"
-          >
-            <div class="relative flex-none w-12 h-12 mr-1 image-fit">
-              <img
-                alt="Midone Tailwind HTML Admin Template"
-                class="rounded-full"
-                :src="faker.photos[0]"
-              />
-              <div
-                class="absolute bottom-0 right-0 w-3 h-3 border-2 border-white rounded-full bg-success dark:border-darkmode-600"
-              ></div>
-            </div>
-            <div class="ml-2 overflow-hidden">
-              <div class="flex items-center">
-                <a href="" class="mr-5 font-medium truncate">
-                  {{ faker.users[0].name }}
-                </a>
-                <div class="ml-auto text-xs text-slate-400 whitespace-nowrap">
-                  {{ faker.times[0] }}
-                </div>
+          <div class="mb-5 font-medium">알림 목록</div>
+          <div style="height: 750px; overflow-y: scroll; overflow-x: hidden">
+            <div
+              v-for="(faker, fakerKey) in _.take(fakerData, 20)"
+              :key="fakerKey"
+              :class="[
+                'cursor-pointer relative flex items-center',
+                { 'mt-5': fakerKey },
+              ]"
+            >
+              <div class="relative flex-none w-12 h-12 mr-1 image-fit">
+                <img
+                  alt="Midone Tailwind HTML Admin Template"
+                  class="rounded-full"
+                  src="../../assets/images/alert/facility.png"
+                />
+                <div
+                  class="absolute bottom-0 right-0 w-3 h-3 border-2 border-white rounded-full bg-success dark:border-darkmode-600"
+                ></div>
               </div>
-              <div class="w-full truncate text-slate-500 mt-0.5">
-                {{ faker.news[0].shortContent }}
+              <div class="ml-2 overflow-hidden">
+                <div class="flex items-center">
+                  <a href="" class="mr-5 font-medium truncate">
+                    설비알림발생
+                  </a>
+                  <div class="ml-auto text-xs text-slate-400 whitespace-nowrap">
+                    2023-05-19 10:14:43
+                  </div>
+                </div>
+                <div class="w-full text-slate-500 mt-0.5">
+                  인쇄기1 가동이 중단되었습니다.
+                </div>
+                <div class="w-2/3 mt-0.5 mx-auto">
+                  <Button variant="primary" class="h-5 w-full">확인</Button>
+                </div>
               </div>
             </div>
           </div>
         </Popover.Panel>
       </Popover>
-      END: Notifications -->
+      <!-- END: Notifications -->
       <!-- BEGIN: Account Menu -->
 
       <Menu>

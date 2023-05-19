@@ -7,7 +7,7 @@ const user_level = proxy.gstate.level.PreventPlan; //권한레벨
 const phone = ref("");
 
 const submit = async () => {
-  const res = await fetch("/api/sms/send", {
+  const res = await fetch("/q-api/sms/send", {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
