@@ -30,7 +30,7 @@ export default defineConfig({
   server: {
     proxy: {
       "/api": "http://localhost:3000",
-      //"/q-api": "http://192.168.0.250:3000",
+      "/q-api": "https://qmes.co.kr:5000",
     },
   },
 });
