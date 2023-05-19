@@ -32,7 +32,7 @@ const user_level = proxy.gstate.level.QualityIncoming; //권한레벨
 // 페이지 로딩 시 시작
 onMounted(async () => {
   dataManager.loadDatas(); // 메인으로 쓸 데이터 불러오기
-  incoming_order.loadDatas(); // 발주 데이터 불러오기
+  // incoming_order.loadDatas(); // 발주 데이터 불러오기
 });
 
 // 페이징기능
@@ -320,75 +320,75 @@ const onFileImport = (event: any) => {
 // ############################################### 발주 가져오기 ###############################################
 
 // 페이징기능
-const currentPage_order = ref(1); // 현재페이지
-const rowsPerPage_order = ref(10); // 한 페이지에 보여질 데이터 갯수
-const pageChangeFirst_order = () => {
-  currentPage_order.value = 1; // 데이터 갯수 변경 시 1페이지로 이동
-};
+// const currentPage_order = ref(1); // 현재페이지
+// const rowsPerPage_order = ref(10); // 한 페이지에 보여질 데이터 갯수
+// const pageChangeFirst_order = () => {
+//   currentPage_order.value = 1; // 데이터 갯수 변경 시 1페이지로 이동
+// };
 
-// 수주 데이터 설정
-const url_incoming_order = "/api/quality/incoming/order";
-const incoming_order = useSendApi<OrderOrder>(
-  url_incoming_order,
-  currentPage_order,
-  rowsPerPage_order
-);
+// // 수주 데이터 설정
+// const url_incoming_order = "/api/quality/incoming/order";
+// const incoming_order = useSendApi<OrderOrder>(
+//   url_incoming_order,
+//   currentPage_order,
+//   rowsPerPage_order
+// );
 
-// 테이블항목 설정 및 가로크기 조정
-const table_setting_order = {
-  순번: { name: "순번", style: "width: 50px; text-align: center;" },
-  항목1: { name: "발주코드", style: "width: 50px; text-align: center;" },
-  항목2: { name: "발주일자", style: "width: 50px; text-align: center;" },
-  항목3: { name: "거래처명", style: "width: 50px; text-align: center;" },
-  항목4: { name: "품목구분", style: "width: 50px; text-align: center;" },
-  항목5: { name: "품번", style: "width: 50px; text-align: center;" },
-  항목6: { name: "품명", style: "width: 50px; text-align: center;" },
-  항목7: { name: "수량", style: "width: 50px; text-align: center;" },
-  항목8: { name: "항목8", style: "width: 50px; text-align: center;" },
-};
+// // 테이블항목 설정 및 가로크기 조정
+// const table_setting_order = {
+//   순번: { name: "순번", style: "width: 50px; text-align: center;" },
+//   항목1: { name: "발주코드", style: "width: 50px; text-align: center;" },
+//   항목2: { name: "발주일자", style: "width: 50px; text-align: center;" },
+//   항목3: { name: "거래처명", style: "width: 50px; text-align: center;" },
+//   항목4: { name: "품목구분", style: "width: 50px; text-align: center;" },
+//   항목5: { name: "품번", style: "width: 50px; text-align: center;" },
+//   항목6: { name: "품명", style: "width: 50px; text-align: center;" },
+//   항목7: { name: "수량", style: "width: 50px; text-align: center;" },
+//   항목8: { name: "항목8", style: "width: 50px; text-align: center;" },
+// };
 
-// ########################## 조회기간 설정 ##########################
-const searchDate_order = ref("전체기간");
-// ########################## 품목 조회  ##########################
-const searchKey_order = ref("전체");
-const searchInput_order = ref("");
-const sortKey_order = ref("등록일");
-const sortOrder_order = ref("내림차순");
-const sortOrderToggle_order = () => {
-  sortOrder_order.value =
-    sortOrder_order.value == "내림차순" ? "오름차순" : "내림차순";
-};
-//  정렬기준이 변경되면 실행
-watch([sortKey_order, sortOrder_order], (newValue, oldValue) => {
-  search_order();
-  pageChangeFirst_order();
-});
-const search_order = () => {
-  // console.log(searchKey.value, searchInput.value);
-  incoming_order.searchDatas(
-    searchDate_order.value,
-    searchKey_order.value,
-    searchInput_order.value,
-    sortKey_order.value,
-    sortOrder_order.value
-  );
-};
+// // ########################## 조회기간 설정 ##########################
+// const searchDate_order = ref("전체기간");
+// // ########################## 품목 조회  ##########################
+// const searchKey_order = ref("전체");
+// const searchInput_order = ref("");
+// const sortKey_order = ref("등록일");
+// const sortOrder_order = ref("내림차순");
+// const sortOrderToggle_order = () => {
+//   sortOrder_order.value =
+//     sortOrder_order.value == "내림차순" ? "오름차순" : "내림차순";
+// };
+// //  정렬기준이 변경되면 실행
+// watch([sortKey_order, sortOrder_order], (newValue, oldValue) => {
+//   search_order();
+//   pageChangeFirst_order();
+// });
+// const search_order = () => {
+//   // console.log(searchKey.value, searchInput.value);
+//   incoming_order.searchDatas(
+//     searchDate_order.value,
+//     searchKey_order.value,
+//     searchInput_order.value,
+//     sortKey_order.value,
+//     sortOrder_order.value
+//   );
+// };
 
-// ########################## 모달 설정  ##########################
-// 발주등록 모달 설정
-const orderModal = ref(false);
-const setOrderModal = (value: boolean) => {
-  orderModal.value = value;
-};
+// // ########################## 모달 설정  ##########################
+// // 발주등록 모달 설정
+// const orderModal = ref(false);
+// const setOrderModal = (value: boolean) => {
+//   orderModal.value = value;
+// };
 
-// 모달에서 선택한 품목을 items에 넣기
-const importOrder = (no: any) => {
-  insertModalData.발주NO = no;
-  insertModalData.발주코드 = incoming_order.dataAll.value.filter(
-    (c) => c.NO == no
-  )[0]?.발주코드;
-  setOrderModal(false);
-};
+// // 모달에서 선택한 품목을 items에 넣기
+// const importOrder = (no: any) => {
+//   insertModalData.발주NO = no;
+//   insertModalData.발주코드 = incoming_order.dataAll.value.filter(
+//     (c) => c.NO == no
+//   )[0]?.발주코드;
+//   setOrderModal(false);
+// };
 
 // ################################################## 검사 및 입고 확인 ##################################################
 // 수입검사 데이터 설정
@@ -901,7 +901,7 @@ const checkDataFunction = async () => {
     <Dialog.Panel class="p-10 text-center">
       <!--추가 Modal 내용 시작-->
       <div class="mb-5" style="font-weight: bold">등록</div>
-      <Tab.Group>
+      <!-- <Tab.Group>
         <Tab.List variant="boxed-tabs">
           <Tab>
             <Tab.Button class="w-full py-2" as="button"> 기본 내용 </Tab.Button>
@@ -966,7 +966,7 @@ const checkDataFunction = async () => {
             </div>
           </Tab.Panel>
         </Tab.Panels>
-      </Tab.Group>
+      </Tab.Group> -->
       <div style="text-align: left">
         <div class="mt-5 text-right">
           <Button
@@ -1495,9 +1495,8 @@ const checkDataFunction = async () => {
   <!-- END: 프린트 출력 Modal -->
 
   <!-- BEGIN: Order Modal Content -->
-  <Dialog size="xxl" :open="orderModal" @close="setOrderModal(false)">
+  <!-- <Dialog size="xxl" :open="orderModal" @close="setOrderModal(false)">
     <Dialog.Panel class="p-5 text-center">
-      <!--Order Modal 내용 시작-->
       <div class="mb-5" style="font-weight: bold; font-size: x-large">
         발주 리스트
       </div>
@@ -1548,7 +1547,6 @@ const checkDataFunction = async () => {
             </div>
           </div>
         </div>
-        <!-- BEGIN: Pagination-->
         <div
           class="flex flex-wrap items-center col-span-12 mt-0 intro-y sm:flex-nowrap"
         >
@@ -1615,9 +1613,6 @@ const checkDataFunction = async () => {
             >
           </div>
         </div>
-        <!-- END: Pagination-->
-        <!-- BEGIN: Data List -->
-        <!-- style="height: calc(100vh - 350px)" : 브라우저 화면 창크기에 맞게 변경됨 -->
         <div class="col-span-12 overflow-auto intro-y lg:overflow-visible">
           <div
             class="mr-3"
@@ -1756,7 +1751,6 @@ const checkDataFunction = async () => {
             </div>
           </div>
         </div>
-        <!-- END: Data List -->
       </div>
       <div style="text-align: left">
         <div class="mt-5 text-right">
@@ -1768,9 +1762,8 @@ const checkDataFunction = async () => {
           >
         </div>
       </div>
-      <!--Modal 내용 끝-->
     </Dialog.Panel>
-  </Dialog>
+  </Dialog> -->
   <!-- BEGIN: Order Modal Content -->
 
   <!-- BEGIN: 검사 및 입고 확인 Modal -->
