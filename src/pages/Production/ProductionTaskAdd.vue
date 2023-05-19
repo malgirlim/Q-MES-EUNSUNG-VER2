@@ -25,7 +25,10 @@ import {
   MasterFacility,
   MasterUser,
 } from "../../interfaces/menu/MasterInterface";
-import { StockItemReceive } from "../../interfaces/menu/stockInterface";
+import {
+  StockItemReceive,
+  StockStockLOT,
+} from "../../interfaces/menu/stockInterface";
 import {
   ProductionTask,
   ProductionTaskProcess,
@@ -414,7 +417,7 @@ const table_setting_process = {
   항목4: { name: "작업자", style: "width: 50px; text-align: center;" },
   항목5: { name: "품번", style: "width: 50px; text-align: center;" },
   항목6: { name: "품명", style: "width: 150px; text-align: center;" },
-  항목7: { name: "진행상황", style: "width: 150px; text-align: center;" },
+  항목7: { name: "진행상황", style: "width: 140px; text-align: center;" },
   항목8: { name: "항목8", style: "width: 50px; text-align: center;" },
   상세보기: { name: "정보", style: "width: 100px; text-align: center;" },
   편집: { name: "편집", style: "width: 100px; text-align: center;" },
@@ -485,12 +488,12 @@ const task_process_item = useSendApi<ProductionTaskProcessItem>(
 const table_setting_process_item = {
   체크박스: { name: "체크박스", style: "width: 50px" },
   순번: { name: "순번", style: "width: 50px; text-align: center;" },
-  항목1: { name: "LOT코드", style: "width: 100px; text-align: center;" },
-  항목2: { name: "품목구분", style: "width: 100px; text-align: center;" },
-  항목3: { name: "품번", style: "width: 150px; text-align: center;" },
-  항목4: { name: "품명", style: "width: 100px; text-align: center;" },
+  항목1: { name: "LOT코드", style: "width: 50px; text-align: center;" },
+  항목2: { name: "품목구분", style: "width: 50px; text-align: center;" },
+  항목3: { name: "품명", style: "width: 100px; text-align: center;" },
+  항목4: { name: "규격", style: "width: 100px; text-align: center;" },
   항목5: { name: "단위", style: "width: 50px; text-align: center;" },
-  항목6: { name: "수량", style: "width: 100px; text-align: center;" },
+  항목6: { name: "수량", style: "width: 50px; text-align: center;" },
   항목7: { name: "항목7", style: "width: 50px; text-align: center;" },
   항목8: { name: "항목8", style: "width: 50px; text-align: center;" },
   상세보기: { name: "정보", style: "width: 100px; text-align: center;" },

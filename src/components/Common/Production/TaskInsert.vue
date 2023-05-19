@@ -187,6 +187,7 @@ const insertData = async () => {
   // 공정리스트의 작업지시NO를 설정해준다.
   await processlist.value.forEach((p) => {
     p.작업지시NO = maxNO_task;
+    p.진행상황 = "작업미확인";
   });
 
   // 공정리스트에서 NO가 1인 데이터에는 작업정보등록 품목 데이터로 설정해준다.

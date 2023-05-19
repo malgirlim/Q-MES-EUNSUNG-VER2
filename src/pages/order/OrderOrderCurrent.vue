@@ -52,14 +52,14 @@ const table_setting = {
   항목1: { name: "발주코드", style: "width: 50px; text-align: center;" },
   항목2: { name: "발주일자", style: "width: 50px; text-align: center;" },
   항목3: { name: "납기일", style: "width: 50px; text-align: center;" },
-  항목4: { name: "거래처명", style: "width: 200px; text-align: center;" },
+  항목4: { name: "거래처명", style: "width: 50px; text-align: center;" },
   항목5: { name: "품목구분", style: "width: 50px; text-align: center;" },
   항목6: { name: "품명", style: "width: 50px; text-align: center;" },
   항목7: { name: "발주수량", style: "width: 50px; text-align: center;" },
   항목8: { name: "입고수량", style: "width: 50px; text-align: center;" },
   상세보기: { name: "정보", style: "width: 50px; text-align: center;" },
   편집: { name: "편집", style: "width: 50px; text-align: center;" },
-  수입검사: { name: "수입검사", style: "width: 50px; text-align: center;" },
+  수입검사: { name: "수입검사", style: "width: 110px; text-align: center;" },
   입고율: { name: "입고율", style: "width: 50px; text-align: center;" },
 };
 
@@ -669,15 +669,9 @@ const incomingDataFunction = async () => {
                 </Table.Th>
                 <Table.Th
                   class="text-center border-b-0 whitespace-nowrap font-bold"
-                  :style="table_setting.상세보기.style"
+                  :style="table_setting.입고율.style"
                 >
-                  {{ table_setting.상세보기.name }}
-                </Table.Th>
-                <Table.Th
-                  class="text-center border-b-0 whitespace-nowrap font-bold"
-                  :style="table_setting.편집.style"
-                >
-                  {{ table_setting.편집.name }}
+                  {{ table_setting.입고율.name }}
                 </Table.Th>
                 <Table.Th
                   class="text-center border-b-0 whitespace-nowrap font-bold"
@@ -687,9 +681,15 @@ const incomingDataFunction = async () => {
                 </Table.Th>
                 <Table.Th
                   class="text-center border-b-0 whitespace-nowrap font-bold"
-                  :style="table_setting.입고율.style"
+                  :style="table_setting.상세보기.style"
                 >
-                  {{ table_setting.입고율.name }}
+                  {{ table_setting.상세보기.name }}
+                </Table.Th>
+                <Table.Th
+                  class="text-center border-b-0 whitespace-nowrap font-bold"
+                  :style="table_setting.편집.style"
+                >
+                  {{ table_setting.편집.name }}
                 </Table.Th>
               </Table.Tr>
             </Table.Thead>
@@ -775,6 +775,58 @@ const incomingDataFunction = async () => {
                 </Table.Td>
                 <Table.Td
                   class="first:rounded-l-md last:rounded-r-md text-center bg-white border-b-0 dark:bg-darkmode-600 shadow-[20px_3px_20px_#0000000b] py-0 relative before:block before:w-px before:h-8 before:bg-slate-200 before:absolute before:left-0 before:inset-y-0 before:my-auto before:dark:bg-darkmode-400"
+                  :style="table_setting.입고율.style"
+                >
+                  <div>
+                    {{
+                      (
+                        (Number(todo["입고수량"]) / Number(todo["발주수량"])) *
+                        100
+                      ).toLocaleString()
+                    }}%
+                  </div>
+                  <div class="flex items-center justify-center">
+                    <Progress class="h-1">
+                      <Progress.Bar
+                        class="bg-primary"
+                        :style="
+                          'width:' +
+                          String(
+                            (Number(todo['입고수량']) /
+                              Number(todo['발주수량'])) *
+                              100
+                          ) +
+                          '%'
+                        "
+                        role="progressbar"
+                      ></Progress.Bar>
+                    </Progress>
+                  </div>
+                </Table.Td>
+                <Table.Td
+                  class="first:rounded-l-md last:rounded-r-md text-center bg-white border-b-0 dark:bg-darkmode-600 shadow-[20px_3px_20px_#0000000b] py-0 relative before:block before:w-px before:h-8 before:bg-slate-200 before:absolute before:left-0 before:inset-y-0 before:my-auto before:dark:bg-darkmode-400"
+                  :style="table_setting.수입검사.style"
+                >
+                  <div class="flex items-center justify-center text-success">
+                    <Button
+                      variant="facebook"
+                      class="flex items-center"
+                      @click="
+                        () => {
+                          incomingModalData.발주NO = todo.NO;
+                          incomingModalData.전달사항 = '';
+                          incomingModalData.결과 = '미검사';
+                          setIncomingModal(true);
+                        }
+                      "
+                    >
+                      <Lucide icon="CheckCircle" class="w-4 h-4 mr-1" />
+                      검사요청
+                    </Button>
+                  </div>
+                </Table.Td>
+                <Table.Td
+                  class="first:rounded-l-md last:rounded-r-md text-center bg-white border-b-0 dark:bg-darkmode-600 shadow-[20px_3px_20px_#0000000b] py-0 relative before:block before:w-px before:h-8 before:bg-slate-200 before:absolute before:left-0 before:inset-y-0 before:my-auto before:dark:bg-darkmode-400"
                   :style="table_setting.상세보기.style"
                 >
                   <div class="flex items-center justify-center text-cyan-700">
@@ -811,58 +863,6 @@ const incomingDataFunction = async () => {
                       <Lucide icon="Edit" class="w-4 h-4 mr-1" />
                       수정
                     </a>
-                  </div>
-                </Table.Td>
-                <Table.Td
-                  class="first:rounded-l-md last:rounded-r-md text-center bg-white border-b-0 dark:bg-darkmode-600 shadow-[20px_3px_20px_#0000000b] py-0 relative before:block before:w-px before:h-8 before:bg-slate-200 before:absolute before:left-0 before:inset-y-0 before:my-auto before:dark:bg-darkmode-400"
-                  :style="table_setting.수입검사.style"
-                >
-                  <div class="flex items-center justify-center text-success">
-                    <a
-                      class="flex items-center mr-3"
-                      href="#"
-                      @click="
-                        () => {
-                          incomingModalData.발주NO = todo.NO;
-                          incomingModalData.전달사항 = '';
-                          incomingModalData.결과 = '미검사';
-                          setIncomingModal(true);
-                        }
-                      "
-                    >
-                      <Lucide icon="CheckCircle" class="w-4 h-4 mr-1" />
-                      검사요청
-                    </a>
-                  </div>
-                </Table.Td>
-                <Table.Td
-                  class="first:rounded-l-md last:rounded-r-md text-center bg-white border-b-0 dark:bg-darkmode-600 shadow-[20px_3px_20px_#0000000b] py-0 relative before:block before:w-px before:h-8 before:bg-slate-200 before:absolute before:left-0 before:inset-y-0 before:my-auto before:dark:bg-darkmode-400"
-                  :style="table_setting.입고율.style"
-                >
-                  <div>
-                    {{
-                      (
-                        (Number(todo["입고수량"]) / Number(todo["발주수량"])) *
-                        100
-                      ).toLocaleString()
-                    }}%
-                  </div>
-                  <div class="flex items-center justify-center">
-                    <Progress class="h-1">
-                      <Progress.Bar
-                        class="bg-primary"
-                        :style="
-                          'width:' +
-                          String(
-                            (Number(todo['입고수량']) /
-                              Number(todo['발주수량'])) *
-                              100
-                          ) +
-                          '%'
-                        "
-                        role="progressbar"
-                      ></Progress.Bar>
-                    </Progress>
                   </div>
                 </Table.Td>
               </Table.Tr>
