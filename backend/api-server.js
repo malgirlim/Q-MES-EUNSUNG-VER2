@@ -7,6 +7,7 @@ const fs = require("fs");
 const path = require("path");
 
 const authRouter = require("./router/auth");
+const infoRouter = require("./router/infoRouter");
 
 const masterRouter = require("./router/masterRouter");
 const orderRouter = require("./router/orderRouter");
@@ -33,6 +34,9 @@ app.use(
 
 // 로그인 - router/auth.js
 app.use("/api/auth", authRouter);
+
+// 로그 또는 알림정보 - router/info.js
+app.use("/api/info", infoRouter);
 
 // 기준정보 - router/masterRouter.js
 app.use("/api/master", masterRouter);
