@@ -71,3 +71,33 @@ export interface QualityProcess {
   등록자?: string;
   등록일시?: string;
 }
+
+// 품질관리 - 출하검사
+export interface QualityShipment {
+  [attribute: string]: any | undefined;
+  NO?: number;
+  납품NO?: number;
+  LOT코드?: string;
+  품목구분?: string;
+  품명?: string;
+  규격?: string;
+  단위?: string;
+  구분?: string;
+  요청일시?: string;
+  요청수량?: string;
+  샘플수량?: string;
+  결과?: string;
+  내용1?: string;
+  내용2?: string;
+  내용3?: string;
+  내용4?: string;
+  내용5?: string;
+  내용6?: string;
+  내용7?: string;
+  내용8?: string;
+  내용9?: string;
+  내용10?: string;
+  비고?: string;
+  등록자?: string;
+  등록일시?: string;
+}

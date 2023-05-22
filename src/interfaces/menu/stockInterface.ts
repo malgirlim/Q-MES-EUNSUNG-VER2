@@ -123,3 +123,19 @@ export interface StockStockLOT {
   기말재공재고?: string;
   기말재고?: string;
 }
+
+// 재고 관리 - 완제품 LOT별 재고현황
+export interface StockStockFinLOT {
+  [attribute: string]: any | undefined;
+  품목NO?: number;
+  LOT코드?: string;
+  품목구분?: string;
+  품번?: string;
+  품명?: string;
+  규격?: string;
+  단위?: string;
+  기초재고?: string;
+  입고?: string;
+  출하?: string;
+  기말재고?: string;
+}
