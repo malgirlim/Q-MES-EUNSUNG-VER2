@@ -475,7 +475,7 @@ const shipmentDataFunction = async () => {
 
     <div
       class="container"
-      style="display: flex; max-width: 100%; height: 365px"
+      style="display: flex; max-width: 100%; height: 465px"
     >
       <div class="item" style="flex: 1 1 40%">
         <!-- style="height: calc(100vh - 250px)" : 브라우저 화면 창크기에 맞게 변경됨 : 100vh - 브라우저 창 크기 -->
@@ -667,7 +667,7 @@ const shipmentDataFunction = async () => {
           <div class="col-span-12 overflow-auto intro-y lg:overflow-visible">
             <div
               class="mr-3"
-              style="overflow-y: scroll; overflow-x: hidden; height: 250px"
+              style="overflow-y: scroll; overflow-x: hidden; height: 350px"
             >
               <Table class="border-spacing-y-[8px] border-separate -mt-2">
                 <Table.Thead
@@ -973,7 +973,7 @@ const shipmentDataFunction = async () => {
             <div class="col-span-12 overflow-auto intro-y lg:overflow-visible">
               <div
                 class="mr-3"
-                style="overflow-y: scroll; overflow-x: hidden; height: 312px"
+                style="overflow-y: scroll; overflow-x: hidden; height: 212px"
               >
                 <Table class="border-spacing-y-[8px] border-separate -mt-2">
                   <Table.Thead
