@@ -2,7 +2,7 @@
 import { useRoute } from "vue-router";
 import Devider from "./Devider.vue";
 import Menu from "./Menu.vue";
-import TopBar from "../../components/TopBar";
+import TopBar from "../../components/MobileTopBar";
 import DarkModeSwitcher from "../../components/DarkModeSwitcher";
 import MainColorSwitcher from "../../components/MainColorSwitcher";
 import MobileMenu from "../../components/MobileMenu";
@@ -148,7 +148,7 @@ onMounted(() => {
       <!-- BEGIN: Content -->
       <div
         :class="[
-          'max-w-full md:max-w-none rounded-[30px] md:rounded-none px-0 md:px-[22px] min-w-0 min-h-screen bg-slate-100 flex-1 md:pt-20 pb-10 mt-5 md:mt-1 relative dark:bg-darkmode-700',
+          'max-w-full md:max-w-none rounded-[30px] md:rounded-none px-0 md:px-[22px] min-w-0 bg-slate-100 flex-1 md:pt-20 pb-10 mt-5 md:mt-1 relative dark:bg-darkmode-700',
           'before:content-[\'\'] before:w-full before:h-px before:block',
         ]"
       >

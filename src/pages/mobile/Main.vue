@@ -1,26 +1,26 @@
 <script setup lang="ts">
 import { onMounted, ref, Ref } from "vue";
 import _ from "lodash";
-import { FormLabel } from "../base-components/Form";
+import { FormLabel } from "../../base-components/Form";
 
-import Lucide from "../base-components/Lucide";
-import Button from "../base-components/Button";
-import PieChart from "../components/PieChart";
-import VerticalBarChart from "../components/VerticalBarChart";
-import LineChart from "../components/LineChart";
-import LoadingIcon from "../base-components/LoadingIcon";
+import Lucide from "../../base-components/Lucide";
+import Button from "../../base-components/Button";
+import PieChart from "../../components/PieChart";
+import VerticalBarChart from "../../components/VerticalBarChart";
+import LineChart from "../../components/LineChart";
+import LoadingIcon from "../../base-components/LoadingIcon";
 
 import moment from "moment";
 
-import RunningCard from "../components/Common/Main/RunningCard.vue";
-import DisabledRunningCard from "../components/Common/Main/DisabledRunningCard.vue";
-import KPICard from "../components/Common/Main/KPICard.vue";
-import DisabledKPICard from "../components/Common/Main/DisabledKPICard.vue";
-import NoticeCard from "../components/Common/Main/NoticeCard.vue";
+import RunningCard from "../../components/Common/Main/RunningCard.vue";
+import DisabledRunningCard from "../../components/Common/Main/DisabledRunningCard.vue";
+import KPICard from "../../components/Common/Main/KPICard.vue";
+import DisabledKPICard from "../../components/Common/Main/DisabledKPICard.vue";
+import NoticeCard from "../../components/Common/Main/NoticeCard.vue";
 
 import { Chart } from "chart.js";
 import ChartDataLabels from "chartjs-plugin-datalabels";
-import router from "../router";
+import router from "../../router";
 
 var mobilecheck = function () {
   var check = false;
@@ -38,9 +38,7 @@ var mobilecheck = function () {
   return check;
 };
 if (mobilecheck()) {
-  location.href = "/mobile";
-  //모바일로 접속시 이동 경로
-}
+} else location.href = "/"; //PC로 접속시 이동 경로
 
 Chart.register(ChartDataLabels);
 
@@ -69,31 +67,32 @@ const switch_page_func = () => {
 </script>
 
 <template>
-  <div>
+  <div class="pl-3 pr-3 pt-2 pb-0">
     <div class="flex items-center h-10 mt-3 intro-y">
-      <LoadingIcon icon="circles" class="w-5 h-5 mr-2" />
+      <LoadingIcon icon="circles" class="w-4 h-4 mr-2" />
       <div>
-        <h2 class="mr-5 text-lg font-medium truncate" :key="now">
-          {{ now }} 현재
+        <h2 class="mr-1 text-lg font-medium truncate" :key="now">
+          {{ now }}
         </h2>
       </div>
-
-      <a href="" class="flex items-center ml-auto text-primary">
-        <Lucide icon="RefreshCcw" class="w-4 h-4 mr-3" /> 새로고침
-      </a>
-      <Button
-        class="flex items-center ml-5"
-        as="a"
-        variant="primary"
-        @click="switch_page_func()"
-        ><Lucide icon="ArrowLeftRight" class="w-4 h-4 mr-2" />표시전환
-      </Button>
+      <div class="ml-auto">
+        <!-- <a href="" class="flex items-center text-primary">
+          <Lucide icon="RefreshCcw" class="w-4 h-4 mr-1" /> 새로고침
+        </a> -->
+      </div>
+      <div>
+        <Button
+          class="ml-1"
+          as="a"
+          variant="primary"
+          @click="switch_page_func()"
+          ><Lucide icon="ArrowLeftRight" class="w-4 h-4" />
+        </Button>
+      </div>
     </div>
+    <div class="text-center"></div>
     <!--BEGIN : 첫번째 표시-->
-    <div
-      v-if="switch_page == 'first'"
-      class="grid grid-cols-2 sm:grid-cols-3 xl:grid-cols-6 gap-6 mt-3"
-    >
+    <div v-if="switch_page == 'first'" class="grid grid-cols-2 gap-4 mt-3">
       <RunningCard
         @click="$router.push('process/checker')"
         name="검사기"
@@ -127,10 +126,7 @@ const switch_page_func = () => {
     </div>
     <!--END : 첫번째 표시-->
     <!--BEGIN : 두번째 표시-->
-    <div
-      v-if="switch_page == 'second'"
-      class="grid grid-cols-2 sm:grid-cols-3 xl:grid-cols-6 gap-6 mt-3"
-    >
+    <div v-if="switch_page == 'second'" class="grid grid-cols-2 gap-4 mt-3">
       <RunningCard
         @click="$router.push('process/printer5')"
         name="인쇄기5"
@@ -156,7 +152,7 @@ const switch_page_func = () => {
     </div>
     <!--END : 두번째 표시-->
     <!--BEGIN : KPI 표시-->
-    <div class="mt-7 grid grid-cols-6 sm:grid-cols-6 xl:grid-cols-6 gap-6 mt-5">
+    <div class="mt-7 grid grid-cols-2 gap-4 mt-5">
       <KPICard
         @click="$router.push('monitoring/kpi')"
         data="2%"

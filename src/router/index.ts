@@ -2,10 +2,15 @@ import { createRouter, createWebHistory } from "vue-router";
 
 import SideMenu from "../layouts/SideMenu/SideMenu.vue";
 import SimpleMenu from "../layouts/SimpleMenu/SimpleMenu.vue";
-import TopMenu from "../layouts/TopMenu/TopMenu.vue";
-import Main from "../pages/Main.vue";
-import Login from "../pages/Login.vue";
+import axios from "axios";
 
+/* 공통 */
+import TopMenu from "../layouts/TopMenu/TopMenu.vue";
+import MobileSideMenu from "../layouts/MobileSideMenu/SideMenu.vue";
+import Login from "../pages/Login.vue";
+import Main from "../pages/Main.vue";
+
+/* 키오스크 */
 import LoginKiosk from "../pages/LoginKiosk.vue";
 import FacilitySelect from "../pages/kiosk/FacilitySelect.vue";
 import KioskFacility1 from "../pages/kiosk/Facility1.vue";
@@ -19,8 +24,10 @@ import KioskFacility8 from "../pages/kiosk/Facility8.vue";
 import KioskFacility9 from "../pages/kiosk/Facility9.vue";
 import KioskFacility10 from "../pages/kiosk/Facility10.vue";
 
+/* 공유정보 */
 import ShareNotice from "../pages/share/ShareNotice.vue";
 
+/* 기준정보 */
 import MasterUser from "../pages/master/MasterUser.vue";
 import MasterClient from "../pages/master/MasterClient.vue";
 import MasterProduct from "../pages/master/MasterProduct.vue";
@@ -35,6 +42,7 @@ import MasterFacilityStd from "../pages/master/MasterFacilityStd.vue";
 import MasterStockStd from "../pages/master/MasterStockStd.vue";
 import MasterRecipe from "../pages/master/MasterRecipe.vue";
 
+/* 주문관리 */
 import OrderAdd from "../pages/order/OrderAdd.vue";
 import OrderCurrent from "../pages/order/OrderCurrent.vue";
 import OrderForecast from "../pages/order/OrderForecast.vue";
@@ -45,6 +53,7 @@ import OrderOrderCurrent from "../pages/order/OrderOrderCurrent.vue";
 import OrderFacilityParts from "../pages/order/OrderFacilityParts.vue";
 import OrderFacilityPartsCurrent from "../pages/order/OrderFacilityPartsCurrent.vue";
 
+/* 생산관리 */
 import ProductionPlanAdd from "../pages/production/ProductionPlanAdd.vue";
 import ProductionTaskAdd from "../pages/production/ProductionTaskAdd.vue";
 import ProductionTaskAddInsert from "../pages/production/ProductionTaskAddInsert.vue";
@@ -52,6 +61,7 @@ import ProductionTaskCurrent from "../pages/production/ProductionTaskCurrent.vue
 import ProductionTaskReport from "../pages/production/ProductionTaskReport.vue";
 import ProductionBadRework from "../pages/production/ProductionBadRework.vue";
 
+/* 공정관리 */
 import ProcessLOT from "../pages/process/ProcessLOT.vue";
 import ProcessLOTTrack from "../pages/process/ProcessLOTTrack.vue";
 import ProcessChecker from "../pages/process/ProcessChecker.vue";
@@ -65,6 +75,7 @@ import ProcessPrinter6 from "../pages/process/ProcessPrinter6.vue";
 import ProcessPrinter7 from "../pages/process/ProcessPrinter7.vue";
 import ProcessPrinter8 from "../pages/process/ProcessPrinter8.vue";
 
+/* 재고관리 */
 import StockReceiveRaw from "../pages/stock/StockReceiveRaw.vue";
 import StockWIPRaw from "../pages/stock/StockWIPRaw.vue";
 import StockWIPMonitorRaw from "../pages/stock/StockWIPMonitorRaw.vue";
@@ -81,6 +92,7 @@ import StockReceiveParts from "../pages/stock/StockReceiveParts.vue";
 import StockUseParts from "../pages/stock/StockUseParts.vue";
 import StockMonitorParts from "../pages/stock/StockMonitorParts.vue";
 
+/* 품질관리 */
 import QualityStandard from "../pages/quality/QualityStandard.vue";
 import QualityReport from "../pages/quality/QualityReport.vue";
 import QualityIncoming from "../pages/quality/QualityIncoming.vue";
@@ -88,6 +100,7 @@ import QualityProcess from "../pages/quality/QualityProcess.vue";
 import QualityShipment from "../pages/quality/QualityShipment.vue";
 import QualityInadequate from "../pages/quality/QualityInadequate.vue";
 
+/* 모니터링 */
 import MonitoringKPI from "../pages/monitoring/MonitoringKPI.vue";
 import MonitoringOverall from "../pages/monitoring/MonitoringOverall.vue";
 import MonitoringProduction from "../pages/monitoring/MonitoringProduction.vue";
@@ -99,6 +112,7 @@ import MonitoringMTBF from "../pages/monitoring/MonitoringMTBF.vue";
 import MonitoringMTTR from "../pages/monitoring/MonitoringMTTR.vue";
 import MonitoringOEE from "../pages/monitoring/MonitoringOEE.vue";
 
+/* 예방보전 */
 import PreventPlan from "../pages/prevent/PreventPlan.vue";
 import PreventDailyPlan from "../pages/prevent/PreventDailyPlan.vue";
 import PreventRepairPlan from "../pages/prevent/PreventRepairPlan.vue";
@@ -111,9 +125,13 @@ import PreventRepairForecast from "../pages/prevent/PreventRepairForecast.vue";
 import PreventRepairNotify from "../pages/prevent/PreventRepairNotify.vue";
 import PreventChangeNotify from "../pages/prevent/PreventChangeNotify.vue";
 
+/* 관리자메뉴 */
 import AdminLog from "../pages/admin/AdminLog.vue";
 
-import axios from "axios";
+/* 모바일 */
+import MobileMain from "../pages/mobile/Main.vue";
+
+import MobileOrderCurrentForecast from "../pages/mobile/order/OrderCurrentForecast.vue";
 
 const routes = [
   {
@@ -936,6 +954,27 @@ const routes = [
           category: "관리자메뉴",
         },
         component: AdminLog,
+      },
+    ],
+  },
+  {
+    path: "/mobile",
+    component: MobileSideMenu,
+
+    children: [
+      {
+        path: "",
+        name: "side-menu-mobile-main",
+        component: MobileMain,
+      },
+      {
+        path: "/order/current-forecast",
+        name: "side-menu-mobile-order-current-forecast",
+        meta: {
+          pagename: "수주현황 예보",
+          category: "주문/생산관리",
+        },
+        component: MobileOrderCurrentForecast,
       },
     ],
   },
