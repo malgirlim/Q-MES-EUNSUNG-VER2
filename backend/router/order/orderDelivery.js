@@ -46,7 +46,7 @@ router.get("/", async (req, res) => {
         ,ITEM.단위 AS 단위
         ,[DLVR_LOTCODE] AS LOT코드
         ,[DLVR_AMOUNT] AS 수량
-        ,[DLVR_DT] AS 일시
+        ,CONVERT(VARCHAR, [DLVR_DT], 20) AS 일시
         ,[DLVR_RESULT] AS 검사결과
         ,[DLVR_NOTE] AS 비고
         ,[DLVR_REGIST_NM] AS 등록자
@@ -111,7 +111,7 @@ router.post("/", async (req, res) => {
             ,ITEM.단위 AS 단위
             ,[DLVR_LOTCODE] AS LOT코드
             ,[DLVR_AMOUNT] AS 수량
-            ,[DLVR_DT] AS 일시
+            ,CONVERT(VARCHAR, [DLVR_DT], 20) AS 일시
             ,[DLVR_RESULT] AS 검사결과
             ,[DLVR_NOTE] AS 비고
             ,[DLVR_REGIST_NM] AS 등록자
@@ -167,7 +167,7 @@ router.post("/", async (req, res) => {
             ,ITEM.단위 AS 단위
             ,[DLVR_LOTCODE] AS LOT코드
             ,[DLVR_AMOUNT] AS 수량
-            ,[DLVR_DT] AS 일시
+            ,CONVERT(VARCHAR, [DLVR_DT], 20) AS 일시
             ,[DLVR_RESULT] AS 검사결과
             ,[DLVR_NOTE] AS 비고
             ,[DLVR_REGIST_NM] AS 등록자
@@ -704,13 +704,13 @@ router.get("/finstock", async (req, res) => {
       FROM
       (
         SELECT
-          MAX(RESULT_MIDDLE.품목NO) AS NO
-          ,MAX(RESULT_MIDDLE.LOT코드) AS LOT코드
-          ,MAX(ITEM.품목구분) AS 품목구분
-          ,MAX(ITEM.품번) AS 품번
-          ,MAX(ITEM.품명) AS 품명
-          ,MAX(ITEM.규격) AS 규격
-          ,MAX(ITEM.단위) AS 단위
+          RESULT_MIDDLE.품목NO AS NO
+          ,RESULT_MIDDLE.LOT코드 AS LOT코드
+          ,ITEM.품목구분 AS 품목구분
+          ,ITEM.품번 AS 품번
+          ,ITEM.품명 AS 품명
+          ,ITEM.규격 AS 규격
+          ,ITEM.단위 AS 단위
           ,SUM(RESULT_MIDDLE.기초재고) AS 기초재고
           ,SUM(RESULT_MIDDLE.입고수량) AS 입고
           ,SUM(RESULT_MIDDLE.출하수량) AS 출하
@@ -795,6 +795,7 @@ router.get("/finstock", async (req, res) => {
           FROM [QMES2022].[dbo].[MASTER_ITEM_TB]
         ) AS ITEM ON ITEM.NO = RESULT_MIDDLE.품목NO
         WHERE ITEM.품목구분 = '완제품'
+        GROUP BY RESULT_MIDDLE.품목NO,RESULT_MIDDLE.LOT코드,ITEM.품목구분,ITEM.품번,ITEM.품명,ITEM.규격,ITEM.단위
       ) AS RESULT
       ORDER BY LOT코드 DESC
     `);
@@ -827,13 +828,13 @@ router.post("/finstock", async (req, res) => {
         FROM
         (
           SELECT
-            MAX(RESULT_MIDDLE.품목NO) AS NO
-            ,MAX(RESULT_MIDDLE.LOT코드) AS LOT코드
-            ,MAX(ITEM.품목구분) AS 품목구분
-            ,MAX(ITEM.품번) AS 품번
-            ,MAX(ITEM.품명) AS 품명
-            ,MAX(ITEM.규격) AS 규격
-            ,MAX(ITEM.단위) AS 단위
+            RESULT_MIDDLE.품목NO AS NO
+            ,RESULT_MIDDLE.LOT코드 AS LOT코드
+            ,ITEM.품목구분 AS 품목구분
+            ,ITEM.품번 AS 품번
+            ,ITEM.품명 AS 품명
+            ,ITEM.규격 AS 규격
+            ,ITEM.단위 AS 단위
             ,SUM(RESULT_MIDDLE.기초재고) AS 기초재고
             ,SUM(RESULT_MIDDLE.입고수량) AS 입고
             ,SUM(RESULT_MIDDLE.출하수량) AS 출하
@@ -930,6 +931,7 @@ router.post("/finstock", async (req, res) => {
             FROM [QMES2022].[dbo].[MASTER_ITEM_TB]
           ) AS ITEM ON ITEM.NO = RESULT_MIDDLE.품목NO
           WHERE ITEM.품목구분 = '완제품'
+          GROUP BY RESULT_MIDDLE.품목NO,RESULT_MIDDLE.LOT코드,ITEM.품목구분,ITEM.품번,ITEM.품명,ITEM.규격,ITEM.단위
         ) AS RESULT
         WHERE (1=1)
         AND ( LOT코드 like concat('%',@input,'%')
@@ -966,13 +968,13 @@ router.post("/finstock", async (req, res) => {
         FROM
         (
           SELECT
-            MAX(RESULT_MIDDLE.품목NO) AS NO
-            ,MAX(RESULT_MIDDLE.LOT코드) AS LOT코드
-            ,MAX(ITEM.품목구분) AS 품목구분
-            ,MAX(ITEM.품번) AS 품번
-            ,MAX(ITEM.품명) AS 품명
-            ,MAX(ITEM.규격) AS 규격
-            ,MAX(ITEM.단위) AS 단위
+            RESULT_MIDDLE.품목NO AS NO
+            ,RESULT_MIDDLE.LOT코드 AS LOT코드
+            ,ITEM.품목구분 AS 품목구분
+            ,ITEM.품번 AS 품번
+            ,ITEM.품명 AS 품명
+            ,ITEM.규격 AS 규격
+            ,ITEM.단위 AS 단위
             ,SUM(RESULT_MIDDLE.기초재고) AS 기초재고
             ,SUM(RESULT_MIDDLE.입고수량) AS 입고
             ,SUM(RESULT_MIDDLE.출하수량) AS 출하
@@ -1069,6 +1071,7 @@ router.post("/finstock", async (req, res) => {
             FROM [QMES2022].[dbo].[MASTER_ITEM_TB]
           ) AS ITEM ON ITEM.NO = RESULT_MIDDLE.품목NO
           WHERE ITEM.품목구분 = '완제품'
+          GROUP BY RESULT_MIDDLE.품목NO,RESULT_MIDDLE.LOT코드,ITEM.품목구분,ITEM.품번,ITEM.품명,ITEM.규격,ITEM.단위
         ) AS RESULT
         WHERE (1=1)
         AND ` +

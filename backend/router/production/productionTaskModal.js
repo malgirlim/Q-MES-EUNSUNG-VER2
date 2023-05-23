@@ -1539,13 +1539,13 @@ router.get("/stocklot", async (req, res) => {
       FROM
       (
         SELECT
-          MAX(RESULT_MIDDLE.품목NO) AS NO
-          ,MAX(RESULT_MIDDLE.LOT코드) AS LOT코드
-          ,MAX(MASTER_ITEM.품목구분) AS 품목구분
-          ,MAX(MASTER_ITEM.품번) AS 품번
-          ,MAX(MASTER_ITEM.품명) AS 품명
-          ,MAX(MASTER_ITEM.규격) AS 규격
-          ,MAX(MASTER_ITEM.단위) AS 단위
+          RESULT_MIDDLE.품목NO AS NO
+          ,RESULT_MIDDLE.LOT코드 AS LOT코드
+          ,MASTER_ITEM.품목구분 AS 품목구분
+          ,MASTER_ITEM.품번 AS 품번
+          ,MASTER_ITEM.품명 AS 품명
+          ,MASTER_ITEM.규격 AS 규격
+          ,MASTER_ITEM.단위 AS 단위
           ,SUM(RESULT_MIDDLE.기초재공재고) AS 기초재공재고
           ,SUM(RESULT_MIDDLE.기초재고) AS 기초재고
           ,SUM(RESULT_MIDDLE.입고) AS 입고
@@ -1873,6 +1873,7 @@ router.get("/stocklot", async (req, res) => {
             ,[ITEM_UNIT] AS 단위
           FROM [QMES2022].[dbo].[MASTER_ITEM_TB]
         ) AS MASTER_ITEM ON MASTER_ITEM.NO = RESULT_MIDDLE.품목NO
+        GROUP BY RESULT_MIDDLE.품목NO,RESULT_MIDDLE.LOT코드,MASTER_ITEM.품목구분,MASTER_ITEM.품번,MASTER_ITEM.품명,MASTER_ITEM.규격,MASTER_ITEM.단위
       ) AS RESULT
       WHERE RESULT.품목구분 = '원부자재' OR RESULT.품목구분 = '원재료' OR RESULT.품목구분 = '반제품'
       ORDER BY RESULT.LOT코드 DESC
@@ -1909,13 +1910,13 @@ router.post("/stocklot", async (req, res) => {
         FROM
         (
           SELECT
-            MAX(RESULT_MIDDLE.품목NO) AS NO
-            ,MAX(RESULT_MIDDLE.LOT코드) AS LOT코드
-            ,MAX(MASTER_ITEM.품목구분) AS 품목구분
-            ,MAX(MASTER_ITEM.품번) AS 품번
-            ,MAX(MASTER_ITEM.품명) AS 품명
-            ,MAX(MASTER_ITEM.규격) AS 규격
-            ,MAX(MASTER_ITEM.단위) AS 단위
+            RESULT_MIDDLE.품목NO AS NO
+            ,RESULT_MIDDLE.LOT코드 AS LOT코드
+            ,MASTER_ITEM.품목구분 AS 품목구분
+            ,MASTER_ITEM.품번 AS 품번
+            ,MASTER_ITEM.품명 AS 품명
+            ,MASTER_ITEM.규격 AS 규격
+            ,MASTER_ITEM.단위 AS 단위
             ,SUM(RESULT_MIDDLE.기초재공재고) AS 기초재공재고
             ,SUM(RESULT_MIDDLE.기초재고) AS 기초재고
             ,SUM(RESULT_MIDDLE.입고) AS 입고
@@ -2297,6 +2298,7 @@ router.post("/stocklot", async (req, res) => {
               ,[ITEM_UNIT] AS 단위
             FROM [QMES2022].[dbo].[MASTER_ITEM_TB]
           ) AS MASTER_ITEM ON MASTER_ITEM.NO = RESULT_MIDDLE.품목NO
+          GROUP BY RESULT_MIDDLE.품목NO,RESULT_MIDDLE.LOT코드,MASTER_ITEM.품목구분,MASTER_ITEM.품번,MASTER_ITEM.품명,MASTER_ITEM.규격,MASTER_ITEM.단위
         ) AS RESULT
         WHERE (1=1)
         AND RESULT.품목구분 = '원부자재' OR RESULT.품목구분 = '원재료' OR RESULT.품목구분 = '반제품'
@@ -2332,13 +2334,13 @@ router.post("/stocklot", async (req, res) => {
         FROM
         (
           SELECT
-            MAX(RESULT_MIDDLE.품목NO) AS NO
-            ,MAX(RESULT_MIDDLE.LOT코드) AS LOT코드
-            ,MAX(MASTER_ITEM.품목구분) AS 품목구분
-            ,MAX(MASTER_ITEM.품번) AS 품번
-            ,MAX(MASTER_ITEM.품명) AS 품명
-            ,MAX(MASTER_ITEM.규격) AS 규격
-            ,MAX(MASTER_ITEM.단위) AS 단위
+            RESULT_MIDDLE.품목NO AS NO
+            ,RESULT_MIDDLE.LOT코드 AS LOT코드
+            ,MASTER_ITEM.품목구분 AS 품목구분
+            ,MASTER_ITEM.품번 AS 품번
+            ,MASTER_ITEM.품명 AS 품명
+            ,MASTER_ITEM.규격 AS 규격
+            ,MASTER_ITEM.단위 AS 단위
             ,SUM(RESULT_MIDDLE.기초재공재고) AS 기초재공재고
             ,SUM(RESULT_MIDDLE.기초재고) AS 기초재고
             ,SUM(RESULT_MIDDLE.입고) AS 입고
@@ -2720,6 +2722,7 @@ router.post("/stocklot", async (req, res) => {
               ,[ITEM_UNIT] AS 단위
             FROM [QMES2022].[dbo].[MASTER_ITEM_TB]
           ) AS MASTER_ITEM ON MASTER_ITEM.NO = RESULT_MIDDLE.품목NO
+          GROUP BY RESULT_MIDDLE.품목NO,RESULT_MIDDLE.LOT코드,MASTER_ITEM.품목구분,MASTER_ITEM.품번,MASTER_ITEM.품명,MASTER_ITEM.규격,MASTER_ITEM.단위
         ) AS RESULT
         WHERE (1=1)
         AND RESULT.품목구분 = '원부자재' OR RESULT.품목구분 = '원재료' OR RESULT.품목구분 = '반제품'
