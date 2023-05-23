@@ -105,6 +105,22 @@ export interface StockStock {
   안전재고?: string;
 }
 
+// 재고 관리 - 품목별 재고현황
+export interface StockStockFin {
+  [attribute: string]: any | undefined;
+  품목NO?: number;
+  품목구분?: string;
+  품번?: string;
+  품명?: string;
+  규격?: string;
+  단위?: string;
+  기초재고?: string;
+  입고?: string;
+  출하?: string;
+  기말재고?: string;
+  안전재고?: string;
+}
+
 // 재고 관리 - LOT별 재고현황
 export interface StockStockLOT {
   [attribute: string]: any | undefined;

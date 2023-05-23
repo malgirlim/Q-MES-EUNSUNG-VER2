@@ -20,6 +20,7 @@ import { toast } from "vue3-toastify";
 import { useSendApi } from "../../composables/useSendApi";
 import { MasterQualityStand } from "../../interfaces/menu/MasterInterface";
 import { QualityShipment } from "../../interfaces/menu/qualityInterface";
+import { OrderDelivery } from "../../interfaces/menu/orderInterface";
 
 // 컴포넌트 로드
 import MasterDetail from "../../components/Common/Detail/MasterProcessDetail.vue";
@@ -48,15 +49,15 @@ const table_setting = {
   체크박스: { name: "체크박스", style: "width: 50px" },
   순번: { name: "순번", style: "width: 50px; text-align: center;" },
   항목1: { name: "요청일시", style: "width: 50px; text-align: center;" },
-  항목2: { name: "발주코드", style: "width: 50px; text-align: center;" },
-  항목3: { name: "발주품번", style: "width: 50px; text-align: center;" },
-  항목4: { name: "발주품명", style: "width: 50px; text-align: center;" },
-  항목5: { name: "전달사항", style: "width: 200px; text-align: center;" },
-  항목6: { name: "샘플수량", style: "width: 50px; text-align: center;" },
-  항목7: { name: "입고수량", style: "width: 50px; text-align: center;" },
+  항목2: { name: "LOT코드", style: "width: 50px; text-align: center;" },
+  항목3: { name: "품목구분", style: "width: 50px; text-align: center;" },
+  항목4: { name: "품명", style: "width: 50px; text-align: center;" },
+  항목5: { name: "규격", style: "width: 50px; text-align: center;" },
+  항목6: { name: "단위", style: "width: 50px; text-align: center;" },
+  항목7: { name: "요청수량", style: "width: 50px; text-align: center;" },
   항목8: { name: "결과", style: "width: 50px; text-align: center;" },
   상세보기: { name: "정보", style: "width: 100px; text-align: center;" },
-  편집: { name: "검사 및 입고", style: "width: 50px; text-align: center;" },
+  편집: { name: "검사", style: "width: 50px; text-align: center;" },
 };
 
 // v-tom (모달 실시간 데이터 변동) 에 필요한 함수
@@ -132,7 +133,7 @@ const search = () => {
 let insertModalData: QualityShipment;
 const insertModal = ref(false);
 const setInsertModal = (value: boolean) => {
-  router.push("/order/order-current");
+  router.push("/order/delivery");
   // insertModal.value = value;
   // insertModalData = {}; // 변수 초기화
 };
@@ -306,23 +307,19 @@ const onFileImport = (event: any) => {
   }
 };
 
-// ################################################## 검사 및 입고 확인 ##################################################
+// ########################################## 검사 후 납품 검사결과 변경 ##########################################
 // 수입검사 데이터 설정
-const url_incoming_itemreceive = "/api/quality/incoming/itemreceive";
-const incoming_itemreceive = useSendApi<StockItemReceive>(
-  url_incoming_itemreceive,
+const url_shipment_delivery = "/api/quality/shipment/delivery";
+const shipment_delivery = useSendApi<OrderDelivery>(
+  url_shipment_delivery,
   ref(1),
   ref(10)
 );
-// ########################## 검사 및 입고 모달 설정  ##########################
+// ##################### 검사 모달 설정  #####################
 // 등록할 변수
-let itemReceiveData: StockItemReceive = {
-  수입검사NO: 0,
-  구분: "수입검사입고",
-  입고일시: "",
-  입고코드: "",
-  입고수: "",
-  유효일자: "",
+let deliveryData: OrderDelivery = {
+  NO: 0,
+  검사결과: "미검사",
 };
 // 검사 및 입고 모달 설정
 const checkModal = ref(false);
@@ -332,12 +329,13 @@ const setCheckModal = (value: boolean) => {
 const checkButtonRef = ref(null);
 // 요청버튼 누르면 실행되는 함수
 const checkDataFunction = async () => {
-  itemReceiveData.입고수 = editModalData.입고수량;
-  incoming_itemreceive.insertData(itemReceiveData); // await : 이 함수가 끝나야 다음으로 넘어간다
+  deliveryData.NO = editModalData.납품NO;
+  deliveryData.검사결과 = editModalData.결과;
+  shipment_delivery.editData(deliveryData); // await : 이 함수가 끝나야 다음으로 넘어간다
   editDataFunction();
   setEditModal(false);
   setCheckModal(false);
-  toast.success("검사 및 입고하셨습니다.");
+  toast.success("검사하였습니다.");
 };
 </script>
 
@@ -761,23 +759,13 @@ const checkDataFunction = async () => {
                     @click="
                       () => {
                         editModalData = todo;
-                        itemReceiveData.수입검사NO = todo.NO;
-                        itemReceiveData.입고코드 =
-                          (todo.발주코드 ?? '') +
-                          (todo.발주품번 ?? '') +
-                          dayjs().format('YYMMDD');
-                        itemReceiveData.입고일시 = dayjs().format(
-                          'YYYY-MM-DD HH:mm:ss'
-                        );
-                        itemReceiveData.유효일자 = dayjs()
-                          .add(1, 'month')
-                          .format('YYYY-MM-DD');
+                        deliveryData.NO = todo.납품NO;
                         setEditModal(true);
                       }
                     "
                   >
                     <Lucide icon="Edit" class="w-4 h-4 mr-1" />
-                    검사 및 입고
+                    검사
                   </a>
                 </div>
                 <div
@@ -922,7 +910,7 @@ const checkDataFunction = async () => {
     "
   >
     <Dialog.Panel class="p-10 text-center">
-      <div class="mb-5" style="font-weight: bold">검사 및 입고</div>
+      <div class="mb-5" style="font-weight: bold">검사</div>
       <Tab.Group>
         <Tab.List variant="boxed-tabs">
           <Tab>
@@ -943,41 +931,61 @@ const checkDataFunction = async () => {
               "
             >
               <div class="mt-3">
-                <FormLabel htmlFor="vertical-form-3">발주코드</FormLabel>
+                <FormLabel htmlFor="vertical-form-3">LOT코드</FormLabel>
                 <FormInput
                   id="vertical-form-3"
                   type="text"
-                  v-model="editModalData.발주코드"
+                  v-model="editModalData.LOT코드"
                   placeholder=""
                   readonly
                 />
               </div>
               <div class="mt-3">
-                <FormLabel htmlFor="vertical-form-4">발주품번</FormLabel>
+                <FormLabel htmlFor="vertical-form-4">품목구분</FormLabel>
                 <FormInput
                   id="vertical-form-4"
                   type="text"
-                  v-model="editModalData.발주품번"
+                  v-model="editModalData.품목구분"
                   placeholder=""
                   readonly
                 />
               </div>
               <div class="mt-3">
-                <FormLabel htmlFor="vertical-form-6">발주품명</FormLabel>
+                <FormLabel htmlFor="vertical-form-6">품명</FormLabel>
                 <FormInput
                   id="vertical-form-6"
                   type="text"
-                  v-model="editModalData.발주품명"
+                  v-model="editModalData.품명"
                   placeholder=""
                   readonly
                 />
               </div>
               <div class="mt-3">
-                <FormLabel htmlFor="vertical-form-6">전달사항</FormLabel>
+                <FormLabel htmlFor="vertical-form-6">규격</FormLabel>
                 <FormInput
                   id="vertical-form-6"
                   type="text"
-                  v-model="editModalData.전달사항"
+                  v-model="editModalData.규격"
+                  placeholder=""
+                  readonly
+                />
+              </div>
+              <div class="mt-3">
+                <FormLabel htmlFor="vertical-form-6">단위</FormLabel>
+                <FormInput
+                  id="vertical-form-6"
+                  type="text"
+                  v-model="editModalData.단위"
+                  placeholder=""
+                  readonly
+                />
+              </div>
+              <div class="mt-3">
+                <FormLabel htmlFor="vertical-form-6">요청수량</FormLabel>
+                <FormInput
+                  id="vertical-form-6"
+                  type="text"
+                  v-model="editModalData.요청수량"
                   placeholder=""
                   readonly
                 />
@@ -988,42 +996,6 @@ const checkDataFunction = async () => {
                   id="vertical-form-6"
                   type="number"
                   v-model="editModalData.샘플수량"
-                  placeholder=""
-                />
-              </div>
-              <div class="mt-3">
-                <FormLabel htmlFor="vertical-form-6">입고수량</FormLabel>
-                <FormInput
-                  id="vertical-form-6"
-                  type="number"
-                  v-model="editModalData.입고수량"
-                  placeholder=""
-                />
-              </div>
-              <div class="mt-3">
-                <FormLabel htmlFor="vertical-form-6">입고코드</FormLabel>
-                <FormInput
-                  id="vertical-form-6"
-                  type="text"
-                  v-model="itemReceiveData.입고코드"
-                  placeholder=""
-                />
-              </div>
-              <div class="mt-3">
-                <FormLabel htmlFor="vertical-form-6">입고일시</FormLabel>
-                <FormInput
-                  id="vertical-form-6"
-                  type="datetime-local"
-                  v-model="itemReceiveData.입고일시"
-                  placeholder=""
-                />
-              </div>
-              <div class="mt-3">
-                <FormLabel htmlFor="vertical-form-6">유효일자</FormLabel>
-                <FormInput
-                  id="vertical-form-6"
-                  type="date"
-                  v-model="itemReceiveData.유효일자"
                   placeholder=""
                 />
               </div>
@@ -1169,7 +1141,7 @@ const checkDataFunction = async () => {
                 // setEditModal(false);
               }
             "
-            >검사 및 입고</Button
+            >검사완료</Button
           >
           <Button
             class="mr-2 shadow-md"
@@ -1410,7 +1382,7 @@ const checkDataFunction = async () => {
   </Dialog>
   <!-- END: 프린트 출력 Modal -->
 
-  <!-- BEGIN: 검사 및 입고 확인 Modal -->
+  <!-- BEGIN: 검사 확인 Modal -->
   <Dialog
     :open="checkModal"
     @close="
@@ -1426,8 +1398,8 @@ const checkDataFunction = async () => {
           icon="CheckCircle"
           class="w-16 h-16 mx-auto mt-3 text-success"
         />
-        <div class="mt-5 text-3xl">검사 및 입고</div>
-        <div class="mt-2 text-slate-500">정말 입고하시겠습니까?</div>
+        <div class="mt-5 text-3xl">검사</div>
+        <div class="mt-2 text-slate-500">정말 검사를 완료하시겠습니까?</div>
 
         <!-- <div style="text-align: left">
           <div class="mt-3">
@@ -1466,7 +1438,7 @@ const checkDataFunction = async () => {
             }
           "
         >
-          입고
+          완료
         </Button>
       </div>
     </Dialog.Panel>

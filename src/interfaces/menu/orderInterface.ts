@@ -14,6 +14,7 @@ export interface OrderAccept {
   품번?: string;
   품명?: string;
   수량?: string;
+  납품수?: string;
   단가?: string;
   공급가액?: string;
   세액?: string;
