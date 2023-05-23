@@ -177,7 +177,7 @@ const setInsertModal = (value: boolean) => {
       insertModalData = {}; // 변수 초기화
       insertModalData.구분 = "납품등록";
       insertModalData.수주NO = radioSelect.value;
-      insertModalData.일시 = moment().format("YYYY-MM-DD HH:mm:ss");
+      insertModalData.일시 = dayjs().format("YYYY-MM-DD HH:mm:ss");
       insertModalData.검사결과 = "미검사";
     } else toast.warning("수주를 먼저 선택해주세요.");
   } else {

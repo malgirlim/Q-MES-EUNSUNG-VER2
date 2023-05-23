@@ -83,8 +83,8 @@ const vTom = {
 // ########################## 조회기간 설정 ##########################
 // 날짜 구하기
 const searchDate = ref("전체기간");
-const max_year = moment().format("YYYY");
-const min_year = moment().add(-3, "years").format("YYYY");
+const max_year = dayjs().format("YYYY");
+const min_year = dayjs().add(-3, "years").format("YYYY");
 // searchDate가  변경되면 실행
 watch([searchDate], (newValue, oldValue) => {
   search();
@@ -256,7 +256,7 @@ function exportFile(data: any) {
   utils.book_append_sheet(wb, ws, "Data");
   writeFileXLSX(
     wb,
-    "품질관리_수입검사_" + moment().format("YYMMDD_HHmmss") + "_export.xlsx"
+    "품질관리_수입검사_" + dayjs().format("YYMMDD_HHmmss") + "_export.xlsx"
   );
 }
 
@@ -287,7 +287,7 @@ const onFileImport = (event: any) => {
       });
       // file_data.value.forEach((fd: any) => {
       //   if (isNaN(Date.parse(String(fd.출고일시))))
-      //     fd.출고일시 = moment().format("YYYY-MM-DD HH:mm:ss");
+      //     fd.출고일시 = dayjs().format("YYYY-MM-DD HH:mm:ss");
       //   let dataFil = product.dataAll.value.filter(
       //     (c) => c.품목코드 === fd.품목코드
       //   )[0];
@@ -765,11 +765,11 @@ const checkDataFunction = async () => {
                         itemReceiveData.입고코드 =
                           (todo.발주코드 ?? '') +
                           (todo.발주품번 ?? '') +
-                          moment().format('YYMMDD');
-                        itemReceiveData.입고일시 = moment().format(
+                          dayjs().format('YYMMDD');
+                        itemReceiveData.입고일시 = dayjs().format(
                           'YYYY-MM-DD HH:mm:ss'
                         );
-                        itemReceiveData.유효일자 = moment()
+                        itemReceiveData.유효일자 = dayjs()
                           .add(1, 'month')
                           .format('YYYY-MM-DD');
                         setEditModal(true);
