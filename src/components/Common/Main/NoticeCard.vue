@@ -5,7 +5,7 @@ import Tippy from "../../../base-components/Tippy";
 import { Dialog } from "../../../base-components/Headless";
 import NoticeDetail from "../Detail/NoticeDetail.vue";
 import Button from "../../../base-components/Button";
-import moment from "moment";
+import dayjs from "dayjs";
 
 // 페이지 전환
 const switch_page = ref("all");
@@ -21,7 +21,7 @@ const date_all = ["2023-05-09", "2023-03-28", "2023-02-05"]; // 임시 기입 �
 const date_part = ["2023-05-09", "2023-03-03", "2023-01-03"]; // 임시 기입 데이터
 
 const new_notice = (date: any) => {
-  const days = moment().diff(date, "days");
+  const days = dayjs().diff(date, "days");
   return days;
 };
 const days = new_notice(date_all[0]);

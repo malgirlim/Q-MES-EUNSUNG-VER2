@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import moment from "moment";
-const now = moment().format("YYYY-MM-DD HH:mm");
+import dayjs from "dayjs";
+const now = dayjs().format("YYYY-MM-DD HH:mm");
 </script>
 <template>
   <div>

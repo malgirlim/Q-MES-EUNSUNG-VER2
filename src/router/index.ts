@@ -133,6 +133,8 @@ import MobileMain from "../pages/mobile/Main.vue";
 
 import MobileOrderCurrentForecast from "../pages/mobile/order/OrderCurrentForecast.vue";
 
+import MobilePreventDailyCheck from "../pages/mobile/prevent/PreventDailyCheck.vue";
+
 const routes = [
   {
     path: "/login",
@@ -968,13 +970,22 @@ const routes = [
         component: MobileMain,
       },
       {
-        path: "/order/current-forecast",
+        path: "/mobile/order/current-forecast",
         name: "side-menu-mobile-order-current-forecast",
         meta: {
           pagename: "수주현황 예보",
           category: "주문/생산관리",
         },
         component: MobileOrderCurrentForecast,
+      },
+      {
+        path: "/mobile/prevent/daily-check",
+        name: "side-menu-mobile-prevent-daily-check",
+        meta: {
+          pagename: "일상점검",
+          category: "예방보전",
+        },
+        component: MobilePreventDailyCheck,
       },
     ],
   },

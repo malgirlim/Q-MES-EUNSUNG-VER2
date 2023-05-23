@@ -12,7 +12,7 @@ import InnerImageZoom from "vue-inner-image-zoom";
 import "vue-inner-image-zoom/lib/vue-inner-image-zoom.css";
 import VueJsProgress from "vue-js-progress";
 
-import moment from "moment";
+import dayjs from "dayjs";
 import { toast } from "vue3-toastify";
 
 import axios from "axios";
@@ -29,7 +29,7 @@ import WorkerChange from "../../components/Common/Kiosk/WorkerChange.vue";
 
 onMounted(async () => {
   setInterval(() => {
-    now.value = moment().format("YYYY-MM-DD HH:mm:ss");
+    now.value = dayjs().format("YYYY-MM-DD HH:mm:ss");
   }, 1000);
 });
 
@@ -69,8 +69,8 @@ const setLogoutModal = (value: boolean) => {
 };
 
 // 날짜 구하기
-const now = ref(moment().format("YYYY-MM-DD HH:mm:ss"));
-const year = ref(moment().format("YYYY"));
+const now = ref(dayjs().format("YYYY-MM-DD HH:mm:ss"));
+const year = ref(dayjs().format("YYYY"));
 
 // 임시데이터
 const running = "미가동";

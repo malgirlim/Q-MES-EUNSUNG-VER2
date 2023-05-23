@@ -5,7 +5,7 @@ import { FormInput, FormSelect, FormCheck } from "../../base-components/Form";
 import Lucide from "../../base-components/Lucide";
 import { Dialog, Menu } from "../../base-components/Headless";
 import Table from "../../base-components/Table";
-import moment from "moment";
+import dayjs from "dayjs";
 import Litepicker from "../../base-components/Litepicker";
 import * as XLSX from "xlsx";
 import { read, utils, writeFileXLSX } from "xlsx";
@@ -237,7 +237,7 @@ function exportFile(data: any) {
   utils.book_append_sheet(wb, ws, "Data");
   writeFileXLSX(
     wb,
-    "기준정보_사용자관리_" + moment().format("YYMMDD_HHmmss") + "_export.xlsx"
+    "기준정보_사용자관리_" + dayjs().format("YYMMDD_HHmmss") + "_export.xlsx"
   );
 }
 
@@ -276,10 +276,10 @@ const onFileImport = (event: any) => {
 // ########################## 엑셀 다운로드 및 업로드 끝 ##########################
 
 // 날짜 구하기
-const now = moment().format("YYYY-MM-DD");
-const nowPlus = moment().add(7, "days").format("YYYY-MM-DD");
-const max_year = moment().format("YYYY");
-const min_year = moment().add(-3, "years").format("YYYY");
+const now = dayjs().format("YYYY-MM-DD");
+const nowPlus = dayjs().add(7, "days").format("YYYY-MM-DD");
+const max_year = dayjs().format("YYYY");
+const min_year = dayjs().add(-3, "years").format("YYYY");
 const now2 = "전체기간";
 
 // 체크박스 선택으로 데이터 가져오기

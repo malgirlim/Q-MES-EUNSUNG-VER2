@@ -11,6 +11,7 @@ import Lucide from "../../../base-components/Lucide";
 import { Dialog, Menu } from "../../../base-components/Headless";
 import Table from "../../../base-components/Table";
 import dayjs from "dayjs";
+import "dayjs/locale/ko";
 import Litepicker from "../../../base-components/Litepicker";
 import TomSelect from "tom-select";
 import PaginationComponent from "../../../components/Pagination/PaginationComponent.vue"; // 페이징설정
@@ -32,6 +33,10 @@ onMounted(async () => {
     menu_fix.value = ".";
   }, 500);
 });
+
+// 오늘날짜
+dayjs.locale("ko");
+const now = dayjs().locale("ko").format("YYYY-MM-DD dddd");
 
 // 메뉴재정렬 (메뉴 레이아웃 밀리는 문제 해결 코드)
 const menu_fix = ref();
@@ -75,53 +80,6 @@ const vTom = {
   },
 };
 
-// ########################## 조회기간 설정 ##########################
-// 날짜 구하기
-const searchDate = ref("전체기간");
-const max_year = dayjs().format("YYYY");
-const min_year = dayjs().add(-3, "years").format("YYYY");
-// searchDate가  변경되면 실행
-watch([searchDate], (newValue, oldValue) => {
-  search();
-  pageChangeFirst();
-});
-// 날짜 리셋
-const reset_date = () => {
-  searchDate.value = "전체기간";
-  const litepicker_init = document.querySelector("#litepicker") as any;
-  litepicker_init.value = "전체기간";
-};
-// Litepicker ButtonText가 오류나서 없애기
-const litepikerButtonText: any = {
-  reset: "새로고침",
-  apply: "적용",
-  cancel: "취소",
-};
-
-// ########################## 조회  ##########################
-const searchKey = ref("전체");
-const searchInput = ref("");
-const sortKey = ref("등록일");
-const sortOrder = ref("내림차순");
-const sortOrderToggle = () => {
-  sortOrder.value = sortOrder.value == "내림차순" ? "오름차순" : "내림차순";
-};
-//  정렬기준이 변경되면 실행
-watch([sortKey, sortOrder], (newValue, oldValue) => {
-  search();
-  pageChangeFirst();
-});
-const search = () => {
-  // console.log(searchKey.value, searchInput.value);
-  dataManager.searchDatas(
-    searchDate.value,
-    searchKey.value,
-    searchInput.value,
-    sortKey.value,
-    sortOrder.value
-  );
-};
-
 // ########################## 알림 기능 ##########################
 const noti = (data: string) => {
   Notification.requestPermission();
@@ -136,112 +94,8 @@ const noti = (data: string) => {
 
 <template>
   <div v-if="user_level >= 2">
-    <div class="p-3">
-      <div class="flex items-center mt-3">
-        <div>
-          <Button
-            class="mr-2 shadow-md"
-            as="a"
-            size="sm"
-            variant="outline-primary"
-            @click="reset_date"
-            title="기간 초기화"
-            ><Lucide icon="CalendarX" class="w-5 h-5"
-          /></Button>
-        </div>
-        <div>
-          <div>
-            <Litepicker
-              v-model="searchDate"
-              :options="{
-                autoApply: false,
-                singleMode: false,
-                numberOfColumns: 1,
-                numberOfMonths: 1,
-                showWeekNumbers: true,
-                dropdowns: {
-                  minYear: Number(min_year),
-                  maxYear: Number(max_year),
-                  months: true,
-                  years: true,
-                },
-                lang: 'ko',
-                format: 'YY/MM/DD',
-                delimiter: ' - ',
-                buttonText: litepikerButtonText,
-              }"
-              class="block w-40 mx-auto !box"
-              placeholder="전체기간"
-            />
-          </div>
-        </div>
-        <div class="ml-2">
-          <div class="items-center text-slate-500">
-            <FormInput
-              type="text"
-              class="w-full !box"
-              v-model="searchInput"
-              @keyup.enter="
-                () => {
-                  search();
-                  pageChangeFirst();
-                }
-              "
-              placeholder="검색"
-            />
-            <button
-              @click="
-                () => {
-                  search();
-                  pageChangeFirst();
-                }
-              "
-            >
-              <Lucide
-                icon="Search"
-                class="absolute top-9 right-2 w-4 h-4 my-auto mr-3"
-              />
-            </button>
-          </div>
-        </div>
-      </div>
-    </div>
-    <!-- BEGIN: Pagination-->
-    <div class="flex flex-wrap items-center mt-0 intro-y sm:flex-nowrap">
-      <div class="flex mx-auto">
-        <PaginationComponent
-          class="pagination-component"
-          v-model="currentPage"
-          :numberOfPages="dataManager.numberOfPages.value"
-        />
-      </div>
-    </div>
-    <div class="flex items-center">
-      <div class="">
-        <span class="ml-3 mr-3"
-          >[ {{ dataManager.dataCount }}개 데이터 조회됨 ]
-        </span>
-        <span class="mr-4">
-          [ {{ currentPage }} / {{ dataManager.numberOfPages }} 페이지 ]</span
-        >
-      </div>
-      <div class="ml-auto"></div>
-      <div class="mr-3">
-        <FormSelect
-          class="w-20 !box"
-          v-model="rowsPerPage"
-          @change="pageChangeFirst"
-        >
-          <option>10</option>
-          <option>25</option>
-          <option>50</option>
-          <option>100</option>
-          <option :value="dataManager.dataCount.value">전체</option>
-        </FormSelect>
-      </div>
-    </div>
+    <div class="px-3 pt-3">{{ now }}</div>
 
-    <!-- END: Pagination-->
     <!-- BEGIN: Data List -->
     <div class="intro-y">
       <div class="px-3">

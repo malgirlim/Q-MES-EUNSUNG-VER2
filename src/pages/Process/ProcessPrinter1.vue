@@ -6,7 +6,7 @@ import { FormInput, FormSelect, FormCheck } from "../../base-components/Form";
 import Lucide from "../../base-components/Lucide";
 import { Dialog, Menu } from "../../base-components/Headless";
 import Table from "../../base-components/Table";
-import moment from "moment";
+import dayjs from "dayjs";
 import Litepicker from "../../base-components/Litepicker";
 import TomSelect from "tom-select";
 import * as XLSX from "xlsx";
@@ -71,7 +71,7 @@ const insertModal = ref(false);
 const setInsertModal = (value: boolean) => {
   insertModal.value = value;
   insertModalData = {}; // 변수 초기화
-  insertModalData.출고일시 = moment().format("YYYY-MM-DD HH:mm:ss");
+  insertModalData.출고일시 = dayjs().format("YYYY-MM-DD HH:mm:ss");
 };
 let insertModalData: StockUse; // 등록할 변수
 // 등록 함수
@@ -179,9 +179,7 @@ function exportFile(data: any) {
   utils.book_append_sheet(wb, ws, "Data");
   writeFileXLSX(
     wb,
-    "재고관리_원자재사용등록" +
-      moment().format("YYMMDD_HHmmss") +
-      "_export.xlsx"
+    "재고관리_원자재사용등록" + dayjs().format("YYMMDD_HHmmss") + "_export.xlsx"
   );
 }
 
@@ -212,7 +210,7 @@ const onFileImport = (event: any) => {
       });
       file_data.value.forEach((fd: any) => {
         if (isNaN(Date.parse(String(fd.출고일시))))
-          fd.출고일시 = moment().format("YYYY-MM-DD HH:mm:ss");
+          fd.출고일시 = dayjs().format("YYYY-MM-DD HH:mm:ss");
         let dataFil = product.dataAll.value.filter(
           (c) => c.품목코드 === fd.품목코드
         )[0];
@@ -233,10 +231,10 @@ const onFileImport = (event: any) => {
 // ########################## 엑셀 다운로드 및 업로드 끝 ##########################
 
 // 날짜 구하기
-const now = moment().format("YYYY-MM-DD");
-const nowPlus = moment().add(7, "days").format("YYYY-MM-DD");
-const max_year = moment().format("YYYY");
-const min_year = moment().add(-3, "years").format("YYYY");
+const now = dayjs().format("YYYY-MM-DD");
+const nowPlus = dayjs().add(7, "days").format("YYYY-MM-DD");
+const max_year = dayjs().format("YYYY");
+const min_year = dayjs().add(-3, "years").format("YYYY");
 const now2 = ref("전체기간");
 // now2가 변경되면 실행
 watch([now2], (newValue, oldValue) => {

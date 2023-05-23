@@ -10,7 +10,7 @@ import VerticalBarChart from "../components/VerticalBarChart";
 import LineChart from "../components/LineChart";
 import LoadingIcon from "../base-components/LoadingIcon";
 
-import moment from "moment";
+import dayjs from "dayjs";
 
 import RunningCard from "../components/Common/Main/RunningCard.vue";
 import DisabledRunningCard from "../components/Common/Main/DisabledRunningCard.vue";
@@ -46,7 +46,7 @@ Chart.register(ChartDataLabels);
 
 onMounted(async () => {
   setInterval(() => {
-    now.value = moment().format("YYYY-MM-DD HH:mm:ss");
+    now.value = dayjs().format("YYYY-MM-DD(dd) HH:mm:ss");
   }, 1000);
   setInterval(() => {
     switch_page_func();
@@ -54,7 +54,8 @@ onMounted(async () => {
 });
 
 // 날짜 구하기
-const now = ref(moment().format("YYYY-MM-DD HH:mm:ss"));
+dayjs.locale("ko");
+const now = ref(dayjs().format("YYYY-MM-DD(dd) HH:mm:ss"));
 
 // 페이지 전환
 const switch_page = ref("first");

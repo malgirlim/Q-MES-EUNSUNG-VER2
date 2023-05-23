@@ -2,10 +2,10 @@
 import Button from "../../../base-components/Button";
 import Lucide from "../../../base-components/Lucide";
 import { FormSelect } from "../../../base-components/Form";
-import moment from "moment";
+import dayjs from "dayjs";
 
 // 날짜 구하기
-const now = moment().format("YYYY-MM-DD HH:mm:ss");
+const now = dayjs().format("YYYY-MM-DD HH:mm:ss");
 
 // 임시 데이터
 </script>

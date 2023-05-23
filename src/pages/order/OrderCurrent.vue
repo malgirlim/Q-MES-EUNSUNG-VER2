@@ -6,7 +6,7 @@ import { FormInput, FormSelect, FormCheck } from "../../base-components/Form";
 import Lucide from "../../base-components/Lucide";
 import { Dialog, Menu } from "../../base-components/Headless";
 import Table from "../../base-components/Table";
-import moment from "moment";
+import dayjs from "dayjs";
 import Litepicker from "../../base-components/Litepicker";
 import TomSelect from "tom-select";
 import { Tab } from "../../base-components/Headless";
@@ -84,8 +84,8 @@ const vTom = {
 // ########################## 조회기간 설정 ##########################
 // 날짜 구하기
 const searchDate = ref("전체기간");
-const max_year = moment().format("YYYY");
-const min_year = moment().add(-3, "years").format("YYYY");
+const max_year = dayjs().format("YYYY");
+const min_year = dayjs().add(-3, "years").format("YYYY");
 // searchDate가  변경되면 실행
 watch([searchDate], (newValue, oldValue) => {
   search();
@@ -268,7 +268,7 @@ function exportFile(data: any) {
   utils.book_append_sheet(wb, ws, "Data");
   writeFileXLSX(
     wb,
-    "주문관리_수주현황_" + moment().format("YYMMDD_HHmmss") + "_export.xlsx"
+    "주문관리_수주현황_" + dayjs().format("YYMMDD_HHmmss") + "_export.xlsx"
   );
 }
 
@@ -299,7 +299,7 @@ const onFileImport = (event: any) => {
       });
       // file_data.value.forEach((fd: any) => {
       //   if (isNaN(Date.parse(String(fd.출고일시))))
-      //     fd.출고일시 = moment().format("YYYY-MM-DD HH:mm:ss");
+      //     fd.출고일시 = dayjs().format("YYYY-MM-DD HH:mm:ss");
       //   let dataFil = product.dataAll.value.filter(
       //     (c) => c.품목코드 === fd.품목코드
       //   )[0];

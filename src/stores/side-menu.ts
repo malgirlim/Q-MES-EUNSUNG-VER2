@@ -28,11 +28,6 @@ export const useSideMenuStore = defineStore("sideMenu", {
         subMenu: [
           {
             icon: "FileText",
-            pageName: "side-menu-mobile-",
-            title: "작업일보 작성",
-          },
-          {
-            icon: "FileText",
             pageName: "side-menu-mobile-order-current-forecast",
             title: "수주현황 예보",
           },
@@ -40,6 +35,16 @@ export const useSideMenuStore = defineStore("sideMenu", {
             icon: "FileText",
             pageName: "side-menu-mobile-",
             title: "수주현황 통보",
+          },
+          {
+            icon: "FileText",
+            pageName: "side-menu-mobile-",
+            title: "작업일보 작성",
+          },
+          {
+            icon: "FileText",
+            pageName: "side-menu-mobile-",
+            title: "생산실적집계",
           },
         ],
       },
@@ -52,11 +57,6 @@ export const useSideMenuStore = defineStore("sideMenu", {
             icon: "FileText",
             pageName: "side-menu-mobile-",
             title: "입출고",
-          },
-          {
-            icon: "FileText",
-            pageName: "side-menu-mobile-",
-            title: "재고등록",
           },
           {
             icon: "FileText",
@@ -82,7 +82,7 @@ export const useSideMenuStore = defineStore("sideMenu", {
         subMenu: [
           {
             icon: "FileText",
-            pageName: "side-menu-mobile-",
+            pageName: "side-menu-mobile-prevent-daily-check",
             title: "일상점검",
           },
           {

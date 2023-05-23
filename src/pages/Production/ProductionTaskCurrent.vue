@@ -5,7 +5,7 @@ import { FormInput, FormSelect, FormCheck } from "../../base-components/Form";
 import Lucide from "../../base-components/Lucide";
 import { Dialog, Menu } from "../../base-components/Headless";
 import Table from "../../base-components/Table";
-import moment from "moment";
+import dayjs from "dayjs";
 import Litepicker from "../../base-components/Litepicker";
 import TomSelect from "tom-select";
 import { Tab } from "../../base-components/Headless";
@@ -115,8 +115,8 @@ const vTom = {
 // ########################## 조회기간 설정 ##########################
 // 날짜 구하기
 const searchDate = ref("전체기간");
-const max_year = moment().format("YYYY");
-const min_year = moment().add(-3, "years").format("YYYY");
+const max_year = dayjs().format("YYYY");
+const min_year = dayjs().add(-3, "years").format("YYYY");
 // searchDate가  변경되면 실행
 watch([searchDate], (newValue, oldValue) => {
   search();
@@ -279,9 +279,7 @@ function exportFile(data: any) {
   utils.book_append_sheet(wb, ws, "Data");
   writeFileXLSX(
     wb,
-    "재고관리_원자재사용등록" +
-      moment().format("YYMMDD_HHmmss") +
-      "_export.xlsx"
+    "재고관리_원자재사용등록" + dayjs().format("YYMMDD_HHmmss") + "_export.xlsx"
   );
 }
 
@@ -312,7 +310,7 @@ const onFileImport = (event: any) => {
       });
       // file_data.value.forEach((fd: any) => {
       //   if (isNaN(Date.parse(String(fd.출고일시))))
-      //     fd.출고일시 = moment().format("YYYY-MM-DD HH:mm:ss");
+      //     fd.출고일시 = dayjs().format("YYYY-MM-DD HH:mm:ss");
       //   let dataFil = product.dataAll.value.filter(
       //     (c) => c.품목코드 === fd.품목코드
       //   )[0];
@@ -402,11 +400,11 @@ const setResultModal = (value: boolean) => {
     productionResult.value.설비명 = editModalData.설비명;
     productionResult.value.작업자ID = editModalData.작업자ID;
     productionResult.value.작업자 = editModalData.작업자;
-    productionResult.value.시작일시 = moment(
+    productionResult.value.시작일시 = dayjs(
       `${editModalData.시작일} 09:00:01`,
       "YYYY-MM-DD HH:mm:ss"
     ).format("YYYY-MM-DD HH:mm:ss");
-    productionResult.value.종료일시 = moment().format("YYYY-MM-DD HH:mm:ss");
+    productionResult.value.종료일시 = dayjs().format("YYYY-MM-DD HH:mm:ss");
     productionResult.value.생산수 = 0;
     productionResult.value.불량수 = 0;
     useitemlist.value = [];
@@ -697,8 +695,8 @@ const addRows_nonwork = () => {
   nonworklist.value.push({
     ...nonworkInit,
     NO: maxNO + 2,
-    시작일시: moment().format("YYYY-MM-DD HH:mm:ss"),
-    종료일시: moment().format("YYYY-MM-DD HH:mm:ss"),
+    시작일시: dayjs().format("YYYY-MM-DD HH:mm:ss"),
+    종료일시: dayjs().format("YYYY-MM-DD HH:mm:ss"),
   });
 };
 

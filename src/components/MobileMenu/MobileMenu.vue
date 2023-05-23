@@ -14,6 +14,7 @@ import {
 } from "../../layouts/SideMenu/side-menu";
 import { watch, reactive, computed, onMounted, ref } from "vue";
 import SimpleBar from "simplebar";
+import router from "../../router";
 
 const route = useRoute();
 let formattedMenu = reactive<Array<FormattedMenu | "devider">>([]);
@@ -56,14 +57,14 @@ onMounted(() => {
     ]"
   >
     <div class="h-[70px] px-3 sm:px-8 flex items-center">
-      <a href="" class="flex mr-auto">
+      <a @click="$router.push('/mobile')" class="flex mr-auto">
         <img
           alt="Midone Tailwind HTML Admin Template"
           class="w-8"
           :src="logoUrl"
         />
       </a>
-
+      <div class="text-white font-bold text-2xl mr-auto">EUNSUNG PRINTERS</div>
       <a href="#" @click="(e) => e.preventDefault()">
         <Lucide
           icon="BarChart2"

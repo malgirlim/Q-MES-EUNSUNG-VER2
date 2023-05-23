@@ -4,7 +4,7 @@ import { cloneDeep } from "lodash";
 import Table from "../../../base-components/Table";
 import Button from "../../../base-components/Button";
 import { Dialog, Menu } from "../../../base-components/Headless";
-import moment from "moment";
+import dayjs from "dayjs";
 import TomSelect from "tom-select";
 import {
   FormInput,

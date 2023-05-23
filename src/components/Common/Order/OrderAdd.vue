@@ -4,7 +4,7 @@ import { cloneDeep } from "lodash";
 import Table from "../../../base-components/Table";
 import Button from "../../../base-components/Button";
 import { Dialog, Menu } from "../../../base-components/Headless";
-import moment from "moment";
+import dayjs from "dayjs";
 import TomSelect from "tom-select";
 import {
   FormInput,
@@ -61,7 +61,7 @@ const orderAcceptInit: OrderAccept = {
 // 수주코드라던지 납품일 같은 공통적인 데이터를 저장할 곳
 const defaultData = ref({
   ...orderAcceptInit,
-  수주일: moment().format("YYYY-MM-DD"),
+  수주일: dayjs().format("YYYY-MM-DD"),
 });
 
 // 품목 리스트를 저장할 곳

@@ -10,7 +10,7 @@ import VerticalBarChart from "../../components/VerticalBarChart";
 import LineChart from "../../components/LineChart";
 import LoadingIcon from "../../base-components/LoadingIcon";
 
-import moment from "moment";
+import dayjs from "dayjs";
 
 import RunningCard from "../../components/Common/Main/RunningCard.vue";
 import DisabledRunningCard from "../../components/Common/Main/DisabledRunningCard.vue";
@@ -44,7 +44,7 @@ Chart.register(ChartDataLabels);
 
 onMounted(async () => {
   setInterval(() => {
-    now.value = moment().format("YYYY-MM-DD HH:mm:ss");
+    now.value = dayjs().format("YYYY-MM-DD HH:mm:ss");
   }, 1000);
   setInterval(() => {
     switch_page_func();
@@ -52,7 +52,7 @@ onMounted(async () => {
 });
 
 // 날짜 구하기
-const now = ref(moment().format("YYYY-MM-DD HH:mm:ss"));
+const now = ref(dayjs().format("YYYY-MM-DD HH:mm:ss"));
 
 // 페이지 전환
 const switch_page = ref("first");
@@ -93,78 +93,28 @@ const switch_page_func = () => {
     <div class="text-center"></div>
     <!--BEGIN : 첫번째 표시-->
     <div v-if="switch_page == 'first'" class="grid grid-cols-2 gap-4 mt-3">
-      <RunningCard
-        @click="$router.push('process/checker')"
-        name="검사기"
-        :run="true"
-      />
-      <RunningCard
-        @click="$router.push('process/plate')"
-        name="제판기"
-        :run="true"
-      />
-      <RunningCard
-        @click="$router.push('process/printer1')"
-        name="인쇄기1"
-        :run="true"
-      />
-      <RunningCard
-        @click="$router.push('process/printer2')"
-        name="인쇄기2"
-        :run="true"
-      />
-      <RunningCard
-        @click="$router.push('process/printer3')"
-        name="인쇄기3"
-        :run="false"
-      />
-      <RunningCard
-        @click="$router.push('process/printer4')"
-        name="인쇄기4"
-        :run="false"
-      />
+      <RunningCard name="검사기" :run="true" />
+      <RunningCard name="제판기" :run="true" />
+      <RunningCard name="인쇄기1" :run="true" />
+      <RunningCard name="인쇄기2" :run="true" />
+      <RunningCard name="인쇄기3" :run="false" />
+      <RunningCard name="인쇄기4" :run="false" />
     </div>
     <!--END : 첫번째 표시-->
     <!--BEGIN : 두번째 표시-->
     <div v-if="switch_page == 'second'" class="grid grid-cols-2 gap-4 mt-3">
-      <RunningCard
-        @click="$router.push('process/printer5')"
-        name="인쇄기5"
-        :run="false"
-      />
-      <RunningCard
-        @click="$router.push('process/printer6')"
-        name="인쇄기6"
-        :run="false"
-      />
-      <RunningCard
-        @click="$router.push('process/printer7')"
-        name="인쇄기7"
-        :run="false"
-      />
-      <RunningCard
-        @click="$router.push('process/printer8')"
-        name="인쇄기8"
-        :run="false"
-      />
+      <RunningCard name="인쇄기5" :run="false" />
+      <RunningCard name="인쇄기6" :run="false" />
+      <RunningCard name="인쇄기7" :run="false" />
+      <RunningCard name="인쇄기8" :run="false" />
       <DisabledRunningCard />
       <DisabledRunningCard />
     </div>
     <!--END : 두번째 표시-->
     <!--BEGIN : KPI 표시-->
     <div class="mt-7 grid grid-cols-2 gap-4 mt-5">
-      <KPICard
-        @click="$router.push('monitoring/kpi')"
-        data="2%"
-        name="설비가동률"
-        name2="향상률"
-      />
-      <KPICard
-        @click="$router.push('monitoring/kpi')"
-        data="5%"
-        name="재고비용"
-        name2="절감률"
-      />
+      <KPICard data="2%" name="설비가동률" name2="향상률" />
+      <KPICard data="5%" name="재고비용" name2="절감률" />
       <DisabledKPICard />
       <DisabledKPICard />
       <NoticeCard />

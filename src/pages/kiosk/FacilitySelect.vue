@@ -8,7 +8,7 @@ import Button from "../../base-components/Button";
 import LoadingIcon from "../../base-components/LoadingIcon";
 import { Dialog } from "../../base-components/Headless";
 
-import moment from "moment";
+import dayjs from "dayjs";
 import { toast } from "vue3-toastify";
 
 import axios from "axios";
@@ -18,7 +18,7 @@ import FacilityCard from "../../components/Common/Kiosk/FacilityCard.vue";
 
 onMounted(async () => {
   setInterval(() => {
-    now.value = moment().format("YYYY-MM-DD HH:mm:ss");
+    now.value = dayjs().format("YYYY-MM-DD HH:mm:ss");
   }, 1000);
 });
 
@@ -58,8 +58,8 @@ const setLogoutModal = (value: boolean) => {
 };
 
 // 날짜 구하기
-const now = ref(moment().format("YYYY-MM-DD HH:mm:ss"));
-const year = ref(moment().format("YYYY"));
+const now = ref(dayjs().format("YYYY-MM-DD HH:mm:ss"));
+const year = ref(dayjs().format("YYYY"));
 </script>
 
 <template>

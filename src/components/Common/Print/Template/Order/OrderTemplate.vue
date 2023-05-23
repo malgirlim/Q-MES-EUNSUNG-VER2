@@ -1,11 +1,10 @@
 <script setup lang="ts">
-import moment from "moment";
+import dayjs from "dayjs";
 import qrcode from "qrcode.vue";
 
-const now = moment().format("YYYY-MM-DD");
+const now = dayjs().format("YYYY-MM-DD");
 
 const ordercode = "TEST0010003";
-
 </script>
 <template>
   <div>
