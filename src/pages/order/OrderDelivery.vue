@@ -172,18 +172,25 @@ let insertModalData: OrderDelivery;
 const insertModal = ref(false);
 const setInsertModal = (value: boolean) => {
   if (user_level >= 3) {
-    insertModal.value = value;
-    insertModalData = {}; // 변수 초기화
+    if (radioSelect.value) {
+      insertModal.value = value;
+      insertModalData = {}; // 변수 초기화
+      insertModalData.구분 = "납품등록";
+      insertModalData.수주NO = radioSelect.value;
+      insertModalData.일시 = moment().format("YYYY-MM-DD HH:mm:ss");
+      insertModalData.검사결과 = "미검사";
+    } else toast.warning("수주를 먼저 선택해주세요.");
   } else {
     toast.warning("액세스 권한이 없습니다.\n관리자에게 문의하세요.");
   }
 };
 // 등록버튼 누르면 실행되는 함수
 const insertDataFunction = async () => {
-  // await dataManager.insertData(insertModalData);
-  // await setInsertModal(false);
+  await delivery.insertData(insertModalData);
+  await setInsertModal(false);
   // await search();
   // await pageChangeFirst();
+  await delivery.searchDatas("", "수주NO", radioSelect.value, "", "");
 };
 
 // ##### 수정 Modal #####
@@ -375,6 +382,27 @@ const importFinStock = (no: any) => {
   insertModalData.품목NO = delivery_finStock.dataAll.value.filter(
     (c) => c.LOT코드 == no
   )[0]?.품목NO;
+  insertModalData.품목구분 = delivery_finStock.dataAll.value.filter(
+    (c) => c.LOT코드 == no
+  )[0]?.품목구분;
+  insertModalData.품번 = delivery_finStock.dataAll.value.filter(
+    (c) => c.LOT코드 == no
+  )[0]?.품번;
+  insertModalData.품명 = delivery_finStock.dataAll.value.filter(
+    (c) => c.LOT코드 == no
+  )[0]?.품명;
+  insertModalData.규격 = delivery_finStock.dataAll.value.filter(
+    (c) => c.LOT코드 == no
+  )[0]?.규격;
+  insertModalData.단위 = delivery_finStock.dataAll.value.filter(
+    (c) => c.LOT코드 == no
+  )[0]?.단위;
+  insertModalData.LOT코드 = delivery_finStock.dataAll.value.filter(
+    (c) => c.LOT코드 == no
+  )[0]?.LOT코드;
+  insertModalData.수량 = delivery_finStock.dataAll.value.filter(
+    (c) => c.LOT코드 == no
+  )[0]?.기말재고;
   setFinStockModal(false);
 };
 
@@ -461,7 +489,9 @@ const setShipmentModal = (value: boolean) => {
 const shipmentButtonRef = ref(null);
 // 요청버튼 누르면 실행되는 함수
 const shipmentDataFunction = async () => {
+  editModalData.검사결과 = "검사대기";
   await order_shipment_request.insertData(shipmentModalData); // await : 이 함수가 끝나야 다음으로 넘어간다
+  await delivery.editData(editModalData);
   toast.success("출하검사를 요청하셨습니다.");
 };
 </script>
@@ -1059,12 +1089,12 @@ const shipmentDataFunction = async () => {
                       >
                         {{ table_setting_delivery.출하검사.name }}
                       </Table.Th>
-                      <Table.Th
+                      <!-- <Table.Th
                         class="text-center border-b-0 whitespace-nowrap font-bold"
                         :style="table_setting_delivery.편집.style"
                       >
                         {{ table_setting_delivery.편집.name }}
-                      </Table.Th>
+                      </Table.Th> -->
                     </Table.Tr>
                   </Table.Thead>
 
@@ -1149,24 +1179,26 @@ const shipmentDataFunction = async () => {
                         :style="table_setting_delivery.항목8.style"
                       >
                         <div class="flex items-center">
-                          <div>
-                            <Lucide
-                              class="w-4 h-4 mr-1"
-                              :icon="
-                                todo.검사결과 == '미검사'
-                                  ? 'MinusCircle'
-                                  : todo.검사결과 == '검사대기'
-                                  ? 'HelpCircle'
-                                  : todo.검사결과 == '불합격'
-                                  ? 'XCircle'
-                                  : todo.검사결과 == '합격'
-                                  ? 'CheckCircle'
-                                  : 'AlertCircle'
-                              "
-                            />
-                          </div>
-                          <div>
-                            {{ todo[table_setting_delivery.항목8.name] }}
+                          <div class="flex mx-auto">
+                            <div>
+                              <Lucide
+                                class="w-5 h-5 mr-1"
+                                :icon="
+                                  todo.검사결과 == '미검사'
+                                    ? 'MinusCircle'
+                                    : todo.검사결과 == '검사대기'
+                                    ? 'HelpCircle'
+                                    : todo.검사결과 == '불합격'
+                                    ? 'XCircle'
+                                    : todo.검사결과 == '합격'
+                                    ? 'CheckCircle'
+                                    : 'AlertCircle'
+                                "
+                              />
+                            </div>
+                            <div>
+                              {{ todo[table_setting_delivery.항목8.name] }}
+                            </div>
                           </div>
                         </div>
                       </Table.Td>
@@ -1178,10 +1210,15 @@ const shipmentDataFunction = async () => {
                           class="flex items-center justify-center text-success"
                         >
                           <Button
+                            v-if="
+                              todo.검사결과 == '미검사' ||
+                              todo.검사결과 == '불합격'
+                            "
                             variant="facebook"
                             class="flex items-center"
                             @click="
                               () => {
+                                editModalData = todo;
                                 shipmentModalData.납품NO = todo.NO;
                                 shipmentModalData.요청수량 = todo.수량;
                                 shipmentModalData.결과 = '미검사';
@@ -1194,7 +1231,7 @@ const shipmentDataFunction = async () => {
                           </Button>
                         </div>
                       </Table.Td>
-                      <Table.Td
+                      <!-- <Table.Td
                         class="first:rounded-l-md last:rounded-r-md text-center bg-white border-b-0 dark:bg-darkmode-600 shadow-[20px_3px_20px_#0000000b]"
                         :style="table_setting_delivery.편집.style"
                       >
@@ -1215,7 +1252,7 @@ const shipmentDataFunction = async () => {
                             수정
                           </a>
                         </div>
-                      </Table.Td>
+                      </Table.Td> -->
                     </Table.Tr>
                   </Table.Tbody>
                 </Table>
@@ -1259,7 +1296,7 @@ const shipmentDataFunction = async () => {
 ######################################################################################################################### -->
 
   <!-- BEGIN: Insert Modal Content -->
-  <Dialog size="md" :open="insertModal">
+  <Dialog size="md" :open="insertModal" :key="insertModalData?.LOT코드">
     <Dialog.Panel class="p-10 text-center">
       <!--추가 Modal 내용 시작-->
       <div class="mb-5" style="font-weight: bold">등록</div>
@@ -1276,11 +1313,80 @@ const shipmentDataFunction = async () => {
           <Tab.Panel class="leading-relaxed">
             <div style="text-align: left">
               <div class="mt-3">
-                <FormLabel htmlFor="vertical-form-1">비고</FormLabel>
+                <FormLabel htmlFor="vertical-form-1">구분</FormLabel>
                 <FormInput
                   id="vertical-form-1"
                   type="text"
-                  v-model="insertModalData.비고"
+                  v-model="insertModalData.구분"
+                  placeholder=""
+                />
+              </div>
+              <div class="mt-3">
+                <FormLabel htmlFor="vertical-form-1">LOT코드</FormLabel>
+                <FormInput
+                  id="vertical-form-1"
+                  type="text"
+                  v-model="insertModalData.LOT코드"
+                  placeholder="이곳을 클릭하여 재고를 선택해주세요."
+                  @click="setFinStockModal(true)"
+                />
+              </div>
+              <div class="mt-3">
+                <FormLabel htmlFor="vertical-form-1">품목구분</FormLabel>
+                <FormInput
+                  id="vertical-form-1"
+                  type="text"
+                  v-model="insertModalData.품목구분"
+                  placeholder=""
+                  readonly
+                />
+              </div>
+              <div class="mt-3">
+                <FormLabel htmlFor="vertical-form-1">품번</FormLabel>
+                <FormInput
+                  id="vertical-form-1"
+                  type="text"
+                  v-model="insertModalData.품번"
+                  placeholder=""
+                  readonly
+                />
+              </div>
+              <div class="mt-3">
+                <FormLabel htmlFor="vertical-form-1">품명</FormLabel>
+                <FormInput
+                  id="vertical-form-1"
+                  type="text"
+                  v-model="insertModalData.품명"
+                  placeholder=""
+                  readonly
+                />
+              </div>
+              <div class="mt-3">
+                <FormLabel htmlFor="vertical-form-1">규격</FormLabel>
+                <FormInput
+                  id="vertical-form-1"
+                  type="text"
+                  v-model="insertModalData.규격"
+                  placeholder=""
+                  readonly
+                />
+              </div>
+              <div class="mt-3">
+                <FormLabel htmlFor="vertical-form-1">단위</FormLabel>
+                <FormInput
+                  id="vertical-form-1"
+                  type="text"
+                  v-model="insertModalData.단위"
+                  placeholder=""
+                  readonly
+                />
+              </div>
+              <div class="mt-3">
+                <FormLabel htmlFor="vertical-form-1">수량</FormLabel>
+                <FormInput
+                  id="vertical-form-1"
+                  type="number"
+                  v-model="insertModalData.수량"
                   placeholder=""
                 />
               </div>
@@ -1346,80 +1452,11 @@ const shipmentDataFunction = async () => {
           <Tab.Panel class="leading-relaxed">
             <div style="text-align: left">
               <div class="mt-3">
-                <FormLabel htmlFor="vertical-form-4">코드</FormLabel>
+                <FormLabel htmlFor="vertical-form-11">비고</FormLabel>
                 <FormInput
-                  id="vertical-form-4"
+                  id="vertical-form-11"
                   type="text"
-                  v-model="editModalData.코드"
-                  placeholder=""
-                  readonly
-                />
-              </div>
-              <div class="mt-3">
-                <FormLabel htmlFor="vertical-form-4">품목구분</FormLabel>
-                <FormInput
-                  id="vertical-form-4"
-                  type="text"
-                  v-model="editModalData.품목구분"
-                  placeholder=""
-                  readonly
-                />
-              </div>
-              <div class="mt-3">
-                <FormLabel htmlFor="vertical-form-4">품번</FormLabel>
-                <FormInput
-                  id="vertical-form-4"
-                  type="text"
-                  v-model="editModalData.품번"
-                  placeholder=""
-                  readonly
-                />
-              </div>
-              <div class="mt-3">
-                <FormLabel htmlFor="vertical-form-4">품명</FormLabel>
-                <FormInput
-                  id="vertical-form-4"
-                  type="text"
-                  v-model="editModalData.품명"
-                  placeholder=""
-                  readonly
-                />
-              </div>
-              <div class="mt-3">
-                <FormLabel htmlFor="vertical-form-4">규격</FormLabel>
-                <FormInput
-                  id="vertical-form-4"
-                  type="text"
-                  v-model="editModalData.규격"
-                  placeholder=""
-                  readonly
-                />
-              </div>
-              <div class="mt-3">
-                <FormLabel htmlFor="vertical-form-4">단위</FormLabel>
-                <FormInput
-                  id="vertical-form-4"
-                  type="text"
-                  v-model="editModalData.단위"
-                  placeholder=""
-                  readonly
-                />
-              </div>
-              <div class="mt-3">
-                <FormLabel htmlFor="vertical-form-4">수량</FormLabel>
-                <FormInput
-                  id="vertical-form-4"
-                  type="number"
-                  v-model="editModalData.수량"
-                  placeholder=""
-                />
-              </div>
-              <div class="mt-3">
-                <FormLabel htmlFor="vertical-form-6">시작일</FormLabel>
-                <FormInput
-                  id="vertical-form-6"
-                  type="date"
-                  v-model="editModalData.시작일"
+                  v-model="editModalData.비고"
                   placeholder=""
                 />
               </div>
@@ -1893,4 +1930,71 @@ const shipmentDataFunction = async () => {
     </Dialog.Panel>
   </Dialog>
   <!-- END: finStock Modal Content -->
+
+  <!-- #######################################################################################################################
+  #######################################################################################################################
+  ####################################################################################################################### -->
+
+  <!-- BEGIN: 출하검사요청 Modal -->
+  <Dialog
+    :open="shipmentModal"
+    @close="
+      () => {
+        setShipmentModal(false);
+      }
+    "
+    :initialFocus="shipmentButtonRef"
+  >
+    <Dialog.Panel>
+      <div class="p-5 text-center">
+        <Lucide
+          icon="CheckCircle"
+          class="w-16 h-16 mx-auto mt-3 text-success"
+        />
+        <div class="mt-5 text-3xl">출하검사요청</div>
+        <div class="mt-2 text-slate-500">출하요청하시겠습니까?</div>
+
+        <!-- <div style="text-align: left">
+          <div class="mt-3">
+            <FormLabel htmlFor="vertical-form-3">전달사항</FormLabel>
+            <FormInput
+              id="vertical-form-3"
+              type="text"
+              v-model="incomingModalData.전달사항"
+              placeholder="여기에 특이사항을 입력해주세요"
+            />
+          </div>
+        </div> -->
+      </div>
+      <div class="px-5 pb-8 text-center">
+        <Button
+          variant="outline-secondary"
+          type="button"
+          @click="
+            () => {
+              setShipmentModal(false);
+            }
+          "
+          class="w-24 mr-1"
+        >
+          취소
+        </Button>
+        <Button
+          variant="primary"
+          type="button"
+          class="w-24"
+          ref="shipmentButtonRef"
+          @click="
+            () => {
+              shipmentDataFunction();
+              setShipmentModal(false);
+            }
+          "
+        >
+          요청
+        </Button>
+      </div>
+    </Dialog.Panel>
+  </Dialog>
+  <!-- END: 출하검사요청 Modal -->
 </template>

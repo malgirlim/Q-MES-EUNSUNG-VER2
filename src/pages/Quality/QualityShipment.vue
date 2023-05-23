@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import _, { isArguments } from "lodash";
-import { ref, Ref, getCurrentInstance } from "vue";
+import { ref, Ref, onMounted, watch, getCurrentInstance } from "vue";
+import router from "../../router";
 import Button from "../../base-components/Button";
 import { FormInput, FormSelect, FormCheck } from "../../base-components/Form";
 import Lucide from "../../base-components/Lucide";
@@ -9,88 +9,57 @@ import Table from "../../base-components/Table";
 import moment from "moment";
 import Litepicker from "../../base-components/Litepicker";
 import TomSelect from "tom-select";
+import { Tab } from "../../base-components/Headless";
 import * as XLSX from "xlsx";
 import { read, utils, writeFileXLSX } from "xlsx";
 import printJS from "print-js";
+import PaginationComponent from "../../components/Pagination/PaginationComponent.vue"; // 페이징설정
+import { toast } from "vue3-toastify";
 
 // API 보내는 함수 및 인터페이스 불러오기
 import { useSendApi } from "../../composables/useSendApi";
-import { StockUse } from "../../interfaces/menu/stockInterface";
-import { MasterProduct } from "../../interfaces/menu/MasterInterface";
+import { MasterQualityStand } from "../../interfaces/menu/MasterInterface";
+import { QualityShipment } from "../../interfaces/menu/qualityInterface";
 
-// 페이징기능
-import { onMounted, watch } from "vue";
-import PaginationComponent from "../../components/Pagination/PaginationComponent.vue"; // 페이징설정
+// 컴포넌트 로드
+import MasterDetail from "../../components/Common/Detail/MasterProcessDetail.vue";
 
 const { proxy }: any = getCurrentInstance();
 const user_level = proxy.gstate.level.QualityShipment; //권한레벨
 
+// 페이지 로딩 시 시작
+onMounted(async () => {
+  dataManager.loadDatas(); // 메인으로 쓸 데이터 불러오기
+});
+
+// 페이징기능
 const currentPage = ref(1); // 현재페이지
 const rowsPerPage = ref(10); // 한 페이지에 보여질 데이터 갯수
-
-const pageChange = () => {
-  // 한 페이지에 보여질 데이터 갯수 변경 시 1페이지로 이동
-  currentPage.value = 1;
+const pageChangeFirst = () => {
+  currentPage.value = 1; // 데이터 갯수 변경 시 1페이지로 이동
 };
 
-// api 보내기
-const url = "";
-const {
-  datas,
-  dataAll,
-  dataCount,
-  datasAreLoading,
-  loadDatas,
-  searchDatas,
-  insertData,
-  editData,
-  deleteData,
-  insertAllData,
-  numberOfPages,
-} = useSendApi<StockUse>(url, currentPage, rowsPerPage);
+// dataManager 만들기
+const url = "/api/quality/shipment";
+const dataManager = useSendApi<QualityShipment>(url, currentPage, rowsPerPage);
 
-// api2 : 품목등록데이터 가져오기
-const url_2 = "/api/master/product";
-const product = useSendApi<MasterProduct>(url_2, currentPage, rowsPerPage);
-
-const searchKey = ref("전체");
-const searchInput = ref("");
-onMounted(async () => {
-  loadDatas();
-  product.loadDatas();
-}); // 페이지 로딩 시 데이터 불러오기
-
-// 조회
-const search = () => {
-  // console.log(searchKey.value, searchInput.value);
-  searchDatas(now2.value, searchKey.value, searchInput.value);
+// 테이블항목 설정 및 가로크기 조정
+const table_setting = {
+  체크박스: { name: "체크박스", style: "width: 50px" },
+  순번: { name: "순번", style: "width: 50px; text-align: center;" },
+  항목1: { name: "요청일시", style: "width: 50px; text-align: center;" },
+  항목2: { name: "발주코드", style: "width: 50px; text-align: center;" },
+  항목3: { name: "발주품번", style: "width: 50px; text-align: center;" },
+  항목4: { name: "발주품명", style: "width: 50px; text-align: center;" },
+  항목5: { name: "전달사항", style: "width: 200px; text-align: center;" },
+  항목6: { name: "샘플수량", style: "width: 50px; text-align: center;" },
+  항목7: { name: "입고수량", style: "width: 50px; text-align: center;" },
+  항목8: { name: "결과", style: "width: 50px; text-align: center;" },
+  상세보기: { name: "정보", style: "width: 100px; text-align: center;" },
+  편집: { name: "검사 및 입고", style: "width: 50px; text-align: center;" },
 };
 
-//등록 Modal
-const insertModal = ref(false);
-const setInsertModal = (value: boolean) => {
-  insertModal.value = value;
-  insertModalData = {}; // 변수 초기화
-  insertModalData.출고일시 = moment().format("YYYY-MM-DD HH:mm:ss");
-};
-let insertModalData: StockUse; // 등록할 변수
-// 등록 함수
-const insertDataFunction = () => {
-  if ((insertModalData.NO ? insertModalData.NO : 0) > 0) {
-    let pf = product.dataAll.value.filter(
-      (c) => c.NO === insertModalData.NO
-    )[0];
-    insertModalData.품목코드 = pf.품목코드;
-    insertModalData.품명 = pf.품명;
-    insertModalData.규격 = pf.규격;
-    insertModalData.단위 = pf.단위;
-    insertData(insertModalData);
-    setInsertModal(false);
-    search();
-    pageChange();
-  }
-};
-// TomSelect 에 필요한 함수
+// v-tom (모달 실시간 데이터 변동) 에 필요한 함수
 const vTom = {
   mounted(el: any, binding: any, vnode: any) {
     const options = binding.value || {};
@@ -111,34 +80,148 @@ const vTom = {
   },
 };
 
-//수정 Modal
+// ########################## 조회기간 설정 ##########################
+// 날짜 구하기
+const searchDate = ref("전체기간");
+const max_year = moment().format("YYYY");
+const min_year = moment().add(-3, "years").format("YYYY");
+// searchDate가  변경되면 실행
+watch([searchDate], (newValue, oldValue) => {
+  search();
+  pageChangeFirst();
+});
+// 날짜 리셋
+const reset_date = () => {
+  searchDate.value = "전체기간";
+  const litepicker_init = document.querySelector("#litepicker") as any;
+  litepicker_init.value = "전체기간";
+};
+// Litepicker ButtonText가 오류나서 없애기
+const litepikerButtonText: any = {
+  reset: "새로고침",
+  apply: "적용",
+  cancel: "취소",
+};
+
+// ########################## 조회  ##########################
+const searchKey = ref("전체");
+const searchInput = ref("");
+const sortKey = ref("등록일");
+const sortOrder = ref("내림차순");
+const sortOrderToggle = () => {
+  sortOrder.value = sortOrder.value == "내림차순" ? "오름차순" : "내림차순";
+};
+//  정렬기준이 변경되면 실행
+watch([sortKey, sortOrder], (newValue, oldValue) => {
+  search();
+  pageChangeFirst();
+});
+const search = () => {
+  // console.log(searchKey.value, searchInput.value);
+  dataManager.searchDatas(
+    searchDate.value,
+    searchKey.value,
+    searchInput.value,
+    sortKey.value,
+    sortOrder.value
+  );
+};
+
+// ########################## 등록, 수정, 삭제, 상세 Modal ##########################
+// ##### 등록 Modal #####
+let insertModalData: QualityShipment;
+const insertModal = ref(false);
+const setInsertModal = (value: boolean) => {
+  router.push("/order/order-current");
+  // insertModal.value = value;
+  // insertModalData = {}; // 변수 초기화
+};
+// 등록버튼 누르면 실행되는 함수
+const insertDataFunction = async () => {
+  await dataManager.insertData(insertModalData);
+  await setInsertModal(false);
+  await search();
+  await pageChangeFirst();
+};
+
+// ##### 수정 Modal #####
 const editModal = ref(false);
 const setEditModal = (value: boolean) => {
-  editModal.value = value;
-  search();
-  let pfe = product.dataAll.value.filter(
-    (c) => c.품목코드 === editModalData.품목코드
-  )[0];
-  editModalData.품명 = pfe?.품명;
-  editModalData.규격 = pfe?.규격;
-  editModalData.단위 = pfe?.단위;
+  if (user_level >= 3) {
+    editModal.value = value;
+    search();
+  } else {
+    toast.warning("액세스 권한이 없습니다.\n관리자에게 문의하세요.");
+  }
 };
-let editModalData: StockUse; // 수정할 변수
+let editModalData: QualityShipment; // 수정할 변수
+// 수정버튼 누르면 실행되는 함수
+const editDataFunction = async () => {
+  await dataManager.editData(editModalData); // await : 이 함수가 끝나야 다음으로 넘어간다
+  search();
+};
 
-//삭제 Modal
-const deleteConfirmationModal = ref(false);
-const setDeleteConfirmationModal = (value: boolean) => {
-  deleteConfirmationModal.value = value;
+// ##### 삭제 Modal #####
+const deleteModal = ref(false);
+const setDeleteModal = (value: boolean) => {
+  if (user_level >= 3) {
+    deleteModal.value = value;
+  } else {
+    toast.warning("액세스 권한이 없습니다.\n관리자에게 문의하세요.");
+  }
 };
 const deleteButtonRef = ref(null);
+// 삭제버튼 누르면 실행되는 함수
 const deleteDataFunction = async () => {
-  await deleteData(checkDebug.value); // await : 이 함수가 끝나야 다음으로 넘어간다
+  await dataManager.deleteData(checkDebug.value); // await : 이 함수가 끝나야 다음으로 넘어간다
   resetCheckBox();
   search();
 };
 
-// print.js 프린트 기능
+// ##### 상세 Modal #####
+const detailModal = ref(false);
+const setDetailModal = (value: boolean) => {
+  detailModal.value = value;
+};
 
+// ########################## 체크박스 설정 ##########################
+const checkDebug: any = ref([]); // 체크박스 선택 데이터 저장변수
+const mainCheckBox = ref(true); // 메인 체크박스 상태
+// 메인 체크박스가 눌릴 때 모두 체크
+const checkAll = (value: boolean) => {
+  const checkboxes = document.querySelectorAll("input[id=checkbox]"); // input의 id가 checkbox인 요소를 가져오기
+  // 만약 메인 체크박스가 눌렸다면
+  if (value === true) {
+    checkDebug.value = []; // 체크박스 선택 데이터 초기화
+    checkboxes.forEach((cb: any) => {
+      cb.checked = value; // 모든 체크박스를 메인체크박스에 맞춰서 바꿈
+      checkDebug.value.push(cb.value); // 모든 체크박스의 value를 가져와 저장
+    });
+  } else {
+    checkboxes.forEach((cb: any) => {
+      cb.checked = value;
+      checkDebug.value = [];
+    });
+  }
+};
+// 페이징 넘기면 체크박스 데이터 초기화
+const resetCheckBox = () => {
+  const mBox = document.querySelector<HTMLElement>(
+    "input[id=checkbox_all]"
+  ) as HTMLInputElement | null; // 오류 안뜨게 하려고 넣어둔것
+  if (!mBox) return; // 오류 안뜨게 하려고 넣어둔것
+  mBox.checked = false; // 메인체크박스 체크해제
+  mainCheckBox.value = true; // 메인체크박스 데이터 초기화
+  checkDebug.value = [];
+};
+
+// ########################## Print 다운로드 ##########################
+// Print.js  Modal
+const printModal = ref(false);
+const setPrintModal = (value: boolean) => {
+  printModal.value = value;
+};
+// print.js 프린트 기능
 const printPage = (data: any) => {
   printJS({
     printable: data,
@@ -159,12 +242,6 @@ const printPage = (data: any) => {
   });
 };
 
-// Print.js  Modal
-const printModal = ref(false);
-const setPrintModal = (value: boolean) => {
-  printModal.value = value;
-};
-
 // ########################## 엑셀 다운로드 및 업로드 ##########################
 // 엑셀 다운로드 Modal
 const excelExportModal = ref(false);
@@ -179,9 +256,7 @@ function exportFile(data: any) {
   utils.book_append_sheet(wb, ws, "Data");
   writeFileXLSX(
     wb,
-    "재고관리_원자재사용등록" +
-      moment().format("YYMMDD_HHmmss") +
-      "_export.xlsx"
+    "품질관리_수입검사_" + moment().format("YYMMDD_HHmmss") + "_export.xlsx"
   );
 }
 
@@ -193,7 +268,7 @@ const setExcelImportModal = (value: boolean) => {
 };
 // 엑셀 업로드 용 함수
 const onFileImportForm =
-  "../../src/assets/xlsx/업로드양식_재고관리_원자재사용등록.xlsx"; // 엑셀 양식주소
+  "../../src/assets/xlsx/업로드양식_품질관리_수입검사.xlsx"; // 엑셀 양식주소
 const onFileEvent = ref();
 const onFileChangeEvent = (event: any) => {
   onFileEvent.value = event;
@@ -210,94 +285,63 @@ const onFileImport = (event: any) => {
         // console.log(wb.Sheets[sheetName].A1);
         file_data.value = XLSX.utils.sheet_to_json(wb.Sheets[sheetName]); // ,{header: 1} key 값까지 가져옴
       });
-      file_data.value.forEach((fd: any) => {
-        if (isNaN(Date.parse(String(fd.출고일시))))
-          fd.출고일시 = moment().format("YYYY-MM-DD HH:mm:ss");
-        let dataFil = product.dataAll.value.filter(
-          (c) => c.품목코드 === fd.품목코드
-        )[0];
-        if (dataFil != undefined) {
-          fd.품명 = dataFil.품명;
-          fd.거래처명 = dataFil.거래처명;
-          fd.규격 = dataFil.규격;
-          fd.단위 = dataFil.단위;
-        }
-      });
-      await insertAllData(file_data.value);
+      // file_data.value.forEach((fd: any) => {
+      //   if (isNaN(Date.parse(String(fd.출고일시))))
+      //     fd.출고일시 = moment().format("YYYY-MM-DD HH:mm:ss");
+      //   let dataFil = product.dataAll.value.filter(
+      //     (c) => c.품목코드 === fd.품목코드
+      //   )[0];
+      //   if (dataFil != undefined) {
+      //     fd.품명 = dataFil.품명;
+      //     fd.거래처명 = dataFil.거래처명;
+      //     fd.규격 = dataFil.규격;
+      //     fd.단위 = dataFil.단위;
+      //   }
+      // });
+      await dataManager.insertAllData(file_data.value);
       search();
-      pageChange();
+      pageChangeFirst();
     };
     reader.readAsArrayBuffer(file);
   }
 };
-// ########################## 엑셀 다운로드 및 업로드 끝 ##########################
 
-// 날짜 구하기
-const now = moment().format("YYYY-MM-DD");
-const nowPlus = moment().add(7, "days").format("YYYY-MM-DD");
-const max_year = moment().format("YYYY");
-const min_year = moment().add(-3, "years").format("YYYY");
-const now2 = ref("전체기간");
-// now2가 변경되면 실행
-watch([now2], (newValue, oldValue) => {
-  search();
-  pageChange();
-});
-
-// 날짜 리셋
-const reset_date = () => {
-  now2.value = "전체기간";
-  const litepicker_init = document.querySelector("#litepicker") as any;
-  litepicker_init.value = "전체기간";
+// ################################################## 검사 및 입고 확인 ##################################################
+// 수입검사 데이터 설정
+const url_incoming_itemreceive = "/api/quality/incoming/itemreceive";
+const incoming_itemreceive = useSendApi<StockItemReceive>(
+  url_incoming_itemreceive,
+  ref(1),
+  ref(10)
+);
+// ########################## 검사 및 입고 모달 설정  ##########################
+// 등록할 변수
+let itemReceiveData: StockItemReceive = {
+  수입검사NO: 0,
+  구분: "수입검사입고",
+  입고일시: "",
+  입고코드: "",
+  입고수: "",
+  유효일자: "",
 };
-
-// 체크박스 선택으로 데이터 가져오기
-const checkDebug: any = ref([]); // 체크박스 선택 데이터 저장변수
-
-const mainCheckBox = ref(true); // 메인 체크박스 상태
-const checkAll = (value: boolean) => {
-  // 메인 체크박스가 눌릴 때 모두 체크
-  const checkboxes = document.querySelectorAll("input[id=checkbox]"); // input의 id가 checkbox인 요소를 가져오기
-  // 만약 메인 체크박스가 눌렸다면
-  if (value === true) {
-    checkDebug.value = []; // 체크박스 선택 데이터 초기화
-    checkboxes.forEach((cb: any) => {
-      cb.checked = value; // 모든 체크박스를 메인체크박스에 맞춰서 바꿈
-      checkDebug.value.push(cb.value); // 모든 체크박스의 value를 가져와 저장
-    });
-  } else {
-    checkboxes.forEach((cb: any) => {
-      cb.checked = value;
-      checkDebug.value = [];
-    });
-  }
+// 검사 및 입고 모달 설정
+const checkModal = ref(false);
+const setCheckModal = (value: boolean) => {
+  checkModal.value = value;
 };
-
-const resetCheckBox = () => {
-  // 페이징 넘기면 체크박스 데이터 초기화
-  const mBox = document.querySelector<HTMLElement>(
-    "input[id=checkbox_all]"
-  ) as HTMLInputElement | null; // 오류 안뜨게 하려고 넣어둔것
-  if (!mBox) return; // 오류 안뜨게 하려고 넣어둔것
-  mBox.checked = false; // 메인체크박스 체크해제
-  mainCheckBox.value = true; // 메인체크박스 데이터 초기화
-  checkDebug.value = [];
+const checkButtonRef = ref(null);
+// 요청버튼 누르면 실행되는 함수
+const checkDataFunction = async () => {
+  itemReceiveData.입고수 = editModalData.입고수량;
+  incoming_itemreceive.insertData(itemReceiveData); // await : 이 함수가 끝나야 다음으로 넘어간다
+  editDataFunction();
+  setEditModal(false);
+  setCheckModal(false);
+  toast.success("검사 및 입고하셨습니다.");
 };
-// 테이블 열 크기 조정
-const table_width = [
-  "width: 50px",
-  "width: 50px",
-  "width: 50px",
-  "width: 50px",
-  "width: 50px",
-  "width: 50px",
-  "width: 50px",
-  "width: 50px",
-  "width: 50px",
-  "width: 50px",
-  "width: 50px",
-];
 </script>
+
+##############################################################################################################
 
 <template>
   <!-- style="height: calc(100vh - 250px)" : 브라우저 화면 창크기에 맞게 변경됨 : 100vh - 브라우저 창 크기 -->
@@ -310,8 +354,7 @@ const table_width = [
         as="a"
         variant="primary"
         @click="
-          (event) => {
-            event.preventDefault();
+          () => {
             setInsertModal(true);
           }
         "
@@ -324,9 +367,8 @@ const table_width = [
         as="a"
         variant="danger"
         @click="
-          (event) => {
-            event.preventDefault();
-            setDeleteConfirmationModal(true);
+          () => {
+            setDeleteModal(true);
           }
         "
       >
@@ -352,7 +394,7 @@ const table_width = [
       <div class="text-center">
         <div>
           <Litepicker
-            v-model="now2"
+            v-model="searchDate"
             :options="{
               autoApply: false,
               singleMode: false,
@@ -368,11 +410,7 @@ const table_width = [
               lang: 'ko',
               format: 'YY/MM/DD',
               delimiter: ' - ',
-              buttonText: {
-                reset: '새로고침',
-                apply: '적용',
-                cancel: '취소',
-              },
+              buttonText: litepikerButtonText,
             }"
             class="block w-40 mx-auto !box"
             placeholder="전체기간"
@@ -380,12 +418,15 @@ const table_width = [
         </div>
       </div>
       <div class="ml-2">
-        <FormSelect modelValue="전체" class="w-30 mt-3 !box sm:mt-0">
+        <FormSelect v-model="searchKey" class="w-30 mt-3 !box sm:mt-0">
           <option>전체</option>
-          <option>품목코드</option>
-          <option>거래처명</option>
-          <option>품명</option>
-          <option>규격</option>
+          <option>발주코드</option>
+          <option>발주품번</option>
+          <option>발주품명</option>
+          <option>전달사항</option>
+          <option>샘플수량</option>
+          <option>입고수량</option>
+          <option>결과</option>
           <option>비고</option>
         </FormSelect>
       </div>
@@ -398,16 +439,16 @@ const table_width = [
             @keyup.enter="
               () => {
                 search();
-                pageChange();
+                pageChangeFirst();
               }
             "
             placeholder="검색어를 입력해주세요"
           />
           <button
             @click="
-              {
+              () => {
                 search();
-                pageChange();
+                pageChangeFirst();
               }
             "
           >
@@ -418,21 +459,7 @@ const table_width = [
           </button>
         </div>
       </div>
-      <div class="ml-2">
-        <!-- BEGIN: Pagination Pages-->
-        <FormSelect
-          class="w-20 mt-3 !box sm:mt-0"
-          v-model="rowsPerPage"
-          @change="pageChange"
-        >
-          <option>10</option>
-          <option>25</option>
-          <option>35</option>
-          <option>50</option>
-        </FormSelect>
-        <!-- END: Pagination Pages-->
-      </div>
-      <div class="ml-2">
+      <div class="ml-2 mr-4">
         <Menu>
           <Menu.Button :as="Button" class="px-2 !box">
             <span class="flex items-center justify-center w-5 h-5">
@@ -461,22 +488,73 @@ const table_width = [
       class="flex flex-wrap items-center col-span-12 mt-0 intro-y sm:flex-nowrap"
     >
       <div>
+        <FormSelect v-model="sortKey" class="w-30 mt-3 !box sm:mt-0">
+          <option>등록일</option>
+          <option>발주코드</option>
+          <option>발주품번</option>
+          <option>발주품명</option>
+          <option>전달사항</option>
+          <option>샘플수량</option>
+          <option>입고수량</option>
+          <option>결과</option>
+        </FormSelect>
+      </div>
+      <div class="ml-3">
+        <Button
+          class="shadow-md"
+          as="a"
+          variant="outline-primary"
+          v-if="sortOrder == '오름차순'"
+          @click="sortOrderToggle"
+        >
+          <Lucide icon="SortAsc" class="w-4 h-4 mr-1" />
+
+          {{ sortOrder }}</Button
+        >
+        <Button
+          class="shadow-md"
+          as="a"
+          variant="outline-danger"
+          v-if="sortOrder == '내림차순'"
+          @click="sortOrderToggle"
+        >
+          <Lucide icon="SortDesc" class="w-4 h-4 mr-1" />
+
+          {{ sortOrder }}</Button
+        >
+      </div>
+      <div class="ml-5">
+        <FormSelect
+          class="w-20 mt-3 !box sm:mt-0"
+          v-model="rowsPerPage"
+          @change="pageChangeFirst"
+        >
+          <option>10</option>
+          <option>25</option>
+          <option>50</option>
+          <option>100</option>
+          <option :value="dataManager.dataCount.value">전체</option>
+        </FormSelect>
+      </div>
+      <div>
         <PaginationComponent
           class="pagination-component"
           v-model="currentPage"
-          :numberOfPages="numberOfPages"
+          :numberOfPages="dataManager.numberOfPages.value"
           @click="resetCheckBox()"
         />
       </div>
       <div class="hidden mx-auto md:block text-slate-500"></div>
       <div>
-        <span class="mr-3">[ {{ dataCount }}개 데이터 조회됨 ] </span>
-        <span class="mr-5"
-          >[ {{ currentPage }} / {{ numberOfPages }} 페이지 ]</span
+        <span class="mr-3"
+          >[ {{ dataManager.dataCount }}개 데이터 조회됨 ]
+        </span>
+        <span class="mr-4">
+          [ {{ currentPage }} / {{ dataManager.numberOfPages }} 페이지 ]</span
         >
-        <!-- END: Pagination-->
       </div>
     </div>
+    <!-- END: Pagination-->
     <!-- BEGIN: Data List -->
     <!-- style="height: calc(100vh - 350px)" : 브라우저 화면 창크기에 맞게 변경됨 -->
     <div class="col-span-12 overflow-auto intro-y lg:overflow-visible">
@@ -493,7 +571,7 @@ const table_width = [
               <Table.Th
                 class="text-center border-b-0 whitespace-nowrap"
                 id="checkbox"
-                :style="table_width[0]"
+                :style="table_setting.체크박스.style"
               >
                 <Input
                   class="transition-all duration-100 ease-in-out shadow-sm border-slate-200 cursor-pointer rounded focus:ring-4 focus:ring-offset-0 focus:ring-primary focus:ring-opacity-20 [&[type='checkbox']]:checked:bg-primary [&[type='checkbox']]:checked:border-primary [&[type='checkbox']]:checked:border-opacity-10 [&:disabled:not(:checked)]:bg-slate-100 [&:disabled:not(:checked)]:cursor-not-allowed [&:disabled:checked]:opacity-70 [&:disabled:checked]:cursor-not-allowed"
@@ -509,83 +587,83 @@ const table_width = [
                 />
               </Table.Th>
               <Table.Th
-                class="text-center border-b-0 whitespace-nowrap"
-                :style="table_width[1]"
+                class="text-center border-b-0 whitespace-nowrap font-bold"
+                :style="table_setting.순번.style"
               >
-                순번
+                {{ table_setting.순번.name }}
               </Table.Th>
               <Table.Th
-                class="text-center border-b-0 whitespace-nowrap"
-                :style="table_width[2]"
+                class="text-center border-b-0 whitespace-nowrap font-bold"
+                :style="table_setting.항목1.style"
               >
-                항목1
+                {{ table_setting.항목1.name }}
               </Table.Th>
               <Table.Th
-                class="text-center border-b-0 whitespace-nowrap"
-                :style="table_width[3]"
+                class="text-center border-b-0 whitespace-nowrap font-bold"
+                :style="table_setting.항목2.style"
               >
-                항목2
+                {{ table_setting.항목2.name }}
               </Table.Th>
               <Table.Th
-                class="text-center border-b-0 whitespace-nowrap"
-                :style="table_width[4]"
+                class="text-center border-b-0 whitespace-nowrap font-bold"
+                :style="table_setting.항목3.style"
               >
-                항목3
+                {{ table_setting.항목3.name }}
               </Table.Th>
               <Table.Th
-                class="text-center border-b-0 whitespace-nowrap"
-                :style="table_width[5]"
+                class="text-center border-b-0 whitespace-nowrap font-bold"
+                :style="table_setting.항목4.style"
               >
-                항목4
+                {{ table_setting.항목4.name }}
               </Table.Th>
               <Table.Th
-                class="text-center border-b-0 whitespace-nowrap"
-                :style="table_width[6]"
+                class="text-center border-b-0 whitespace-nowrap font-bold"
+                :style="table_setting.항목5.style"
               >
-                항목5
+                {{ table_setting.항목5.name }}
               </Table.Th>
               <Table.Th
-                class="text-center border-b-0 whitespace-nowrap"
-                :style="table_width[7]"
+                class="text-center border-b-0 whitespace-nowrap font-bold"
+                :style="table_setting.항목6.style"
               >
-                항목6
+                {{ table_setting.항목6.name }}
               </Table.Th>
               <Table.Th
-                class="text-center border-b-0 whitespace-nowrap"
-                :style="table_width[8]"
+                class="text-center border-b-0 whitespace-nowrap font-bold"
+                :style="table_setting.항목7.style"
               >
-                항목7
+                {{ table_setting.항목7.name }}
               </Table.Th>
               <Table.Th
-                class="text-center border-b-0 whitespace-nowrap"
-                :style="table_width[9]"
+                class="text-center border-b-0 whitespace-nowrap font-bold"
+                :style="table_setting.항목8.style"
               >
-                항목8
+                {{ table_setting.항목8.name }}
               </Table.Th>
               <Table.Th
-                class="text-center border-b-0 whitespace-nowrap"
-                :style="table_width[10]"
+                class="text-center border-b-0 whitespace-nowrap font-bold"
+                :style="table_setting.상세보기.style"
               >
-                항목9
+                {{ table_setting.상세보기.name }}
+              </Table.Th>
+              <Table.Th
+                class="text-center border-b-0 whitespace-nowrap font-bold"
+                :style="table_setting.편집.style"
+              >
+                {{ table_setting.편집.name }}
               </Table.Th>
             </Table.Tr>
           </Table.Thead>
           <Table.Tbody style="position: relative; z-index: 1">
-            <!-- <Table.Tr
-          <Table.Tr
-            v-for="(faker, fakerKey) in _.take(fakerData, 10)"
-            :key="fakerKey"
-            class="intro-x"
-          > -->
             <Table.Tr
-              v-for="(todo, index) in datas"
+              v-for="(todo, index) in dataManager.datas.value"
               :key="todo.NO"
               class="intro-x"
             >
               <Table.Td
-                class="first:rounded-l-md last:rounded-r-md w-5 text-center bg-white border-b-0 dark:bg-darkmode-600 shadow-[20px_3px_20px_#0000000b]"
+                class="first:rounded-l-md last:rounded-r-md text-center bg-white border-b-0 dark:bg-darkmode-600 shadow-[20px_3px_20px_#0000000b]"
                 id="checkbox"
-                :style="table_width[0]"
+                :style="table_setting.체크박스.style"
               >
                 <input
                   class="transition-all duration-100 ease-in-out shadow-sm border-slate-200 cursor-pointer rounded focus:ring-4 focus:ring-offset-0 focus:ring-primary focus:ring-opacity-20 [&[type='checkbox']]:checked:bg-primary [&[type='checkbox']]:checked:border-primary [&[type='checkbox']]:checked:border-opacity-10 [&:disabled:not(:checked)]:bg-slate-100 [&:disabled:not(:checked)]:cursor-not-allowed [&:disabled:checked]:opacity-70 [&:disabled:checked]:cursor-not-allowed"
@@ -596,95 +674,136 @@ const table_width = [
                 />
               </Table.Td>
               <Table.Td
-                class="first:rounded-l-md last:rounded-r-md w-5 text-center bg-white border-b-0 dark:bg-darkmode-600 shadow-[20px_3px_20px_#0000000b]"
-                :style="table_width[1]"
+                class="first:rounded-l-md last:rounded-r-md text-center bg-white border-b-0 dark:bg-darkmode-600 shadow-[20px_3px_20px_#0000000b]"
+                :style="table_setting.순번.style"
               >
                 <div>{{ index + 1 + (currentPage - 1) * rowsPerPage }}</div>
               </Table.Td>
               <Table.Td
-                class="first:rounded-l-md last:rounded-r-md w-10 text-center bg-white border-b-0 dark:bg-darkmode-600 shadow-[20px_3px_20px_#0000000b]"
-                :style="table_width[2]"
+                class="first:rounded-l-md last:rounded-r-md text-center bg-white border-b-0 dark:bg-darkmode-600 shadow-[20px_3px_20px_#0000000b]"
+                :style="table_setting.항목1.style"
               >
-                <div>예시데이터1</div>
+                <div>{{ todo[table_setting.항목1.name] }}</div>
               </Table.Td>
               <Table.Td
-                class="first:rounded-l-md last:rounded-r-md w-10 text-center bg-white border-b-0 dark:bg-darkmode-600 shadow-[20px_3px_20px_#0000000b]"
-                :style="table_width[3]"
+                class="first:rounded-l-md last:rounded-r-md text-center bg-white border-b-0 dark:bg-darkmode-600 shadow-[20px_3px_20px_#0000000b]"
+                :style="table_setting.항목2.style"
               >
-                <div>예시데이터2</div>
+                <div>{{ todo[table_setting.항목2.name] }}</div>
               </Table.Td>
               <Table.Td
-                class="first:rounded-l-md last:rounded-r-md bg-white border-b-0 dark:bg-darkmode-600 shadow-[20px_3px_20px_#0000000b]"
-                :style="table_width[4]"
+                class="first:rounded-l-md last:rounded-r-md text-center bg-white border-b-0 dark:bg-darkmode-600 shadow-[20px_3px_20px_#0000000b]"
+                :style="table_setting.항목3.style"
               >
-                <div>예시데이터3</div>
+                <div>{{ todo[table_setting.항목3.name] }}</div>
               </Table.Td>
               <Table.Td
-                class="first:rounded-l-md last:rounded-r-md w-50 bg-white border-b-0 dark:bg-darkmode-600 shadow-[20px_3px_20px_#0000000b]"
-                :style="table_width[5]"
+                class="first:rounded-l-md last:rounded-r-md text-center bg-white border-b-0 dark:bg-darkmode-600 shadow-[20px_3px_20px_#0000000b]"
+                :style="table_setting.항목4.style"
               >
-                <div>예시데이터4</div>
+                <div>{{ todo[table_setting.항목4.name] }}</div>
               </Table.Td>
               <Table.Td
-                class="first:rounded-l-md last:rounded-r-md w-5 bg-white border-b-0 dark:bg-darkmode-600 shadow-[20px_3px_20px_#0000000b]"
-                :style="table_width[6]"
+                class="first:rounded-l-md last:rounded-r-md text-center bg-white border-b-0 dark:bg-darkmode-600 shadow-[20px_3px_20px_#0000000b]"
+                :style="table_setting.항목5.style"
               >
-                <div>예시데이터5</div>
+                <div>{{ todo[table_setting.항목5.name] }}</div>
               </Table.Td>
               <Table.Td
-                class="first:rounded-l-md last:rounded-r-md w-10 text-center bg-white border-b-0 dark:bg-darkmode-600 shadow-[20px_3px_20px_#0000000b]"
-                :style="table_width[7]"
+                class="first:rounded-l-md last:rounded-r-md text-center bg-white border-b-0 dark:bg-darkmode-600 shadow-[20px_3px_20px_#0000000b]"
+                :style="table_setting.항목6.style"
               >
-                <div>예시데이터6</div>
+                <div>{{ todo[table_setting.항목6.name] }}</div>
               </Table.Td>
               <Table.Td
-                class="first:rounded-l-md last:rounded-r-md w-10 text-center bg-white border-b-0 dark:bg-darkmode-600 shadow-[20px_3px_20px_#0000000b]"
-                :style="table_width[8]"
+                class="first:rounded-l-md last:rounded-r-md text-center bg-white border-b-0 dark:bg-darkmode-600 shadow-[20px_3px_20px_#0000000b]"
+                :style="table_setting.항목7.style"
               >
-                <div>예시데이터7</div>
+                <div>{{ todo[table_setting.항목7.name] }}</div>
               </Table.Td>
               <Table.Td
-                class="first:rounded-l-md last:rounded-r-md w-10 text-center bg-white border-b-0 dark:bg-darkmode-600 shadow-[20px_3px_20px_#0000000b]"
-                :style="table_width[9]"
+                class="first:rounded-l-md last:rounded-r-md text-center bg-white border-b-0 dark:bg-darkmode-600 shadow-[20px_3px_20px_#0000000b]"
+                :style="table_setting.항목8.style"
               >
-                <div>예시데이터8</div>
+                <div>{{ todo[table_setting.항목8.name] }}</div>
               </Table.Td>
               <Table.Td
                 class="first:rounded-l-md last:rounded-r-md text-center bg-white border-b-0 dark:bg-darkmode-600 shadow-[20px_3px_20px_#0000000b] py-0 relative before:block before:w-px before:h-8 before:bg-slate-200 before:absolute before:left-0 before:inset-y-0 before:my-auto before:dark:bg-darkmode-400"
-                :style="table_width[10]"
+                :style="table_setting.상세보기.style"
               >
-                <div class="flex items-center justify-center text-danger">
+                <div class="flex items-center justify-center text-cyan-700">
                   <a
                     class="flex items-center mr-3"
                     href="#"
                     @click="
                       () => {
                         editModalData = todo;
+                        setDetailModal(true);
+                      }
+                    "
+                  >
+                    <Lucide icon="ListPlus" class="w-5 h-5 mr-1" />
+                    품질기준서
+                  </a>
+                </div>
+              </Table.Td>
+              <Table.Td
+                class="first:rounded-l-md last:rounded-r-md text-center bg-white border-b-0 dark:bg-darkmode-600 shadow-[20px_3px_20px_#0000000b] py-0 relative before:block before:w-px before:h-8 before:bg-slate-200 before:absolute before:left-0 before:inset-y-0 before:my-auto before:dark:bg-darkmode-400"
+                :style="table_setting.편집.style"
+              >
+                <div
+                  v-if="todo.결과 == '미검사'"
+                  class="flex items-center justify-center text-danger"
+                >
+                  <a
+                    class="flex items-center mr-3"
+                    href="#"
+                    @click="
+                      () => {
+                        editModalData = todo;
+                        itemReceiveData.수입검사NO = todo.NO;
+                        itemReceiveData.입고코드 =
+                          (todo.발주코드 ?? '') +
+                          (todo.발주품번 ?? '') +
+                          moment().format('YYMMDD');
+                        itemReceiveData.입고일시 = moment().format(
+                          'YYYY-MM-DD HH:mm:ss'
+                        );
+                        itemReceiveData.유효일자 = moment()
+                          .add(1, 'month')
+                          .format('YYYY-MM-DD');
                         setEditModal(true);
                       }
                     "
                   >
                     <Lucide icon="Edit" class="w-4 h-4 mr-1" />
-                    수정
+                    검사 및 입고
                   </a>
+                </div>
+                <div
+                  v-else
+                  class="flex items-center justify-center text-success"
+                >
+                  <Lucide icon="CheckCircle" class="w-4 h-4 mr-1" />
+                  검사완료
                 </div>
               </Table.Td>
             </Table.Tr>
           </Table.Tbody>
         </Table>
-        <div class="text-center mt-20" v-if="dataCount == 0">
+        <div class="text-center mt-20" v-if="dataManager.dataCount.value == 0">
           저장된 데이터가 없습니다.
         </div>
       </div>
     </div>
     <!-- END: Data List -->
   </div>
-  <!-- BEGIN: Insert Modal Content -->
   <!-- BEGIN: FOOTER(COPYRIGHT) -->
   <div class="intro-y mt-5 mr-5" style="text-align: right">
     <footer>&copy;2023 QInnotek. All rights reserved.</footer>
   </div>
   <!-- END: FOOTER(COPYRIGHT) -->
+  <!-- BEGIN: Insert Modal Content -->
   <Dialog
     size="md"
     :open="insertModal"
@@ -693,59 +812,84 @@ const table_width = [
         setInsertModal(false);
       }
     "
+    :key="insertModalData?.발주코드"
   >
     <Dialog.Panel class="p-10 text-center">
       <!--추가 Modal 내용 시작-->
       <div class="mb-5" style="font-weight: bold">등록</div>
+      <!-- <Tab.Group>
+        <Tab.List variant="boxed-tabs">
+          <Tab>
+            <Tab.Button class="w-full py-2" as="button"> 기본 내용 </Tab.Button>
+          </Tab>
+          <Tab>
+            <Tab.Button class="w-full py-2" as="button"> 추가 내용 </Tab.Button>
+          </Tab>
+        </Tab.List>
+        <Tab.Panels class="mt-5">
+          <Tab.Panel class="leading-relaxed">
+            <div style="text-align: left">
+              <div class="mt-3">
+                <FormLabel htmlFor="vertical-form-3">발주코드</FormLabel>
+                <FormInput
+                  id="vertical-form-3"
+                  type="text"
+                  v-model="insertModalData.발주코드"
+                  placeholder="여기를 클릭하여 발주코드를 등록하세요"
+                  @click="setOrderModal(true)"
+                />
+              </div>
+              <div class="mt-3">
+                <FormLabel htmlFor="vertical-form-4">구분</FormLabel>
+                <FormInput
+                  id="vertical-form-4"
+                  type="text"
+                  v-model="insertModalData.구분"
+                  placeholder=""
+                />
+              </div>
+              <div class="mt-3">
+                <FormLabel htmlFor="vertical-form-6">공정명</FormLabel>
+                <FormInput
+                  id="vertical-form-6"
+                  type="text"
+                  v-model="insertModalData.공정명"
+                  placeholder=""
+                />
+              </div>
+            </div>
+          </Tab.Panel>
+          <Tab.Panel class="leading-relaxed">
+            <div style="text-align: left">
+              <div class="mt-3">
+                <FormLabel htmlFor="vertical-form-2">내용</FormLabel>
+                <FormInput
+                  id="vertical-form-2"
+                  type="text"
+                  v-model="insertModalData.내용"
+                  placeholder=""
+                />
+              </div>
+              <div class="mt-3">
+                <FormLabel htmlFor="vertical-form-11">비고</FormLabel>
+                <FormInput
+                  id="vertical-form-11"
+                  type="text"
+                  v-model="insertModalData.비고"
+                  placeholder=""
+                />
+              </div>
+            </div>
+          </Tab.Panel>
+        </Tab.Panels>
+      </Tab.Group> -->
       <div style="text-align: left">
-        <div>
-          <FormLabel htmlFor="vertical-form-1">등록일시</FormLabel>
-          <FormInput
-            id="vertical-form-1"
-            type="date"
-            v-model="insertModalData.출고일시"
-            placeholder=""
-          />
-        </div>
-        <div class="mt-3">
-          <FormLabel htmlFor="vertical-form-2">등록코드</FormLabel>
-          <select v-tom v-model="insertModalData.NO">
-            <option value="" selected>=== 필수선택 ===</option>
-            <option
-              :value="p.NO"
-              v-for="p in product.dataAll.value"
-              :key="p.NO"
-            >
-              {{ p.품목코드 }} # 품명:{{ p.품명 }} # 규격:{{ p.규격 }} # 단위:{{
-                p.단위
-              }}
-            </option>
-          </select>
-        </div>
-        <div class="mt-3">
-          <FormLabel htmlFor="vertical-form-2">등록수</FormLabel>
-          <FormInput
-            id="vertical-form-2"
-            type="text"
-            v-model="insertModalData.출고수"
-            placeholder=""
-          />
-        </div>
-        <div class="mt-3">
-          <FormLabel htmlFor="vertical-form-2">비고</FormLabel>
-          <FormInput
-            id="vertical-form-2"
-            type="text"
-            v-model="insertModalData.비고"
-            placeholder=""
-          />
-        </div>
         <div class="mt-5 text-right">
           <Button
             class="mr-2 shadow-md"
             variant="primary"
             @click="
-              () => {
+              async () => {
                 insertDataFunction();
               }
             "
@@ -763,8 +907,8 @@ const table_width = [
           >
         </div>
       </div>
-      <!--Modal 내용 끝--></Dialog.Panel
-    >
+      <!--Modal 내용 끝-->
+    </Dialog.Panel>
   </Dialog>
   <!-- END: Insert Modal Content -->
   <!-- BEGIN: Edit Modal Content -->
@@ -778,96 +922,254 @@ const table_width = [
     "
   >
     <Dialog.Panel class="p-10 text-center">
-      <div class="mb-5" style="font-weight: bold">수정</div>
+      <div class="mb-5" style="font-weight: bold">검사 및 입고</div>
+      <Tab.Group>
+        <Tab.List variant="boxed-tabs">
+          <Tab>
+            <Tab.Button class="w-full py-2" as="button"> 기본 내용 </Tab.Button>
+          </Tab>
+          <Tab>
+            <Tab.Button class="w-full py-2" as="button"> 추가 내용 </Tab.Button>
+          </Tab>
+        </Tab.List>
+        <Tab.Panels class="mt-5">
+          <Tab.Panel class="leading-relaxed">
+            <div
+              style="
+                text-align: left;
+                overflow-y: scroll;
+                overflow-x: hidden;
+                height: 500px;
+              "
+            >
+              <div class="mt-3">
+                <FormLabel htmlFor="vertical-form-3">발주코드</FormLabel>
+                <FormInput
+                  id="vertical-form-3"
+                  type="text"
+                  v-model="editModalData.발주코드"
+                  placeholder=""
+                  readonly
+                />
+              </div>
+              <div class="mt-3">
+                <FormLabel htmlFor="vertical-form-4">발주품번</FormLabel>
+                <FormInput
+                  id="vertical-form-4"
+                  type="text"
+                  v-model="editModalData.발주품번"
+                  placeholder=""
+                  readonly
+                />
+              </div>
+              <div class="mt-3">
+                <FormLabel htmlFor="vertical-form-6">발주품명</FormLabel>
+                <FormInput
+                  id="vertical-form-6"
+                  type="text"
+                  v-model="editModalData.발주품명"
+                  placeholder=""
+                  readonly
+                />
+              </div>
+              <div class="mt-3">
+                <FormLabel htmlFor="vertical-form-6">전달사항</FormLabel>
+                <FormInput
+                  id="vertical-form-6"
+                  type="text"
+                  v-model="editModalData.전달사항"
+                  placeholder=""
+                  readonly
+                />
+              </div>
+              <div class="mt-3">
+                <FormLabel htmlFor="vertical-form-6">샘플수량</FormLabel>
+                <FormInput
+                  id="vertical-form-6"
+                  type="number"
+                  v-model="editModalData.샘플수량"
+                  placeholder=""
+                />
+              </div>
+              <div class="mt-3">
+                <FormLabel htmlFor="vertical-form-6">입고수량</FormLabel>
+                <FormInput
+                  id="vertical-form-6"
+                  type="number"
+                  v-model="editModalData.입고수량"
+                  placeholder=""
+                />
+              </div>
+              <div class="mt-3">
+                <FormLabel htmlFor="vertical-form-6">입고코드</FormLabel>
+                <FormInput
+                  id="vertical-form-6"
+                  type="text"
+                  v-model="itemReceiveData.입고코드"
+                  placeholder=""
+                />
+              </div>
+              <div class="mt-3">
+                <FormLabel htmlFor="vertical-form-6">입고일시</FormLabel>
+                <FormInput
+                  id="vertical-form-6"
+                  type="datetime-local"
+                  v-model="itemReceiveData.입고일시"
+                  placeholder=""
+                />
+              </div>
+              <div class="mt-3">
+                <FormLabel htmlFor="vertical-form-6">유효일자</FormLabel>
+                <FormInput
+                  id="vertical-form-6"
+                  type="date"
+                  v-model="itemReceiveData.유효일자"
+                  placeholder=""
+                />
+              </div>
+              <div class="mt-3">
+                <FormLabel htmlFor="vertical-form-6">결과</FormLabel>
+                <FormSelect v-model="editModalData.결과">
+                  <option value="합격">합격</option>
+                  <option value="불합격">불합격</option>
+                </FormSelect>
+              </div>
+            </div>
+          </Tab.Panel>
+          <Tab.Panel class="leading-relaxed">
+            <div
+              style="
+                text-align: left;
+                overflow-y: scroll;
+                overflow-x: hidden;
+                height: 500px;
+              "
+            >
+              <div class="mt-3">
+                <FormLabel htmlFor="vertical-form-2">구분</FormLabel>
+                <FormInput
+                  id="vertical-form-2"
+                  type="text"
+                  v-model="editModalData.구분"
+                  placeholder=""
+                />
+              </div>
+              <div class="mt-3">
+                <FormLabel htmlFor="vertical-form-2">내용1</FormLabel>
+                <FormInput
+                  id="vertical-form-2"
+                  type="text"
+                  v-model="editModalData.내용1"
+                  placeholder=""
+                />
+              </div>
+              <div class="mt-3">
+                <FormLabel htmlFor="vertical-form-2">내용2</FormLabel>
+                <FormInput
+                  id="vertical-form-2"
+                  type="text"
+                  v-model="editModalData.내용2"
+                  placeholder=""
+                />
+              </div>
+              <div class="mt-3">
+                <FormLabel htmlFor="vertical-form-2">내용3</FormLabel>
+                <FormInput
+                  id="vertical-form-2"
+                  type="text"
+                  v-model="editModalData.내용3"
+                  placeholder=""
+                />
+              </div>
+              <div class="mt-3">
+                <FormLabel htmlFor="vertical-form-2">내용4</FormLabel>
+                <FormInput
+                  id="vertical-form-2"
+                  type="text"
+                  v-model="editModalData.내용4"
+                  placeholder=""
+                />
+              </div>
+              <div class="mt-3">
+                <FormLabel htmlFor="vertical-form-2">내용5</FormLabel>
+                <FormInput
+                  id="vertical-form-2"
+                  type="text"
+                  v-model="editModalData.내용5"
+                  placeholder=""
+                />
+              </div>
+              <div class="mt-3">
+                <FormLabel htmlFor="vertical-form-2">내용6</FormLabel>
+                <FormInput
+                  id="vertical-form-2"
+                  type="text"
+                  v-model="editModalData.내용6"
+                  placeholder=""
+                />
+              </div>
+              <div class="mt-3">
+                <FormLabel htmlFor="vertical-form-2">내용7</FormLabel>
+                <FormInput
+                  id="vertical-form-2"
+                  type="text"
+                  v-model="editModalData.내용7"
+                  placeholder=""
+                />
+              </div>
+              <div class="mt-3">
+                <FormLabel htmlFor="vertical-form-2">내용8</FormLabel>
+                <FormInput
+                  id="vertical-form-2"
+                  type="text"
+                  v-model="editModalData.내용8"
+                  placeholder=""
+                />
+              </div>
+              <div class="mt-3">
+                <FormLabel htmlFor="vertical-form-2">내용9</FormLabel>
+                <FormInput
+                  id="vertical-form-2"
+                  type="text"
+                  v-model="editModalData.내용9"
+                  placeholder=""
+                />
+              </div>
+              <div class="mt-3">
+                <FormLabel htmlFor="vertical-form-2">내용10</FormLabel>
+                <FormInput
+                  id="vertical-form-2"
+                  type="text"
+                  v-model="editModalData.내용10"
+                  placeholder=""
+                />
+              </div>
+              <div class="mt-3">
+                <FormLabel htmlFor="vertical-form-11">비고</FormLabel>
+                <FormInput
+                  id="vertical-form-11"
+                  type="text"
+                  v-model="editModalData.비고"
+                  placeholder=""
+                />
+              </div>
+            </div>
+          </Tab.Panel>
+        </Tab.Panels>
+      </Tab.Group>
       <div style="text-align: left">
-        <div>
-          <FormLabel htmlFor="vertical-form-1">출고일시</FormLabel>
-          <FormInput
-            id="vertical-form-1"
-            type="date"
-            v-model="editModalData.출고일시"
-            placeholder=""
-          />
-        </div>
-        <div class="mt-3">
-          <FormLabel htmlFor="vertical-form-1">품목코드</FormLabel>
-          <FormInput
-            id="vertical-form-1"
-            type="text"
-            v-model="editModalData.품목코드"
-            placeholder=""
-            readonly
-          />
-        </div>
-        <div class="mt-3">
-          <FormLabel htmlFor="vertical-form-1">거래처명</FormLabel>
-          <FormInput
-            id="vertical-form-1"
-            type="text"
-            v-model="editModalData.거래처명"
-            placeholder=""
-            readonly
-          />
-        </div>
-        <div class="mt-3">
-          <FormLabel htmlFor="vertical-form-1">품명</FormLabel>
-          <FormInput
-            id="vertical-form-1"
-            type="text"
-            v-model="editModalData.품명"
-            placeholder=""
-            readonly
-          />
-        </div>
-        <div class="mt-3">
-          <FormLabel htmlFor="vertical-form-1">규격</FormLabel>
-          <FormInput
-            id="vertical-form-1"
-            type="text"
-            v-model="editModalData.규격"
-            placeholder=""
-            readonly
-          />
-        </div>
-        <div class="mt-3">
-          <FormLabel htmlFor="vertical-form-2">단위</FormLabel>
-          <FormInput
-            id="vertical-form-2"
-            type="text"
-            v-model="editModalData.단위"
-            placeholder=""
-            readonly
-          />
-        </div>
-        <div class="mt-3">
-          <FormLabel htmlFor="vertical-form-2">출고수</FormLabel>
-          <FormInput
-            id="vertical-form-2"
-            type="text"
-            v-model="editModalData.출고수"
-            placeholder=""
-          />
-        </div>
-        <div class="mt-3">
-          <FormLabel htmlFor="vertical-form-2">비고</FormLabel>
-          <FormInput
-            id="vertical-form-2"
-            type="text"
-            v-model="editModalData.비고"
-            placeholder=""
-          />
-        </div>
         <div class="mt-5 text-right">
           <Button
             class="mr-2 shadow-md"
             variant="primary"
             @click="
               () => {
-                editData(editModalData);
-                setEditModal(false);
+                setCheckModal(true);
+                // editDataFunction();
+                // setEditModal(false);
               }
             "
-            >확인</Button
+            >검사 및 입고</Button
           >
           <Button
             class="mr-2 shadow-md"
@@ -884,12 +1186,42 @@ const table_width = [
     </Dialog.Panel>
   </Dialog>
   <!-- END: Edit Modal Content -->
-  <!-- BEGIN: Delete Confirmation Modal -->
+  <!-- BEGIN: Detail Modal Content -->
   <Dialog
-    :open="deleteConfirmationModal"
+    size="lg"
+    :open="detailModal"
     @close="
       () => {
-        setDeleteConfirmationModal(false);
+        setDetailModal(false);
+      }
+    "
+  >
+    <Dialog.Panel>
+      <MasterDetail :data="editModalData" />
+      <div class="px-5 pb-8 text-center">
+        <Button
+          variant="outline-primary"
+          as="a"
+          type="button"
+          @click="
+            () => {
+              setDetailModal(false);
+            }
+          "
+          class="w-24 mr-1"
+        >
+          닫기
+        </Button>
+      </div>
+    </Dialog.Panel>
+  </Dialog>
+  <!-- END: Detail Modal Content -->
+  <!-- BEGIN: Delete Confirmation Modal -->
+  <Dialog
+    :open="deleteModal"
+    @close="
+      () => {
+        setDeleteModal(false);
       }
     "
     :initialFocus="deleteButtonRef"
@@ -906,7 +1238,7 @@ const table_width = [
           type="button"
           @click="
             () => {
-              setDeleteConfirmationModal(false);
+              setDeleteModal(false);
             }
           "
           class="w-24 mr-1"
@@ -921,7 +1253,7 @@ const table_width = [
           @click="
             () => {
               deleteDataFunction();
-              setDeleteConfirmationModal(false);
+              setDeleteModal(false);
             }
           "
         >
@@ -946,7 +1278,7 @@ const table_width = [
           class="w-38 mr-3"
           @click="
             () => {
-              exportFile(datas);
+              exportFile(dataManager.datas.value);
               setExcelExportModal(false);
             }
           "
@@ -959,7 +1291,7 @@ const table_width = [
           class="w-38 mr-3"
           @click="
             () => {
-              exportFile(dataAll);
+              exportFile(dataManager.dataSearchAll.value);
               setExcelExportModal(false);
             }
           "
@@ -1045,7 +1377,7 @@ const table_width = [
           class="w-38 mr-3"
           @click="
             () => {
-              printPage(datas);
+              printPage(dataManager.datas.value);
               setPrintModal(false);
             }
           "
@@ -1058,7 +1390,7 @@ const table_width = [
           class="w-38 mr-3"
           @click="
             () => {
-              printPage(dataAll);
+              printPage(dataManager.dataSearchAll.value);
               setPrintModal(false);
             }
           "
@@ -1077,4 +1409,67 @@ const table_width = [
     </Dialog.Panel>
   </Dialog>
   <!-- END: 프린트 출력 Modal -->
+
+  <!-- BEGIN: 검사 및 입고 확인 Modal -->
+  <Dialog
+    :open="checkModal"
+    @close="
+      () => {
+        setCheckModal(false);
+      }
+    "
+    :initialFocus="checkButtonRef"
+  >
+    <Dialog.Panel>
+      <div class="p-5 text-center">
+        <Lucide
+          icon="CheckCircle"
+          class="w-16 h-16 mx-auto mt-3 text-success"
+        />
+        <div class="mt-5 text-3xl">검사 및 입고</div>
+        <div class="mt-2 text-slate-500">정말 입고하시겠습니까?</div>
+
+        <!-- <div style="text-align: left">
+          <div class="mt-3">
+            <FormLabel htmlFor="vertical-form-3">전달사항</FormLabel>
+            <FormInput
+              id="vertical-form-3"
+              type="text"
+              v-model="incomingModalData.전달사항"
+              placeholder="여기에 특이사항을 입력해주세요"
+            />
+          </div>
+        </div> -->
+      </div>
+      <div class="px-5 pb-8 text-center">
+        <Button
+          variant="outline-secondary"
+          type="button"
+          @click="
+            () => {
+              setCheckModal(false);
+            }
+          "
+          class="w-24 mr-1"
+        >
+          취소
+        </Button>
+        <Button
+          variant="primary"
+          type="button"
+          class="w-24"
+          ref="incomingButtonRef"
+          @click="
+            () => {
+              checkDataFunction();
+              setCheckModal(false);
+            }
+          "
+        >
+          입고
+        </Button>
+      </div>
+    </Dialog.Panel>
+  </Dialog>
+  <!-- END: Delete Confirmation Modal -->
 </template>
