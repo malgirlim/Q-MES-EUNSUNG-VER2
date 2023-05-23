@@ -33,18 +33,13 @@ export const useSideMenuStore = defineStore("sideMenu", {
           },
           {
             icon: "FileText",
-            pageName: "side-menu-mobile-",
+            pageName: "side-menu-mobile-order-current-notify",
             title: "수주현황 통보",
           },
           {
             icon: "FileText",
-            pageName: "side-menu-mobile-",
-            title: "작업일보 작성",
-          },
-          {
-            icon: "FileText",
-            pageName: "side-menu-mobile-",
-            title: "생산실적집계",
+            pageName: "side-menu-mobile-order-task-report",
+            title: "생산실적 집계",
           },
         ],
       },
@@ -55,22 +50,22 @@ export const useSideMenuStore = defineStore("sideMenu", {
         subMenu: [
           {
             icon: "FileText",
-            pageName: "side-menu-mobile-",
+            pageName: "side-menu-mobile-stock-receive",
             title: "입출고",
           },
           {
             icon: "FileText",
-            pageName: "side-menu-mobile-",
+            pageName: "side-menu-mobile-stock-lot-print",
             title: "LOT출력",
           },
           {
             icon: "FileText",
-            pageName: "side-menu-mobile-",
+            pageName: "side-menu-mobile-stock-lot-track",
             title: "LOT추적",
           },
           {
             icon: "FileText",
-            pageName: "side-menu-mobile-",
+            pageName: "side-menu-mobile-stock-safe-notify",
             title: "안전재고 미달통보",
           },
         ],
@@ -87,37 +82,37 @@ export const useSideMenuStore = defineStore("sideMenu", {
           },
           {
             icon: "FileText",
-            pageName: "side-menu-mobile-",
+            pageName: "side-menu-mobile-prevent-daily-check-notify",
             title: "일상점검 통보",
           },
           {
             icon: "FileText",
-            pageName: "side-menu-mobile-",
+            pageName: "side-menu-mobile-prevent-forecast",
             title: "예방보전 예보",
           },
           {
             icon: "FileText",
-            pageName: "side-menu-mobile-",
+            pageName: "side-menu-mobile-prevent-notify",
             title: "예방보전 통보",
           },
           {
             icon: "FileText",
-            pageName: "side-menu-mobile-",
+            pageName: "side-menu-mobile-prevent-repair-forecast",
             title: "설비수리 예보",
           },
           {
             icon: "FileText",
-            pageName: "side-menu-mobile-",
+            pageName: "side-menu-mobile-prevent-repair-notify",
             title: "설비수리 통보",
           },
           {
             icon: "FileText",
-            pageName: "side-menu-mobile-",
+            pageName: "side-menu-mobile-prevent-change-notify",
             title: "설비부품 교체시기 통보",
           },
           {
             icon: "FileText",
-            pageName: "side-menu-mobile-",
+            pageName: "side-menu-mobile-prevent-error-notify",
             title: "설비고장발생 통보",
           },
         ],
