@@ -36,7 +36,8 @@ const user_level = proxy.gstate.level.OrderDelivery; //권한레벨
 // 페이지 로딩 시 시작
 onMounted(async () => {
   await dataManager.loadDatas(); // 메인으로 쓸 데이터 불러오기
-  await delivery.loadDatas(); // 납품 데이터 불러오기
+  // await delivery.loadDatas(); // 납품 데이터 불러오기
+  await delivery.searchDatas("", "수주NO", radioSelect.value, "", "");
   await delivery_finStock.loadDatas(); // 완제품재고 데이터 불러오기
 });
 
@@ -56,14 +57,15 @@ const table_setting = {
   체크박스: { name: "체크박스", style: "width: 20px" },
   선택: { name: "선택", style: "width: 20px; text-align: center;" },
   순번: { name: "순번", style: "width: 20px; text-align: center;" },
-  항목1: { name: "수주일", style: "width: 50px; text-align: center;" },
-  항목2: { name: "코드", style: "width: 50px; text-align: center;" },
-  항목3: { name: "코드순번", style: "width: 50px; text-align: center;" },
-  항목4: { name: "거래처명", style: "width: 50px; text-align: center;" },
-  항목5: { name: "품목구분", style: "width: 50px; text-align: center;" },
-  항목6: { name: "품명", style: "width: 50px; text-align: center;" },
-  항목7: { name: "수량", style: "width: 50px; text-align: center;" },
-  항목8: { name: "납기일", style: "width: 50px; text-align: center;" },
+  항목1: { name: "코드", style: "width: 50px; text-align: center;" },
+  항목2: { name: "코드순번", style: "width: 50px; text-align: center;" },
+  항목3: { name: "수주일", style: "width: 50px; text-align: center;" },
+  항목4: { name: "납기일", style: "width: 50px; text-align: center;" },
+  항목5: { name: "거래처명", style: "width: 50px; text-align: center;" },
+  항목6: { name: "품목구분", style: "width: 50px; text-align: center;" },
+  항목7: { name: "품명", style: "width: 50px; text-align: center;" },
+  항목8: { name: "수량", style: "width: 50px; text-align: center;" },
+  항목9: { name: "납품수", style: "width: 50px; text-align: center;" },
   상세보기: { name: "정보", style: "width: 50px; text-align: center;" },
   편집: { name: "편집", style: "width: 50px; text-align: center;" },
   진행율: { name: "진행율", style: "width: 50px; text-align: center;" },
@@ -763,6 +765,18 @@ const shipmentDataFunction = async () => {
                     >
                       {{ table_setting.항목8.name }}
                     </Table.Th>
+                    <Table.Th
+                      class="text-center border-b-0 whitespace-nowrap font-bold"
+                      :style="table_setting.항목9.style"
+                    >
+                      {{ table_setting.항목9.name }}
+                    </Table.Th>
+                    <Table.Th
+                      class="text-center border-b-0 whitespace-nowrap font-bold"
+                      :style="table_setting.진행율.style"
+                    >
+                      {{ table_setting.진행율.name }}
+                    </Table.Th>
                     <!-- <Table.Th
                       class="text-center border-b-0 whitespace-nowrap font-bold"
                       :style="table_setting.진행율.style"
@@ -890,6 +904,45 @@ const shipmentDataFunction = async () => {
                       :style="table_setting.항목8.style"
                     >
                       <div>{{ todo[table_setting.항목8.name] }}</div>
+                    </Table.Td>
+                    <Table.Td
+                      :class="[
+                        'first:rounded-l-md last:rounded-r-md text-center bg-white border-b-0 dark:bg-darkmode-600 shadow-[20px_3px_20px_#0000000b]',
+                        { 'bg-warning': radioSelect == todo.NO },
+                      ]"
+                      :style="table_setting.항목9.style"
+                    >
+                      <div>{{ todo[table_setting.항목9.name] }}</div>
+                    </Table.Td>
+                    <Table.Td
+                      :class="[
+                        'first:rounded-l-md last:rounded-r-md text-center bg-white border-b-0 dark:bg-darkmode-600 shadow-[20px_3px_20px_#0000000b]',
+                        { 'bg-warning': radioSelect == todo.NO },
+                      ]"
+                      :style="table_setting.진행율.style"
+                    >
+                      <div>
+                        {{
+                          Number(
+                            (Number(todo.납품수) / Number(todo.수량)) * 100
+                          ).toLocaleString()
+                        }}%
+                      </div>
+                      <div class="flex items-center justify-center">
+                        <Progress class="h-1">
+                          <Progress.Bar
+                            class="bg-primary"
+                            :style="
+                              'width:' +
+                              Number(
+                                (Number(todo.납품수) / Number(todo.수량)) * 100
+                              ) +
+                              '%'
+                            "
+                            role="progressbar"
+                          ></Progress.Bar>
+                        </Progress>
+                      </div>
                     </Table.Td>
                     <!-- <Table.Td
                       :class="[
@@ -1170,7 +1223,7 @@ const shipmentDataFunction = async () => {
                         :class="[
                           'first:rounded-l-md last:rounded-r-md text-center bg-white border-b-0 dark:bg-darkmode-600 shadow-[20px_3px_20px_#0000000b]',
                           { 'text-black': todo.검사결과 == '미검사' },
-                          { 'text-gray-500': todo.검사결과 == '검사대기' },
+                          { 'text-orange-500': todo.검사결과 == '검사대기' },
                           { 'text-danger': todo.검사결과 == '불합격' },
                           { 'text-success': todo.검사결과 == '합격' },
                         ]"

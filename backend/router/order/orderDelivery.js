@@ -147,6 +147,52 @@ router.post("/", async (req, res) => {
         req.body.sortOrder +
         `
       `;
+    } else if (req.body.searchKey == "수주NO") {
+      sql =
+        `
+        SELECT
+          NO AS NO, 구분 AS 구분, 수주NO AS 수주NO, 품목NO AS 품목NO, 품목구분 AS 품목구분, 품번 AS 품번, 품명 AS 품명,
+          규격 AS 규격, 단위 AS 단위, LOT코드 AS LOT코드, 수량 AS 수량, 일시 AS 일시, 검사결과 AS 검사결과,
+          비고 AS 비고, 등록자 AS 등록자, 등록일시 AS 등록일시
+        FROM(
+          SELECT
+            [DLVR_PK] AS NO
+            ,[DLVR_DIV] AS 구분
+            ,[DLVR_ACCEPT_PK] AS 수주NO
+            ,[DLVR_ITEM_PK] AS 품목NO
+            ,ITEM.품목구분 AS 품목구분
+            ,ITEM.품번 AS 품번
+            ,ITEM.품명 AS 품명
+            ,ITEM.규격 AS 규격
+            ,ITEM.단위 AS 단위
+            ,[DLVR_LOTCODE] AS LOT코드
+            ,[DLVR_AMOUNT] AS 수량
+            ,CONVERT(VARCHAR, [DLVR_DT], 20) AS 일시
+            ,[DLVR_RESULT] AS 검사결과
+            ,[DLVR_NOTE] AS 비고
+            ,[DLVR_REGIST_NM] AS 등록자
+            ,[DLVR_REGIST_DT] AS 등록일시
+          FROM [QMES2022].[dbo].[MANAGE_DELIVERY_TB]
+          LEFT JOIN
+          (
+            SELECT
+              [ITEM_PK] AS NO
+              ,[ITEM_DIV] AS 품목구분
+              ,[ITEM_PRODUCT_NUM] AS 품번
+              ,[ITEM_NAME] AS 품명
+              ,[ITEM_SIZE] AS 규격
+              ,[ITEM_UNIT] AS 단위
+            FROM [QMES2022].[dbo].[MASTER_ITEM_TB]
+          ) AS ITEM ON ITEM.NO = [DLVR_ITEM_PK]
+        ) AS RESULT
+        WHERE (1=1)
+        AND 수주NO = @input
+        ORDER BY ` +
+        req.body.sortKey +
+        ` ` +
+        req.body.sortOrder +
+        `
+      `;
     } else {
       sql =
         `
@@ -494,6 +540,7 @@ router.get("/accept", async (req, res) => {
         ,ITEM.품번 AS 품번
         ,ITEM.품명 AS 품명
         ,[ACPT_AMOUNT] AS 수량
+        ,(SELECT COALESCE(SUM(CONVERT(numeric,[DLVR_AMOUNT])),0) FROM [QMES2022].[dbo].[MANAGE_DELIVERY_TB] WHERE [DLVR_ACCEPT_PK] = [ACPT_PK]) AS 납품수
         ,[ACPT_UNIT_COST] AS 단가
         ,[ACPT_SUPPLY_COST] AS 공급가액
         ,[ACPT_TAX_COST] AS 세액
@@ -541,7 +588,8 @@ router.post("/accept", async (req, res) => {
         SELECT
           NO AS NO, 수주일 AS 수주일, 코드 AS 코드, 코드순번 AS 코드순번, 구분 AS 구분, 거래처NO AS 거래처NO,
           거래처명 AS 거래처명, 연락처 AS 연락처, 품목NO AS 품목NO, 품목구분 AS 품목구분, 품번 AS 품번, 품명 AS 품명,
-          수량 AS 수량, 단가 AS 단가, 공급가액 AS 공급가액, 세액 AS 세액, 결제조건 AS 결제조건, 결제예정일 AS 결제예정일,
+          수량 AS 수량, 납품수 AS 납품수, 단가 AS 단가, 공급가액 AS 공급가액, 세액 AS 세액, 결제조건 AS 결제조건,
+          결제예정일 AS 결제예정일,
           납기일 AS 납기일, 도착지주소 AS 도착지주소, 기타 AS 기타, 비고 AS 비고, 등록자 AS 등록자, 등록일시 AS 등록일시
         FROM(
           SELECT
@@ -558,6 +606,7 @@ router.post("/accept", async (req, res) => {
             ,ITEM.품번 AS 품번
             ,ITEM.품명 AS 품명
             ,[ACPT_AMOUNT] AS 수량
+            ,(SELECT COALESCE(SUM(CONVERT(numeric,[DLVR_AMOUNT])),0) FROM [QMES2022].[dbo].[MANAGE_DELIVERY_TB] WHERE [DLVR_ACCEPT_PK] = [ACPT_PK]) AS 납품수
             ,[ACPT_UNIT_COST] AS 단가
             ,[ACPT_SUPPLY_COST] AS 공급가액
             ,[ACPT_TAX_COST] AS 세액
@@ -614,7 +663,7 @@ router.post("/accept", async (req, res) => {
         SELECT
           NO AS NO, 수주일 AS 수주일, 코드 AS 코드, 코드순번 AS 코드순번, 구분 AS 구분, 거래처NO AS 거래처NO,
           거래처명 AS 거래처명, 연락처 AS 연락처, 품목NO AS 품목NO, 품목구분 AS 품목구분, 품번 AS 품번, 품명 AS 품명,
-          수량 AS 수량, 단가 AS 단가, 공급가액 AS 공급가액, 세액 AS 세액, 결제조건 AS 결제조건, 결제예정일 AS 결제예정일,
+          수량 AS 수량, 납품수 AS 납품수, 단가 AS 단가, 공급가액 AS 공급가액, 세액 AS 세액, 결제조건 AS 결제조건, 결제예정일 AS 결제예정일,
           납기일 AS 납기일, 도착지주소 AS 도착지주소, 기타 AS 기타, 비고 AS 비고, 등록자 AS 등록자, 등록일시 AS 등록일시
         FROM(
           SELECT
@@ -631,6 +680,7 @@ router.post("/accept", async (req, res) => {
             ,ITEM.품번 AS 품번
             ,ITEM.품명 AS 품명
             ,[ACPT_AMOUNT] AS 수량
+            ,(SELECT COALESCE(SUM(CONVERT(numeric,[DLVR_AMOUNT])),0) FROM [QMES2022].[dbo].[MANAGE_DELIVERY_TB] WHERE [DLVR_ACCEPT_PK] = [ACPT_PK]) AS 납품수
             ,[ACPT_UNIT_COST] AS 단가
             ,[ACPT_SUPPLY_COST] AS 공급가액
             ,[ACPT_TAX_COST] AS 세액
@@ -1092,6 +1142,84 @@ router.post("/finstock", async (req, res) => {
 
     res.send(JSON.stringify(result.recordset));
   } catch (err) {
+    res.status(500);
+    res.send(err.message);
+  }
+});
+
+// 출하검사 등록
+router.post("/shipment_request/insert", async (req, res) => {
+  try {
+    const Pool = await pool;
+    await Pool.request()
+      .input("납품NO", req.body.data.납품NO ?? null)
+      .input("구분", req.body.data.구분 ?? "")
+      .input(
+        "요청일시",
+        moment(req.body.data.요청일시).format("YYYY-MM-DD HH:mm:ss") ??
+          moment().tz("Asia/Seoul").format("YYYY-MM-DD HH:mm:ss")
+      )
+      .input("요청수량", req.body.data.요청수량 ?? "")
+      .input("샘플수량", req.body.data.샘플수량 ?? "")
+      .input("결과", req.body.data.결과 ?? "")
+      .input("내용1", req.body.data.내용1 ?? "")
+      .input("내용2", req.body.data.내용2 ?? "")
+      .input("내용3", req.body.data.내용3 ?? "")
+      .input("내용4", req.body.data.내용4 ?? "")
+      .input("내용5", req.body.data.내용5 ?? "")
+      .input("내용6", req.body.data.내용6 ?? "")
+      .input("내용7", req.body.data.내용7 ?? "")
+      .input("내용8", req.body.data.내용8 ?? "")
+      .input("내용9", req.body.data.내용9 ?? "")
+      .input("내용10", req.body.data.내용10 ?? "")
+      .input("비고", req.body.data.비고 ?? "")
+      .input("등록자", req.body.user ?? "")
+      .input(
+        "등록일시",
+        moment().tz("Asia/Seoul").format("YYYY-MM-DD HH:mm:ss")
+      ).query(`
+        INSERT INTO [QMES2022].[dbo].[MANAGE_DELIVERY_INSPECT_TB]
+          ([DLISP_DELIVERY_PK]
+          ,[DLISP_DIV]
+          ,[DLISP_REQUEST_DT]
+          ,[DLISP_SAMPLE_AMT]
+          ,[DLISP_AMOUNT]
+          ,[DLISP_RESULT]
+          ,[DLISP_CONTENT1]
+          ,[DLISP_CONTENT2]
+          ,[DLISP_CONTENT3]
+          ,[DLISP_CONTENT4]
+          ,[DLISP_CONTENT5]
+          ,[DLISP_CONTENT6]
+          ,[DLISP_CONTENT7]
+          ,[DLISP_CONTENT8]
+          ,[DLISP_CONTENT9]
+          ,[DLISP_CONTENT10]
+          ,[DLISP_NOTE]
+          ,[DLISP_REGIST_NM]
+          ,[DLISP_REGIST_DT])
+        VALUES
+          (@납품NO,@구분,@요청일시,@샘플수량,@요청수량,@결과,@내용1,@내용2,@내용3,@내용4,@내용5,
+            @내용6,@내용7,@내용8,@내용9,@내용10,@비고,@등록자,@등록일시)
+      `);
+
+    // 로그기록 저장
+    await logSend(
+      (type = "검사요청"),
+      (ct = JSON.stringify(req.body.data) + " 을 검사요청."),
+      (amount = 1),
+      (user = req.body.user ?? "")
+    );
+
+    res.send("등록완료");
+  } catch (err) {
+    // 로그기록 저장
+    await logSend(
+      (type = "에러"),
+      (ct = err.message ?? ""),
+      (amount = 0),
+      (user = req.body.user ?? "")
+    );
     res.status(500);
     res.send(err.message);
   }
