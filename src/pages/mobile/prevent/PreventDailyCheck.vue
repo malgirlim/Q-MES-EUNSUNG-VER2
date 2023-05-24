@@ -23,6 +23,8 @@ import { OrderAccept } from "../../../interfaces/menu/orderInterface";
 import { MasterClient } from "../../../interfaces/menu/MasterInterface";
 
 // 컴포넌트 로드
+import DailyCheck from "../../../components/Common/Mobile/Prevent/DailyCheck.vue";
+
 const { proxy }: any = getCurrentInstance();
 const user_level = proxy.gstate.level.OrderCurrent; //권한레벨
 
@@ -36,7 +38,7 @@ onMounted(async () => {
 
 // 오늘날짜
 dayjs.locale("ko");
-const now = dayjs().locale("ko").format("YYYY-MM-DD dddd");
+const now = dayjs().format("YYYY-MM-DD dddd");
 
 // 메뉴재정렬 (메뉴 레이아웃 밀리는 문제 해결 코드)
 const menu_fix = ref();
@@ -55,8 +57,9 @@ const dataManager = useSendApi<OrderAccept>(url, currentPage, rowsPerPage);
 // 테이블항목 설정 및 가로크기 조정
 const table_setting = {
   순번: { name: "순번", style: "text-align: center;" },
-  항목1: { name: "수주일", style: "text-align: center;" },
-  항목2: { name: "코드", style: "" },
+  항목1: { name: "설비명", style: "text-align: center;" },
+  항목2: { name: "점검", style: "text-align: center;" },
+  항목3: { name: "점검현황", style: "text-align: center;" },
 };
 
 // v-tom (모달 실시간 데이터 변동) 에 필요한 함수
@@ -88,13 +91,22 @@ const noti = (data: string) => {
     image: "../assets/image/logo.png",
   });
 };
+
+// ##### 점검시작 Modal #####
+const checkCheckBox = ref(false);
+const checkModal = ref(false);
+const setCheckModal = (value: boolean) => {
+  checkModal.value = value;
+};
 </script>
 
 ##############################################################################################################
 
 <template>
   <div v-if="user_level >= 2">
-    <div class="px-3 pt-3">{{ now }}</div>
+    <div class="p-3">
+      <div class="text-center text-lg font-bold">{{ now }} 일상점검 리스트</div>
+    </div>
 
     <!-- BEGIN: Data List -->
     <div class="intro-y">
@@ -112,16 +124,22 @@ const noti = (data: string) => {
                 {{ table_setting.순번.name }}
               </Table.Th>
               <Table.Th
-                class="px-2 text-center w-4/12 border-b-0 whitespace-nowrap font-bold"
+                class="px-2 text-center w-5/12 border-b-0 whitespace-nowrap font-bold"
                 :style="table_setting.항목1.style"
               >
                 {{ table_setting.항목1.name }}
               </Table.Th>
               <Table.Th
-                class="px-2 text-center w-7/12 border-b-0 whitespace-nowrap font-bold"
+                class="px-2 text-center w-3/12 border-b-0 whitespace-nowrap font-bold"
                 :style="table_setting.항목2.style"
               >
                 {{ table_setting.항목2.name }}
+              </Table.Th>
+              <Table.Th
+                class="px-2 text-center w-3/12 border-b-0 whitespace-nowrap font-bold"
+                :style="table_setting.항목2.style"
+              >
+                {{ table_setting.항목3.name }}
               </Table.Th>
             </Table.Tr>
           </Table.Thead>
@@ -141,17 +159,30 @@ const noti = (data: string) => {
                 class="px-2 first:rounded-l-md last:rounded-r-md text-center bg-white border-b-0 dark:bg-darkmode-600 shadow-[20px_3px_20px_#0000000b]"
                 :style="table_setting.항목1.style"
               >
-                <div>
-                  {{ todo[table_setting.항목1.name] }}
-                </div>
+                <div>인쇄기1</div>
               </Table.Td>
               <Table.Td
                 class="px-2 first:rounded-l-md last:rounded-r-md bg-white border-b-0 dark:bg-darkmode-600 shadow-[20px_3px_20px_#0000000b]"
                 :style="table_setting.항목2.style"
               >
                 <div>
-                  <label>{{ todo[table_setting.항목2.name] }} </label>
+                  <Button variant="primary" @click="setCheckModal(true)"
+                    >시작</Button
+                  >
                 </div>
+                <!-- <div>
+                  <Button class="text-black" variant="secondary"
+                    >완료</Button
+                  >
+                </div> -->
+              </Table.Td>
+              <Table.Td
+                class="px-2 first:rounded-l-md last:rounded-r-md bg-white border-b-0 dark:bg-darkmode-600 shadow-[20px_3px_20px_#0000000b]"
+                :style="table_setting.항목2.style"
+              >
+                <div class="text-danger">미점검</div>
+                <!-- <div class="text-pending">점검중</div>
+                <div class="text-success">점검완료</div> -->
               </Table.Td>
             </Table.Tr>
           </Table.Tbody>
@@ -183,4 +214,52 @@ const noti = (data: string) => {
     <footer>&copy;2023 QInnotek. All rights reserved{{ menu_fix }}</footer>
   </div>
   <!-- END: FOOTER(COPYRIGHT) -->
+
+  <!-- BEGIN: 점검목록 Modal -->
+  <Dialog :open="checkModal" size="md">
+    <Dialog.Panel style="top: -7%">
+      <div class="p-1 text-center"></div>
+      <div><DailyCheck /></div>
+      <label class="cursor-pointer"
+        ><div class="flex text-center text-md mb-5">
+          <div class="flex m-auto">
+            <div>
+              <Input
+                class="w-4 h-4 mb-0.5 transition-all duration-100 ease-in-out shadow-sm border-slate-200 cursor-pointer rounded focus:ring-4 focus:ring-offset-0 focus:ring-primary focus:ring-opacity-20 [&[type='checkbox']]:checked:bg-primary [&[type='checkbox']]:checked:border-primary [&[type='checkbox']]:checked:border-opacity-10 [&:disabled:not(:checked)]:bg-slate-100 [&:disabled:not(:checked)]:cursor-not-allowed [&:disabled:checked]:opacity-70 [&:disabled:checked]:cursor-not-allowed"
+                id="checkCheckBox"
+                type="checkbox"
+                :value="checkCheckBox"
+                v-model="checkCheckBox"
+              />
+            </div>
+            <div class="ml-2">위 점검 목록을 모두 확인하였습니다.</div>
+          </div>
+        </div></label
+      >
+      <div class="mt-1 mb-3 text-center text-md">
+        점검자 : {{ proxy.gstate.account.name }}
+      </div>
+      <div class="px-5 pb-8 text-center">
+        <Button
+          variant="primary"
+          type="button"
+          class="w-24 mr-10"
+          :disabled="!checkCheckBox"
+          @click="setCheckModal(false)"
+        >
+          확인
+        </Button>
+
+        <Button
+          variant="outline-primary"
+          type="button"
+          class="w-24"
+          @click="setCheckModal(false)"
+        >
+          취소
+        </Button>
+      </div>
+    </Dialog.Panel>
+  </Dialog>
+  <!-- END: 점검목록 Modal -->
 </template>

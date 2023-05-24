@@ -132,8 +132,24 @@ import AdminLog from "../pages/admin/AdminLog.vue";
 import MobileMain from "../pages/mobile/Main.vue";
 
 import MobileOrderCurrentForecast from "../pages/mobile/order/OrderCurrentForecast.vue";
+import MobileOrderCurrentNotify from "../pages/mobile/order/OrderCurrentNotify.vue";
+import MobileOrderTaskReport from "../pages/mobile/order/OrderTaskReport.vue";
+
+import MobileStockReceive from "../pages/mobile/stock/StockReceive.vue";
+import MobileStockLOTPrint from "../pages/mobile/stock/StockLOTPrint.vue";
+import MobileStockLOTTrack from "../pages/mobile/stock/StockLOTTrack.vue";
+import MobileStockSafeNotify from "../pages/mobile/stock/StockSafeNotify.vue";
 
 import MobilePreventDailyCheck from "../pages/mobile/prevent/PreventDailyCheck.vue";
+import MobilePreventDailyCheckNotify from "../pages/mobile/prevent/PreventDailyCheckNotify.vue";
+import MobilePreventForecast from "../pages/mobile/prevent/PreventForecast.vue";
+import MobilePreventNotify from "../pages/mobile/prevent/PreventNotify.vue";
+import MobilePreventRepairFocecast from "../pages/mobile/prevent/PreventRepairForecast.vue";
+import MobilePreventRepairNotify from "../pages/mobile/prevent/PreventRepairNotify.vue";
+import MobilePreventChangeNotify from "../pages/mobile/prevent/PreventChangeNotify.vue";
+import MobilePreventErrorNotify from "../pages/mobile/prevent/PreventErrorNotify.vue";
+
+import MobileOrderTaskReportFacility1 from "../pages/mobile/order/report/Facility1.vue";
 
 const routes = [
   {
@@ -979,6 +995,61 @@ const routes = [
         component: MobileOrderCurrentForecast,
       },
       {
+        path: "/mobile/order/current-notify",
+        name: "side-menu-mobile-order-current-notify",
+        meta: {
+          pagename: "수주현황 통보",
+          category: "주문/생산관리",
+        },
+        component: MobileOrderCurrentNotify,
+      },
+      {
+        path: "/mobile/order/task-report",
+        name: "side-menu-mobile-order-task-report",
+        meta: {
+          pagename: "생산실적 집계",
+          category: "주문/생산관리",
+        },
+        component: MobileOrderTaskReport,
+      },
+      {
+        path: "/mobile/stock/stock-receive",
+        name: "side-menu-mobile-stock-receive",
+        meta: {
+          pagename: "입출고",
+          category: "재고관리",
+        },
+        component: MobileStockReceive,
+      },
+      {
+        path: "/mobile/stock/lot-print",
+        name: "side-menu-mobile-stock-lot-print",
+        meta: {
+          pagename: "LOT출력",
+          category: "재고관리",
+        },
+        component: MobileStockLOTPrint,
+      },
+      {
+        path: "/mobile/stock/lot-track",
+        name: "side-menu-mobile-stock-lot-track",
+        meta: {
+          pagename: "LOT추적",
+          category: "재고관리",
+        },
+        component: MobileStockLOTTrack,
+      },
+      {
+        path: "/mobile/stock/safe-notify",
+        name: "side-menu-mobile-stock-safe-notify",
+        meta: {
+          pagename: "안전재고 미달통보",
+          category: "재고관리",
+        },
+        component: MobileStockSafeNotify,
+      },
+      
+      {
         path: "/mobile/prevent/daily-check",
         name: "side-menu-mobile-prevent-daily-check",
         meta: {
@@ -987,7 +1058,79 @@ const routes = [
         },
         component: MobilePreventDailyCheck,
       },
-    ],
+      {
+        path: "/mobile/prevent/daily-check-notify",
+        name: "side-menu-mobile-prevent-daily-check-notify",
+        meta: {
+          pagename: "일상점검 통보",
+          category: "예방보전",
+        },
+        component: MobilePreventDailyCheckNotify,
+      },
+      {
+        path: "/mobile/prevent/forecast",
+        name: "side-menu-mobile-prevent-forecast",
+        meta: {
+          pagename: "예방보전 예보",
+          category: "예방보전",
+        },
+        component: MobilePreventForecast,
+      },
+      {
+        path: "/mobile/prevent/notify",
+        name: "side-menu-mobile-prevent-notify",
+        meta: {
+          pagename: "예방보전 통보",
+          category: "예방보전",
+        },
+        component: MobilePreventNotify,
+      },
+      {
+        path: "/mobile/prevent/repair-forecast",
+        name: "side-menu-mobile-prevent-repair-forecast",
+        meta: {
+          pagename: "설비수리 예보",
+          category: "예방보전",
+        },
+        component: MobilePreventRepairFocecast,
+      },
+      {
+        path: "/mobile/prevent/repair-notify",
+        name: "side-menu-mobile-prevent-repair-notify",
+        meta: {
+          pagename: "설비수리 통보",
+          category: "예방보전",
+        },
+        component: MobilePreventRepairNotify,
+      },
+      {
+        path: "/mobile/prevent/change-notify",
+        name: "side-menu-mobile-prevent-change-notify",
+        meta: {
+          pagename: "설비부품 교체시기 통보",
+          category: "예방보전",
+        },
+        component: MobilePreventChangeNotify,
+      },
+      {
+        path: "/mobile/prevent/error-notify",
+        name: "side-menu-mobile-prevent-error-notify",
+        meta: {
+          pagename: "설비고장발생 통보",
+          category: "예방보전",
+        },
+        component: MobilePreventErrorNotify,
+      },
+      {
+        path: "/mobile/order/task-report/facility1",
+        name: "side-menu-mobile-order-task-report-facility",
+        meta: {
+          pagename: "인쇄기1 생산실적 집계",
+          category: "주문/생산관리",
+        },
+        component: MobileOrderTaskReportFacility1,
+      },
+          ],
   },
 ];
 
