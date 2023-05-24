@@ -98,8 +98,8 @@ router.post("/", async (req, res) => {
       sql =
         `
         SELECT
-          NO AS NO, 거래처NO AS 거래처NO, 설비NO AS 설비NO, 구분 AS 구분, 품번 AS 품번, 품명 AS 품명, 차종 AS 차종,
-          규격 AS 규격, 단위 AS 단위, 안전재고 AS 안전재고, 단가 AS 단가, 비고 AS 비고,
+          NO AS NO, 거래처NO AS 거래처NO, 설비NO AS 설비NO, 설비명 AS 설비명, 구분 AS 구분, 품번 AS 품번, 품명 AS 품명,
+          차종 AS 차종, 규격 AS 규격, 단위 AS 단위, 안전재고 AS 안전재고, 단가 AS 단가, 비고 AS 비고,
           등록자 AS 등록자, 등록일시 AS 등록일시
         FROM(
           SELECT
@@ -155,8 +155,8 @@ router.post("/", async (req, res) => {
       sql =
         `
         SELECT
-          NO AS NO, 거래처NO AS 거래처NO, 설비NO AS 설비NO, 구분 AS 구분, 품번 AS 품번, 품명 AS 품명, 차종 AS 차종,
-          규격 AS 규격, 단위 AS 단위, 안전재고 AS 안전재고, 단가 AS 단가, 비고 AS 비고,
+          NO AS NO, 거래처NO AS 거래처NO, 설비NO AS 설비NO, 설비명 AS 설비명, 구분 AS 구분, 품번 AS 품번, 품명 AS 품명,
+          차종 AS 차종, 규격 AS 규격, 단위 AS 단위, 안전재고 AS 안전재고, 단가 AS 단가, 비고 AS 비고,
           등록자 AS 등록자, 등록일시 AS 등록일시
         FROM(
           SELECT
