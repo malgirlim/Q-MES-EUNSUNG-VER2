@@ -171,12 +171,12 @@ const insert_check = () => {
     pass_flag = false;
   }
 
-  if (set_구분.value != null && set_구분.value != "") {
-    insertModalData.구분 = set_구분.value;
-  } else {
-    set_구분.value = "";
-    pass_flag = false;
-  }
+  // if (set_구분.value != null && set_구분.value != "") {
+  //   insertModalData.구분 = set_구분.value;
+  // } else {
+  //   set_구분.value = "";
+  //   pass_flag = false;
+  // }
 
   if (set_품번.value != null && set_품번.value != "") {
     insertModalData.품번 = set_품번.value;

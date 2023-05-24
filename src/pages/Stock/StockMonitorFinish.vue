@@ -21,6 +21,8 @@ import { useSendApi } from "../../composables/useSendApi";
 import {
   StockStock,
   StockStockLOT,
+  StockStockFin,
+  StockStockFinLOT
 } from "../../interfaces/menu/stockInterface";
 
 // 컴포넌트 로드
@@ -44,7 +46,7 @@ const pageChangeFirst = () => {
 
 // dataManager 만들기
 const url = "/api/stock/stock/fin";
-const dataManager = useSendApi<StockStockFinLOT>(url, currentPage, rowsPerPage);
+const dataManager = useSendApi<StockStockFin>(url, currentPage, rowsPerPage);
 
 // 테이블항목 설정 및 가로크기 조정
 const table_setting = {
