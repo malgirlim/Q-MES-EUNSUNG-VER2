@@ -80,7 +80,6 @@ const checked = false;
 const 지시수량 = 3000;
 
 // 불량, 양품
-const num_show = ref("0");
 
 let num_bad = ref("27");
 let num_good: any = ref(
@@ -89,8 +88,19 @@ let num_good: any = ref(
   ).toLocaleString(undefined, { maximumFractionDigits: 11 })
 );
 
-// 키패드
-const num = ref("0");
+// 생산수 저장
+const 생산수량 = ref("0");
+
+const 생산수량_초기화 = () => {};
+
+const 생산수량_증가 = () => {};
+
+const 생산수량_차감 = () => {};
+
+// 키패드 (생산수입력)
+const 입력수량 = ref(0);
+const 입력수량_show = ref("0");
+
 let num_split = [];
 let num_dot = ".";
 
@@ -523,10 +533,13 @@ const setWorkerChangeModal = (value: boolean) => {
                     생산수량
                   </td>
                   <td class="pl-2 text-left">
-                    <div class="flex">
-                      <div class="mr-auto">{{ num_show }}</div>
+                    <div class="flex items-center">
+                      <div class="mr-auto">{{ 생산수량 }}</div>
                       <div class="ml-auto p-1">
-                        <Button class="h-7 mr-2" variant="primary"
+                        <Button
+                          class="h-7 mr-2"
+                          variant="primary"
+                          @click="init_생산수량()"
                           >초기화</Button
                         >
                       </div>
@@ -552,6 +565,27 @@ const setWorkerChangeModal = (value: boolean) => {
                     양품수량
                   </td>
                   <td class="pl-2 text-left w-28">{{ num_good }}</td>
+                </tr>
+
+                <tr class="border-b-2 border-primary h-9">
+                  <td class="border-primary bg-slate-200 font-bold" colspan="3">
+                    생산수 저장
+                  </td>
+                </tr>
+                <tr>
+                  <td class="w-1/2">
+                    <div
+                      class="mx-auto mt-1.5 p-1.5 w-48 h-10 border-2 border-slate-200"
+                    >
+                      {{ num_show }}
+                    </div>
+                  </td>
+                  <td colspan="2" class="w-1/2">
+                    <div class="mt-1.5">
+                      <Button class="mr-5 h-10" variant="primary">증가</Button
+                      ><Button class="h-10" variant="danger">차감</Button>
+                    </div>
+                  </td>
                 </tr>
 
                 <!-- <tr class="border-b-2 border-primary h-9">
