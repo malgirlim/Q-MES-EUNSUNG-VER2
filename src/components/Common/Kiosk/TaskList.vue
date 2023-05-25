@@ -9,7 +9,8 @@ import { ProductionTaskCurrent } from "../../../interfaces/menu/productionInterf
 
 // 데이터 가져오기
 const props = defineProps<{
-  data?: any;
+  키오스크no?: any;
+  설비명?: any;
 }>();
 
 // 데이터 내보내기
@@ -53,7 +54,9 @@ const dataManager = useSendApi<ProductionTaskCurrent>(url, ref(1), ref(100));
         <tbody>
           <tr
             class="text-center"
-            v-for="(data, index) in dataManager.dataAll.value"
+            v-for="(data, index) in dataManager.dataAll.value.filter(
+              (c) => c.설비명 == props.설비명 || c.진행상황 != '작업완료'
+            )"
             :key="data.NO"
           >
             <td class="border-l-2 border-b-2 border-r-2 border-success h-20">
