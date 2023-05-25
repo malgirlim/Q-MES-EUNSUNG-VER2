@@ -350,7 +350,7 @@ const setTaskFinishModal = (value: boolean) => {
           <div class="pl-1 pr-1 pt-1 bg-success text-white">
             <strong>생산제품</strong>
           </div>
-          <div class="border-2 border-success" style="height: 279px">
+          <div class="border-2 border-success" style="height: 200px">
             <table class="w-full">
               <tbody>
                 <tr class="border-b-2 border-success h-9">
@@ -429,7 +429,7 @@ const setTaskFinishModal = (value: boolean) => {
           <div class="pl-1 pr-1 pt-1 bg-primary text-white">
             <strong>생산실적</strong>
           </div>
-          <div class="border-2 border-primary" style="height: 279px">
+          <div class="border-2 border-primary" style="height: 200px">
             <table class="w-full">
               <tbody>
                 <tr class="border-b-2 border-primary h-9">
@@ -469,7 +469,7 @@ const setTaskFinishModal = (value: boolean) => {
           <div class="pl-1 pr-1 pt-1 bg-success text-white">
             <strong>작업지시정보</strong>
           </div>
-          <div class="border-2 border-success" style="height: 279px">
+          <div class="border-2 border-success" style="height: 200px">
             <table class="w-full">
               <tbody>
                 <tr class="border-b-2 border-success h-9">
@@ -530,7 +530,7 @@ const setTaskFinishModal = (value: boolean) => {
 
           <div
             class="border-2 border-[#D9821C]"
-            style="height: 279px; overflow-y: visible; overflow-x: hidden"
+            style="height: 340px; overflow-y: visible; overflow-x: hidden"
           >
             <table class="w-full">
               <thead
@@ -567,7 +567,7 @@ const setTaskFinishModal = (value: boolean) => {
           </div>
           <div
             class="border-2 border-[#D9821C]"
-            style="height: 279px; overflow-y: visible; overflow-x: hidden"
+            style="height: 340px; overflow-y: visible; overflow-x: hidden"
           >
             <table class="w-full">
               <thead

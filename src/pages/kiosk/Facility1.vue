@@ -75,6 +75,7 @@ const year = ref(dayjs().format("YYYY"));
 
 // 임시데이터
 const running = "미가동";
+const task_status = "작업중";
 const checked = false;
 const 지시수량 = 3000;
 
@@ -249,13 +250,8 @@ const setWorkerChangeModal = (value: boolean) => {
           ><Lucide icon="Home" class="w-7 h-7 mb-0.5 mr-1" /><strong
             >설비선택</strong
           ></Button
-        ><Button
-          class="mr-5 h-14 w-44 text-2xl text-white"
-          as="a"
-          variant="success"
-          @click="setTaskListModal(true)"
-          ><strong>작업지시목록</strong></Button
-        ><Button
+        >
+        <Button
           :class="[
             'mr-5 h-14 w-44 text-2xl text-white',
             { 'border-4 border-danger': checked == false },
@@ -267,47 +263,66 @@ const setWorkerChangeModal = (value: boolean) => {
         >
         <Button
           class="mr-5 h-14 w-44 text-2xl text-white"
-          as="a"
           variant="success"
+          @click="setTaskListModal(true)"
+          :disabled="task_status == '작업중'"
+          ><strong>작업지시목록</strong></Button
+        >
+        <Button
+          v-if="task_status == '작업미확인' || task_status == ''"
+          class="mr-5 h-14 w-44 text-2xl text-white"
+          variant="success"
+          :disabled="task_status == ''"
+          @click="setTaskStartModal(true)"
+          ><strong>작업수락</strong></Button
+        >
+        <Button
+          v-if="task_status == '작업대기' || task_status == '작업중'"
+          class="mr-5 h-14 w-44 text-2xl text-white"
+          variant="success"
+          :disabled="task_status == '작업중'"
           @click="setTaskStartModal(true)"
           ><strong>작업시작</strong></Button
-        ><Button
+        >
+        <Button
           class="mr-5 h-14 w-44 text-2xl"
-          as="a"
           variant="pending"
           @click="setNonOPModal(true)"
+          :disabled="task_status != '작업중'"
           ><strong>비가동전환</strong></Button
         ><Button
           class="mr-5 h-14 w-44 text-2xl"
-          as="a"
           variant="pending"
           @click="setBadAddModal(true)"
+          :disabled="task_status != '작업중'"
           ><strong>불량변경</strong></Button
         ><Button
           class="mr-5 h-14 w-44 text-2xl"
-          as="a"
           variant="pending"
           @click="setItemAddModal(true)"
+          :disabled="task_status != '작업중'"
           ><strong>투입자재변경</strong></Button
         ><Button
-          v-if="running != '미가동'"
+          v-if="task_status == '작업중'"
           class="mr-5 h-14 w-44 text-2xl"
-          as="a"
           variant="danger"
           @click="setTaskFinishModal(true)"
           ><strong>작업종료</strong></Button
         >
         <Button
-          v-if="running == '미가동'"
+          v-if="
+            task_status == '작업미확인' ||
+            task_status == '작업대기' ||
+            task_status == ''
+          "
           class="mr-5 h-14 w-48 text-2xl"
-          as="a"
           variant="danger"
           @click="setTaskCancleModal(true)"
-          ><strong>작업취소/반려</strong></Button
+          :disabled="task_status == ''"
+          ><strong>작업반려</strong></Button
         >
         <Button
           class="h-14 w-44 text-2xl"
-          as="a"
           variant="danger"
           @click="setAlertModal(true)"
           ><Lucide icon="Siren" class="w-7 h-7 mb-0.5 mr-1" /><strong
@@ -489,23 +504,31 @@ const setWorkerChangeModal = (value: boolean) => {
               <tbody>
                 <tr class="border-b-2 border-primary h-9">
                   <td
-                    class="border-r-2 border-primary bg-slate-200 font-bold w-32"
+                    class="border-r-2 border-primary bg-slate-200 font-bold w-[30%]"
                   >
                     지시수량
                   </td>
-                  <td class="pl-2 text-left w-28" colspan="3">
+                  <td class="pl-2 text-left w-[70%]">
                     {{ 지시수량.toLocaleString() }}
                   </td>
                 </tr>
                 <tr class="border-b-2 border-primary h-9">
                   <td class="border-r-2 border-primary bg-slate-200 font-bold">
+                    완료수량
+                  </td>
+                  <td class="pl-2 text-left">0</td>
+                </tr>
+                <tr class="border-b-2 border-primary h-9">
+                  <td class="border-r-2 border-primary bg-slate-200 font-bold">
                     생산수량
                   </td>
-                  <td class="pl-2 text-left" colspan="3">
+                  <td class="pl-2 text-left">
                     <div class="flex">
-                      <div>{{ num_show }}</div>
-                      <div v-if="num_show == '0'" class="ml-8 text-danger">
-                        <strong>* 생산수를 입력해주세요 *</strong>
+                      <div class="mr-auto">{{ num_show }}</div>
+                      <div class="ml-auto p-1">
+                        <Button class="h-7 mr-2" variant="primary"
+                          >초기화</Button
+                        >
                       </div>
                     </div>
                   </td>
@@ -515,25 +538,14 @@ const setWorkerChangeModal = (value: boolean) => {
                     불량수량
                   </td>
                   <td class="pl-2 text-left">{{ num_bad }}</td>
-                  <td
-                    class="border-l-2 border-r-2 border-primary bg-slate-200 font-bold w-32"
-                  >
-                    불량건수
-                  </td>
-                  <td class="pl-2 text-left">5</td>
                 </tr>
                 <tr class="border-b-2 border-primary h-9">
                   <td class="border-r-2 border-primary bg-slate-200 font-bold">
                     양품수량
                   </td>
-                  <td class="pl-2 text-left" colspan="3">{{ num_good }}</td>
+                  <td class="pl-2 text-left w-28">{{ num_good }}</td>
                 </tr>
-                <tr class="border-b-2 border-primary h-9">
-                  <td class="border-r-2 border-primary bg-slate-200 font-bold">
-                    비가동건수
-                  </td>
-                  <td class="pl-2 text-left" colspan="3">3</td>
-                </tr>
+
                 <!-- <tr class="border-b-2 border-primary h-9">
                   <td class="border-primary bg-slate-200 font-bold" colspan="4">
                     작업진행률
@@ -809,7 +821,7 @@ const setWorkerChangeModal = (value: boolean) => {
   <!-- END: 작업지시목록 Modal -->
 
   <!-- BEGIN: 일상점검 Modal -->
-  <Dialog :open="checkListModal" size="xxl" @close="setCheckListModal(false)">
+  <Dialog :open="checkListModal" size="xxl">
     <Dialog.Panel>
       <div class="p-3 text-center">
         <div class="mt-8 text-4xl"><strong>일상점검</strong></div>
@@ -827,11 +839,35 @@ const setWorkerChangeModal = (value: boolean) => {
                 v-model="checkListCheckBox"
               />
             </div>
-            <div class="ml-2">위 점검 목록을 모두 확인하였습니다.</div>
+            <div class="ml-2">위 점검 목록을 확인하였습니다.</div>
           </div>
         </div></label
       >
-      <div class="mt-1 mb-3 text-center text-2xl">작업자 : 박명한</div>
+      <div class="mt-1 mb-3 text-center text-2xl">
+        <div class="flex">
+          <div class="flex mx-auto">
+            <div class="mr-3 mt-1.5">점검자 :</div>
+            <div>
+              <FormSelect
+                class="w-48"
+                formSelectSize="xxl"
+                model-value="강민철"
+              >
+                <option>강민철</option>
+                <option>고범석</option>
+                <option>김주현</option>
+                <option>박명한</option>
+                <option>사은미</option>
+                <option>손정일</option>
+                <option>송은아</option>
+                <option>윤호상</option>
+                <option>이훈노</option>
+                <option>최순우</option>
+              </FormSelect>
+            </div>
+          </div>
+        </div>
+      </div>
       <div class="px-5 pb-8 text-center">
         <Button
           variant="primary"
@@ -840,7 +876,7 @@ const setWorkerChangeModal = (value: boolean) => {
           :disabled="!checkListCheckBox"
           @click="setCheckListModal(false)"
         >
-          확인
+          저장
         </Button>
 
         <Button
@@ -862,7 +898,7 @@ const setWorkerChangeModal = (value: boolean) => {
       <div class="p-5 text-center">
         <Lucide icon="Play" class="w-24 h-24 mx-auto mt-3 text-success" />
         <div class="mt-5 text-3xl"><strong>작업 시작</strong></div>
-        <div class="mt-3 text-2xl">작업 시작 전 점검 목록을 확인해주세요.</div>
+        <div class="mt-3 text-2xl">설비가 작업중으로 전환됩니다.</div>
       </div>
 
       <div class="mt-5 px-5 pb-8 text-center">
@@ -897,7 +933,7 @@ const setWorkerChangeModal = (value: boolean) => {
       <div class="p-5 text-center">
         <Lucide icon="Pause" class="w-24 h-24 mx-auto mt-3 text-[#D9821C]" />
         <div class="mt-5 text-3xl"><strong>비가동 전환</strong></div>
-        <div class="mt-3 text-2xl">장비가 비가동으로 전환됩니다.</div>
+        <div class="mt-3 text-2xl">설비가 비가동으로 전환됩니다.</div>
       </div>
 
       <div class="mt-5 px-5 pb-8 text-center">
@@ -932,7 +968,7 @@ const setWorkerChangeModal = (value: boolean) => {
     <Dialog.Panel>
       <div class="p-3 text-center">
         <Lucide icon="Pause" class="w-20 h-20 mx-auto mt-3 text-[#D9821C]" />
-        <div class="mt-5 text-3xl"><strong>장비가 비가동중입니다</strong></div>
+        <div class="mt-5 text-3xl"><strong>설비가 비가동중입니다</strong></div>
         <div class="mt-3 text-2xl">
           비가동 사유를 선택하고 작업을 재개해 주세요
         </div>
@@ -1294,7 +1330,7 @@ const setWorkerChangeModal = (value: boolean) => {
       <div class="p-5 text-center">
         <Lucide icon="Siren" class="w-24 h-24 mx-auto mt-3 text-danger" />
         <div class="mt-5 text-3xl"><strong>고장발생</strong></div>
-        <div class="mt-3 text-2xl">장비가 고장중으로 전환됩니다.</div>
+        <div class="mt-3 text-2xl">설비가 고장중으로 전환됩니다.</div>
       </div>
 
       <div class="mt-5 px-5 pb-8 text-center">

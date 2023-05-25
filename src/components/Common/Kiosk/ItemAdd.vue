@@ -30,6 +30,11 @@ const delete_num = () => {
   if (num.value.length > 1) num.value = num.value.slice(0, -1);
   else num.value = "0";
 };
+
+const init_num = () => {
+  num.value = "0";
+};
+
 watch([num], (newValue, oldValue) => {
   num_split = num.value.split(".");
   if (num_split[1] == undefined) {
@@ -201,7 +206,9 @@ watch([num], (newValue, oldValue) => {
                     장
                   </td>
                   <td class="border-b-2 border-r-2 border-[#D9821C] h-10">
-                    100
+                    <div class="mx-auto p-2 w-20 border-2 border-slate-200">
+                      24
+                    </div>
                   </td>
                   <td class="border-b-2 border-r-2 border-[#D9821C] h-10">
                     <Button class="h-10 w-16" variant="pending"
@@ -245,8 +252,11 @@ watch([num], (newValue, oldValue) => {
                   class="text-center border-b-2 border-l-2 border-r-2 border-[#D9821C] h-10"
                 >
                   <td class="p-5">
-                    <Button class="w-32 h-16 text-2xl" variant="pending"
-                      >입력</Button
+                    <Button
+                      class="w-32 h-16 text-2xl"
+                      variant="pending"
+                      @click="init_num()"
+                      >초기화</Button
                     >
                   </td>
                 </tr>
