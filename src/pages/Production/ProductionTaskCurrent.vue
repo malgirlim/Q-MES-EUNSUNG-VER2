@@ -1609,7 +1609,7 @@ const importNonwork = (no: any) => {
                           <Lucide icon="PlayCircle" class="w-4 h-4 mr-1" />
                           시작
                         </Button>
-                        <Button
+                        <!-- <Button
                           class="flex items-center text-white h-8"
                           variant="danger"
                           @click="
@@ -1621,6 +1621,19 @@ const importNonwork = (no: any) => {
                         >
                           <Lucide icon="XCircle" class="w-4 h-4 mr-1" />
                           취소
+                        </Button> -->
+                        <Button
+                          class="flex items-center h-8"
+                          variant="danger"
+                          @click="
+                            () => {
+                              editModalData = todo;
+                              setTaskReturnModal(true);
+                            }
+                          "
+                        >
+                          <Lucide icon="XCircle" class="w-4 h-4 mr-1" />
+                          반려
                         </Button>
                       </div>
                       <div
@@ -1889,7 +1902,7 @@ const importNonwork = (no: any) => {
   </Dialog>
   <!-- END: 작업수락 Modal -->
 
-  <!-- BEGIN: 작업반려 Modal -->
+  <!-- BEGIN: 작업취소 Modal -->
   <Dialog
     :open="TaskCancelModal"
     @close="

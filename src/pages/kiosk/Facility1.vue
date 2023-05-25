@@ -466,7 +466,7 @@ const setWorkerChangeModal = (value: boolean) => {
                 class="border-b-2 border-[#D9821C] bg-slate-200 h-9"
                 style="position: sticky; top: 0px; z-index: 2"
               >
-                <th class="border-r-2 border-[#D9821C] w-40">입고코드</th>
+                <th class="border-r-2 border-[#D9821C] w-40">LOT코드</th>
                 <th class="border-r-2 border-[#D9821C] w-32">품목코드</th>
                 <th class="border-r-2 border-[#D9821C] w-32">품목구분</th>
                 <th class="border-r-2 border-[#D9821C] w-48">품명</th>
@@ -474,7 +474,7 @@ const setWorkerChangeModal = (value: boolean) => {
                 <th class="w-24">수량</th>
               </thead>
               <tbody>
-                <tr v-for="i in Array(5).fill('10')">
+                <tr v-for="i in Array(10).fill('10')">
                   <td class="border-b-2 border-r-2 border-[#D9821C] h-9">
                     FA00001230418
                   </td>
@@ -530,6 +530,14 @@ const setWorkerChangeModal = (value: boolean) => {
                           >초기화</Button
                         >
                       </div>
+                      <!-- <div v-if="num_show != '0'" class="ml-auto">
+                        <Button
+                          class="h-7 text-white mr-2"
+                          variant="primary"
+                          @click="setWorkerChangeModal(true)"
+                          >임시저장</Button
+                        >
+                      </div> -->
                     </div>
                   </td>
                 </tr>
@@ -663,7 +671,7 @@ const setWorkerChangeModal = (value: boolean) => {
                 <th class="w-32">종료일시</th>
               </thead>
               <tbody>
-                <tr v-for="i in Array(3).fill('10')">
+                <tr v-for="i in Array(10).fill('10')">
                   <td class="border-b-2 border-r-2 border-[#D9821C] h-9">
                     0012
                   </td>
@@ -700,7 +708,7 @@ const setWorkerChangeModal = (value: boolean) => {
                 <th class="w-24">수량</th>
               </thead>
               <tbody>
-                <tr v-for="i in Array(5).fill('10')">
+                <tr v-for="i in Array(10).fill('10')">
                   <td class="border-b-2 border-r-2 border-[#D9821C] h-9">
                     001230418
                   </td>

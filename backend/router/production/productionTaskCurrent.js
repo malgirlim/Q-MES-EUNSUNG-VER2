@@ -45,14 +45,14 @@ router.get("/", async (req, res) => {
         ,ITEM.규격 AS 규격
         ,ITEM.단위 AS 단위
         ,[ISPC_AMOUNT] AS 지시수량
-		    ,(SELECT SUM(CONVERT(numeric,COALESCE([PDRS_PRODUCE_AMT],0))) - COALESCE(SUM(PDDF.불량수),0)
+		    ,COALESCE((SELECT SUM(CONVERT(numeric,COALESCE([PDRS_PRODUCE_AMT],0))) - COALESCE(SUM(PDDF.불량수),0)
           FROM [QMES2022].[dbo].[MANAGE_PRODUCE_RESULT_TB]
           LEFT JOIN
           (SELECT [PDDF_PRODUCE_RESULT_PK], SUM(CONVERT(numeric,COALESCE([PDDF_AMOUNT],0))) AS 불량수
           FROM [QMES2022].[dbo].[MANAGE_PRODUCE_DEFECT_TB]
 		      GROUP BY [PDDF_PRODUCE_RESULT_PK]
           ) AS PDDF ON PDDF.[PDDF_PRODUCE_RESULT_PK] = [PDRS_PK]
-          WHERE [PDRS_INST_PROCESS_PK] = [ISPC_PK]) AS 생산양품수량
+          WHERE [PDRS_INST_PROCESS_PK] = [ISPC_PK]),0) AS 생산양품수량
         ,WORK_INSTRUCT.시작일 AS 시작일
         ,[ISPC_PROCESS_PK] AS 공정NO
         ,PROCESS.공정명 AS 공정명
@@ -200,14 +200,14 @@ router.post("/", async (req, res) => {
             ,ITEM.규격 AS 규격
             ,ITEM.단위 AS 단위
             ,[ISPC_AMOUNT] AS 지시수량
-            ,(SELECT SUM(CONVERT(numeric,COALESCE([PDRS_PRODUCE_AMT],0))) - COALESCE(SUM(PDDF.불량수),0)
+            ,COALESCE((SELECT SUM(CONVERT(numeric,COALESCE([PDRS_PRODUCE_AMT],0))) - COALESCE(SUM(PDDF.불량수),0)
               FROM [QMES2022].[dbo].[MANAGE_PRODUCE_RESULT_TB]
               LEFT JOIN
               (SELECT [PDDF_PRODUCE_RESULT_PK], SUM(CONVERT(numeric,COALESCE([PDDF_AMOUNT],0))) AS 불량수
               FROM [QMES2022].[dbo].[MANAGE_PRODUCE_DEFECT_TB]
               GROUP BY [PDDF_PRODUCE_RESULT_PK]
               ) AS PDDF ON PDDF.[PDDF_PRODUCE_RESULT_PK] = [PDRS_PK]
-              WHERE [PDRS_INST_PROCESS_PK] = [ISPC_PK]) AS 생산양품수량
+              WHERE [PDRS_INST_PROCESS_PK] = [ISPC_PK]),0) AS 생산양품수량
             ,WORK_INSTRUCT.시작일 AS 시작일
             ,[ISPC_PROCESS_PK] AS 공정NO
             ,PROCESS.공정명 AS 공정명
@@ -355,14 +355,14 @@ router.post("/", async (req, res) => {
             ,ITEM.규격 AS 규격
             ,ITEM.단위 AS 단위
             ,[ISPC_AMOUNT] AS 지시수량
-            ,(SELECT SUM(CONVERT(numeric,COALESCE([PDRS_PRODUCE_AMT],0))) - COALESCE(SUM(PDDF.불량수),0)
+            ,COALESCE((SELECT SUM(CONVERT(numeric,COALESCE([PDRS_PRODUCE_AMT],0))) - COALESCE(SUM(PDDF.불량수),0)
               FROM [QMES2022].[dbo].[MANAGE_PRODUCE_RESULT_TB]
               LEFT JOIN
               (SELECT [PDDF_PRODUCE_RESULT_PK], SUM(CONVERT(numeric,COALESCE([PDDF_AMOUNT],0))) AS 불량수
               FROM [QMES2022].[dbo].[MANAGE_PRODUCE_DEFECT_TB]
               GROUP BY [PDDF_PRODUCE_RESULT_PK]
               ) AS PDDF ON PDDF.[PDDF_PRODUCE_RESULT_PK] = [PDRS_PK]
-              WHERE [PDRS_INST_PROCESS_PK] = [ISPC_PK]) AS 생산양품수량
+              WHERE [PDRS_INST_PROCESS_PK] = [ISPC_PK]),0) AS 생산양품수량
             ,WORK_INSTRUCT.시작일 AS 시작일
             ,[ISPC_PROCESS_PK] AS 공정NO
             ,PROCESS.공정명 AS 공정명
