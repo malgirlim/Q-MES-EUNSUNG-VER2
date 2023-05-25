@@ -26,6 +26,7 @@ import NonOPAdd from "../../components/Common/Kiosk/NonOPAdd.vue";
 import BadAdd from "../../components/Common/Kiosk/BadAdd.vue";
 import ItemAdd from "../../components/Common/Kiosk/ItemAdd.vue";
 import WorkerChange from "../../components/Common/Kiosk/WorkerChange.vue";
+import AlertAdd from "../../components/Common/Kiosk/AlertAdd.vue";
 
 onMounted(async () => {
   setInterval(() => {
@@ -164,12 +165,6 @@ const setItemAddModal = (value: boolean) => {
   itemAddModal.value = value;
 };
 
-/* 작업자변경 Modal */
-const workerChangeModal = ref(false);
-const setWorkerChangeModal = (value: boolean) => {
-  workerChangeModal.value = value;
-};
-
 /* 작업종료 Modal */
 const finishCheckBox = ref(false);
 const taskFinishModal = ref(false);
@@ -186,10 +181,28 @@ const setTaskCancleModal = (value: boolean) => {
   taskCancleModal.value = value;
 };
 
+/* 고장발생확인 Modal */
+const alertModal = ref(false);
+const setAlertModal = (value: boolean) => {
+  alertModal.value = value;
+};
+
+/* 고장발생입력 Modal */
+const alertAddModal = ref(false);
+const setAlertAddModal = (value: boolean) => {
+  alertAddModal.value = value;
+};
+
 /* 작업표준서 열기 Modal */
 const taskStandardModal = ref(false);
 const setTaskStandardModal = (value: boolean) => {
   taskStandardModal.value = value;
+};
+
+/* 작업자변경 Modal */
+const workerChangeModal = ref(false);
+const setWorkerChangeModal = (value: boolean) => {
+  workerChangeModal.value = value;
 };
 </script>
 
@@ -250,7 +263,7 @@ const setTaskStandardModal = (value: boolean) => {
           as="a"
           variant="success"
           @click="setCheckListModal(true)"
-          ><strong>점검목록</strong></Button
+          ><strong>일상점검</strong></Button
         >
         <Button
           class="mr-5 h-14 w-44 text-2xl text-white"
@@ -277,14 +290,8 @@ const setTaskStandardModal = (value: boolean) => {
           @click="setItemAddModal(true)"
           ><strong>투입자재변경</strong></Button
         ><Button
-          class="mr-5 h-14 w-44 text-2xl"
-          as="a"
-          variant="primary"
-          @click="setWorkerChangeModal(true)"
-          ><strong>작업자변경</strong></Button
-        ><Button
           v-if="running != '미가동'"
-          class="h-14 w-44 text-2xl"
+          class="mr-5 h-14 w-44 text-2xl"
           as="a"
           variant="danger"
           @click="setTaskFinishModal(true)"
@@ -292,11 +299,20 @@ const setTaskStandardModal = (value: boolean) => {
         >
         <Button
           v-if="running == '미가동'"
-          class="h-14 w-48 text-2xl"
+          class="mr-5 h-14 w-48 text-2xl"
           as="a"
           variant="danger"
           @click="setTaskCancleModal(true)"
           ><strong>작업취소/반려</strong></Button
+        >
+        <Button
+          class="h-14 w-44 text-2xl"
+          as="a"
+          variant="danger"
+          @click="setAlertModal(true)"
+          ><Lucide icon="Siren" class="w-7 h-7 mb-0.5 mr-1" /><strong
+            >고장발생</strong
+          ></Button
         >
       </div>
     </div>
@@ -597,7 +613,19 @@ const setTaskStandardModal = (value: boolean) => {
                   <td class="border-r-2 border-success bg-slate-200 font-bold">
                     작업자
                   </td>
-                  <td class="pl-2 text-left">박명한</td>
+                  <td class="pl-2 text-left">
+                    <div class="flex">
+                      <div class="mr-auto">박명한</div>
+                      <div class="ml-auto">
+                        <Button
+                          class="h-7 text-white mr-2"
+                          variant="success"
+                          @click="setWorkerChangeModal(true)"
+                          >작업자변경</Button
+                        >
+                      </div>
+                    </div>
+                  </td>
                 </tr>
               </tbody>
             </table>
@@ -780,11 +808,11 @@ const setTaskStandardModal = (value: boolean) => {
   </Dialog>
   <!-- END: 작업지시목록 Modal -->
 
-  <!-- BEGIN: 점검목록 Modal -->
+  <!-- BEGIN: 일상점검 Modal -->
   <Dialog :open="checkListModal" size="xxl" @close="setCheckListModal(false)">
     <Dialog.Panel>
       <div class="p-3 text-center">
-        <div class="mt-8 text-4xl"><strong>점검목록</strong></div>
+        <div class="mt-8 text-4xl"><strong>일상점검</strong></div>
       </div>
       <div><CheckList /></div>
       <label class="cursor-pointer"
@@ -826,7 +854,7 @@ const setTaskStandardModal = (value: boolean) => {
       </div>
     </Dialog.Panel>
   </Dialog>
-  <!-- END: 점검목록 Modal -->
+  <!-- END: 일상점검 Modal -->
 
   <!-- BEGIN: 작업시작 확인 Modal -->
   <Dialog :open="taskStartModal" size="lg" @close="setTaskStartModal(false)">
@@ -992,46 +1020,6 @@ const setTaskStandardModal = (value: boolean) => {
     </Dialog.Panel>
   </Dialog>
   <!-- END: 불량변경 Modal -->
-
-  <!-- BEGIN: 작업자 변경 Modal -->
-  <Dialog
-    :open="workerChangeModal"
-    size="lg"
-    @close="setWorkerChangeModal(false)"
-  >
-    <Dialog.Panel>
-      <div class="p-5 text-center">
-        <Lucide icon="Users" class="w-24 h-24 mx-auto mt-3 text-primary" />
-        <div class="mt-5 text-3xl"><strong>작업자 변경</strong></div>
-        <div class="mt-3 text-2xl">변경할 작업자를 선택해주세요.</div>
-      </div>
-      <div><WorkerChange /></div>
-
-      <div class="mt-5 px-5 pb-8 text-center">
-        <Button
-          variant="primary"
-          type="button"
-          @click="
-            () => {
-              setWorkerChangeModal(false);
-            }
-          "
-          class="w-48 text-2xl mr-10"
-        >
-          변경
-        </Button>
-        <Button
-          variant="outline-primary"
-          type="button"
-          class="w-48 text-2xl"
-          @click="setWorkerChangeModal(false)"
-        >
-          취소
-        </Button>
-      </div>
-    </Dialog.Panel>
-  </Dialog>
-  <!-- END: 작업자 변경 Modal -->
 
   <!-- BEGIN: 작업종료 Modal -->
   <Dialog :open="taskFinishModal" size="lg" @close="setTaskFinishModal(false)">
@@ -1300,6 +1288,70 @@ const setTaskStandardModal = (value: boolean) => {
   </Dialog>
   <!-- END: 작업 취소, 보류 Modal -->
 
+  <!-- BEGIN: 고장발생 확인 Modal -->
+  <Dialog :open="alertModal" size="lg" @close="setAlertModal(false)">
+    <Dialog.Panel>
+      <div class="p-5 text-center">
+        <Lucide icon="Siren" class="w-24 h-24 mx-auto mt-3 text-danger" />
+        <div class="mt-5 text-3xl"><strong>고장발생</strong></div>
+        <div class="mt-3 text-2xl">장비가 고장중으로 전환됩니다.</div>
+      </div>
+
+      <div class="mt-5 px-5 pb-8 text-center">
+        <Button
+          variant="primary"
+          type="button"
+          @click="
+            () => {
+              setAlertModal(false);
+              setAlertAddModal(true);
+            }
+          "
+          class="w-48 text-2xl mr-10"
+        >
+          전환
+        </Button>
+        <Button
+          variant="outline-primary"
+          type="button"
+          class="w-48 text-2xl"
+          @click="setAlertModal(false)"
+        >
+          취소
+        </Button>
+      </div>
+    </Dialog.Panel>
+  </Dialog>
+  <!-- END: 고장발생 확인 Modal -->
+
+  <!-- BEGIN: 고장발생 Modal -->
+  <Dialog :open="alertAddModal" size="lg">
+    <Dialog.Panel>
+      <div class="p-3 text-center">
+        <Lucide icon="Siren" class="w-20 h-20 mx-auto mt-3 text-danger" />
+        <div class="mt-5 text-3xl">
+          <strong>설비가 고장 발생중입니다</strong>
+        </div>
+        <div class="mt-3 text-2xl">
+          고장 사유를 선택하고 설비를 재개해 주세요
+        </div>
+      </div>
+      <div><AlertAdd /></div>
+
+      <div class="px-5 pb-8 text-center">
+        <Button
+          variant="primary"
+          type="button"
+          class="w-48 text-2xl"
+          @click="setAlertAddModal(false)"
+        >
+          설비재개
+        </Button>
+      </div>
+    </Dialog.Panel>
+  </Dialog>
+  <!-- END: 고장발생 Modal -->
+
   <!-- BEGIN: 작업표준서 열기 Modal -->
   <Dialog
     :open="taskStandardModal"
@@ -1332,6 +1384,46 @@ const setTaskStandardModal = (value: boolean) => {
     </Dialog.Panel>
   </Dialog>
   <!-- END: 작업표준서 열기 Modal -->
+
+  <!-- BEGIN: 작업자 변경 Modal -->
+  <Dialog
+    :open="workerChangeModal"
+    size="lg"
+    @close="setWorkerChangeModal(false)"
+  >
+    <Dialog.Panel>
+      <div class="p-5 text-center">
+        <Lucide icon="Users" class="w-24 h-24 mx-auto mt-3 text-primary" />
+        <div class="mt-5 text-3xl"><strong>작업자 변경</strong></div>
+        <div class="mt-3 text-2xl">변경할 작업자를 선택해주세요.</div>
+      </div>
+      <div><WorkerChange /></div>
+
+      <div class="mt-5 px-5 pb-8 text-center">
+        <Button
+          variant="primary"
+          type="button"
+          @click="
+            () => {
+              setWorkerChangeModal(false);
+            }
+          "
+          class="w-48 text-2xl mr-10"
+        >
+          변경
+        </Button>
+        <Button
+          variant="outline-primary"
+          type="button"
+          class="w-48 text-2xl"
+          @click="setWorkerChangeModal(false)"
+        >
+          취소
+        </Button>
+      </div>
+    </Dialog.Panel>
+  </Dialog>
+  <!-- END: 작업자 변경 Modal -->
 
   <!-- BEGIN: 로그아웃 확인 Modal -->
   <Dialog :open="logoutModal" size="lg" @close="setLogoutModal(false)">

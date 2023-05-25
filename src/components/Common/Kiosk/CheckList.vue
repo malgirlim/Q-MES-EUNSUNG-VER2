@@ -3,14 +3,68 @@ import { ref } from "vue";
 import Button from "../../../base-components/Button";
 import Lucide from "../../../base-components/Lucide";
 import { FormSelect } from "../../../base-components/Form";
+import dayjs from "dayjs";
+
+// 오늘날짜
+dayjs.locale("ko");
+let now = ref(dayjs().format("YYYY-MM-DD"));
+let diff = 0;
+
+const changeDate = (type: any) => {
+  if (type == "dayPlus") {
+    if (dayjs().diff(now.value, "day") > 0)
+      now.value = dayjs(now.value).add(1, "day").format("YYYY-MM-DD");
+  }
+
+  if (type == "dayMinus") {
+    now.value = dayjs(now.value).subtract(1, "day").format("YYYY-MM-DD");
+  }
+
+  if (type == "monthPlus") {
+    if (dayjs().diff(now.value, "month") > 0)
+      now.value = dayjs(now.value).add(1, "month").format("YYYY-MM-DD");
+    else now.value = dayjs().format("YYYY-MM-DD");
+  }
+
+  if (type == "monthMinus") {
+    now.value = dayjs(now.value).subtract(1, "month").format("YYYY-MM-DD");
+  }
+
+  if (type == "today") {
+    now.value = dayjs().format("YYYY-MM-DD");
+  }
+};
 
 const radioSelect: any = ref([]);
 </script>
 <template>
-  <div class="p-7">
+  <div class="px-7 py-3">
+    <div class="flex">
+      <div class="flex mx-auto mb-3">
+        <div class="cursor-pointer mr-5" @click="changeDate('monthMinus')">
+          <Lucide class="w-10 h-10" icon="ChevronsLeft" />
+        </div>
+        <div class="cursor-pointer" @click="changeDate('dayMinus')">
+          <Lucide class="w-10 h-10" icon="ChevronLeft" />
+        </div>
+        <div
+          class="text-center mx-10 mt-1 text-2xl font-bold cursor-pointer"
+          @click="changeDate('today')"
+        >
+          {{ dayjs(now).format("YYYY-MM-DD dddd") }}
+        </div>
+        <div class="cursor-pointer mr-5" @click="changeDate('dayPlus')">
+          <Lucide class="w-10 h-10" icon="ChevronRight" />
+        </div>
+        <div class="cursor-pointer" @click="changeDate('monthPlus')">
+          <Lucide class="w-10 h-10" icon="ChevronsRight" />
+        </div>
+      </div>
+    </div>
+
     <div
       class="text-2xl"
-      style="height: 560px; overflow-y: visible; overflow-x: hidden"
+      style="height: 500px; overflow-y: visible; overflow-x: hidden"
     >
       <table class="w-full">
         <thead
