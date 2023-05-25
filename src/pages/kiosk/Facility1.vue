@@ -84,61 +84,79 @@ const year = ref(dayjs().format("YYYY"));
 const running = "미가동";
 const task_status = "작업미확인";
 const checked = false;
-const 지시수량 = 3000;
+const 지시수량 = ref("3000");
+const 완료수량 = ref("0");
 
-// 불량, 양품
-const num = ref("0");
-const num_show = ref("0");
-
-let num_bad = ref("27");
-let num_good: any = ref(
-  (
-    Number(num_show.value.replace(/,/g, "")) - Number(num_bad.value)
-  ).toLocaleString(undefined, { maximumFractionDigits: 11 })
+// 생산실적 초기값 설정
+const 생산수량 = ref("0");
+const 불량수량 = ref("27");
+const 양품수량 = ref(
+  String(
+    Number(완료수량.value) + Number(생산수량.value) - Number(불량수량.value)
+  )
 );
 
-// 생산수 저장
-const 생산수량 = ref("0");
+// ########################### 키패드 (생산수입력) BEGIN ###########################
+const 입력수량 = ref("0");
+const 입력수량_show = ref("0");
 
-const 생산수량_초기화 = () => {};
-
-const 생산수량_증가 = () => {};
-
-const 생산수량_차감 = () => {};
-
-// 키패드 (생산수입력)
-
-let num_split = [];
-let num_dot = ".";
-
+// [함수] 입력수량에 숫자 집어넣기
 const insert_num = (numpad_value: any) => {
-  if (num.value == "0") num.value = "" + numpad_value;
-  else if (num.value.length < 13) num.value += numpad_value;
+  // 만약 입력수량이 "0" 이라면 선택한 숫자로 덮어쓰기
+  if (입력수량.value == "0") 입력수량.value = numpad_value;
+  // 만약 입력수량이 "0"이 아니고 13글자를 넘지 않는다면 선택한 숫자를 추가하기
+  else if (입력수량.value.length < 13) 입력수량.value += numpad_value;
 };
 
+// [함수] 입력수량에 . (점) 집어넣기
 const insert_dot = () => {
-  const dot_count = num.value.split(".").length - 1;
-  if (dot_count < 1 && num.value.length < 13) num.value += ".";
+  // 만약 입력수량에 . (점)이 없고, 13자리를 넘지 않는다면 .(점)을 추가하기
+  if (입력수량.value.indexOf(".") == -1 && 입력수량.value.length < 13)
+    입력수량.value += ".";
 };
 
+// [함수] 입력수량을 뒤에서부터 지우기
 const delete_num = () => {
-  if (num.value.length > 1) num.value = num.value.slice(0, -1);
-  else num.value = "0";
+  // 만약 입력수량이 1글자라면 뒤에서 1개를 지우기
+  if (입력수량.value.length > 1) 입력수량.value = 입력수량.value.slice(0, -1);
+  else 입력수량.value = "0"; // 아니라면 "0"으로 바꾸기
 };
-watch([num], (newValue, oldValue) => {
-  num_split = num.value.split(".");
-  if (num_split[1] == undefined) {
-    num_split[1] = "";
-    num_dot = "";
-  } else num_dot = ".";
-  num_show.value = Number(num_split[0]).toLocaleString();
-  if (num_split[1] != undefined || num_split[1] != "")
-    num_show.value += num_dot;
-  num_show.value += num_split[1];
-  num_good.value = (
-    Number(num_show.value.replace(/,/g, "")) - Number(num_bad.value)
-  ).toLocaleString(undefined, { maximumFractionDigits: 11 });
+
+// 생산수 저장함수
+const 생산수량_초기화 = () => {
+  생산수량.value = "0";
+};
+const 생산수량_증가 = () => {
+  생산수량.value = String(Number(생산수량.value) + Number(입력수량.value));
+  입력수량.value = "0";
+  입력수량_show.value = "0";
+};
+const 생산수량_차감 = () => {
+  생산수량.value = String(Number(생산수량.value) - Number(입력수량.value));
+  if (생산수량.value < 0) 생산수량.value = "0";
+  입력수량.value = "0";
+  입력수량_show.value = "0";
+};
+
+// [watch] 입력수량이 바뀔때마다 입력수량_show의 값을 바꾸기
+watch([입력수량], (newValue, oldValue) => {
+  // 만약 입력수량에 .(점)이 있다면 정수부분을 Locale해주고 .(점)을 붙여줌
+  if (입력수량.value.indexOf(".") != -1) {
+    입력수량_show.value =
+      Number(입력수량.value.split(".")[0]).toLocaleString() +
+      "." +
+      (입력수량.value.split(".")[1] ?? "");
+  } else 입력수량_show.value = Number(입력수량.value).toLocaleString(); // 바로 Locale 해도 됨
 });
+
+// [watch] 생산수량이 바뀔때마다 양품수량 바꾸기
+watch([생산수량], (newValue, oldValue) => {
+  양품수량.value = String(
+    Number(완료수량.value) + Number(생산수량.value) - Number(불량수량.value)
+  );
+});
+
+// ########################### 키패드 (생산수입력) END ###########################
 
 /* 작업지시목록 Modal */
 const taskListModal = ref(false);
@@ -531,15 +549,25 @@ const setWorkerChangeModal = (value: boolean) => {
                   >
                     지시수량
                   </td>
-                  <td class="pl-2 text-left w-[70%]">
-                    {{ 지시수량.toLocaleString() }}
+                  <td colspan="3" class="pl-2 text-left w-[70%]">
+                    {{
+                      Number(지시수량).toLocaleString(undefined, {
+                        maximumFractionDigits: 11,
+                      })
+                    }}
                   </td>
                 </tr>
                 <tr class="border-b-2 border-primary h-9">
                   <td class="border-r-2 border-primary bg-slate-200 font-bold">
                     완료수량
                   </td>
-                  <td class="pl-2 text-left">0</td>
+                  <td class="pl-2 text-left">
+                    {{
+                      Number(완료수량).toLocaleString(undefined, {
+                        maximumFractionDigits: 11,
+                      })
+                    }}
+                  </td>
                 </tr>
                 <tr class="border-b-2 border-primary h-9">
                   <td class="border-r-2 border-primary bg-slate-200 font-bold">
@@ -547,12 +575,18 @@ const setWorkerChangeModal = (value: boolean) => {
                   </td>
                   <td class="pl-2 text-left">
                     <div class="flex items-center">
-                      <div class="mr-auto">{{ 생산수량 }}</div>
+                      <div class="mr-auto" :key="생산수량">
+                        {{
+                          Number(생산수량).toLocaleString(undefined, {
+                            maximumFractionDigits: 11,
+                          })
+                        }}
+                      </div>
                       <div class="ml-auto p-1">
                         <Button
                           class="h-7 mr-2"
                           variant="primary"
-                          @click="init_생산수량()"
+                          @click="생산수량_초기화()"
                           >초기화</Button
                         >
                       </div>
@@ -571,13 +605,25 @@ const setWorkerChangeModal = (value: boolean) => {
                   <td class="border-r-2 border-primary bg-slate-200 font-bold">
                     불량수량
                   </td>
-                  <td class="pl-2 text-left">{{ num_bad }}</td>
+                  <td class="pl-2 text-left">
+                    {{
+                      Number(불량수량).toLocaleString(undefined, {
+                        maximumFractionDigits: 11,
+                      })
+                    }}
+                  </td>
                 </tr>
                 <tr class="border-b-2 border-primary h-9">
                   <td class="border-r-2 border-primary bg-slate-200 font-bold">
                     양품수량
                   </td>
-                  <td class="pl-2 text-left w-28">{{ num_good }}</td>
+                  <td class="pl-2 text-left w-28">
+                    {{
+                      Number(양품수량).toLocaleString(undefined, {
+                        maximumFractionDigits: 11,
+                      })
+                    }}
+                  </td>
                 </tr>
 
                 <tr class="border-b-2 border-primary h-9">
@@ -586,17 +632,28 @@ const setWorkerChangeModal = (value: boolean) => {
                   </td>
                 </tr>
                 <tr>
-                  <td class="w-1/2">
-                    <div
-                      class="mx-auto mt-1.5 p-1.5 w-48 h-10 border-2 border-slate-200"
-                    >
-                      {{ num_show }}
-                    </div>
-                  </td>
-                  <td colspan="2" class="w-1/2">
-                    <div class="mt-1.5">
-                      <Button class="mr-5 h-10" variant="primary">증가</Button
-                      ><Button class="h-10" variant="danger">차감</Button>
+                  <td colspan="2">
+                    <div class="flex">
+                      <div class="flex mx-auto">
+                        <div
+                          class="mt-1.5 mr-10 p-1.5 w-48 h-10 border-2 border-slate-200"
+                        >
+                          {{ 입력수량_show }}
+                        </div>
+                        <div class="mt-1.5">
+                          <Button
+                            class="mr-5 h-10"
+                            variant="primary"
+                            @click="생산수량_증가()"
+                            >증가</Button
+                          ><Button
+                            class="h-10"
+                            variant="danger"
+                            @click="생산수량_차감()"
+                            >차감</Button
+                          >
+                        </div>
+                      </div>
                     </div>
                   </td>
                 </tr>
