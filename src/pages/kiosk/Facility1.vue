@@ -87,6 +87,8 @@ const checked = false;
 const 지시수량 = 3000;
 
 // 불량, 양품
+const num = ref("0");
+const num_show = ref("0");
 
 let num_bad = ref("27");
 let num_good: any = ref(
@@ -105,8 +107,6 @@ const 생산수량_증가 = () => {};
 const 생산수량_차감 = () => {};
 
 // 키패드 (생산수입력)
-const 입력수량 = ref(0);
-const 입력수량_show = ref("0");
 
 let num_split = [];
 let num_dot = ".";
@@ -1253,119 +1253,37 @@ const setWorkerChangeModal = (value: boolean) => {
   </Dialog>
   <!-- END: 작업 종료 Modal -->
 
-  <!-- BEGIN: 작업 취소, 보류 Modal -->
+  <!-- BEGIN: 작업 반려 Modal -->
   <Dialog :open="taskCancleModal" size="lg" @close="setTaskCancleModal(false)">
     <Dialog.Panel>
       <div class="p-5 text-center">
-        <Lucide icon="CheckCircle" class="w-20 h-20 mx-auto mt-3 text-danger" />
-        <div class="mt-5 text-3xl"><strong>작업취소/반려</strong></div>
-        <div class="mt-3 text-2xl">유형을 선택해주세요.</div>
+        <Lucide icon="Slash" class="w-20 h-20 mx-auto mt-3 text-danger" />
+        <div class="mt-5 text-3xl"><strong>작업반려</strong></div>
+        <div class="mt-3 text-2xl">반려 사유를 입력해주세요.</div>
         <div class="mt-5">
-          <div class="pl-7 pr-7 mt-5 text-xl">
-            <table class="w-full">
-              <tbody>
-                <tr class="border-t-2 border-l-2 border-b-2 border-danger h-12">
-                  <td
-                    class="text-center border-r-2 border-danger bg-slate-200 font-bold w-32"
-                  >
-                    작업취소
-                  </td>
-                </tr>
-                <tr class="border-b-2 border-danger h-12">
-                  <td
-                    class="text-center border-l-2 border-r-2 border-danger font-bold"
-                  >
-                    <div>
-                      작업 선택을 취소하고
-                      <label class="text-pending font-bold">작업미확인</label
-                      >으로 전환
-                    </div>
-                  </td>
-                </tr>
-                <tr class="border-b-2 border-danger h-20">
-                  <td
-                    class="text-center border-l-2 border-r-2 border-danger font-bold"
-                  >
-                    <Button
-                      variant="pending"
-                      type="button"
-                      @click="
-                        () => {
-                          setTaskCancleModal(false);
-                        }
-                      "
-                      class="w-40 text-2xl mb-5 mt-5"
-                    >
-                      작업취소
-                    </Button>
-                  </td>
-                </tr>
-              </tbody>
-            </table>
+          <div class="mt-5">
+            <FormSelect class="w-64" formSelectSize="xxl" model-value="미입력">
+              <option>미입력</option>
+              <option>원자재 부족</option>
+              <option>부자재 부족</option>
+              <option>작업자 부족</option>
+              <option>작업자 불일치</option>
+              <option>기타</option>
+            </FormSelect>
           </div>
-          <div class="pl-7 pr-7 mt-5 text-xl">
-            <table class="w-full">
-              <tbody>
-                <tr class="border-t-2 border-l-2 border-b-2 border-danger h-12">
-                  <td
-                    class="text-center border-r-2 border-danger bg-slate-200 font-bold w-32"
-                  >
-                    작업반려
-                  </td>
-                </tr>
-                <tr class="border-b-2 border-danger h-12">
-                  <td
-                    class="text-center border-l-2 border-r-2 border-danger font-bold"
-                  >
-                    <div>
-                      반려 사유를 입력하고
-                      <label class="text-danger font-bold">작업반려</label>로
-                      전환
-                    </div>
-                  </td>
-                </tr>
-
-                <tr class="border-b-2 border-danger h-20">
-                  <td
-                    class="text-center border-l-2 border-r-2 border-danger font-bold"
-                  >
-                    <div class="mt-5">
-                      <FormSelect
-                        class="w-64"
-                        formSelectSize="xxl"
-                        model-value="미입력"
-                      >
-                        <option>미입력</option>
-                        <option>원자재 부족</option>
-                        <option>부자재 부족</option>
-                        <option>작업자 부족</option>
-                        <option>작업자 불일치</option>
-                        <option>기타</option>
-                      </FormSelect>
-                    </div>
-                    <div>
-                      <Button
-                        variant="danger"
-                        type="button"
-                        @click="
-                          () => {
-                            setTaskCancleModal(false);
-                          }
-                        "
-                        class="w-40 text-2xl mb-5 mt-5"
-                      >
-                        작업반려
-                      </Button>
-                    </div>
-                  </td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
+          <div></div>
         </div>
       </div>
 
       <div class="mt-5 px-5 pb-8 text-center">
+        <Button
+          variant="danger"
+          type="button"
+          class="w-40 text-2xl mr-10"
+          @click="setTaskCancleModal(false)"
+        >
+          작업반려
+        </Button>
         <Button
           variant="outline-primary"
           type="button"
@@ -1377,7 +1295,7 @@ const setWorkerChangeModal = (value: boolean) => {
       </div>
     </Dialog.Panel>
   </Dialog>
-  <!-- END: 작업 취소, 보류 Modal -->
+  <!-- END: 작업 반려 Modal -->
 
   <!-- BEGIN: 고장발생 확인 Modal -->
   <Dialog :open="alertModal" size="lg" @close="setAlertModal(false)">
