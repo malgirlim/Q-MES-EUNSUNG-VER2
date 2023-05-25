@@ -1,14 +1,30 @@
 <script setup lang="ts">
+import { ref, onMounted, watch } from "vue";
 import Button from "../../../base-components/Button";
 import Lucide from "../../../base-components/Lucide";
 
-// 임시 작업지시 데이터
+// API 보내는 함수 및 인터페이스 불러오기
+import { useSendApi } from "../../../composables/useSendApi";
+import { ProductionTaskCurrent } from "../../../interfaces/menu/productionInterface";
 
-const task_status = "작업대기";
-const task_status_tmp = "작업중";
-const task_qty_current = "0";
-const task_qty = "10,000";
-const task_qty_std = "개";
+// 데이터 가져오기
+const props = defineProps<{
+  data?: any;
+}>();
+
+// 데이터 내보내기
+const output = ref();
+const emit = defineEmits(["update:output"]);
+emit(`update:output`, output.value); // 실제로 내보낼 때 쓰는 코드
+
+// 페이지 로딩 시 시작
+onMounted(async () => {
+  dataManager.loadDatas(); // 메인으로 쓸 데이터 불러오기
+});
+
+// dataManager 만들기
+const url = "/api/production/task/current";
+const dataManager = useSendApi<ProductionTaskCurrent>(url, ref(1), ref(100));
 </script>
 <template>
   <div class="p-7">
@@ -35,78 +51,61 @@ const task_qty_std = "개";
           <th class="border-t-2 border-r-2 border-success w-20">선택</th>
         </thead>
         <tbody>
-          <tr class="text-center">
+          <tr
+            class="text-center"
+            v-for="(data, index) in dataManager.dataAll.value"
+            :key="data.NO"
+          >
             <td class="border-l-2 border-b-2 border-r-2 border-success h-20">
-              1
+              {{ index + 1 }}
             </td>
             <td class="border-b-2 border-r-2 border-success h-20">
-              TAS0022112202
+              {{ data.작업코드 }}
             </td>
-            <td class="border-b-2 border-r-2 border-success h-20">인쇄2공정</td>
-            <td class="border-b-2 border-r-2 border-success h-20">박명한</td>
             <td class="border-b-2 border-r-2 border-success h-20">
-              2074-G901-1
+              {{ data.공정명 }}
             </td>
-            <td class="border-b-2 border-r-2 border-success h-20">반제품</td>
+            <td class="border-b-2 border-r-2 border-success h-20">
+              {{ data.작업자 }}
+            </td>
+            <td class="border-b-2 border-r-2 border-success h-20">
+              {{ data.품번 }}
+            </td>
+            <td class="border-b-2 border-r-2 border-success h-20">
+              {{ data.품목구분 }}
+            </td>
 
             <td class="border-b-2 border-r-2 border-success h-20">
-              POWER TERMINAL PRE-MOLD
+              {{ data.품명 }}
             </td>
-            <td class="border-b-2 border-r-2 border-success h-20">A2 E-EGR</td>
+            <td class="border-b-2 border-r-2 border-success h-20">
+              {{ data.규격 }}
+            </td>
             <td class="border-b-2 border-r-2 border-success h-20">
               <div
                 :class="[
-                  { 'text-danger': task_status_tmp == '작업대기' },
-                  { 'text-indigo-500': task_status_tmp == '작업중' },
+                  { 'text-gray-500': data.진행상황 == '작업보류' },
+                  { 'text-danger': data.진행상황 == '작업반려' },
+                  { 'text-black': data.진행상황 == '작업미확인' },
+                  { 'text-orange-500': data.진행상황 == '작업대기' },
+                  { 'text-success': data.진행상황 == '작업중' },
+                  // { 'text-danger': data.진행상황 == '작업대기' },
+                  // { 'text-indigo-500': data.진행상황 == '작업중' },
                 ]"
               >
-                {{ task_status_tmp }}
+                {{ data.진행상황 }}
               </div>
               <div class="text-xl">
-                ({{ task_qty_current }}/{{ task_qty }}{{ task_qty_std }})
+                ({{ data.생산양품수량 }}/{{ data.지시수량 }}{{ data.단위 }})
               </div>
             </td>
             <td class="border-b-2 border-r-2 border-success h-20">
-              <div v-if="task_status_tmp == '작업대기'">
+              <div v-if="data.진행상황 == '작업미확인'">
                 <Button variant="primary"
                   ><Lucide class="w-8 h-8 mx-auto" icon="CheckSquare"
                 /></Button>
               </div>
-            </td>
-          </tr>
-          <tr class="text-center" v-for="i in Array(10).fill('10')">
-            <td class="border-l-2 border-b-2 border-r-2 border-success h-20">
-              1
-            </td>
-            <td class="border-b-2 border-r-2 border-success h-20">
-              TAS0022112202
-            </td>
-            <td class="border-b-2 border-r-2 border-success h-20">인쇄2공정</td>
-            <td class="border-b-2 border-r-2 border-success h-20">박명한</td>
-            <td class="border-b-2 border-r-2 border-success h-20">
-              2074-G901-1
-            </td>
-            <td class="border-b-2 border-r-2 border-success h-20">반제품</td>
-
-            <td class="border-b-2 border-r-2 border-success h-20">
-              POWER TERMINAL PRE-MOLD
-            </td>
-            <td class="border-b-2 border-r-2 border-success h-20">A2 E-EGR</td>
-            <td class="border-b-2 border-r-2 border-success h-20">
-              <div
-                :class="[
-                  { 'text-danger': task_status == '작업대기' },
-                  { 'text-indigo-500': task_status == '작업중' },
-                ]"
-              >
-                {{ task_status }}
-              </div>
-              <div class="text-xl">
-                ({{ task_qty_current }}/{{ task_qty }}{{ task_qty_std }})
-              </div>
-            </td>
-            <td class="border-b-2 border-r-2 border-success h-20">
-              <div v-if="task_status == '작업대기'">
+              <div v-if="data.진행상황 == '작업대기'">
                 <Button variant="primary"
                   ><Lucide class="w-8 h-8 mx-auto" icon="CheckSquare"
                 /></Button>
