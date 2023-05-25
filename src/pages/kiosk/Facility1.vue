@@ -1,6 +1,5 @@
 <script setup lang="ts">
 import { getCurrentInstance, onMounted, ref, watch } from "vue";
-import _ from "lodash";
 
 import Button from "../../base-components/Button";
 import Lucide from "../../base-components/Lucide";
@@ -28,16 +27,29 @@ import ItemAdd from "../../components/Common/Kiosk/ItemAdd.vue";
 import WorkerChange from "../../components/Common/Kiosk/WorkerChange.vue";
 import AlertAdd from "../../components/Common/Kiosk/AlertAdd.vue";
 
-onMounted(async () => {
-  setInterval(() => {
-    now.value = dayjs().format("YYYY-MM-DD HH:mm:ss");
-  }, 1000);
-});
+/* ##########################################  키오스크 정보 관련 (중요!)  ########################################## */
+
+const 키오스크NO = 1;
+const 설비명 = "인쇄기1";
+
+/* ################################################################################################################ */
 
 /*로그인 관련 BEGIN*/
-
 const { proxy }: any = getCurrentInstance();
 
+// login(또는 메뉴이동) 할 때마다 token refresh해주는 함수
+axios
+  .get("/api/auth")
+  .then((res: any) => {
+    proxy.gstate.account = res.data;
+  })
+  .catch(() => {
+    if (proxy.gstate.account.id == null) {
+      router.push("/kiosk/login");
+    }
+  });
+
+// 로그아웃
 const logout = () => {
   axios
     .delete("/api/auth", { params: { user: proxy.gstate.account.id } })
@@ -50,24 +62,19 @@ const logout = () => {
     });
 };
 
-axios
-  .get("/api/auth")
-  .then((res: any) => {
-    proxy.gstate.account = res.data;
-  })
-  .catch(() => {
-    if (proxy.gstate.account.id == null) {
-      router.push("/kiosk/login");
-    }
-  });
-
-/*로그인 관련 END*/
-
-/* 로그아웃 확인 Modal */
+// 로그아웃 확인 Modal
 const logoutModal = ref(false);
 const setLogoutModal = (value: boolean) => {
   logoutModal.value = value;
 };
+/*로그인 관련 END*/
+
+// 페이지 로딩 시 시작
+onMounted(async () => {
+  setInterval(() => {
+    now.value = dayjs().format("YYYY-MM-DD HH:mm:ss");
+  }, 1000);
+});
 
 // 날짜 구하기
 const now = ref(dayjs().format("YYYY-MM-DD HH:mm:ss"));
@@ -75,7 +82,7 @@ const year = ref(dayjs().format("YYYY"));
 
 // 임시데이터
 const running = "미가동";
-const task_status = "작업중";
+const task_status = "작업미확인";
 const checked = false;
 const 지시수량 = 3000;
 
@@ -206,6 +213,12 @@ const setWorkerChangeModal = (value: boolean) => {
   workerChangeModal.value = value;
 };
 </script>
+
+<!-- 
+#####################################################################################################################
+#####################################################################################################################
+#####################################################################################################################
+-->
 
 <template>
   <div class="pl-8 pr-8 pt-8">
@@ -812,7 +825,7 @@ const setWorkerChangeModal = (value: boolean) => {
       <div class="p-3 text-center">
         <div class="mt-8 text-4xl"><strong>인쇄기1 작업지시목록</strong></div>
       </div>
-      <div><TaskList /></div>
+      <div><TaskList :키오스크no="키오스크NO" /></div>
 
       <div class="px-5 pb-8 text-center">
         <Button
