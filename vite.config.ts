@@ -1,6 +1,7 @@
 import { defineConfig } from "vite";
 import vue from "@vitejs/plugin-vue";
 import path from "path";
+import basicSsl from '@vitejs/plugin-basic-ssl'
 
 // https://vitejs.dev/config/
 export default defineConfig({
@@ -20,6 +21,7 @@ export default defineConfig({
         },
       },
     }),
+    basicSsl(),
   ],
   resolve: {
     alias: {
@@ -32,5 +34,7 @@ export default defineConfig({
       "/api": "http://localhost:3000",
       "/q-api": "http://aligo.qmes.co.kr",
     },
+    https : true,
   },
+
 });
