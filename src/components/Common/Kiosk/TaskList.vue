@@ -103,18 +103,11 @@ const dataManager = useSendApi<ProductionTaskCurrent>(url, ref(1), ref(100));
               </div>
             </td>
             <td class="border-b-2 border-r-2 border-success h-20">
-              <div v-if="data.진행상황 == '작업미확인'">
-                <Button
-                  variant="primary"
-                  @click="
-                    () => {
-                      emit(`update:modalclose`, false);
-                    }
-                  "
-                  ><Lucide class="w-8 h-8 mx-auto" icon="CheckSquare" />
-                </Button>
-              </div>
-              <div v-if="data.진행상황 == '작업대기'">
+              <div
+                v-if="
+                  data.진행상황 == '작업미확인' || data.진행상황 == '작업대기'
+                "
+              >
                 <Button
                   variant="primary"
                   @click="
