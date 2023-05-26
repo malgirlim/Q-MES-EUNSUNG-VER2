@@ -62,6 +62,7 @@ v-for="i in Array(5).fill('10')"
           <div><Lucide class="w-6 h-6 mr-1" icon="ChevronsDown" /></div>
           <div><Lucide class="w-6 h-6 mr-1" icon="ChevronsDown" /></div>
           <div><Lucide class="w-6 h-6" icon="ChevronsDown" /></div>
+          <Button>모달닫기테스트</Button>
         </div>
       </div>
     </div>
