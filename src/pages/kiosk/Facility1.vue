@@ -69,16 +69,15 @@ const setLogoutModal = (value: boolean) => {
 };
 /*로그인 관련 END*/
 
+// 날짜 구하기
+const now = ref(dayjs().format("YYYY-MM-DD HH:mm:ss"));
+
 // 페이지 로딩 시 시작
 onMounted(async () => {
   setInterval(() => {
     now.value = dayjs().format("YYYY-MM-DD HH:mm:ss");
   }, 1000);
 });
-
-// 날짜 구하기
-const now = ref(dayjs().format("YYYY-MM-DD HH:mm:ss"));
-const year = ref(dayjs().format("YYYY"));
 
 // 임시데이터
 const running = "미가동";
@@ -916,7 +915,13 @@ const setWorkerChangeModal = (value: boolean) => {
       <div class="p-3 text-center">
         <div class="mt-8 text-4xl"><strong>인쇄기1 작업지시목록</strong></div>
       </div>
-      <div><TaskList :키오스크no="키오스크NO" /></div>
+      <div>
+        <TaskList
+          :키오스크no="키오스크NO"
+          :설비명="설비명"
+          v-model:modalclose="taskListModal"
+        />
+      </div>
 
       <div class="px-5 pb-8 text-center">
         <Button
