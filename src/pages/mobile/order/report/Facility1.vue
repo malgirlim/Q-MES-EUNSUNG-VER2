@@ -13,6 +13,9 @@ import {
 // 컴포넌트 로드
 
 import TaskList from "../../../../components/Common/Mobile/Order/TaskList.vue";
+import ItemList from "../../../../components/Common/Mobile/Order/ItemList.vue";
+import BadList from "../../../../components/Common/Mobile/Order/BadList.vue";
+import NonOPList from "../../../../components/Common/Mobile/Order/NonOPList.vue";
 
 // 페이지 로딩 시 시작
 onMounted(async () => {
@@ -31,6 +34,24 @@ const data = true;
 const taskListModal = ref(false);
 const setTaskListModal = (value: boolean) => {
   taskListModal.value = value;
+};
+
+// ##### 소요자재목록 Modal #####
+const itemListModal = ref(false);
+const setItemListModal = (value: boolean) => {
+  itemListModal.value = value;
+};
+
+// ##### 불량사유목록 Modal #####
+const badListModal = ref(false);
+const setBadListModal = (value: boolean) => {
+  badListModal.value = value;
+};
+
+// ##### 비가동사유목록 Modal #####
+const nonOPListModal = ref(false);
+const setNonOPListModal = (value: boolean) => {
+  nonOPListModal.value = value;
 };
 
 // ##### 설비 선택 Modal #####
@@ -54,9 +75,7 @@ const setFacilitySelectModal = (value: boolean) => {
         >
       </div>
       <div>
-        <Button
-          variant="dark"
-          @click="$router.push('/mobile/order/task-report')"
+        <Button variant="dark" @click="setFacilitySelectModal(true)"
           ><Lucide class="w-4 h-4 mb-0.5 mr-1" icon="Home" />설비 선택</Button
         >
       </div>
@@ -259,7 +278,12 @@ const setFacilitySelectModal = (value: boolean) => {
         >
           <div class="my-auto pl-9 ml-auto"><strong>소요 자재</strong></div>
           <div class="my-auto ml-auto">
-            <Button class="h-6 mb-0.5 mr-0.5" variant="primary">+</Button>
+            <Button
+              class="h-6 mb-0.5 mr-0.5"
+              variant="primary"
+              @click="setItemListModal(true)"
+              >+</Button
+            >
           </div>
         </div>
         <div class="border-l-2 border-r-2 border-t-2 border-[#D9821C]">
@@ -315,7 +339,12 @@ const setFacilitySelectModal = (value: boolean) => {
         >
           <div class="my-auto pl-9 ml-auto"><strong>불량 사유</strong></div>
           <div class="my-auto ml-auto">
-            <Button class="h-6 mb-0.5 mr-0.5" variant="primary">+</Button>
+            <Button
+              class="h-6 mb-0.5 mr-0.5"
+              variant="primary"
+              @click="setBadListModal(true)"
+              >+</Button
+            >
           </div>
         </div>
         <div class="border-l-2 border-r-2 border-t-2 border-[#D9821C]">
@@ -365,7 +394,12 @@ const setFacilitySelectModal = (value: boolean) => {
         >
           <div class="my-auto pl-9 ml-auto"><strong>비가동 사유</strong></div>
           <div class="my-auto ml-auto">
-            <Button class="h-6 mb-0.5 mr-0.5" variant="primary">+</Button>
+            <Button
+              class="h-6 mb-0.5 mr-0.5"
+              variant="primary"
+              @click="setNonOPListModal(true)"
+              >+</Button
+            >
           </div>
         </div>
         <div class="border-l-2 border-r-2 border-t-2 border-[#D9821C]">
@@ -465,6 +499,90 @@ const setFacilitySelectModal = (value: boolean) => {
   </Dialog>
   <!-- END: 작업지시목록 Modal -->
 
+  <!-- BEGIN: 소요자재 목록 Modal -->
+  <Dialog
+    :open="itemListModal"
+    size="md"
+    @close="
+      () => {
+        setItemListModal(false);
+      }
+    "
+  >
+    <Dialog.Panel style="top: -7%">
+      <div class="font-bold text-xl text-center pt-4">소요자재 선택</div>
+      <div><ItemList /></div>
+
+      <div class="px-5 pb-8 text-center">
+        <Button
+          variant="outline-primary"
+          type="button"
+          class="w-24"
+          @click="setItemListModal(false)"
+        >
+          닫기
+        </Button>
+      </div>
+    </Dialog.Panel>
+  </Dialog>
+  <!-- END: 소요자재목록 Modal -->
+
+  <!-- BEGIN: 불량사유 목록 Modal -->
+  <Dialog
+    :open="badListModal"
+    size="md"
+    @close="
+      () => {
+        setBadListModal(false);
+      }
+    "
+  >
+    <Dialog.Panel style="top: -7%">
+      <div class="font-bold text-xl text-center pt-4">불량유형 선택</div>
+      <div><BadList /></div>
+
+      <div class="px-5 pb-8 text-center">
+        <Button
+          variant="outline-primary"
+          type="button"
+          class="w-24"
+          @click="setBadListModal(false)"
+        >
+          닫기
+        </Button>
+      </div>
+    </Dialog.Panel>
+  </Dialog>
+  <!-- END: 불량사유 목록 Modal -->
+
+  <!-- BEGIN: 비가동사유 목록 Modal -->
+  <Dialog
+    :open="nonOPListModal"
+    size="md"
+    @close="
+      () => {
+        setNonOPListModal(false);
+      }
+    "
+  >
+    <Dialog.Panel style="top: -7%">
+      <div class="font-bold text-xl text-center pt-4">비가동사유 선택</div>
+      <div><NonOPList /></div>
+
+      <div class="px-5 pb-8 text-center">
+        <Button
+          variant="outline-primary"
+          type="button"
+          class="w-24"
+          @click="setNonOPListModal(false)"
+        >
+          닫기
+        </Button>
+      </div>
+    </Dialog.Panel>
+  </Dialog>
+  <!-- END: 비가동사유목록 Modal -->
+
   <!-- BEGIN: 설비 선택 Modal -->
   <Dialog
     :open="facilitySelectModal"
@@ -475,27 +593,35 @@ const setFacilitySelectModal = (value: boolean) => {
       }
     "
   >
-    <Dialog.Panel style="top: -7%">
-      <div class="font-bold text-xl text-center pt-4">
-        설비선택 메뉴로 돌아가시겠습니까?
-      </div>
-      <div class="px-5 pb-8 text-center">
-        <Button
-          variant="primary"
-          type="button"
-          class="w-24"
-          @click="setFacilitySelectModal(false)"
-        >
-          확인
-        </Button>
-        <Button
-          variant="outline-danger"
-          type="button"
-          class="w-24"
-          @click="setFacilitySelectModal(false)"
-        >
-          취소
-        </Button>
+    <Dialog.Panel style="top: 25%">
+      <div class="p-3">
+        <div class="text-primary">
+          <Lucide class="mx-auto w-20 h-20" icon="HelpCircle" />
+        </div>
+        <div class="font-bold text-xl text-center pt-4">
+          설비선택 메뉴로 돌아가시겠습니까?
+        </div>
+        <div class="px-5 pb-4 pt-5 text-center">
+          <Button
+            variant="primary"
+            type="button"
+            class="w-24 mr-5"
+            @click="
+              setFacilitySelectModal(false);
+              $router.push('/mobile/order/task-report');
+            "
+          >
+            확인
+          </Button>
+          <Button
+            variant="outline-primary"
+            type="button"
+            class="w-24"
+            @click="setFacilitySelectModal(false)"
+          >
+            취소
+          </Button>
+        </div>
       </div>
     </Dialog.Panel>
   </Dialog>
