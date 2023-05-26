@@ -22,6 +22,8 @@ import { OrderAccept } from "../../../interfaces/menu/orderInterface";
 import { MasterClient } from "../../../interfaces/menu/MasterInterface";
 
 // 컴포넌트 로드
+import BarcodeReader from "../../../components/Common/Mobile/Stock/BarcodeReader.vue";
+
 const { proxy }: any = getCurrentInstance();
 const user_level = proxy.gstate.level.OrderCurrent; //권한레벨
 
@@ -129,6 +131,12 @@ const noti = (data: string) => {
     body: data,
     image: "../assets/image/logo.png",
   });
+};
+
+// ##### 바코드리더 Modal #####
+const barcodeReaderModal = ref(false);
+const setBarcodeReaderModal = (value: boolean) => {
+  barcodeReaderModal.value = value;
 };
 </script>
 
@@ -242,6 +250,9 @@ const noti = (data: string) => {
     </div>
 
     <!-- END: Pagination-->
+    <div>
+      <Button @click="setBarcodeReaderModal(true)">바코드리더 테스트</Button>
+    </div>
     <!-- BEGIN: Data List -->
     <div class="intro-y">
       <div class="px-3">
@@ -329,4 +340,41 @@ const noti = (data: string) => {
     <footer>&copy;2023 QInnotek. All rights reserved{{ menu_fix }}</footer>
   </div>
   <!-- END: FOOTER(COPYRIGHT) -->
+
+  <!-- BEGIN: 바코드리더 Modal -->
+  <Dialog
+    :open="barcodeReaderModal"
+    size="md"
+    @close="
+      () => {
+        setBarcodeReaderModal(false);
+      }
+    "
+  >
+    <Dialog.Panel style="top: 25%">
+      <div class="p-3">
+        <div class="font-bold text-xl text-center pt-4">바코드리더 테스트</div>
+        <div><BarcodeReader /></div>
+        <div class="px-5 pb-4 pt-5 text-center">
+          <Button
+            variant="primary"
+            type="button"
+            class="w-24 mr-5"
+            @click="setBarcodeReaderModal(false)"
+          >
+            확인
+          </Button>
+          <Button
+            variant="outline-primary"
+            type="button"
+            class="w-24"
+            @click="setBarcodeReaderModal(false)"
+          >
+            취소
+          </Button>
+        </div>
+      </div>
+    </Dialog.Panel>
+  </Dialog>
+  <!-- END: 바코드리더 Modal -->
 </template>

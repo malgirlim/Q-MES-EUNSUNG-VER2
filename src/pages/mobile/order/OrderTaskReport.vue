@@ -16,7 +16,7 @@ import router from "../../../router";
 
 import FacilityCard from "../../../components/Common/Mobile/Order/FacilityCard.vue";
 
-onMounted(async () => {  
+onMounted(async () => {
   setTimeout(() => {
     menu_fix.value = ".";
   }, 500);
@@ -24,12 +24,10 @@ onMounted(async () => {
 
 // 메뉴재정렬 (메뉴 레이아웃 밀리는 문제 해결 코드)
 const menu_fix = ref();
-
 </script>
 
 <template>
   <div class="pl-2 pr-2 pt-8">
- 
     <div
       class="p-3 mb-5 mx-3 font-bold border-2 border-[#3a437c] text-center text-2xl rounded-md bg-white intro-y"
     >
@@ -50,19 +48,23 @@ const menu_fix = ref();
           running="가동중"
           product="제품2"
           worker="고범석"
-        /></div>
-        <div class="grid grid-cols-2 gap-6 mt-5">
+          @click="$router.push('/mobile/order/task-report/facility2')"
+        />
+      </div>
+      <div class="grid grid-cols-2 gap-6 mt-5">
         <FacilityCard
           name="인쇄기3"
           running="비가동"
           product="제품3"
           worker="윤호상"
+          @click="$router.push('/mobile/order/task-report/facility3')"
         />
         <FacilityCard
           name="인쇄기4"
           running="가동중"
           product="제품4"
           worker="강민철"
+          @click="$router.push('/mobile/order/task-report/facility4')"
         />
       </div>
       <div class="grid grid-cols-2 gap-6 mt-5">
@@ -71,24 +73,30 @@ const menu_fix = ref();
           running="미가동"
           product="제품5"
           worker="김주현"
+          @click="$router.push('/mobile/order/task-report/facility5')"
         />
         <FacilityCard
           name="인쇄기6"
           running="가동중"
           product="제품6"
           worker="송은아"
-        /></div><div class="grid grid-cols-2 gap-6 mt-5">
+          @click="$router.push('/mobile/order/task-report/facility6')"
+        />
+      </div>
+      <div class="grid grid-cols-2 gap-6 mt-5">
         <FacilityCard
           name="인쇄기7"
           running="가동중"
           product="제품7"
           worker="사은미"
+          @click="$router.push('/mobile/order/task-report/facility7')"
         />
         <FacilityCard
           name="인쇄기8"
           running="비가동"
           product="제품8"
           worker="이훈노"
+          @click="$router.push('/mobile/order/task-report/facility8')"
         />
       </div>
       <div class="grid grid-cols-2 gap-6 mt-5">
@@ -97,12 +105,14 @@ const menu_fix = ref();
           running="가동중"
           product="제품9"
           worker="최순우"
+          @click="$router.push('/mobile/order/task-report/facility9')"
         />
         <FacilityCard
           name="제판기"
           running="미가동"
           product="제품10"
           worker="손정일"
+          @click="$router.push('/mobile/order/task-report/facility10')"
         />
       </div>
     </div>
