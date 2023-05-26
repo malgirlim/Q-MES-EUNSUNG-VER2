@@ -15,7 +15,7 @@ const props = defineProps<{
 
 // 데이터 내보내기
 const output = ref();
-const emit = defineEmits(["update:output"]);
+const emit = defineEmits(["update:output", "update:modalclose"]);
 emit(`update:output`, output.value); // 실제로 내보낼 때 쓰는 코드
 
 // 페이지 로딩 시 시작
@@ -104,14 +104,26 @@ const dataManager = useSendApi<ProductionTaskCurrent>(url, ref(1), ref(100));
             </td>
             <td class="border-b-2 border-r-2 border-success h-20">
               <div v-if="data.진행상황 == '작업미확인'">
-                <Button variant="primary"
-                  ><Lucide class="w-8 h-8 mx-auto" icon="CheckSquare"
-                /></Button>
+                <Button
+                  variant="primary"
+                  @click="
+                    () => {
+                      emit(`update:modalclose`, false);
+                    }
+                  "
+                  ><Lucide class="w-8 h-8 mx-auto" icon="CheckSquare" />
+                </Button>
               </div>
               <div v-if="data.진행상황 == '작업대기'">
-                <Button variant="primary"
-                  ><Lucide class="w-8 h-8 mx-auto" icon="CheckSquare"
-                /></Button>
+                <Button
+                  variant="primary"
+                  @click="
+                    () => {
+                      emit(`update:modalclose`, false);
+                    }
+                  "
+                  ><Lucide class="w-8 h-8 mx-auto" icon="CheckSquare" />
+                </Button>
               </div>
             </td>
           </tr>
