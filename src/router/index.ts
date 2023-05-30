@@ -34,6 +34,7 @@ import MasterProduct from "../pages/master/MasterProduct.vue";
 import MasterBOM from "../pages/master/MasterBOM.vue";
 import MasterFacility from "../pages/master/MasterFacility.vue";
 import MasterProcess from "../pages/master/MasterProcess.vue";
+import MasterMold from "../pages/master/MasterMold.vue";
 import MasterCodeBad from "../pages/master/MasterCodeBad.vue";
 import MasterCodeNonOP from "../pages/master/MasterCodeNonOP.vue";
 import MasterFacilityParts from "../pages/master/MasterFacilityParts.vue";
@@ -99,6 +100,11 @@ import QualityIncoming from "../pages/quality/QualityIncoming.vue";
 import QualityProcess from "../pages/quality/QualityProcess.vue";
 import QualityShipment from "../pages/quality/QualityShipment.vue";
 import QualityInadequate from "../pages/quality/QualityInadequate.vue";
+
+/* 금형관리 */
+import MoldUse from "../pages/mold/MoldUse.vue";
+import MoldRepair from "../pages/mold/MoldRepair.vue";
+import MoldCheck from "../pages/mold/MoldCheck.vue";
 
 /* 모니터링 */
 import MonitoringKPI from "../pages/monitoring/MonitoringKPI.vue";
@@ -286,6 +292,15 @@ const routes = [
           category: "기준정보",
         },
         component: MasterProcess,
+      },
+      {
+        path: "master/mold",
+        name: "top-menu-master-mold",
+        meta: {
+          pagename: "금형 관리",
+          category: "기준정보",
+        },
+        component: MasterMold,
       },
       {
         path: "master/code-bad",
@@ -785,6 +800,33 @@ const routes = [
         component: QualityInadequate,
       },
       {
+        path: "mold/use",
+        name: "top-menu-mold-use",
+        meta: {
+          pagename: "금형사용",
+          category: "금형관리",
+        },
+        component: MoldUse,
+      },
+      {
+        path: "mold/repair",
+        name: "top-menu-mold-repair",
+        meta: {
+          pagename: "금형수선",
+          category: "금형관리",
+        },
+        component: MoldRepair,
+      },
+      {
+        path: "mold/check",
+        name: "top-menu-mold-check",
+        meta: {
+          pagename: "금형점검",
+          category: "금형관리",
+        },
+        component: MoldCheck,
+      },
+      {
         path: "monitoring/kpi",
         name: "top-menu-monitoring-kpi",
         meta: {
@@ -978,7 +1020,7 @@ const routes = [
         name: "top-menu-admin-log",
         meta: {
           pagename: "Log 조회",
-          category: "관리자메뉴",
+          //category: "관리자메뉴",
         },
         component: AdminLog,
       },

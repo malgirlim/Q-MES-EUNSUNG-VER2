@@ -69,6 +69,12 @@ export const useTopMenuStore = defineStore("topMenu", {
             title: "공정 관리",
           },
           {
+            // 협성, 협성테크 전용메뉴
+            icon: "FileText",
+            pageName: "top-menu-master-mold",
+            title: "금형 관리",
+          },
+          {
             icon: "FileText",
             pageName: "top-menu-master-code-bad",
             title: "불량코드 관리",
@@ -376,6 +382,29 @@ export const useTopMenuStore = defineStore("topMenu", {
         ],
       },
       {
+        // 협성, 협성테크 전용 메뉴
+        icon: "Folders",
+        pageName: "",
+        title: "금형관리",
+        subMenu: [
+          {
+            icon: "FileText",
+            pageName: "top-menu-mold-use",
+            title: "금형사용",
+          },
+          {
+            icon: "FileText",
+            pageName: "top-menu-mold-repair",
+            title: "금형수선",
+          },
+          {
+            icon: "FileText",
+            pageName: "top-menu-mold-check",
+            title: "금형점검",
+          },
+        ],
+      },
+      {
         icon: "Folders",
         pageName: "",
         title: "모니터링",
@@ -491,18 +520,6 @@ export const useTopMenuStore = defineStore("topMenu", {
             icon: "FileText",
             pageName: "top-menu-prevent-change-notify",
             title: "설비부품 교체시기 통보",
-          },
-        ],
-      },
-      {
-        icon: "Folders",
-        pageName: "",
-        title: "관리자메뉴",
-        subMenu: [
-          {
-            icon: "FileText",
-            pageName: "top-menu-admin-log",
-            title: "Log 조회",
           },
         ],
       },

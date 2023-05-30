@@ -386,6 +386,13 @@ const setDebugMode = () => {
           <Menu.Item class="hover:bg-white/5">
             <Lucide icon="HelpCircle" class="w-4 h-4 mr-2" /> 도움말
           </Menu.Item>
+          <Menu.Item
+            class="hover:bg-white/5"
+            @click="router.push('/admin/log')"
+          >
+            <Lucide icon="Scroll" class="w-4 h-4 mr-2" />
+            Log 조회
+          </Menu.Item>
           <Menu.Item class="hover:bg-white/5" @click="setInfoModal(true)">
             <Lucide icon="Info" class="w-4 h-4 mr-2" />
             프로그램 정보

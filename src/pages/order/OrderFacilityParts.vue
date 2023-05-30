@@ -12,7 +12,7 @@ const user_level = proxy.gstate.level.OrderFacilityParts; //권한레벨
   <div v-if="user_level >= 3">
     <div class="bg-white mt-10 mb-10 border-4 pl-10 pr-10 pt-10 pb-10">
       <div class="text-2xl text-center mb-5 intro-y">
-        <strong>설비부품 발주서</strong>
+        <strong>설비부품 발주등록</strong>
       </div>
       <div><OrderFacilityParts /></div>
     </div>
