@@ -16,6 +16,8 @@ const stockRouter = require("./router/stockRouter");
 const qualityRouter = require("./router/qualityRouter");
 const monitorRouter = require("./router/monitorRouter");
 
+const kioskRouter = require("./router/kioskRouter");
+
 const uploadRouter = require("./router/uploadRouter");
 const smsRouter = require("./router/smsRouter");
 const kakaoRouter = require("./router/kakaoRouter");
@@ -55,6 +57,9 @@ app.use("/api/quality", qualityRouter);
 
 // 모니터링 - router/monitorRouter.js
 app.use("/api/monitor", monitorRouter);
+
+// 키오스크 - router/kioskRouter.js
+app.use("/api/kiosk", kioskRouter);
 
 // 파일 업로드 - uploadRouter.js
 app.use("/api/upload", uploadRouter);

@@ -6,6 +6,7 @@ import Lucide from "../../../base-components/Lucide";
 // API 보내는 함수 및 인터페이스 불러오기
 import { useSendApi } from "../../../composables/useSendApi";
 import { ProductionTaskCurrent } from "../../../interfaces/menu/productionInterface";
+import { KioskWork } from "../../../interfaces/menu/kioskInterface";
 
 // 데이터 가져오기
 const props = defineProps<{
@@ -24,8 +25,11 @@ onMounted(async () => {
 });
 
 // dataManager 만들기
-const url = "/api/production/task/current";
+const url = "/api/kiosk/worklist";
 const dataManager = useSendApi<ProductionTaskCurrent>(url, ref(1), ref(100));
+
+// 키오스크 작업관리 데이터
+let kiosk_work: KioskWork;
 </script>
 <template>
   <div class="p-7">
@@ -112,6 +116,14 @@ const dataManager = useSendApi<ProductionTaskCurrent>(url, ref(1), ref(100));
                   variant="primary"
                   @click="
                     () => {
+                      // kiosk_work.NO = props.;
+                      // kiosk_work.지시공정NO = data.NO;
+                      // kiosk_work.현황 = data.진행상황;
+                      dataManager.insertData({
+                        NO: props.키오스크no,
+                        지시공정NO: data.NO,
+                        현황: data.진행상황,
+                      });
                       emit(`update:modalclose`, false);
                     }
                   "
