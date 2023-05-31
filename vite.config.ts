@@ -21,7 +21,7 @@ export default defineConfig({
         },
       },
     }),
-    basicSsl(), // SSL 연결을
+    basicSsl(), // SSL 연결을 위한 코드 ( https 적용 )
   ],
   resolve: {
     alias: {
