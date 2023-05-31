@@ -14,6 +14,7 @@ const orderRouter = require("./router/orderRouter");
 const productionRouter = require("./router/productionRouter");
 const stockRouter = require("./router/stockRouter");
 const qualityRouter = require("./router/qualityRouter");
+const moldRouter = require("./router/moldRouter");
 const monitorRouter = require("./router/monitorRouter");
 const preventRouter = require("./router/preventRouter");
 
@@ -55,6 +56,9 @@ app.use("/api/stock", stockRouter);
 
 // 품질관리 - router/qualityRouter.js
 app.use("/api/quality", qualityRouter);
+
+// 금형관리 - router/moldRouter.js
+app.use("/api/mold", moldRouter);
 
 // 모니터링 - router/monitorRouter.js
 app.use("/api/monitor", monitorRouter);
