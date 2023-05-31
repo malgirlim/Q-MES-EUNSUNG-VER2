@@ -51,7 +51,12 @@ export const useSideMenuStore = defineStore("sideMenu", {
           {
             icon: "FileText",
             pageName: "side-menu-mobile-stock-receive",
-            title: "입출고",
+            title: "입고",
+          },
+          {
+            icon: "FileText",
+            pageName: "side-menu-mobile-stock-delivery",
+            title: "출고(납품)",
           },
           {
             icon: "FileText",

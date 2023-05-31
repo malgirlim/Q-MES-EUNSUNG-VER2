@@ -142,6 +142,7 @@ import MobileOrderCurrentNotify from "../pages/mobile/order/OrderCurrentNotify.v
 import MobileOrderTaskReport from "../pages/mobile/order/OrderTaskReport.vue";
 
 import MobileStockReceive from "../pages/mobile/stock/StockReceive.vue";
+import MobileStockDelivery from "../pages/mobile/stock/StockDelivery.vue";
 import MobileStockLOTPrint from "../pages/mobile/stock/StockLOTPrint.vue";
 import MobileStockLOTTrack from "../pages/mobile/stock/StockLOTTrack.vue";
 import MobileStockSafeNotify from "../pages/mobile/stock/StockSafeNotify.vue";
@@ -1067,10 +1068,19 @@ const routes = [
         path: "/mobile/stock/stock-receive",
         name: "side-menu-mobile-stock-receive",
         meta: {
-          pagename: "입출고",
+          pagename: "입고",
           category: "재고관리",
         },
         component: MobileStockReceive,
+      },
+      {
+        path: "/mobile/stock/stock-delivery",
+        name: "side-menu-mobile-stock-delivery",
+        meta: {
+          pagename: "출고(납품)",
+          category: "재고관리",
+        },
+        component: MobileStockDelivery,
       },
       {
         path: "/mobile/stock/lot-print",
