@@ -36,7 +36,7 @@ const user_level = proxy.gstate.level.OrderDelivery; //권한레벨
 // 페이지 로딩 시 시작
 onMounted(async () => {
   await dataManager.loadDatas(); // 메인으로 쓸 데이터 불러오기
-  // await delivery.loadDatas(); // 납품 데이터 불러오기
+  await delivery.loadDatas(); // 납품 데이터 불러오기
   await delivery.searchDatas("", "수주NO", radioSelect.value, "", "");
   await delivery_finStock.loadDatas(); // 완제품재고 데이터 불러오기
 });

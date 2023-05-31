@@ -18,7 +18,7 @@ import { toast } from "vue3-toastify";
 // API 보내는 함수 및 인터페이스 불러오기
 import { useSendApi } from "../../composables/useSendApi";
 import {
-  MasteRecipe,
+  MasterRecipe,
   MasterProduct,
 } from "../../interfaces/menu/MasterInterface";
 
@@ -42,7 +42,7 @@ const pageChangeFirst = () => {
 
 // dataManager 만들기
 const url = "/api/master/recipe";
-const dataManager = useSendApi<MasteRecipe>(url, currentPage, rowsPerPage);
+const dataManager = useSendApi<MasterRecipe>(url, currentPage, rowsPerPage);
 
 // 추가 데이터
 const url_recipe_product = "/api/master/recipe/product";
@@ -167,7 +167,7 @@ const insert_check = () => {
 
 // ########################## 등록, 수정, 삭제, 상세 Modal ##########################
 // ##### 등록 Modal #####
-let insertModalData: MasteRecipe;
+let insertModalData: MasterRecipe;
 const insertModal = ref(false);
 const setInsertModal = (value: boolean) => {
   if (user_level >= 3) {
@@ -206,7 +206,7 @@ const setEditModal = (value: boolean) => {
     toast.warning("액세스 권한이 없습니다.\n관리자에게 문의하세요.");
   }
 };
-let editModalData: MasteRecipe; // 수정할 변수
+let editModalData: MasterRecipe; // 수정할 변수
 // 수정버튼 누르면 실행되는 함수
 const editDataFunction = async () => {
   await dataManager.editData(editModalData); // await : 이 함수가 끝나야 다음으로 넘어간다
