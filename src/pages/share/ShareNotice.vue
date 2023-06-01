@@ -1,7 +1,12 @@
 <script setup lang="ts">
 import { ref, Ref, onMounted, watch, getCurrentInstance } from "vue";
 import Button from "../../base-components/Button";
-import { FormInput, FormSelect, FormCheck } from "../../base-components/Form";
+import {
+  FormInput,
+  FormSelect,
+  FormCheck,
+  FormTextarea,
+} from "../../base-components/Form";
 import Lucide from "../../base-components/Lucide";
 import { Dialog, Menu } from "../../base-components/Headless";
 import Table from "../../base-components/Table";
@@ -17,7 +22,7 @@ import { toast } from "vue3-toastify";
 
 // API 보내는 함수 및 인터페이스 불러오기
 import { useSendApi } from "../../composables/useSendApi";
-import { MasterClient } from "../../interfaces/menu/MasterInterface";
+import { ShareNotice } from "../../interfaces/menu/infoInterface";
 
 // 컴포넌트 로드
 import MasterDetail from "../../components/Common/Detail/MasterClientDetail.vue";
@@ -38,23 +43,20 @@ const pageChangeFirst = () => {
 };
 
 // dataManager 만들기
-const url = "/api/master/client";
-const dataManager = useSendApi<MasterClient>(url, currentPage, rowsPerPage);
+const url = "/api/info/announ";
+const dataManager = useSendApi<ShareNotice>(url, currentPage, rowsPerPage);
 
 // 테이블항목 설정 및 가로크기 조정
 const table_setting = {
-  체크박스: { name: "체크박스", style: "width: 50px" },
-  순번: { name: "순번", style: "width: 50px; text-align: center;" },
-  항목1: { name: "사업자번호", style: "width: 50px; text-align: center;" },
-  항목2: { name: "거래처명", style: "width: 200px; text-align: center;" },
-  항목3: { name: "담당자", style: "width: 50px; text-align: center;" },
-  항목4: { name: "전화번호", style: "width: 50px; text-align: center;" },
-  항목5: { name: "휴대폰번호", style: "width: 50px; text-align: center;" },
-  항목6: { name: "팩스", style: "width: 50px; text-align: center;" },
-  항목7: { name: "이메일", style: "width: 50px; text-align: center;" },
-  항목8: { name: "항목8", style: "width: 50px; text-align: center;" },
-  상세보기: { name: "정보", style: "width: 50px; text-align: center;" },
-  편집: { name: "편집", style: "width: 50px; text-align: center;" },
+  체크박스: { name: "체크박스", style: "width: 5px" },
+  순번: { name: "순번", style: "width: 5px; text-align: center;" },
+  항목1: { name: "구분", style: "width: 50px; text-align: center;" },
+  항목2: { name: "제목", style: "width: 100px; text-align: center;" },
+  항목3: { name: "비고", style: "width: 50px; text-align: center;" },
+  항목4: { name: "등록자", style: "width: 50px; text-align: center;" },
+  항목5: { name: "등록일시", style: "width: 50px; text-align: center;" },
+  상세보기: { name: "정보", style: "width: 5px; text-align: center;" },
+  편집: { name: "편집", style: "width: 5px; text-align: center;" },
 };
 
 // v-tom (모달 실시간 데이터 변동) 에 필요한 함수
@@ -137,31 +139,31 @@ let pass_flag = false;
 const insert_check = () => {
   pass_flag = true;
 
-  if (set_거래처명.value != null && set_거래처명.value != "") {
-    insertModalData.거래처명 = set_거래처명.value;
-  } else {
-    set_거래처명.value = "";
-    pass_flag = false;
-  }
+  // if (set_거래처명.value != null && set_거래처명.value != "") {
+  //   insertModalData.거래처명 = set_거래처명.value;
+  // } else {
+  //   set_거래처명.value = "";
+  //   pass_flag = false;
+  // }
 
-  if (set_전화번호.value != null && set_전화번호.value != "") {
-    insertModalData.전화번호 = set_전화번호.value;
-  } else {
-    set_전화번호.value = "";
-    if (set_휴대폰번호.value != null && set_휴대폰번호.value != "") {
-      insertModalData.휴대폰번호 = set_휴대폰번호.value;
-    } else {
-      set_휴대폰번호.value = "";
-      pass_flag = false;
-    }
-  }
+  // if (set_전화번호.value != null && set_전화번호.value != "") {
+  //   insertModalData.전화번호 = set_전화번호.value;
+  // } else {
+  //   set_전화번호.value = "";
+  //   if (set_휴대폰번호.value != null && set_휴대폰번호.value != "") {
+  //     insertModalData.휴대폰번호 = set_휴대폰번호.value;
+  //   } else {
+  //     set_휴대폰번호.value = "";
+  //     pass_flag = false;
+  //   }
+  // }
 
-  if (set_담당자.value != null && set_담당자.value != "") {
-    insertModalData.담당자 = set_담당자.value;
-  } else {
-    set_담당자.value = "";
-    pass_flag = false;
-  }
+  // if (set_담당자.value != null && set_담당자.value != "") {
+  //   insertModalData.담당자 = set_담당자.value;
+  // } else {
+  //   set_담당자.value = "";
+  //   pass_flag = false;
+  // }
 
   if (pass_flag == false) {
     return;
@@ -170,14 +172,14 @@ const insert_check = () => {
 
 // ########################## 등록, 수정, 삭제, 상세 Modal ##########################
 // ##### 등록 Modal #####
-let insertModalData: MasterClient;
+let insertModalData: ShareNotice;
 const insertModal = ref(false);
 const setInsertModal = (value: boolean) => {
   if (user_level >= 3) {
-    set_거래처명.value = null;
-    set_전화번호.value = null;
-    set_휴대폰번호.value = null;
-    set_담당자.value = null;
+    // set_거래처명.value = null;
+    // set_전화번호.value = null;
+    // set_휴대폰번호.value = null;
+    // set_담당자.value = null;
     insertModal.value = value;
     insertModalData = {}; // 변수 초기화
   } else {
@@ -208,7 +210,7 @@ const setEditModal = (value: boolean) => {
     toast.warning("액세스 권한이 없습니다.\n관리자에게 문의하세요.");
   }
 };
-let editModalData: MasterClient; // 수정할 변수
+let editModalData: ShareNotice; // 수정할 변수
 // 수정버튼 누르면 실행되는 함수
 const editDataFunction = async () => {
   await dataManager.editData(editModalData); // await : 이 함수가 끝나야 다음으로 넘어간다
@@ -440,14 +442,12 @@ const onFileImport = (event: any) => {
         <div class="ml-2">
           <FormSelect v-model="searchKey" class="w-30 mt-3 !box sm:mt-0">
             <option>전체</option>
-            <option>사업자번호</option>
-            <option>주소</option>
-            <option>전화번호</option>
-            <option>휴대폰번호</option>
-            <option>팩스</option>
-            <option>이메일</option>
-            <option>담당자</option>
+            <option>구분</option>
+            <option>제목</option>
+            <option>내용</option>
             <option>비고</option>
+            <option>등록자</option>
+            <option>등록일시</option>
           </FormSelect>
         </div>
         <div class="w-full mt-3 sm:w-auto sm:mt-0 sm:ml-auto md:ml-2">
@@ -510,12 +510,12 @@ const onFileImport = (event: any) => {
         <div>
           <FormSelect v-model="sortKey" class="w-30 mt-3 !box sm:mt-0">
             <option>등록일</option>
-            <option>사업자번호</option>
-            <option>전화번호</option>
-            <option>휴대폰번호</option>
-            <option>팩스</option>
-            <option>이메일</option>
-            <option>담당자</option>
+            <option>구분</option>
+            <option>제목</option>
+            <option>내용</option>
+            <option>비고</option>
+            <option>등록자</option>
+            <option>등록일시</option>
           </FormSelect>
         </div>
         <div class="ml-3">
@@ -643,18 +643,6 @@ const onFileImport = (event: any) => {
                 </Table.Th>
                 <Table.Th
                   class="text-center border-b-0 whitespace-nowrap font-bold"
-                  :style="table_setting.항목6.style"
-                >
-                  {{ table_setting.항목6.name }}
-                </Table.Th>
-                <Table.Th
-                  class="text-center border-b-0 whitespace-nowrap font-bold"
-                  :style="table_setting.항목7.style"
-                >
-                  {{ table_setting.항목7.name }}
-                </Table.Th>
-                <Table.Th
-                  class="text-center border-b-0 whitespace-nowrap font-bold"
                   :style="table_setting.상세보기.style"
                 >
                   {{ table_setting.상세보기.name }}
@@ -721,18 +709,6 @@ const onFileImport = (event: any) => {
                   :style="table_setting.항목5.style"
                 >
                   <div>{{ todo[table_setting.항목5.name] }}</div>
-                </Table.Td>
-                <Table.Td
-                  class="first:rounded-l-md last:rounded-r-md text-center bg-white border-b-0 dark:bg-darkmode-600 shadow-[20px_3px_20px_#0000000b]"
-                  :style="table_setting.항목6.style"
-                >
-                  <div>{{ todo[table_setting.항목6.name] }}</div>
-                </Table.Td>
-                <Table.Td
-                  class="first:rounded-l-md last:rounded-r-md text-center bg-white border-b-0 dark:bg-darkmode-600 shadow-[20px_3px_20px_#0000000b]"
-                  :style="table_setting.항목7.style"
-                >
-                  <div>{{ todo[table_setting.항목7.name] }}</div>
                 </Table.Td>
                 <Table.Td
                   class="first:rounded-l-md last:rounded-r-md text-center bg-white border-b-0 dark:bg-darkmode-600 shadow-[20px_3px_20px_#0000000b] py-0 relative before:block before:w-px before:h-8 before:bg-slate-200 before:absolute before:left-0 before:inset-y-0 before:my-auto before:dark:bg-darkmode-400"
@@ -825,130 +801,41 @@ const onFileImport = (event: any) => {
           <Tab.Panel class="leading-relaxed">
             <div style="text-align: left">
               <div class="mt-3">
-                <FormLabel htmlFor="vertical-form-3">거래처명</FormLabel
-                ><label class="text-danger"><sup>*</sup></label>
-                <FormInput
-                  id="vertical-form-3"
-                  type="text"
-                  v-model="set_거래처명"
-                  placeholder=""
-                />
-              </div>
-              <div v-if="set_거래처명 == ''" class="text-danger text-xs mt-1">
-                거래처명이 입력되지 않았습니다.
-              </div>
-              <div class="mt-3">
-                <FormLabel htmlFor="vertical-form-4">사업자번호</FormLabel>
-                <FormInput
-                  id="vertical-form-4"
-                  type="text"
-                  v-model="insertModalData.사업자번호"
-                  placeholder=""
-                />
+                <FormLabel htmlFor="vertical-form-1">구분</FormLabel>
+                <FormSelect v-model="insertModalData.구분" class="">
+                  <option>전체</option>
+                  <option>경영</option>
+                  <option>금형</option>
+                  <option>설비</option>
+                  <option>생산</option>
+                  <option>영업</option>
+                  <option>외주</option>
+                  <option>자재</option>
+                  <option>품질</option>
+                </FormSelect>
               </div>
               <div class="mt-3">
-                <FormLabel htmlFor="vertical-form-6">전화번호</FormLabel
-                ><label class="text-danger"
-                  ><sup>* (전화번호, 휴대폰번호 중 택1)</sup></label
-                >
-                <FormInput
-                  id="vertical-form-6"
-                  type="tel"
-                  v-model="set_전화번호"
-                  placeholder=""
-                />
-              </div>
-              <div
-                v-if="
-                  (set_전화번호 == '' && set_휴대폰번호 == '') ||
-                  (set_전화번호 == '' && set_휴대폰번호 == null) ||
-                  (set_전화번호 == null && set_휴대폰번호 == '')
-                "
-                class="text-danger text-xs mt-1"
-              >
-                전화번호, 휴대폰번호 중 1개 항목은 필수입력입니다.
-              </div>
-              <div class="mt-3">
-                <FormLabel htmlFor="vertical-form-7">휴대폰번호</FormLabel
-                ><label class="text-danger"><sup>*</sup></label>
-                <FormInput
-                  id="vertical-form-7"
-                  type="tel"
-                  v-model="set_휴대폰번호"
-                  placeholder=""
-                />
-                <div
-                  v-if="
-                    (set_전화번호 == '' && set_휴대폰번호 == '') ||
-                    (set_전화번호 == '' && set_휴대폰번호 == null) ||
-                    (set_전화번호 == null && set_휴대폰번호 == '')
-                  "
-                  class="text-danger text-xs mt-1"
-                >
-                  전화번호, 휴대폰번호 중 1개 항목은 필수입력입니다.
-                </div>
-              </div>
-              <div class="mt-3">
-                <FormLabel htmlFor="vertical-form-8">팩스</FormLabel>
-                <FormInput
-                  id="vertical-form-8"
-                  type="text"
-                  v-model="insertModalData.팩스"
-                  placeholder=""
-                />
-              </div>
-              <div class="mt-3">
-                <FormLabel htmlFor="vertical-form-9">이메일</FormLabel>
-                <FormInput
-                  id="vertical-form-9"
-                  type="text"
-                  v-model="insertModalData.이메일"
-                  placeholder=""
-                />
-              </div>
-              <div class="mt-3">
-                <FormLabel htmlFor="vertical-form-10">담당자</FormLabel
-                ><label class="text-danger"><sup>*</sup></label>
-                <FormInput
-                  id="vertical-form-10"
-                  type="text"
-                  v-model="set_담당자"
-                  placeholder=""
-                />
-              </div>
-              <div v-if="set_담당자 == ''" class="text-danger text-xs mt-1">
-                담당자명이 입력되지 않았습니다.
-              </div>
-            </div> </Tab.Panel
-          ><Tab.Panel class="leading-relaxed">
-            <div style="text-align: left">
-              <div>
-                <FormLabel htmlFor="vertical-form-1">코드</FormLabel>
-                <FormInput
-                  id="vertical-form-1"
-                  type="text"
-                  v-model="insertModalData.코드"
-                  placeholder=""
-                />
-              </div>
-              <div>
-                <FormLabel htmlFor="vertical-form-2">구분</FormLabel>
+                <FormLabel htmlFor="vertical-form-2">제목</FormLabel>
                 <FormInput
                   id="vertical-form-2"
                   type="text"
-                  v-model="insertModalData.구분"
+                  v-model="insertModalData.제목"
                   placeholder=""
                 />
               </div>
               <div class="mt-3">
-                <FormLabel htmlFor="vertical-form-5">주소</FormLabel>
-                <FormInput
-                  id="vertical-form-5"
-                  type="text"
-                  v-model="insertModalData.주소"
-                  placeholder=""
-                />
+                <FormLabel htmlFor="vertical-form-2">내용</FormLabel>
+                <FormTextarea
+                  id="vertical-form-2"
+                  formTextareaSize="sm"
+                  v-model="insertModalData.내용"
+                >
+                </FormTextarea>
               </div>
+            </div>
+          </Tab.Panel>
+          <Tab.Panel class="leading-relaxed">
+            <div style="text-align: left">
               <div class="mt-3">
                 <FormLabel htmlFor="vertical-form-11">비고</FormLabel>
                 <FormInput
@@ -1007,98 +894,41 @@ const onFileImport = (event: any) => {
           <Tab.Panel class="leading-relaxed">
             <div style="text-align: left">
               <div class="mt-3">
-                <FormLabel htmlFor="vertical-form-3">거래처명</FormLabel>
-                <FormInput
-                  id="vertical-form-3"
-                  type="text"
-                  v-model="editModalData.거래처명"
-                  placeholder=""
-                />
+                <FormLabel htmlFor="vertical-form-1">구분</FormLabel>
+                <FormSelect v-model="editModalData.구분" class="">
+                  <option>전체</option>
+                  <option>경영</option>
+                  <option>금형</option>
+                  <option>설비</option>
+                  <option>생산</option>
+                  <option>영업</option>
+                  <option>외주</option>
+                  <option>자재</option>
+                  <option>품질</option>
+                </FormSelect>
               </div>
               <div class="mt-3">
-                <FormLabel htmlFor="vertical-form-4">사업자번호</FormLabel>
-                <FormInput
-                  id="vertical-form-4"
-                  type="text"
-                  v-model="editModalData.사업자번호"
-                  placeholder=""
-                />
-              </div>
-              <div class="mt-3">
-                <FormLabel htmlFor="vertical-form-6">전화번호</FormLabel>
-                <FormInput
-                  id="vertical-form-6"
-                  type="tel"
-                  v-model="editModalData.전화번호"
-                  placeholder=""
-                />
-              </div>
-              <div class="mt-3">
-                <FormLabel htmlFor="vertical-form-7">휴대폰번호</FormLabel>
-                <FormInput
-                  id="vertical-form-7"
-                  type="tel"
-                  v-model="editModalData.휴대폰번호"
-                  placeholder=""
-                />
-              </div>
-              <div class="mt-3">
-                <FormLabel htmlFor="vertical-form-8">팩스</FormLabel>
-                <FormInput
-                  id="vertical-form-8"
-                  type="text"
-                  v-model="editModalData.팩스"
-                  placeholder=""
-                />
-              </div>
-              <div class="mt-3">
-                <FormLabel htmlFor="vertical-form-9">이메일</FormLabel>
-                <FormInput
-                  id="vertical-form-9"
-                  type="text"
-                  v-model="editModalData.이메일"
-                  placeholder=""
-                />
-              </div>
-              <div class="mt-3">
-                <FormLabel htmlFor="vertical-form-10">담당자</FormLabel>
-                <FormInput
-                  id="vertical-form-10"
-                  type="text"
-                  v-model="editModalData.담당자"
-                  placeholder=""
-                />
-              </div>
-            </div> </Tab.Panel
-          ><Tab.Panel class="leading-relaxed">
-            <div style="text-align: left">
-              <div>
-                <FormLabel htmlFor="vertical-form-1">코드</FormLabel>
-                <FormInput
-                  id="vertical-form-1"
-                  type="text"
-                  v-model="editModalData.코드"
-                  placeholder=""
-                />
-              </div>
-              <div>
-                <FormLabel htmlFor="vertical-form-2">구분</FormLabel>
+                <FormLabel htmlFor="vertical-form-2">제목</FormLabel>
                 <FormInput
                   id="vertical-form-2"
                   type="text"
-                  v-model="editModalData.구분"
+                  v-model="editModalData.제목"
                   placeholder=""
                 />
               </div>
               <div class="mt-3">
-                <FormLabel htmlFor="vertical-form-5">주소</FormLabel>
-                <FormInput
-                  id="vertical-form-5"
-                  type="text"
-                  v-model="editModalData.주소"
-                  placeholder=""
-                />
+                <FormLabel htmlFor="vertical-form-2">내용</FormLabel>
+                <FormTextarea
+                  id="vertical-form-2"
+                  formTextareaSize="sm"
+                  v-model="editModalData.내용"
+                >
+                </FormTextarea>
               </div>
+            </div>
+          </Tab.Panel>
+          <Tab.Panel class="leading-relaxed">
+            <div style="text-align: left">
               <div class="mt-3">
                 <FormLabel htmlFor="vertical-form-11">비고</FormLabel>
                 <FormInput

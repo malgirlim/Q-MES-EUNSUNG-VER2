@@ -1875,7 +1875,7 @@ router.get("/stocklot", async (req, res) => {
         ) AS MASTER_ITEM ON MASTER_ITEM.NO = RESULT_MIDDLE.품목NO
         GROUP BY RESULT_MIDDLE.품목NO,RESULT_MIDDLE.LOT코드,MASTER_ITEM.품목구분,MASTER_ITEM.품번,MASTER_ITEM.품명,MASTER_ITEM.규격,MASTER_ITEM.단위
       ) AS RESULT
-      WHERE RESULT.품목구분 = '원부자재' OR RESULT.품목구분 = '원재료' OR RESULT.품목구분 = '반제품'
+      WHERE RESULT.품목구분 = '원부자재' OR RESULT.품목구분 = '반제품'
       ORDER BY RESULT.LOT코드 DESC
     `);
 
@@ -2301,7 +2301,7 @@ router.post("/stocklot", async (req, res) => {
           GROUP BY RESULT_MIDDLE.품목NO,RESULT_MIDDLE.LOT코드,MASTER_ITEM.품목구분,MASTER_ITEM.품번,MASTER_ITEM.품명,MASTER_ITEM.규격,MASTER_ITEM.단위
         ) AS RESULT
         WHERE (1=1)
-        AND RESULT.품목구분 = '원부자재' OR RESULT.품목구분 = '원재료' OR RESULT.품목구분 = '반제품'
+        AND RESULT.품목구분 = '원부자재' OR RESULT.품목구분 = '반제품'
         AND ( 품목구분 like concat('%',@input,'%')
         OR 품번 like concat('%',@input,'%')
         OR 품명 like concat('%',@input,'%')
@@ -2725,7 +2725,7 @@ router.post("/stocklot", async (req, res) => {
           GROUP BY RESULT_MIDDLE.품목NO,RESULT_MIDDLE.LOT코드,MASTER_ITEM.품목구분,MASTER_ITEM.품번,MASTER_ITEM.품명,MASTER_ITEM.규격,MASTER_ITEM.단위
         ) AS RESULT
         WHERE (1=1)
-        AND RESULT.품목구분 = '원부자재' OR RESULT.품목구분 = '원재료' OR RESULT.품목구분 = '반제품'
+        AND RESULT.품목구분 = '원부자재' OR RESULT.품목구분 = '반제품'
         AND ` +
         req.body.searchKey +
         ` like concat('%',@input,'%')

@@ -101,7 +101,7 @@ router.get("/", async (req, res) => {
           GROUP BY [PDUI_ITEM_PK]
         ) AS 사용_MIDDLE ON 사용_MIDDLE.품목NO = MASTER_ITEM.ITEM_PK
       ) AS RESULT
-      WHERE RESULT.품목구분 = '원부자재' OR RESULT.품목구분 = '원재료'
+      WHERE RESULT.품목구분 = '원부자재'
       ORDER BY RESULT.품번 DESC
     `);
 
@@ -257,7 +257,7 @@ router.post("/", async (req, res) => {
           ) AS 기초재고_MIDDLE ON 기초재고_MIDDLE.품목NO = MASTER_ITEM.ITEM_PK
         ) AS RESULT
         WHERE (1=1)
-        AND RESULT.품목구분 = '원부자재' OR RESULT.품목구분 = '원재료'
+        AND RESULT.품목구분 = '원부자재'
         AND ( 품목구분 like concat('%',@input,'%')
         OR 품번 like concat('%',@input,'%')
         OR 품명 like concat('%',@input,'%')
@@ -396,7 +396,7 @@ router.post("/", async (req, res) => {
           ) AS 기초재고_MIDDLE ON 기초재고_MIDDLE.품목NO = MASTER_ITEM.ITEM_PK
         ) AS RESULT
         WHERE (1=1)
-        AND RESULT.품목구분 = '원부자재' OR RESULT.품목구분 = '원재료'
+        AND RESULT.품목구분 = '원부자재'
         AND ` +
         req.body.searchKey +
         ` like concat('%',@input,'%')
