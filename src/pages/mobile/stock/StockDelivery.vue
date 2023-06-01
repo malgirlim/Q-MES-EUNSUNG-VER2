@@ -37,12 +37,18 @@ import DocumentPrint from "../../../components/Common/Print/Template/Order/Main.
 const { proxy }: any = getCurrentInstance();
 const user_level = proxy.gstate.level.OrderDelivery; //권한레벨
 
+// 메뉴재정렬 (메뉴 레이아웃 밀리는 문제 해결 코드)
+const menu_fix = ref();
+
 // 페이지 로딩 시 시작
 onMounted(async () => {
   await dataManager.loadDatas(); // 메인으로 쓸 데이터 불러오기
   // await delivery.loadDatas(); // 납품 데이터 불러오기
   await delivery.searchDatas("", "수주NO", radioSelect.value, "", "");
   await delivery_finStock.loadDatas(); // 완제품재고 데이터 불러오기
+  setTimeout(() => {
+    menu_fix.value = ".";
+  }, 500);
 });
 
 // 페이징기능
@@ -996,8 +1002,8 @@ const shipmentDataFunction = async () => {
   </div>
   <!-- END : 권한 없을 때 -->
   <!-- BEGIN: FOOTER(COPYRIGHT) -->
-  <div class="mt-3 mr-5" style="text-align: right">
-    <footer>&copy;2023 QInnotek. All rights reserved.</footer>
+  <div class="intro-y mt-5 mr-5" style="text-align: right">
+    <footer>&copy;2023 QInnotek. All rights reserved{{ menu_fix }}</footer>
   </div>
   <!-- END: FOOTER(COPYRIGHT) -->
 
