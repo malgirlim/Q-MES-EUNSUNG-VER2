@@ -19,7 +19,7 @@ app.mount("#app");
 
 app.config.globalProperties.gstate = reactive({
   account: {
-    id: null,
+    id: "",
     name: "",
     part: "",
     rank: "",

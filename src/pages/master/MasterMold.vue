@@ -117,10 +117,10 @@ const table_setting_item = {
   체크박스: { name: "체크박스", style: "width: 50px" },
   선택: { name: "선택", style: "width: 50px; text-align: center;" },
   순번: { name: "순번", style: "width: 20px; text-align: center;" },
-  항목1: { name: "품번", style: "width: 150px; text-align: center;" },
-  항목2: { name: "품목구분", style: "width: 150px; text-align: center;" },
-  항목3: { name: "품명", style: "width: 100px; text-align: center;" },
-  항목4: { name: "규격", style: "width: 100px; text-align: center;" },
+  항목1: { name: "품번", style: "width: 50px; text-align: center;" },
+  항목2: { name: "품목구분", style: "width: 50px; text-align: center;" },
+  항목3: { name: "품명", style: "width: 50px; text-align: center;" },
+  항목4: { name: "규격", style: "width: 50px; text-align: center;" },
   항목5: { name: "CAVITY", style: "width: 50px; text-align: center;" },
   항목6: { name: "동시여부", style: "width: 50px; text-align: center;" },
   삭제: { name: "삭제", style: "width: 5px; text-align: center;" },
@@ -254,6 +254,7 @@ let editModalData: MasterMold; // 수정할 변수
 // 수정버튼 누르면 실행되는 함수
 const editDataFunction = async () => {
   await dataManager.editData(editModalData); // await : 이 함수가 끝나야 다음으로 넘어간다
+  await setEditModal(false);
   search();
 };
 
@@ -271,6 +272,7 @@ const deleteButtonRef = ref(null);
 // 삭제버튼 누르면 실행되는 함수
 const deleteDataFunction = async () => {
   await dataManager.deleteData([radioSelect.value]); // await : 이 함수가 끝나야 다음으로 넘어간다
+  await setDeleteModal(false);
   resetCheckBox();
   search();
 };
@@ -298,7 +300,7 @@ const setInsertModalItem = (value: boolean) => {
   }
 };
 // 등록버튼 누르면 실행되는 함수
-const insertDataFunction_Item = async () => {
+const insertDataFunctionItem = async () => {
   await mold_item.insertData(insertModalData_Item);
   await setInsertModalItem(false);
   await mold_item.searchDatas("", "금형NO", radioSelect.value, "", ""); //날짜,조회기준,조회값,정렬기준,정렬값
@@ -314,7 +316,7 @@ const setEditModalItem = (value: boolean) => {
   }
 };
 let editModalData_Item: MasterMoldItem; // 수정할 변수
-const editDataFunction_Item = async () => {
+const editDataFunctionItem = async () => {
   await mold_item.editData(editModalData_Item); // await : 이 함수가 끝나야 다음으로 넘어간다
   await setEditModalItem(false);
   await mold_item.searchDatas("", "금형NO", radioSelect.value, "", ""); //날짜,조회기준,조회값,정렬기준,정렬값
@@ -335,6 +337,62 @@ const deleteDataFunctionItem = async () => {
   await mold_item.deleteData([editModalData_Item.NO]); // await : 이 함수가 끝나야 다음으로 넘어간다
   await setDeleteModalItem(false);
   await mold_item.searchDatas("", "금형NO", radioSelect.value, "", ""); //날짜,조회기준,조회값,정렬기준,정렬값
+};
+
+// ########################## LEVEL2 점검 목록 - 등록, 수정, 삭제 Modal ##########################
+// ##### LEVEL2 점검 목록 등록 Modal #####
+let insertModalData_Inspect: MasterMoldInspect;
+const insertModal_Inspect = ref(false);
+const setInsertModalInspect = (value: boolean) => {
+  if (user_level >= 3) {
+    if (radioSelect.value > 0) {
+      insertModal_Inspect.value = value;
+      insertModalData_Inspect = { 금형NO: radioSelect.value }; // 변수 초기화
+    } else {
+      toast.warning("금형을 선택해주세요.");
+    }
+  } else {
+    toast.warning("액세스 권한이 없습니다.\n관리자에게 문의하세요.");
+  }
+};
+// 등록버튼 누르면 실행되는 함수
+const insertDataFunctionInspect = async () => {
+  await mold_inspect.insertData(insertModalData_Inspect);
+  await setInsertModalInspect(false);
+  await mold_inspect.searchDatas("", "금형NO", radioSelect.value, "", ""); //날짜,조회기준,조회값,정렬기준,정렬값
+};
+
+// ##### LEVEL2 생산 품목 수정 Modal #####
+const editModal_Inspect = ref(false);
+const setEditModalInspect = (value: boolean) => {
+  if (user_level >= 3) {
+    editModal_Inspect.value = value;
+  } else {
+    toast.warning("액세스 권한이 없습니다.\n관리자에게 문의하세요.");
+  }
+};
+let editModalData_Inspect: MasterMoldInspect; // 수정할 변수
+const editDataFunctionInspect = async () => {
+  await mold_inspect.editData(editModalData_Inspect); // await : 이 함수가 끝나야 다음으로 넘어간다
+  await setEditModalInspect(false);
+  await mold_inspect.searchDatas("", "금형NO", radioSelect.value, "", ""); //날짜,조회기준,조회값,정렬기준,정렬값
+};
+
+// ##### LEVEL2 생산 품목 삭제 Modal #####
+const deleteModal_Inspect = ref(false);
+const setDeleteModalInspect = (value: boolean) => {
+  if (user_level >= 4) {
+    deleteModal_Inspect.value = value;
+  } else {
+    toast.warning("액세스 권한이 없습니다.\n관리자에게 문의하세요.");
+  }
+};
+const deleteButtonRef_Inspect = ref(null);
+// 삭제버튼 누르면 실행되는 함수
+const deleteDataFunctionInspect = async () => {
+  await mold_inspect.deleteData([editModalData_Inspect.NO]); // await : 이 함수가 끝나야 다음으로 넘어간다
+  await setDeleteModalInspect(false);
+  await mold_inspect.searchDatas("", "금형NO", radioSelect.value, "", ""); //날짜,조회기준,조회값,정렬기준,정렬값
 };
 
 // ########################## 체크박스 설정 ##########################
@@ -822,14 +880,7 @@ const setPrintDocumentModal = (value: boolean) => {
                       ]"
                       :style="table_setting.항목1.style"
                     >
-                      <div>
-                        <label
-                          class="text-blue-500"
-                          style="cursor: pointer"
-                          @click="setPrintDocumentModal(true)"
-                          >{{ todo[table_setting.항목1.name] }}
-                        </label>
-                      </div>
+                      <div>{{ todo[table_setting.항목1.name] }}</div>
                     </Table.Td>
                     <Table.Td
                       :class="[
@@ -996,7 +1047,7 @@ const setPrintDocumentModal = (value: boolean) => {
               class="flex flex-wrap items-center col-span-12 mt-1 mb-1 mr-5 intro-y sm:flex-nowrap"
             >
               <div class="flex items-center text-lg">
-                <Lucide icon="Frown" class="w-5 h-5 mr-1 mb-0.5" /><strong
+                <Lucide icon="Box" class="w-6 h-6 mr-1 mb-0.5" /><strong
                   >생산 품목 목록</strong
                 >
               </div>
@@ -1127,34 +1178,44 @@ const setPrintDocumentModal = (value: boolean) => {
                         class="first:rounded-l-md last:rounded-r-md w-10 text-center bg-white border-b-0 dark:bg-darkmode-600 shadow-[20px_3px_20px_#0000000b]"
                         :style="table_setting_item.편집.style"
                       >
-                        <div>
-                          <Lucide
-                            icon="Edit"
-                            class="w-4 h-4 mr-2 mb-0.5 text-danger cursor-pointer"
+                        <div
+                          class="flex items-center justify-center text-danger"
+                        >
+                          <a
+                            class="flex items-center mr-1"
+                            href="#"
                             @click="
                               () => {
                                 editModalData_Item = todo;
                                 setEditModalItem(true);
                               }
                             "
-                          />
+                          >
+                            <Lucide icon="Edit" class="w-4 h-4 mr-1" />
+                            수정
+                          </a>
                         </div>
                       </Table.Td>
                       <Table.Td
                         class="first:rounded-l-md last:rounded-r-md w-10 text-center bg-white border-b-0 dark:bg-darkmode-600 shadow-[20px_3px_20px_#0000000b]"
                         :style="table_setting_item.삭제.style"
                       >
-                        <div>
-                          <Lucide
-                            icon="Trash2"
-                            class="w-4 h-4 mr-2 mb-0.5 text-danger cursor-pointer"
+                        <div
+                          class="flex items-center justify-center text-danger"
+                        >
+                          <a
+                            class="flex items-center mr-1"
+                            href="#"
                             @click="
                               () => {
                                 editModalData_Item = todo;
                                 setDeleteModalItem(true);
                               }
                             "
-                          />
+                          >
+                            <Lucide icon="Trash2" class="w-4 h-4 mr-1" />
+                            삭제
+                          </a>
                         </div>
                       </Table.Td>
                     </Table.Tr>
@@ -1180,7 +1241,7 @@ const setPrintDocumentModal = (value: boolean) => {
             class="flex flex-wrap items-center col-span-12 mt-1 mb-1 mr-5 intro-y sm:flex-nowrap"
           >
             <div class="flex items-center text-lg">
-              <Lucide icon="PauseCircle" class="w-5 h-5 mr-1 mb-0.5" /><strong
+              <Lucide icon="Clipboard" class="w-6 h-6 mr-1 mb-0.5" /><strong
                 >점검 목록</strong
               >
             </div>
@@ -1334,34 +1395,40 @@ const setPrintDocumentModal = (value: boolean) => {
                       class="first:rounded-l-md last:rounded-r-md px-1 text-center bg-white border-b-0 dark:bg-darkmode-600 shadow-[20px_3px_20px_#0000000b]"
                       :style="table_setting_inspect.편집.style"
                     >
-                      <div>
-                        <Lucide
-                          icon="Edit"
-                          class="w-4 h-4 mr-2 mb-0.5 text-danger cursor-pointer"
+                      <div class="flex items-center justify-center text-danger">
+                        <a
+                          class="flex items-center mr-1"
+                          href="#"
                           @click="
                             () => {
                               editModalData_Inspect = todo;
                               setEditModalInspect(true);
                             }
                           "
-                        />
+                        >
+                          <Lucide icon="Edit" class="w-4 h-4 mr-1" />
+                          수정
+                        </a>
                       </div>
                     </Table.Td>
                     <Table.Td
                       class="first:rounded-l-md last:rounded-r-md px-1 text-center bg-white border-b-0 dark:bg-darkmode-600 shadow-[20px_3px_20px_#0000000b]"
                       :style="table_setting_inspect.삭제.style"
                     >
-                      <div>
-                        <Lucide
-                          icon="Trash2"
-                          class="w-4 h-4 mr-2 mb-0.5 text-danger cursor-pointer"
+                      <div class="flex items-center justify-center text-danger">
+                        <a
+                          class="flex items-center mr-1"
+                          href="#"
                           @click="
                             () => {
                               editModalData_Inspect = todo;
                               setDeleteModalInspect(true);
                             }
                           "
-                        />
+                        >
+                          <Lucide icon="Trash2" class="w-4 h-4 mr-1" />
+                          삭제
+                        </a>
                       </div>
                     </Table.Td>
                   </Table.Tr>
@@ -1402,23 +1469,185 @@ const setPrintDocumentModal = (value: boolean) => {
   </div>
   <!-- END: FOOTER(COPYRIGHT) -->
 
-  <!-- #########################################################################################################################
-######################################################  금형  ######################################################
-######################################################################################################################### -->
+  <!-- ########################################################################################################################
+  ######################################################  금형  ###############################################################
+  ######################################################################################################################### -->
 
   <!-- BEGIN: Insert Modal Content -->
-  <Dialog
-    size="md"
-    :open="insertModal"
-    @close="
-      () => {
-        setInsertModal(false);
-      }
-    "
-  >
+  <Dialog size="md" :open="insertModal">
     <Dialog.Panel class="p-10 text-center">
       <!--추가 Modal 내용 시작-->
-      <div class="mb-5" style="font-weight: bold">등록</div>
+      <div class="mb-5" style="font-weight: bold">금형 등록</div>
+      <Tab.Group>
+        <Tab.List variant="boxed-tabs">
+          <Tab>
+            <Tab.Button class="w-full py-2" as="button"> 기본 내용 </Tab.Button>
+          </Tab>
+          <Tab>
+            <Tab.Button class="w-full py-2" as="button"> 추가 내용 </Tab.Button>
+          </Tab>
+        </Tab.List>
+        <Tab.Panels class="mt-5">
+          <Tab.Panel class="leading-relaxed">
+            <div
+              style="
+                text-align: left;
+                overflow-y: scroll;
+                overflow-x: hidden;
+                height: 500px;
+              "
+            >
+              <div class="mt-3">
+                <FormLabel htmlFor="vertical-form-1">코드</FormLabel>
+                <FormInput
+                  id="vertical-form-1"
+                  type="text"
+                  v-model="insertModalData.코드"
+                  placeholder=""
+                />
+              </div>
+              <div class="mt-3">
+                <FormLabel htmlFor="vertical-form-2">취득구분</FormLabel>
+                <FormSelect v-model="insertModalData.취득구분" class="">
+                  <option>사급</option>
+                  <option>제작</option>
+                  <option>변형</option>
+                </FormSelect>
+              </div>
+              <div class="mt-3">
+                <FormLabel htmlFor="vertical-form-3">공정구분</FormLabel>
+                <FormSelect v-model="insertModalData.공정구분" class="">
+                  <option>사출</option>
+                  <option>조립</option>
+                  <option>사상</option>
+                  <option>테스트</option>
+                </FormSelect>
+              </div>
+              <div class="mt-3">
+                <FormLabel htmlFor="vertical-form-4">금형명</FormLabel>
+                <FormInput
+                  id="vertical-form-4"
+                  type="text"
+                  v-model="insertModalData.금형명"
+                  placeholder=""
+                />
+              </div>
+              <div class="mt-3">
+                <FormLabel htmlFor="vertical-form-5">등급</FormLabel>
+                <FormInput
+                  id="vertical-form-5"
+                  type="text"
+                  v-model="insertModalData.등급"
+                  placeholder=""
+                />
+              </div>
+              <div class="mt-3">
+                <FormLabel htmlFor="vertical-form-6">규격</FormLabel>
+                <FormInput
+                  id="vertical-form-6"
+                  type="text"
+                  v-model="insertModalData.규격"
+                  placeholder=""
+                />
+              </div>
+              <div class="mt-3">
+                <FormLabel htmlFor="vertical-form-7">사용여부</FormLabel>
+                <FormSelect v-model="insertModalData.사용여부" class="">
+                  <option>Y</option>
+                  <option>N</option>
+                </FormSelect>
+              </div>
+            </div>
+          </Tab.Panel>
+          <Tab.Panel class="leading-relaxed">
+            <div
+              style="
+                text-align: left;
+                overflow-y: scroll;
+                overflow-x: hidden;
+                height: 500px;
+              "
+            >
+              <div class="mt-3">
+                <FormLabel htmlFor="vertical-form-8">공정</FormLabel>
+                <select v-tom v-model="insertModalData.공정NO">
+                  <option value="" selected>=== 추가 선택 ===</option>
+                  <option
+                    :value="p.NO"
+                    v-for="p in mold_modal_process.dataAll.value"
+                    :key="p.NO"
+                  >
+                    {{ p.코드 }} # 공정명:{{ p.공정명 }} # 설비:{{ p.설비 }}
+                  </option>
+                </select>
+              </div>
+              <div class="mt-3">
+                <FormLabel htmlFor="vertical-form-9">제작사</FormLabel>
+                <FormInput
+                  id="vertical-form-9"
+                  type="text"
+                  v-model="insertModalData.제작사"
+                  placeholder=""
+                />
+              </div>
+              <div class="mt-3">
+                <FormLabel htmlFor="vertical-form-10">가격</FormLabel>
+                <FormInput
+                  id="vertical-form-10"
+                  type="number"
+                  v-model="insertModalData.가격"
+                  placeholder=""
+                />
+              </div>
+              <div class="mt-3">
+                <FormLabel htmlFor="vertical-form-11">취득일자</FormLabel>
+                <FormInput
+                  id="vertical-form-11"
+                  type="date"
+                  v-model="insertModalData.취득일자"
+                  placeholder=""
+                />
+              </div>
+              <div class="mt-3">
+                <FormLabel htmlFor="vertical-form-12">교체수명일</FormLabel>
+                <FormInput
+                  id="vertical-form-12"
+                  type="date"
+                  v-model="insertModalData.교체수명일"
+                  placeholder=""
+                />
+              </div>
+              <div class="mt-3">
+                <FormLabel htmlFor="vertical-form-13">보관장소</FormLabel>
+                <FormInput
+                  id="vertical-form-13"
+                  type="text"
+                  v-model="insertModalData.보관장소"
+                  placeholder=""
+                />
+              </div>
+              <div class="mt-3">
+                <FormLabel htmlFor="vertical-form-14">사진</FormLabel>
+                <FormInput
+                  id="vertical-form-14"
+                  type="file"
+                  v-model="insertModalData.사진"
+                  placeholder=""
+                />
+              </div>
+              <div class="mt-3">
+                <FormLabel htmlFor="vertical-form-15">비고</FormLabel>
+                <FormInput
+                  id="vertical-form-15"
+                  type="text"
+                  v-model="insertModalData.비고"
+                  placeholder=""
+                />
+              </div>
+            </div>
+          </Tab.Panel>
+        </Tab.Panels>
+      </Tab.Group>
       <div style="text-align: left">
         <div class="mt-5 text-right">
           <Button
@@ -1458,66 +1687,200 @@ const setPrintDocumentModal = (value: boolean) => {
     "
   >
     <Dialog.Panel class="p-10 text-center">
-      <div class="mb-5" style="font-weight: bold">생산실적 수정</div>
-      <div style="text-align: left">
-        <div class="mt-3">
-          <FormLabel htmlFor="vertical-form-4">작업코드</FormLabel>
-          <FormInput
-            type="text"
-            v-model="editModalData.작업코드"
-            placeholder=""
-            readonly
-          />
-        </div>
-        <div class="mt-3">
-          <FormLabel htmlFor="vertical-form-4">설비명</FormLabel>
-          <FormInput
-            type="text"
-            :value="editModalData.설비명"
-            v-model="editModalData.설비명"
-            @click="setFacilityModal(true)"
-            placeholder=""
-          />
-        </div>
-        <div class="mt-3">
-          <FormLabel htmlFor="vertical-form-4">작업자</FormLabel>
-          <FormInput
-            type="text"
-            :value="editModalData.작업자"
-            v-model="editModalData.작업자"
-            @click="setUserModal(true)"
-            placeholder=""
-          />
-        </div>
-        <div class="mt-3">
-          <FormLabel htmlFor="vertical-form-6">시작일시</FormLabel>
-          <FormInput
-            type="datetime-local"
-            step="10"
-            v-model="editModalData.시작일시"
-            placeholder=""
-          />
-        </div>
-        <div class="mt-3">
-          <FormLabel htmlFor="vertical-form-6">종료일시</FormLabel>
-          <FormInput
-            type="datetime-local"
-            step="10"
-            v-model="editModalData.종료일시"
-            placeholder=""
-          />
-        </div>
-        <div class="mt-3">
-          <FormLabel htmlFor="vertical-form-6">생산수</FormLabel>
-          <FormInput
-            id="vertical-form-6"
-            type="text"
-            v-model="editModalData.생산수"
-            placeholder=""
-          />
-        </div>
-      </div>
-
+      <div class="mb-5" style="font-weight: bold">금형 수정</div>
+      <Tab.Group>
+        <Tab.List variant="boxed-tabs">
+          <Tab>
+            <Tab.Button class="w-full py-2" as="button"> 기본 내용 </Tab.Button>
+          </Tab>
+          <Tab>
+            <Tab.Button class="w-full py-2" as="button"> 추가 내용 </Tab.Button>
+          </Tab>
+        </Tab.List>
+        <Tab.Panels class="mt-5">
+          <Tab.Panel class="leading-relaxed">
+            <div
+              style="
+                text-align: left;
+                overflow-y: scroll;
+                overflow-x: hidden;
+                height: 500px;
+              "
+            >
+              <div class="mt-3">
+                <FormLabel htmlFor="vertical-form-1">코드</FormLabel>
+                <FormInput
+                  id="vertical-form-1"
+                  type="text"
+                  v-model="editModalData.코드"
+                  placeholder=""
+                />
+              </div>
+              <div class="mt-3">
+                <FormLabel htmlFor="vertical-form-2">취득구분</FormLabel>
+                <FormSelect v-model="editModalData.취득구분" class="">
+                  <option>사급</option>
+                  <option>제작</option>
+                  <option>변형</option>
+                </FormSelect>
+              </div>
+              <div class="mt-3">
+                <FormLabel htmlFor="vertical-form-3">공정구분</FormLabel>
+                <FormSelect v-model="editModalData.공정구분" class="">
+                  <option>사출</option>
+                  <option>조립</option>
+                  <option>사상</option>
+                  <option>테스트</option>
+                </FormSelect>
+              </div>
+              <div class="mt-3">
+                <FormLabel htmlFor="vertical-form-4">금형명</FormLabel>
+                <FormInput
+                  id="vertical-form-4"
+                  type="text"
+                  v-model="editModalData.금형명"
+                  placeholder=""
+                />
+              </div>
+              <div class="mt-3">
+                <FormLabel htmlFor="vertical-form-5">등급</FormLabel>
+                <FormInput
+                  id="vertical-form-5"
+                  type="text"
+                  v-model="editModalData.등급"
+                  placeholder=""
+                />
+              </div>
+              <div class="mt-3">
+                <FormLabel htmlFor="vertical-form-6">규격</FormLabel>
+                <FormInput
+                  id="vertical-form-6"
+                  type="text"
+                  v-model="editModalData.규격"
+                  placeholder=""
+                />
+              </div>
+              <div class="mt-3">
+                <FormLabel htmlFor="vertical-form-7">사용여부</FormLabel>
+                <FormSelect v-model="editModalData.사용여부" class="">
+                  <option>Y</option>
+                  <option>N</option>
+                </FormSelect>
+              </div>
+            </div>
+          </Tab.Panel>
+          <Tab.Panel class="leading-relaxed">
+            <div
+              style="
+                text-align: left;
+                overflow-y: scroll;
+                overflow-x: hidden;
+                height: 500px;
+              "
+            >
+              <div class="mt-3">
+                <FormLabel htmlFor="vertical-form-8">공정</FormLabel>
+                <select v-tom v-model="editModalData.공정NO">
+                  <option
+                    v-if="editModalData.공정NO"
+                    :value="editModalData.공정NO"
+                    selected
+                  >
+                    {{
+                      mold_modal_process.dataAll.value.filter(
+                        (c) => c.NO == editModalData.공정NO
+                      )[0].코드
+                    }}
+                    # 공정명:{{
+                      mold_modal_process.dataAll.value.filter(
+                        (c) => c.NO == editModalData.공정NO
+                      )[0].공정명
+                    }}
+                    # 설비:{{
+                      mold_modal_process.dataAll.value.filter(
+                        (c) => c.NO == editModalData.공정NO
+                      )[0].설비
+                    }}
+                  </option>
+                  <option v-if="!editModalData.공정NO" value="" selected>
+                    === 추가 선택 ===
+                  </option>
+                  <option
+                    :value="p.NO"
+                    v-for="p in mold_modal_process.dataAll.value"
+                    :key="p.NO"
+                  >
+                    {{ p.코드 }} # 공정명:{{ p.공정명 }} # 설비:{{ p.설비 }}
+                  </option>
+                </select>
+              </div>
+              <div class="mt-3">
+                <FormLabel htmlFor="vertical-form-9">제작사</FormLabel>
+                <FormInput
+                  id="vertical-form-9"
+                  type="text"
+                  v-model="editModalData.제작사"
+                  placeholder=""
+                />
+              </div>
+              <div class="mt-3">
+                <FormLabel htmlFor="vertical-form-10">가격</FormLabel>
+                <FormInput
+                  id="vertical-form-10"
+                  type="number"
+                  v-model="editModalData.가격"
+                  placeholder=""
+                />
+              </div>
+              <div class="mt-3">
+                <FormLabel htmlFor="vertical-form-11">취득일자</FormLabel>
+                <FormInput
+                  id="vertical-form-11"
+                  type="date"
+                  v-model="editModalData.취득일자"
+                  placeholder=""
+                />
+              </div>
+              <div class="mt-3">
+                <FormLabel htmlFor="vertical-form-12">교체수명일</FormLabel>
+                <FormInput
+                  id="vertical-form-12"
+                  type="date"
+                  v-model="editModalData.교체수명일"
+                  placeholder=""
+                />
+              </div>
+              <div class="mt-3">
+                <FormLabel htmlFor="vertical-form-13">보관장소</FormLabel>
+                <FormInput
+                  id="vertical-form-13"
+                  type="text"
+                  v-model="editModalData.보관장소"
+                  placeholder=""
+                />
+              </div>
+              <div class="mt-3">
+                <FormLabel htmlFor="vertical-form-14">사진</FormLabel>
+                <FormInput
+                  id="vertical-form-14"
+                  type="file"
+                  v-model="editModalData.사진"
+                  placeholder=""
+                />
+              </div>
+              <div class="mt-3">
+                <FormLabel htmlFor="vertical-form-15">비고</FormLabel>
+                <FormInput
+                  id="vertical-form-15"
+                  type="text"
+                  v-model="editModalData.비고"
+                  placeholder=""
+                />
+              </div>
+            </div>
+          </Tab.Panel>
+        </Tab.Panels>
+      </Tab.Group>
       <div style="text-align: left">
         <div class="mt-5 text-right">
           <Button
@@ -1526,7 +1889,6 @@ const setPrintDocumentModal = (value: boolean) => {
             @click="
               () => {
                 editDataFunction();
-                setEditModal(false);
               }
             "
             >확인</Button
@@ -1583,7 +1945,6 @@ const setPrintDocumentModal = (value: boolean) => {
           @click="
             () => {
               deleteDataFunction();
-              setDeleteModal(false);
             }
           "
         >
@@ -1594,62 +1955,100 @@ const setPrintDocumentModal = (value: boolean) => {
   </Dialog>
   <!-- END: Delete Confirmation Modal -->
 
-  <!-- #########################################################################################################################
-#########################################################################################################################
-######################################################################################################################### -->
+  <!-- ########################################################################################################################
+  ######################################################  생산품목  ###############################################################
+  ######################################################################################################################### -->
 
-  <!-- LEVEL2 모달 시작 -->
-  <!-- BEGIN: LEVEL2 Insert Modal Content -->
-  <Dialog
-    size="md"
-    :open="insertModal_Defect"
-    :key="insertModalData_Defect?.불량코드"
-  >
+  <!-- BEGIN: Insert Modal Content -->
+  <Dialog size="md" :open="insertModal_Item">
     <Dialog.Panel class="p-10 text-center">
-      <div class="mb-5" style="font-weight: bold">불량 사유 등록</div>
-
+      <!--추가 Modal 내용 시작-->
+      <div class="mb-5" style="font-weight: bold">생산품목 등록</div>
+      <Tab.Group>
+        <Tab.List variant="boxed-tabs">
+          <Tab>
+            <Tab.Button class="w-full py-2" as="button"> 기본 내용 </Tab.Button>
+          </Tab>
+          <Tab>
+            <Tab.Button class="w-full py-2" as="button"> 추가 내용 </Tab.Button>
+          </Tab>
+        </Tab.List>
+        <Tab.Panels class="mt-5">
+          <Tab.Panel class="leading-relaxed">
+            <div
+              style="
+                text-align: left;
+                overflow-y: scroll;
+                overflow-x: hidden;
+                height: 500px;
+              "
+            >
+              <div class="mt-3">
+                <FormLabel htmlFor="vertical-form-1">품목</FormLabel>
+                <select v-tom v-model="insertModalData_Item.품목NO">
+                  <option value="" selected>=== 필수 선택 ===</option>
+                  <option
+                    :value="p.NO"
+                    v-for="p in mold_modal_item.dataAll.value"
+                    :key="p.NO"
+                  >
+                    {{ p.품번 }} # 품목구분:{{ p.품목구분 }} # 품명:{{
+                      p.품명
+                    }}
+                    # 규격:{{ p.규격 }}
+                  </option>
+                </select>
+              </div>
+              <div class="mt-3">
+                <FormLabel htmlFor="vertical-form-2">CAVITY</FormLabel>
+                <FormInput
+                  id="vertical-form-2"
+                  type="text"
+                  v-model="insertModalData_Item.CAVITY"
+                  placeholder=""
+                />
+              </div>
+              <div class="mt-3">
+                <FormLabel htmlFor="vertical-form-2">동시여부</FormLabel>
+                <FormSelect v-model="insertModalData_Item.동시여부" class="">
+                  <option>Y</option>
+                  <option>N</option>
+                </FormSelect>
+              </div>
+            </div>
+          </Tab.Panel>
+          <Tab.Panel class="leading-relaxed">
+            <div
+              style="
+                text-align: left;
+                overflow-y: scroll;
+                overflow-x: hidden;
+                height: 500px;
+              "
+            >
+              <div class="mt-3">
+                <FormLabel htmlFor="vertical-form-15">비고</FormLabel>
+                <FormInput
+                  id="vertical-form-15"
+                  type="text"
+                  v-model="insertModalData_Item.비고"
+                  placeholder=""
+                />
+              </div>
+            </div>
+          </Tab.Panel>
+        </Tab.Panels>
+      </Tab.Group>
       <div style="text-align: left">
-        <div class="mt-3">
-          <FormLabel htmlFor="vertical-form-4">불량코드</FormLabel>
-          <FormInput
-            type="text"
-            v-model="insertModalData_Defect.불량코드"
-            @click="setDefectModal(true)"
-            placeholder=""
-          />
-        </div>
-        <div class="mt-3">
-          <FormLabel htmlFor="vertical-form-4">구분</FormLabel>
-          <FormInput
-            type="text"
-            v-model="insertModalData_Defect.구분"
-            placeholder=""
-            readonly
-          />
-        </div>
-        <div class="mt-3">
-          <FormLabel htmlFor="vertical-form-4">불량명</FormLabel>
-          <FormInput
-            type="text"
-            v-model="insertModalData_Defect.불량명"
-            placeholder=""
-            readonly
-          />
-        </div>
-        <div class="mt-3">
-          <FormLabel htmlFor="vertical-form-4">수량</FormLabel>
-          <FormInput
-            type="number"
-            v-model="insertModalData_Defect.수량"
-            placeholder=""
-          />
-        </div>
-
         <div class="mt-5 text-right">
           <Button
             class="mr-2 shadow-md"
             variant="primary"
-            @click="insertDataFunction_Defect"
+            @click="
+              async () => {
+                insertDataFunctionItem();
+              }
+            "
             >확인</Button
           >
           <Button
@@ -1657,7 +2056,150 @@ const setPrintDocumentModal = (value: boolean) => {
             variant="outline-primary"
             @click="
               () => {
-                setInsertModalDefect(false);
+                setInsertModalItem(false);
+              }
+            "
+            >취소</Button
+          >
+        </div>
+      </div>
+      <!--Modal 내용 끝-->
+    </Dialog.Panel>
+  </Dialog>
+  <!-- END: Insert Modal Content -->
+  <!-- BEGIN: Edit Modal Content -->
+  <Dialog
+    size="md"
+    :open="editModal_Item"
+    @close="
+      () => {
+        setEditModalItem(false);
+      }
+    "
+  >
+    <Dialog.Panel class="p-10 text-center">
+      <div class="mb-5" style="font-weight: bold">생산품목 수정</div>
+      <Tab.Group>
+        <Tab.List variant="boxed-tabs">
+          <Tab>
+            <Tab.Button class="w-full py-2" as="button"> 기본 내용 </Tab.Button>
+          </Tab>
+          <Tab>
+            <Tab.Button class="w-full py-2" as="button"> 추가 내용 </Tab.Button>
+          </Tab>
+        </Tab.List>
+        <Tab.Panels class="mt-5">
+          <Tab.Panel class="leading-relaxed">
+            <div
+              style="
+                text-align: left;
+                overflow-y: scroll;
+                overflow-x: hidden;
+                height: 500px;
+              "
+            >
+              <div class="mt-3">
+                <FormLabel htmlFor="vertical-form-1">품목</FormLabel>
+                <select v-tom v-model="editModalData_Item.품목NO">
+                  <option
+                    v-if="editModalData_Item.품목NO"
+                    :value="editModalData_Item.품목NO"
+                    selected
+                  >
+                    {{
+                      mold_modal_item.dataAll.value.filter(
+                        (c) => c.NO == editModalData_Item.품목NO
+                      )[0].품번
+                    }}
+                    # 품목구분:{{
+                      mold_modal_item.dataAll.value.filter(
+                        (c) => c.NO == editModalData_Item.품목NO
+                      )[0].품목구분
+                    }}
+                    # 품명:{{
+                      mold_modal_item.dataAll.value.filter(
+                        (c) => c.NO == editModalData_Item.품목NO
+                      )[0].품명
+                    }}
+                    # 규격:{{
+                      mold_modal_item.dataAll.value.filter(
+                        (c) => c.NO == editModalData_Item.품목NO
+                      )[0].규격
+                    }}
+                  </option>
+                  <option v-if="!editModalData_Item.품목NO" value="" selected>
+                    === 필수 선택 ===
+                  </option>
+                  <option
+                    :value="p.NO"
+                    v-for="p in mold_modal_item.dataAll.value"
+                    :key="p.NO"
+                  >
+                    {{ p.품번 }} # 품목구분:{{ p.품목구분 }} # 품명:{{
+                      p.품명
+                    }}
+                    # 규격:{{ p.규격 }}
+                  </option>
+                </select>
+              </div>
+              <div class="mt-3">
+                <FormLabel htmlFor="vertical-form-2">CAVITY</FormLabel>
+                <FormInput
+                  id="vertical-form-2"
+                  type="text"
+                  v-model="editModalData_Item.CAVITY"
+                  placeholder=""
+                />
+              </div>
+              <div class="mt-3">
+                <FormLabel htmlFor="vertical-form-2">동시여부</FormLabel>
+                <FormSelect v-model="editModalData_Item.동시여부" class="">
+                  <option>Y</option>
+                  <option>N</option>
+                </FormSelect>
+              </div>
+            </div>
+          </Tab.Panel>
+          <Tab.Panel class="leading-relaxed">
+            <div
+              style="
+                text-align: left;
+                overflow-y: scroll;
+                overflow-x: hidden;
+                height: 500px;
+              "
+            >
+              <div class="mt-3">
+                <FormLabel htmlFor="vertical-form-15">비고</FormLabel>
+                <FormInput
+                  id="vertical-form-15"
+                  type="text"
+                  v-model="editModalData_Item.비고"
+                  placeholder=""
+                />
+              </div>
+            </div>
+          </Tab.Panel>
+        </Tab.Panels>
+      </Tab.Group>
+      <div style="text-align: left">
+        <div class="mt-5 text-right">
+          <Button
+            class="mr-2 shadow-md"
+            variant="primary"
+            @click="
+              () => {
+                editDataFunctionItem();
+              }
+            "
+            >확인</Button
+          >
+          <Button
+            class="mr-2 shadow-md"
+            variant="outline-primary"
+            @click="
+              () => {
+                setEditModalItem(false);
               }
             "
             >취소</Button
@@ -1666,75 +2208,190 @@ const setPrintDocumentModal = (value: boolean) => {
       </div>
     </Dialog.Panel>
   </Dialog>
-
+  <!-- END: Edit Modal Content -->
+  <!-- BEGIN: Delete Confirmation Modal -->
   <Dialog
-    size="md"
-    :open="insertModal_Nonwork"
-    :key="insertModalData_Nonwork?.비가동코드"
+    :open="deleteModal_Item"
+    @close="
+      () => {
+        setDeleteModalItem(false);
+      }
+    "
+    :initialFocus="deleteButtonRef_Item"
   >
-    <Dialog.Panel class="p-10 text-center">
-      <div class="mb-5" style="font-weight: bold">비가동 사유 등록</div>
+    <Dialog.Panel>
+      <div class="p-5 text-center">
+        <Lucide icon="XCircle" class="w-16 h-16 mx-auto mt-3 text-danger" />
+        <div class="mt-5 text-3xl">삭제</div>
+        <div class="mt-2 text-slate-500">정말 삭제하시겠습니까?</div>
+      </div>
+      <div class="px-5 pb-8 text-center">
+        <Button
+          variant="outline-secondary"
+          type="button"
+          @click="
+            () => {
+              setDeleteModaItem(false);
+            }
+          "
+          class="w-24 mr-1"
+        >
+          취소
+        </Button>
+        <Button
+          variant="danger"
+          type="button"
+          class="w-24"
+          ref="deleteButtonRef_Item"
+          @click="
+            () => {
+              deleteDataFunctionItem();
+            }
+          "
+        >
+          삭제
+        </Button>
+      </div>
+    </Dialog.Panel>
+  </Dialog>
+  <!-- END: Delete Confirmation Modal -->
 
+  <!-- ########################################################################################################################
+  ######################################################  점검목록  ###############################################################
+  ######################################################################################################################### -->
+
+  <!-- BEGIN: Insert Modal Content -->
+  <Dialog size="md" :open="insertModal_Inspect">
+    <Dialog.Panel class="p-10 text-center">
+      <!--추가 Modal 내용 시작-->
+      <div class="mb-5" style="font-weight: bold">점검 등록</div>
+      <Tab.Group>
+        <Tab.List variant="boxed-tabs">
+          <Tab>
+            <Tab.Button class="w-full py-2" as="button"> 기본 내용 </Tab.Button>
+          </Tab>
+          <Tab>
+            <Tab.Button class="w-full py-2" as="button"> 추가 내용 </Tab.Button>
+          </Tab>
+        </Tab.List>
+        <Tab.Panels class="mt-5">
+          <Tab.Panel class="leading-relaxed">
+            <div
+              style="
+                text-align: left;
+                overflow-y: scroll;
+                overflow-x: hidden;
+                height: 500px;
+              "
+            >
+              <div class="mt-3">
+                <FormLabel htmlFor="vertical-form-1">구분</FormLabel>
+                <FormInput
+                  id="vertical-form-1"
+                  type="text"
+                  v-model="insertModalData_Inspect.구분"
+                  placeholder=""
+                />
+              </div>
+              <div class="mt-3">
+                <FormLabel htmlFor="vertical-form-2">내용</FormLabel>
+                <FormInput
+                  id="vertical-form-2"
+                  type="text"
+                  v-model="insertModalData_Inspect.내용"
+                  placeholder=""
+                />
+              </div>
+              <div class="mt-3">
+                <FormLabel htmlFor="vertical-form-3">검사방법</FormLabel>
+                <FormSelect v-model="insertModalData_Inspect.검사방법" class="">
+                  <option>육안검사</option>
+                  <option>치수검사</option>
+                </FormSelect>
+              </div>
+              <div class="mt-3">
+                <FormLabel htmlFor="vertical-form-4">기준</FormLabel>
+                <FormInput
+                  id="vertical-form-4"
+                  type="text"
+                  v-model="insertModalData_Inspect.기준"
+                  placeholder=""
+                />
+              </div>
+              <div class="mt-3">
+                <FormLabel htmlFor="vertical-form-5">단위</FormLabel>
+                <FormInput
+                  id="vertical-form-5"
+                  type="text"
+                  v-model="insertModalData_Inspect.단위"
+                  placeholder=""
+                />
+              </div>
+              <div class="mt-3">
+                <FormLabel htmlFor="vertical-form-6">최소</FormLabel>
+                <FormInput
+                  id="vertical-form-6"
+                  type="number"
+                  v-model="insertModalData_Inspect.최소"
+                  placeholder=""
+                />
+              </div>
+              <div class="mt-3">
+                <FormLabel htmlFor="vertical-form-7">최대</FormLabel>
+                <FormInput
+                  id="vertical-form-7"
+                  type="number"
+                  v-model="insertModalData_Inspect.최대"
+                  placeholder=""
+                />
+              </div>
+              <div class="mt-3">
+                <FormLabel htmlFor="vertical-form-8">담당자</FormLabel>
+                <select v-tom v-model="insertModalData_Inspect.담당자ID">
+                  <option value="" selected>=== 필수 선택 ===</option>
+                  <option
+                    :value="p.아이디"
+                    v-for="p in mold_modal_user.dataAll.value"
+                    :key="p.아이디"
+                  >
+                    {{ p.이름 }} # 부서명:{{ p.부서명 }} # 직급:{{ p.직급 }}
+                  </option>
+                </select>
+              </div>
+            </div>
+          </Tab.Panel>
+          <Tab.Panel class="leading-relaxed">
+            <div
+              style="
+                text-align: left;
+                overflow-y: scroll;
+                overflow-x: hidden;
+                height: 500px;
+              "
+            >
+              <div class="mt-3">
+                <FormLabel htmlFor="vertical-form-15">비고</FormLabel>
+                <FormInput
+                  id="vertical-form-15"
+                  type="text"
+                  v-model="insertModalData_Inspect.비고"
+                  placeholder=""
+                />
+              </div>
+            </div>
+          </Tab.Panel>
+        </Tab.Panels>
+      </Tab.Group>
       <div style="text-align: left">
-        <div class="mt-3">
-          <FormLabel htmlFor="vertical-form-4"> 비가동코드</FormLabel>
-          <FormInput
-            type="text"
-            v-model="insertModalData_Nonwork.비가동코드"
-            @click="setNonworkModal(true)"
-            placeholder=""
-          />
-        </div>
-        <div class="mt-3">
-          <FormLabel htmlFor="vertical-form-4">구분</FormLabel>
-          <FormInput
-            type="text"
-            v-model="insertModalData_Nonwork.구분"
-            placeholder=""
-            readonly
-          />
-        </div>
-        <div class="mt-3">
-          <FormLabel htmlFor="vertical-form-4">비가동명</FormLabel>
-          <FormInput
-            type="text"
-            v-model="insertModalData_Nonwork.비가동명"
-            placeholder=""
-            readonly
-          />
-        </div>
-        <div class="mt-3">
-          <FormLabel htmlFor="vertical-form-4">내용</FormLabel>
-          <FormInput
-            type="text"
-            v-model="insertModalData_Nonwork.내용"
-            placeholder=""
-            readonly
-          />
-        </div>
-        <div class="mt-3">
-          <FormLabel htmlFor="vertical-form-4">시작일시</FormLabel>
-          <FormInput
-            type="datetime-local"
-            step="10"
-            v-model="insertModalData_Nonwork.시작일시"
-            placeholder=""
-          />
-        </div>
-        <div class="mt-3">
-          <FormLabel htmlFor="vertical-form-4">종료일시</FormLabel>
-          <FormInput
-            type="datetime-local"
-            step="10"
-            v-model="insertModalData_Nonwork.종료일시"
-            placeholder=""
-          />
-        </div>
         <div class="mt-5 text-right">
           <Button
             class="mr-2 shadow-md"
             variant="primary"
-            @click="insertDataFunction_Nonwork"
+            @click="
+              async () => {
+                insertDataFunctionInspect();
+              }
+            "
             >확인</Button
           >
           <Button
@@ -1742,7 +2399,187 @@ const setPrintDocumentModal = (value: boolean) => {
             variant="outline-primary"
             @click="
               () => {
-                setInsertModalNonwork(false);
+                setInsertModaInspect(false);
+              }
+            "
+            >취소</Button
+          >
+        </div>
+      </div>
+      <!--Modal 내용 끝-->
+    </Dialog.Panel>
+  </Dialog>
+  <!-- END: Insert Modal Content -->
+  <!-- BEGIN: Edit Modal Content -->
+  <Dialog
+    size="md"
+    :open="editModal_Inspect"
+    @close="
+      () => {
+        setEditModalInspect(false);
+      }
+    "
+  >
+    <Dialog.Panel class="p-10 text-center">
+      <div class="mb-5" style="font-weight: bold">점검 수정</div>
+      <Tab.Group>
+        <Tab.List variant="boxed-tabs">
+          <Tab>
+            <Tab.Button class="w-full py-2" as="button"> 기본 내용 </Tab.Button>
+          </Tab>
+          <Tab>
+            <Tab.Button class="w-full py-2" as="button"> 추가 내용 </Tab.Button>
+          </Tab>
+        </Tab.List>
+        <Tab.Panels class="mt-5">
+          <Tab.Panel class="leading-relaxed">
+            <div
+              style="
+                text-align: left;
+                overflow-y: scroll;
+                overflow-x: hidden;
+                height: 500px;
+              "
+            >
+              <div class="mt-3">
+                <FormLabel htmlFor="vertical-form-1">구분</FormLabel>
+                <FormInput
+                  id="vertical-form-1"
+                  type="text"
+                  v-model="editModalData_Inspect.구분"
+                  placeholder=""
+                />
+              </div>
+              <div class="mt-3">
+                <FormLabel htmlFor="vertical-form-2">내용</FormLabel>
+                <FormInput
+                  id="vertical-form-2"
+                  type="text"
+                  v-model="editModalData_Inspect.내용"
+                  placeholder=""
+                />
+              </div>
+              <div class="mt-3">
+                <FormLabel htmlFor="vertical-form-3">검사방법</FormLabel>
+                <FormSelect v-model="editModalData_Inspect.검사방법" class="">
+                  <option>육안검사</option>
+                  <option>치수검사</option>
+                </FormSelect>
+              </div>
+              <div class="mt-3">
+                <FormLabel htmlFor="vertical-form-4">기준</FormLabel>
+                <FormInput
+                  id="vertical-form-4"
+                  type="text"
+                  v-model="editModalData_Inspect.기준"
+                  placeholder=""
+                />
+              </div>
+              <div class="mt-3">
+                <FormLabel htmlFor="vertical-form-5">단위</FormLabel>
+                <FormInput
+                  id="vertical-form-5"
+                  type="text"
+                  v-model="editModalData_Inspect.단위"
+                  placeholder=""
+                />
+              </div>
+              <div class="mt-3">
+                <FormLabel htmlFor="vertical-form-6">최소</FormLabel>
+                <FormInput
+                  id="vertical-form-6"
+                  type="number"
+                  v-model="editModalData_Inspect.최소"
+                  placeholder=""
+                />
+              </div>
+              <div class="mt-3">
+                <FormLabel htmlFor="vertical-form-7">최대</FormLabel>
+                <FormInput
+                  id="vertical-form-7"
+                  type="number"
+                  v-model="editModalData_Inspect.최대"
+                  placeholder=""
+                />
+              </div>
+              <div class="mt-3">
+                <FormLabel htmlFor="vertical-form-8">담당자</FormLabel>
+                <select v-tom v-model="editModalData_Inspect.담당자ID">
+                  <option
+                    v-if="editModalData_Inspect.담당자ID"
+                    :value="editModalData_Inspect.담당자ID"
+                    selected
+                  >
+                    {{
+                      mold_modal_user.dataAll.value.filter(
+                        (c) => c.아이디 == editModalData_Inspect.담당자ID
+                      )[0].이름
+                    }}
+                    # 부서명:{{
+                      mold_modal_user.dataAll.value.filter(
+                        (c) => c.아이디 == editModalData_Inspect.담당자ID
+                      )[0].부서명
+                    }}
+                    # 직급:{{
+                      mold_modal_user.dataAll.value.filter(
+                        (c) => c.아이디 == editModalData_Inspect.담당자ID
+                      )[0].직급
+                    }}
+                  </option>
+                  <option v-if="!editModalData_Inspect.품목NO" value="">
+                    === 필수 선택 ===
+                  </option>
+                  <option
+                    :value="p.아이디"
+                    v-for="p in mold_modal_user.dataAll.value"
+                    :key="p.아이디"
+                  >
+                    {{ p.이름 }} # 부서명:{{ p.부서명 }} # 직급:{{ p.직급 }}
+                  </option>
+                </select>
+              </div>
+            </div>
+          </Tab.Panel>
+          <Tab.Panel class="leading-relaxed">
+            <div
+              style="
+                text-align: left;
+                overflow-y: scroll;
+                overflow-x: hidden;
+                height: 500px;
+              "
+            >
+              <div class="mt-3">
+                <FormLabel htmlFor="vertical-form-15">비고</FormLabel>
+                <FormInput
+                  id="vertical-form-15"
+                  type="text"
+                  v-model="editModalData_Inspect.비고"
+                  placeholder=""
+                />
+              </div>
+            </div>
+          </Tab.Panel>
+        </Tab.Panels>
+      </Tab.Group>
+      <div style="text-align: left">
+        <div class="mt-5 text-right">
+          <Button
+            class="mr-2 shadow-md"
+            variant="primary"
+            @click="
+              () => {
+                editDataFunctionInspect();
+              }
+            "
+            >확인</Button
+          >
+          <Button
+            class="mr-2 shadow-md"
+            variant="outline-primary"
+            @click="
+              () => {
+                setEditModalInspect(false);
               }
             "
             >취소</Button
@@ -1751,253 +2588,57 @@ const setPrintDocumentModal = (value: boolean) => {
       </div>
     </Dialog.Panel>
   </Dialog>
-
+  <!-- END: Edit Modal Content -->
+  <!-- BEGIN: Delete Confirmation Modal -->
   <Dialog
-    size="md"
-    :open="insertModal_Useitem"
-    :key="insertModalData_Useitem?.LOT코드"
+    :open="deleteModal_Inspect"
+    @close="
+      () => {
+        setDeleteModalInspect(false);
+      }
+    "
+    :initialFocus="deleteButtonRef_Inspect"
   >
-    <Dialog.Panel class="p-10 text-center">
-      <div class="mb-5" style="font-weight: bold">투입 자재 등록</div>
-
-      <div style="text-align: left">
-        <div class="mt-3">
-          <FormLabel htmlFor="vertical-form-4">LOT코드</FormLabel>
-          <FormInput
-            type="text"
-            v-model="insertModalData_Useitem.LOT코드"
-            @click="setItemProcessModal(true)"
-            placeholder=""
-          />
-        </div>
-        <div class="mt-3">
-          <FormLabel htmlFor="vertical-form-4">품목구분</FormLabel>
-          <FormInput
-            type="text"
-            v-model="insertModalData_Useitem.품목구분"
-            placeholder=""
-            readonly
-          />
-        </div>
-        <div class="mt-3">
-          <FormLabel htmlFor="vertical-form-4">품명</FormLabel>
-          <FormInput
-            type="text"
-            v-model="insertModalData_Useitem.품명"
-            placeholder=""
-            readonly
-          />
-        </div>
-        <div class="mt-3">
-          <FormLabel htmlFor="vertical-form-4">규격</FormLabel>
-          <FormInput
-            type="text"
-            v-model="insertModalData_Useitem.규격"
-            placeholder=""
-            readonly
-          />
-        </div>
-        <div class="mt-3">
-          <FormLabel htmlFor="vertical-form-4">단위</FormLabel>
-          <FormInput
-            type="text"
-            v-model="insertModalData_Useitem.단위"
-            placeholder=""
-            readonly
-          />
-        </div>
-        <div class="mt-3">
-          <FormLabel htmlFor="vertical-form-4">수량</FormLabel>
-          <FormInput
-            type="number"
-            v-model="insertModalData_Useitem.수량"
-            placeholder=""
-          />
-        </div>
-
-        <div class="mt-5 text-right">
-          <Button
-            class="mr-2 shadow-md"
-            variant="primary"
-            @click="insertDataFunction_Useitem"
-            >확인</Button
-          >
-          <Button
-            class="mr-2 shadow-md"
-            variant="outline-primary"
-            @click="
-              () => {
-                setInsertModalUseitem(false);
-              }
-            "
-            >취소</Button
-          >
-        </div>
+    <Dialog.Panel>
+      <div class="p-5 text-center">
+        <Lucide icon="XCircle" class="w-16 h-16 mx-auto mt-3 text-danger" />
+        <div class="mt-5 text-3xl">삭제</div>
+        <div class="mt-2 text-slate-500">정말 삭제하시겠습니까?</div>
+      </div>
+      <div class="px-5 pb-8 text-center">
+        <Button
+          variant="outline-secondary"
+          type="button"
+          @click="
+            () => {
+              setDeleteModaInspect(false);
+            }
+          "
+          class="w-24 mr-1"
+        >
+          취소
+        </Button>
+        <Button
+          variant="danger"
+          type="button"
+          class="w-24"
+          ref="deleteButtonRef_Inspect"
+          @click="
+            () => {
+              deleteDataFunctionInspect();
+            }
+          "
+        >
+          삭제
+        </Button>
       </div>
     </Dialog.Panel>
   </Dialog>
+  <!-- END: Delete Confirmation Modal -->
 
-  <!-- END: LEVEL2 Insert Modal Content -->
-
-  <!-- #######################################################################################################################
-  #######################################################################################################################
-  ####################################################################################################################### -->
-
-  <!-- BEGIN: LEVEL2 Edit Modal -->
-  <Dialog
-    size="md"
-    :open="level2_defect_editModal"
-    @close="setLevel2DefectEditModal(false)"
-  >
-    <Dialog.Panel class="p-10 text-center">
-      <div class="mb-5" style="font-weight: bold">불량 사유 편집</div>
-
-      <div style="text-align: left">
-        <div class="mt-3">
-          <FormLabel htmlFor="vertical-form-4">불량코드</FormLabel>
-          <FormInput
-            type="text"
-            v-model="editModalData_Defect.불량코드"
-            placeholder=""
-            readonly
-          />
-        </div>
-
-        <div class="mt-3">
-          <FormLabel htmlFor="vertical-form-4">수량</FormLabel>
-          <FormInput
-            type="number"
-            v-model="editModalData_Defect.수량"
-            placeholder=""
-          />
-        </div>
-        <div class="mt-5 text-right">
-          <Button
-            class="mr-2 shadow-md"
-            variant="primary"
-            @click="editDataFunction_Defect"
-            >확인</Button
-          >
-          <Button
-            class="mr-2 shadow-md"
-            variant="outline-primary"
-            @click="
-              () => {
-                setLevel2DefectEditModal(false);
-              }
-            "
-            >취소</Button
-          >
-        </div>
-      </div>
-    </Dialog.Panel>
-  </Dialog>
-
-  <Dialog
-    size="md"
-    :open="level2_nonwork_editModal"
-    @close="setLevel2NonworkEditModal(false)"
-  >
-    <Dialog.Panel class="p-10 text-center">
-      <div class="mb-5" style="font-weight: bold">비가동 사유 편집</div>
-
-      <div style="text-align: left">
-        <div class="mt-3">
-          <FormLabel htmlFor="vertical-form-4">비가동코드</FormLabel>
-          <FormInput
-            type="text"
-            v-model="editModalData_Nonwork.비가동코드"
-            placeholder=""
-            readonly
-          />
-        </div>
-        <div class="mt-3">
-          <FormLabel htmlFor="vertical-form-4">시작일시</FormLabel>
-          <FormInput
-            type="datetime-local"
-            step="10"
-            v-model="editModalData_Nonwork.시작일시"
-            placeholder=""
-          />
-        </div>
-
-        <div class="mt-3">
-          <FormLabel htmlFor="vertical-form-4">종료일시</FormLabel>
-          <FormInput
-            type="datetime-local"
-            step="10"
-            v-model="editModalData_Nonwork.종료일시"
-            placeholder=""
-          />
-        </div>
-        <div class="mt-5 text-right">
-          <Button
-            class="mr-2 shadow-md"
-            variant="primary"
-            @click="editDataFunction_Nonwork"
-            >확인</Button
-          >
-          <Button
-            class="mr-2 shadow-md"
-            variant="outline-primary"
-            @click="
-              () => {
-                setLevel2NonworkEditModal(false);
-              }
-            "
-            >취소</Button
-          >
-        </div>
-      </div>
-    </Dialog.Panel>
-  </Dialog>
-
-  <!-- <Dialog
-    size="md"
-    :open="level2_useitem_editModal"
-    @close="setLevel2UseitemEditModal(false)"
-  >
-    <Dialog.Panel class="p-10 text-center">
-      <div class="mb-5" style="font-weight: bold">투입 자재 편집</div>
-
-      <div style="text-align: left">
-        <div class="mt-3">
-          <FormLabel htmlFor="vertical-form-4">코드</FormLabel>
-          <FormInput type="text" placeholder="" readonly />
-        </div>
-
-        <div class="mt-3">
-          <FormLabel htmlFor="vertical-form-4">수량</FormLabel>
-          <FormInput type="number" placeholder="" />
-        </div>
-        <div class="mt-5 text-right">
-          <Button
-            class="mr-2 shadow-md"
-            variant="primary"
-            @click="async () => {}"
-            >확인</Button
-          >
-          <Button
-            class="mr-2 shadow-md"
-            variant="outline-primary"
-            @click="
-              () => {
-                setLevel2UseitemEditModal(false);
-              }
-            "
-            >취소</Button
-          >
-        </div>
-      </div>
-    </Dialog.Panel>
-  </Dialog> -->
-  <!-- END: LEVEL2 Edit Modal -->
-
-  <!-- LEVEL2 모달 종료 -->
-
-  <!-- #######################################################################################################################
-  #######################################################################################################################
-  ####################################################################################################################### -->
+  <!-- ########################################################################################################################
+  ######################################################  상세  ###############################################################
+  ######################################################################################################################### -->
 
   <!-- BEGIN: Detail Modal Content -->
   <Dialog
@@ -2046,1404 +2687,4 @@ const setPrintDocumentModal = (value: boolean) => {
     </Dialog.Panel>
   </Dialog>
   <!-- END: 수주서 확인 Modal -->
-
-  <!-- #######################################################################################################################
-  #######################################################################################################################
-  ####################################################################################################################### -->
-
-  <!-- BEGIN: Facility Modal Content -->
-  <Dialog size="xxl" :open="facilityModal" @close="setFacilityModal(false)">
-    <Dialog.Panel class="p-10 text-center">
-      <!--Facility Modal 내용 시작-->
-      <div class="mb-3" style="font-weight: bold; font-size: x-large">
-        설비 리스트
-      </div>
-      <div class="grid grid-cols-12 gap-1 mt-1">
-        <div
-          class="flex flex-wrap itemlist-center col-span-12 mt-2 mb-2 intro-y sm:flex-nowrap"
-        >
-          <div class="hidden mx-auto md:block text-slate-500"></div>
-          <div class="ml-2">
-            <FormSelect
-              v-model="searchKey_facility"
-              class="w-30 mt-3 !box sm:mt-0"
-            >
-              <option>전체</option>
-              <option>거래처명</option>
-              <option>사업자번호</option>
-              <option>주소</option>
-              <option>비고</option>
-            </FormSelect>
-          </div>
-          <div class="w-full mt-3 sm:w-auto sm:mt-0 sm:ml-auto md:ml-2">
-            <div class="relative w-56 text-slate-500">
-              <FormInput
-                type="text"
-                class="w-56 pr-10 !box"
-                v-model="searchInput_facility"
-                @keyup.enter="
-                  () => {
-                    search_facility();
-                    pageChangeFirst_facility();
-                  }
-                "
-                placeholder="검색어를 입력해주세요"
-              />
-              <button
-                @click="
-                  () => {
-                    search_facility();
-                    pageChangeFirst_facility();
-                  }
-                "
-              >
-                <Lucide
-                  icon="Search"
-                  class="absolute inset-y-0 right-0 w-4 h-4 my-auto mr-3"
-                />
-              </button>
-            </div>
-          </div>
-        </div>
-        <!-- BEGIN: Pagination-->
-        <div
-          class="flex flex-wrap itemlist-center col-span-12 mt-0 intro-y sm:flex-nowrap"
-        >
-          <div>
-            <FormSelect
-              v-model="sortKey_facility"
-              class="w-30 mt-3 !box sm:mt-0"
-            >
-              <option>등록일</option>
-              <option>거래처명</option>
-              <option>사업자번호</option>
-              <option>주소</option>
-            </FormSelect>
-          </div>
-          <div class="ml-3">
-            <Button
-              class="shadow-md"
-              as="a"
-              variant="outline-primary"
-              v-if="sortOrder_facility == '오름차순'"
-              @click="sortOrderToggle_facility"
-            >
-              <Lucide icon="SortAsc" class="w-4 h-4 mr-1" />
-
-              {{ sortOrder_facility }}</Button
-            >
-            <Button
-              class="shadow-md"
-              as="a"
-              variant="outline-danger"
-              v-if="sortOrder_facility == '내림차순'"
-              @click="sortOrderToggle_facility"
-            >
-              <Lucide icon="SortDesc" class="w-4 h-4 mr-1" />
-
-              {{ sortOrder_facility }}</Button
-            >
-          </div>
-          <div class="ml-5">
-            <FormSelect
-              class="w-20 mt-3 !box sm:mt-0"
-              v-model="rowsPerPage_facility"
-              @change="pageChangeFirst_facility"
-            >
-              <option>10</option>
-              <option>25</option>
-              <option>50</option>
-              <option>100</option>
-              <option :value="task_modal_facility.dataCount.value">전체</option>
-            </FormSelect>
-          </div>
-          <div>
-            <PaginationComponent
-              class="pagination-component"
-              v-model="currentPage_facility"
-              :numberOfPages="task_modal_facility.numberOfPages.value"
-            />
-          </div>
-          <div class="hidden mx-auto md:block text-slate-500"></div>
-          <div>
-            <span class="mr-3"
-              >[ {{ task_modal_facility.dataCount }}개 데이터 조회됨 ]
-            </span>
-            <span class="mr-4">
-              [ {{ currentPage_facility }} /
-              {{ task_modal_facility.numberOfPages }} 페이지 ]</span
-            >
-          </div>
-        </div>
-        <!-- END: Pagination-->
-        <!-- BEGIN: Data List -->
-        <!-- style="height: calc(100vh - 350px)" : 브라우저 화면 창크기에 맞게 변경됨 -->
-        <div class="col-span-12 overflow-auto intro-y lg:overflow-visible">
-          <div
-            class="mr-3"
-            style="overflow-y: scroll; overflow-x: hidden; height: 580px"
-          >
-            <Table class="border-spacing-y-[6px] border-separate -mt-2">
-              <Table.Thead
-                class="bg-slate-100"
-                style="position: sticky; top: 0px; z-index: 2"
-              >
-                <Table.Tr>
-                  <Table.Th
-                    class="text-center border-b-0 whitespace-nowrap"
-                    :style="table_setting_facility.순번.style"
-                  >
-                    {{ table_setting_facility.순번.name }}
-                  </Table.Th>
-                  <Table.Th
-                    class="text-center border-b-0 whitespace-nowrap"
-                    :style="table_setting_facility.항목1.style"
-                  >
-                    {{ table_setting_facility.항목1.name }}
-                  </Table.Th>
-                  <Table.Th
-                    class="text-center border-b-0 whitespace-nowrap"
-                    :style="table_setting_facility.항목2.style"
-                  >
-                    {{ table_setting_facility.항목2.name }}
-                  </Table.Th>
-                  <Table.Th
-                    class="text-center border-b-0 whitespace-nowrap"
-                    :style="table_setting_facility.항목3.style"
-                  >
-                    {{ table_setting_facility.항목3.name }}
-                  </Table.Th>
-                  <Table.Th
-                    class="text-center border-b-0 whitespace-nowrap"
-                    :style="table_setting_facility.항목4.style"
-                  >
-                    {{ table_setting_facility.항목4.name }}
-                  </Table.Th>
-                  <Table.Th
-                    class="text-center border-b-0 whitespace-nowrap"
-                    :style="table_setting_facility.항목5.style"
-                  >
-                    {{ table_setting_facility.항목5.name }}
-                  </Table.Th>
-                </Table.Tr>
-              </Table.Thead>
-              <Table.Tbody style="position: relative; z-index: 1">
-                <Table.Tr
-                  v-for="(todo, index) in task_modal_facility.datas.value"
-                  :key="todo.NO"
-                  class="intro-x hover:bg-gray-200 active:bg-gray-300 cursor-pointer"
-                >
-                  <Table.Td
-                    class="first:rounded-l-md last:rounded-r-md text-center border-b-2 dark:bg-darkmode-600"
-                    :style="table_setting_facility.순번.style"
-                    @click="importFacility(todo.NO)"
-                  >
-                    <div>
-                      {{
-                        index +
-                        1 +
-                        (currentPage_facility - 1) * rowsPerPage_facility
-                      }}
-                    </div>
-                  </Table.Td>
-                  <Table.Td
-                    class="first:rounded-l-md last:rounded-r-md text-center border-b-2 dark:bg-darkmode-600"
-                    :style="table_setting_facility.항목1.style"
-                    @click="importFacility(todo.NO)"
-                  >
-                    <div>{{ todo[table_setting_facility.항목1.name] }}</div>
-                  </Table.Td>
-                  <Table.Td
-                    class="first:rounded-l-md last:rounded-r-md text-center border-b-2 dark:bg-darkmode-600"
-                    :style="table_setting_facility.항목2.style"
-                    @click="importFacility(todo.NO)"
-                  >
-                    <div>{{ todo[table_setting_facility.항목2.name] }}</div>
-                  </Table.Td>
-                  <Table.Td
-                    class="first:rounded-l-md last:rounded-r-md text-center border-b-2 dark:bg-darkmode-600"
-                    :style="table_setting_facility.항목3.style"
-                    @click="importFacility(todo.NO)"
-                  >
-                    <div>{{ todo[table_setting_facility.항목3.name] }}</div>
-                  </Table.Td>
-                  <Table.Td
-                    class="first:rounded-l-md last:rounded-r-md text-center border-b-2 dark:bg-darkmode-600"
-                    :style="table_setting_facility.항목4.style"
-                    @click="importFacility(todo.NO)"
-                  >
-                    <div>{{ todo[table_setting_facility.항목4.name] }}</div>
-                  </Table.Td>
-                  <Table.Td
-                    class="first:rounded-l-md last:rounded-r-md text-center border-b-2 dark:bg-darkmode-600"
-                    :style="table_setting_facility.항목5.style"
-                    @click="importFacility(todo.NO)"
-                  >
-                    <div>{{ todo[table_setting_facility.항목5.name] }}</div>
-                  </Table.Td>
-                </Table.Tr>
-              </Table.Tbody>
-            </Table>
-            <div
-              class="text-center mt-20"
-              v-if="task_modal_facility.dataCount.value == 0"
-            >
-              저장된 데이터가 없습니다.
-            </div>
-          </div>
-        </div>
-        <!-- END: Data List -->
-      </div>
-      <div style="text-align: left">
-        <div class="mt-5 text-right">
-          <Button
-            class="mr-2 shadow-md"
-            variant="outline-primary"
-            @click="setFacilityModal(false)"
-            >취소</Button
-          >
-        </div>
-      </div>
-      <!--Modal 내용 끝-->
-    </Dialog.Panel>
-  </Dialog>
-  <!-- END: Facility Modal Content -->
-
-  <!-- #######################################################################################################################
-  #######################################################################################################################
-  ####################################################################################################################### -->
-
-  <!-- BEGIN: User Modal Content -->
-  <Dialog size="xxl" :open="userModal" @close="setUserModal(false)">
-    <Dialog.Panel class="p-10 text-center">
-      <!--User Modal 내용 시작-->
-      <div class="mb-3" style="font-weight: bold; font-size: x-large">
-        작업자 리스트
-      </div>
-      <div class="grid grid-cols-12 gap-1 mt-1">
-        <div
-          class="flex flex-wrap itemlist-center col-span-12 mt-2 mb-2 intro-y sm:flex-nowrap"
-        >
-          <div class="hidden mx-auto md:block text-slate-500"></div>
-          <div class="ml-2">
-            <FormSelect v-model="searchKey_user" class="w-30 mt-3 !box sm:mt-0">
-              <option>전체</option>
-              <option>거래처명</option>
-              <option>사업자번호</option>
-              <option>주소</option>
-              <option>비고</option>
-            </FormSelect>
-          </div>
-          <div class="w-full mt-3 sm:w-auto sm:mt-0 sm:ml-auto md:ml-2">
-            <div class="relative w-56 text-slate-500">
-              <FormInput
-                type="text"
-                class="w-56 pr-10 !box"
-                v-model="searchInput_user"
-                @keyup.enter="
-                  () => {
-                    search_user();
-                    pageChangeFirst_user();
-                  }
-                "
-                placeholder="검색어를 입력해주세요"
-              />
-              <button
-                @click="
-                  () => {
-                    search_user();
-                    pageChangeFirst_user();
-                  }
-                "
-              >
-                <Lucide
-                  icon="Search"
-                  class="absolute inset-y-0 right-0 w-4 h-4 my-auto mr-3"
-                />
-              </button>
-            </div>
-          </div>
-        </div>
-        <!-- BEGIN: Pagination-->
-        <div
-          class="flex flex-wrap itemlist-center col-span-12 mt-0 intro-y sm:flex-nowrap"
-        >
-          <div>
-            <FormSelect v-model="sortKey_user" class="w-30 mt-3 !box sm:mt-0">
-              <option>등록일</option>
-              <option>거래처명</option>
-              <option>사업자번호</option>
-              <option>주소</option>
-            </FormSelect>
-          </div>
-          <div class="ml-3">
-            <Button
-              class="shadow-md"
-              as="a"
-              variant="outline-primary"
-              v-if="sortOrder_user == '오름차순'"
-              @click="sortOrderToggle_user"
-            >
-              <Lucide icon="SortAsc" class="w-4 h-4 mr-1" />
-
-              {{ sortOrder_user }}</Button
-            >
-            <Button
-              class="shadow-md"
-              as="a"
-              variant="outline-danger"
-              v-if="sortOrder_user == '내림차순'"
-              @click="sortOrderToggle_user"
-            >
-              <Lucide icon="SortDesc" class="w-4 h-4 mr-1" />
-
-              {{ sortOrder_user }}</Button
-            >
-          </div>
-          <div class="ml-5">
-            <FormSelect
-              class="w-20 mt-3 !box sm:mt-0"
-              v-model="rowsPerPage_user"
-              @change="pageChangeFirst_user"
-            >
-              <option>10</option>
-              <option>25</option>
-              <option>50</option>
-              <option>100</option>
-              <option :value="task_modal_user.dataCount.value">전체</option>
-            </FormSelect>
-          </div>
-          <div>
-            <PaginationComponent
-              class="pagination-component"
-              v-model="currentPage_user"
-              :numberOfPages="task_modal_user.numberOfPages.value"
-            />
-          </div>
-          <div class="hidden mx-auto md:block text-slate-500"></div>
-          <div>
-            <span class="mr-3"
-              >[ {{ task_modal_user.dataCount }}개 데이터 조회됨 ]
-            </span>
-            <span class="mr-4">
-              [ {{ currentPage_user }} /
-              {{ task_modal_user.numberOfPages }} 페이지 ]</span
-            >
-          </div>
-        </div>
-        <!-- END: Pagination-->
-        <!-- BEGIN: Data List -->
-        <!-- style="height: calc(100vh - 350px)" : 브라우저 화면 창크기에 맞게 변경됨 -->
-        <div class="col-span-12 overflow-auto intro-y lg:overflow-visible">
-          <div
-            class="mr-3"
-            style="overflow-y: scroll; overflow-x: hidden; height: 580px"
-          >
-            <Table class="border-spacing-y-[6px] border-separate -mt-2">
-              <Table.Thead
-                class="bg-slate-100"
-                style="position: sticky; top: 0px; z-index: 2"
-              >
-                <Table.Tr>
-                  <Table.Th
-                    class="text-center border-b-0 whitespace-nowrap"
-                    :style="table_setting_user.순번.style"
-                  >
-                    {{ table_setting_user.순번.name }}
-                  </Table.Th>
-                  <Table.Th
-                    class="text-center border-b-0 whitespace-nowrap"
-                    :style="table_setting_user.항목1.style"
-                  >
-                    {{ table_setting_user.항목1.name }}
-                  </Table.Th>
-                  <Table.Th
-                    class="text-center border-b-0 whitespace-nowrap"
-                    :style="table_setting_user.항목2.style"
-                  >
-                    {{ table_setting_user.항목2.name }}
-                  </Table.Th>
-                  <Table.Th
-                    class="text-center border-b-0 whitespace-nowrap"
-                    :style="table_setting_user.항목3.style"
-                  >
-                    {{ table_setting_user.항목3.name }}
-                  </Table.Th>
-                  <Table.Th
-                    class="text-center border-b-0 whitespace-nowrap"
-                    :style="table_setting_user.항목4.style"
-                  >
-                    {{ table_setting_user.항목4.name }}
-                  </Table.Th>
-                  <Table.Th
-                    class="text-center border-b-0 whitespace-nowrap"
-                    :style="table_setting_user.항목5.style"
-                  >
-                    {{ table_setting_user.항목5.name }}
-                  </Table.Th>
-                </Table.Tr>
-              </Table.Thead>
-              <Table.Tbody style="position: relative; z-index: 1">
-                <Table.Tr
-                  v-for="(todo, index) in task_modal_user.datas.value"
-                  :key="todo.아이디"
-                  class="intro-x hover:bg-gray-200 active:bg-gray-300 cursor-pointer"
-                >
-                  <Table.Td
-                    class="first:rounded-l-md last:rounded-r-md text-center border-b-2 dark:bg-darkmode-600"
-                    :style="table_setting_user.순번.style"
-                    @click="importUser(todo.아이디)"
-                  >
-                    <div>
-                      {{
-                        index + 1 + (currentPage_user - 1) * rowsPerPage_user
-                      }}
-                    </div>
-                  </Table.Td>
-                  <Table.Td
-                    class="first:rounded-l-md last:rounded-r-md text-center border-b-2 dark:bg-darkmode-600"
-                    :style="table_setting_user.항목1.style"
-                    @click="importUser(todo.아이디)"
-                  >
-                    <div>{{ todo[table_setting_user.항목1.name] }}</div>
-                  </Table.Td>
-                  <Table.Td
-                    class="first:rounded-l-md last:rounded-r-md text-center border-b-2 dark:bg-darkmode-600"
-                    :style="table_setting_user.항목2.style"
-                    @click="importUser(todo.아이디)"
-                  >
-                    <div>{{ todo[table_setting_user.항목2.name] }}</div>
-                  </Table.Td>
-                  <Table.Td
-                    class="first:rounded-l-md last:rounded-r-md text-center border-b-2 dark:bg-darkmode-600"
-                    :style="table_setting_user.항목3.style"
-                    @click="importUser(todo.아이디)"
-                  >
-                    <div>{{ todo[table_setting_user.항목3.name] }}</div>
-                  </Table.Td>
-                  <Table.Td
-                    class="first:rounded-l-md last:rounded-r-md text-center border-b-2 dark:bg-darkmode-600"
-                    :style="table_setting_user.항목4.style"
-                    @click="importUser(todo.아이디)"
-                  >
-                    <div>{{ todo[table_setting_user.항목4.name] }}</div>
-                  </Table.Td>
-                  <Table.Td
-                    class="first:rounded-l-md last:rounded-r-md text-center border-b-2 dark:bg-darkmode-600"
-                    :style="table_setting_user.항목5.style"
-                    @click="importUser(todo.아이디)"
-                  >
-                    <div>{{ todo[table_setting_user.항목5.name] }}</div>
-                  </Table.Td>
-                </Table.Tr>
-              </Table.Tbody>
-            </Table>
-            <div
-              class="text-center mt-20"
-              v-if="task_modal_user.dataCount.value == 0"
-            >
-              저장된 데이터가 없습니다.
-            </div>
-          </div>
-        </div>
-        <!-- END: Data List -->
-      </div>
-      <div style="text-align: left">
-        <div class="mt-5 text-right">
-          <Button
-            class="mr-2 shadow-md"
-            variant="outline-primary"
-            @click="setUserModal(false)"
-            >취소</Button
-          >
-        </div>
-      </div>
-      <!--Modal 내용 끝-->
-    </Dialog.Panel>
-  </Dialog>
-  <!-- END: User Modal Content -->
-
-  <!-- #######################################################################################################################
-  #######################################################################################################################
-  ####################################################################################################################### -->
-
-  <!-- BEGIN: ItemProcess Modal Content -->
-  <Dialog
-    size="xxl"
-    :open="itemProcessModal"
-    @close="setItemProcessModal(false)"
-  >
-    <Dialog.Panel class="p-10 text-center">
-      <!--ItemProcess Modal 내용 시작-->
-      <div class="mb-3" style="font-weight: bold; font-size: x-large">
-        품목재공 리스트
-      </div>
-      <div class="grid grid-cols-12 gap-1 mt-1">
-        <div
-          class="flex flex-wrap itemlist-center col-span-12 mt-2 mb-2 intro-y sm:flex-nowrap"
-        >
-          <div class="hidden mx-auto md:block text-slate-500"></div>
-          <div class="ml-2">
-            <FormSelect
-              v-model="searchKey_itemProcess"
-              class="w-30 mt-3 !box sm:mt-0"
-            >
-              <option>전체</option>
-              <option>거래처명</option>
-              <option>사업자번호</option>
-              <option>주소</option>
-              <option>비고</option>
-            </FormSelect>
-          </div>
-          <div class="w-full mt-3 sm:w-auto sm:mt-0 sm:ml-auto md:ml-2">
-            <div class="relative w-56 text-slate-500">
-              <FormInput
-                type="text"
-                class="w-56 pr-10 !box"
-                v-model="searchInput_itemProcess"
-                @keyup.enter="
-                  () => {
-                    search_itemProcess();
-                    pageChangeFirst_itemProcess();
-                  }
-                "
-                placeholder="검색어를 입력해주세요"
-              />
-              <button
-                @click="
-                  () => {
-                    search_itemProcess();
-                    pageChangeFirst_itemProcess();
-                  }
-                "
-              >
-                <Lucide
-                  icon="Search"
-                  class="absolute inset-y-0 right-0 w-4 h-4 my-auto mr-3"
-                />
-              </button>
-            </div>
-          </div>
-        </div>
-        <!-- BEGIN: Pagination-->
-        <div
-          class="flex flex-wrap itemlist-center col-span-12 mt-0 intro-y sm:flex-nowrap"
-        >
-          <div>
-            <FormSelect
-              v-model="sortKey_itemProcess"
-              class="w-30 mt-3 !box sm:mt-0"
-            >
-              <option>등록일</option>
-              <option>거래처명</option>
-              <option>사업자번호</option>
-              <option>주소</option>
-            </FormSelect>
-          </div>
-          <div class="ml-3">
-            <Button
-              class="shadow-md"
-              as="a"
-              variant="outline-primary"
-              v-if="sortOrder_itemProcess == '오름차순'"
-              @click="sortOrderToggle_itemProcess"
-            >
-              <Lucide icon="SortAsc" class="w-4 h-4 mr-1" />
-
-              {{ sortOrder_itemProcess }}</Button
-            >
-            <Button
-              class="shadow-md"
-              as="a"
-              variant="outline-danger"
-              v-if="sortOrder_itemProcess == '내림차순'"
-              @click="sortOrderToggle_itemProcess"
-            >
-              <Lucide icon="SortDesc" class="w-4 h-4 mr-1" />
-
-              {{ sortOrder_itemProcess }}</Button
-            >
-          </div>
-          <div class="ml-5">
-            <FormSelect
-              class="w-20 mt-3 !box sm:mt-0"
-              v-model="rowsPerPage_itemProcess"
-              @change="pageChangeFirst_itemProcess"
-            >
-              <option>10</option>
-              <option>25</option>
-              <option>50</option>
-              <option>100</option>
-              <option :value="task_modal_itemProcess.dataCount.value">
-                전체
-              </option>
-            </FormSelect>
-          </div>
-          <div>
-            <PaginationComponent
-              class="pagination-component"
-              v-model="currentPage_itemProcess"
-              :numberOfPages="task_modal_itemProcess.numberOfPages.value"
-            />
-          </div>
-          <div class="hidden mx-auto md:block text-slate-500"></div>
-          <div>
-            <span class="mr-3"
-              >[ {{ task_modal_itemProcess.dataCount }}개 데이터 조회됨 ]
-            </span>
-            <span class="mr-4">
-              [ {{ currentPage_itemProcess }} /
-              {{ task_modal_itemProcess.numberOfPages }} 페이지 ]</span
-            >
-          </div>
-        </div>
-        <!-- END: Pagination-->
-        <!-- BEGIN: Data List -->
-        <!-- style="height: calc(100vh - 350px)" : 브라우저 화면 창크기에 맞게 변경됨 -->
-        <div class="col-span-12 overflow-auto intro-y lg:overflow-visible">
-          <div
-            class="mr-3"
-            style="overflow-y: scroll; overflow-x: hidden; height: 580px"
-          >
-            <Table class="border-spacing-y-[6px] border-separate -mt-2">
-              <Table.Thead
-                class="bg-slate-100"
-                style="position: sticky; top: 0px; z-index: 2"
-              >
-                <Table.Tr>
-                  <Table.Th
-                    class="text-center border-b-0 whitespace-nowrap"
-                    :style="table_setting_itemProcess.순번.style"
-                  >
-                    {{ table_setting_itemProcess.순번.name }}
-                  </Table.Th>
-                  <Table.Th
-                    class="text-center border-b-0 whitespace-nowrap"
-                    :style="table_setting_itemProcess.항목1.style"
-                  >
-                    {{ table_setting_itemProcess.항목1.name }}
-                  </Table.Th>
-                  <Table.Th
-                    class="text-center border-b-0 whitespace-nowrap"
-                    :style="table_setting_itemProcess.항목2.style"
-                  >
-                    {{ table_setting_itemProcess.항목2.name }}
-                  </Table.Th>
-                  <Table.Th
-                    class="text-center border-b-0 whitespace-nowrap"
-                    :style="table_setting_itemProcess.항목3.style"
-                  >
-                    {{ table_setting_itemProcess.항목3.name }}
-                  </Table.Th>
-                  <Table.Th
-                    class="text-center border-b-0 whitespace-nowrap"
-                    :style="table_setting_itemProcess.항목4.style"
-                  >
-                    {{ table_setting_itemProcess.항목4.name }}
-                  </Table.Th>
-                  <Table.Th
-                    class="text-center border-b-0 whitespace-nowrap"
-                    :style="table_setting_itemProcess.항목5.style"
-                  >
-                    {{ table_setting_itemProcess.항목5.name }}
-                  </Table.Th>
-                  <Table.Th
-                    class="text-center border-b-0 whitespace-nowrap"
-                    :style="table_setting_itemProcess.항목6.style"
-                  >
-                    {{ table_setting_itemProcess.항목6.name }}
-                  </Table.Th>
-                  <Table.Th
-                    class="text-center border-b-0 whitespace-nowrap"
-                    :style="table_setting_itemProcess.항목7.style"
-                  >
-                    {{ table_setting_itemProcess.항목7.name }}
-                  </Table.Th>
-                  <Table.Th
-                    class="text-center border-b-0 whitespace-nowrap"
-                    :style="table_setting_itemProcess.항목8.style"
-                  >
-                    {{ table_setting_itemProcess.항목8.name }}
-                  </Table.Th>
-                  <Table.Th
-                    class="text-center border-b-0 whitespace-nowrap"
-                    :style="table_setting_itemProcess.항목9.style"
-                  >
-                    {{ table_setting_itemProcess.항목9.name }}
-                  </Table.Th>
-                  <Table.Th
-                    class="text-center border-b-0 whitespace-nowrap"
-                    :style="table_setting_itemProcess.항목10.style"
-                  >
-                    {{ table_setting_itemProcess.항목10.name }}
-                  </Table.Th>
-                </Table.Tr>
-              </Table.Thead>
-              <Table.Tbody style="position: relative; z-index: 1">
-                <Table.Tr
-                  v-for="(todo, index) in task_modal_itemProcess.datas.value"
-                  :key="todo.NO"
-                  class="intro-x hover:bg-gray-200 active:bg-gray-300 cursor-pointer"
-                >
-                  <Table.Td
-                    class="first:rounded-l-md last:rounded-r-md text-center border-b-2 dark:bg-darkmode-600"
-                    :style="table_setting_itemProcess.순번.style"
-                    @click="importItemProcess(todo.NO)"
-                  >
-                    <div>
-                      {{
-                        index +
-                        1 +
-                        (currentPage_itemProcess - 1) * rowsPerPage_itemProcess
-                      }}
-                    </div>
-                  </Table.Td>
-                  <Table.Td
-                    class="first:rounded-l-md last:rounded-r-md text-center border-b-2 dark:bg-darkmode-600"
-                    :style="table_setting_itemProcess.항목1.style"
-                    @click="
-                      importItemProcess(todo.작업지시공정NO, todo.LOT코드)
-                    "
-                  >
-                    <div>{{ todo[table_setting_itemProcess.항목1.name] }}</div>
-                  </Table.Td>
-                  <Table.Td
-                    class="first:rounded-l-md last:rounded-r-md text-center border-b-2 dark:bg-darkmode-600"
-                    :style="table_setting_itemProcess.항목2.style"
-                    @click="
-                      importItemProcess(todo.작업지시공정NO, todo.LOT코드)
-                    "
-                  >
-                    <div>{{ todo[table_setting_itemProcess.항목2.name] }}</div>
-                  </Table.Td>
-                  <Table.Td
-                    class="first:rounded-l-md last:rounded-r-md text-center border-b-2 dark:bg-darkmode-600"
-                    :style="table_setting_itemProcess.항목3.style"
-                    @click="
-                      importItemProcess(todo.작업지시공정NO, todo.LOT코드)
-                    "
-                  >
-                    <div>{{ todo[table_setting_itemProcess.항목3.name] }}</div>
-                  </Table.Td>
-                  <Table.Td
-                    class="first:rounded-l-md last:rounded-r-md text-center border-b-2 dark:bg-darkmode-600"
-                    :style="table_setting_itemProcess.항목4.style"
-                    @click="
-                      importItemProcess(todo.작업지시공정NO, todo.LOT코드)
-                    "
-                  >
-                    <div>{{ todo[table_setting_itemProcess.항목4.name] }}</div>
-                  </Table.Td>
-                  <Table.Td
-                    class="first:rounded-l-md last:rounded-r-md text-center border-b-2 dark:bg-darkmode-600"
-                    :style="table_setting_itemProcess.항목5.style"
-                    @click="
-                      importItemProcess(todo.작업지시공정NO, todo.LOT코드)
-                    "
-                  >
-                    <div>{{ todo[table_setting_itemProcess.항목5.name] }}</div>
-                  </Table.Td>
-                  <Table.Td
-                    class="first:rounded-l-md last:rounded-r-md text-center border-b-2 dark:bg-darkmode-600"
-                    :style="table_setting_itemProcess.항목6.style"
-                    @click="
-                      importItemProcess(todo.작업지시공정NO, todo.LOT코드)
-                    "
-                  >
-                    <div>{{ todo[table_setting_itemProcess.항목6.name] }}</div>
-                  </Table.Td>
-                  <Table.Td
-                    class="first:rounded-l-md last:rounded-r-md text-center border-b-2 dark:bg-darkmode-600"
-                    :style="table_setting_itemProcess.항목7.style"
-                    @click="
-                      importItemProcess(todo.작업지시공정NO, todo.LOT코드)
-                    "
-                  >
-                    <div>{{ todo[table_setting_itemProcess.항목7.name] }}</div>
-                  </Table.Td>
-                  <Table.Td
-                    class="first:rounded-l-md last:rounded-r-md text-center border-b-2 dark:bg-darkmode-600"
-                    :style="table_setting_itemProcess.항목8.style"
-                    @click="
-                      importItemProcess(todo.작업지시공정NO, todo.LOT코드)
-                    "
-                  >
-                    <div>{{ todo[table_setting_itemProcess.항목8.name] }}</div>
-                  </Table.Td>
-                  <Table.Td
-                    class="first:rounded-l-md last:rounded-r-md text-center border-b-2 dark:bg-darkmode-600"
-                    :style="table_setting_itemProcess.항목9.style"
-                    @click="
-                      importItemProcess(todo.작업지시공정NO, todo.LOT코드)
-                    "
-                  >
-                    <div>{{ todo[table_setting_itemProcess.항목9.name] }}</div>
-                  </Table.Td>
-                  <Table.Td
-                    class="first:rounded-l-md last:rounded-r-md text-center border-b-2 dark:bg-darkmode-600"
-                    :style="table_setting_itemProcess.항목10.style"
-                    @click="
-                      importItemProcess(todo.작업지시공정NO, todo.LOT코드)
-                    "
-                  >
-                    <div>{{ todo[table_setting_itemProcess.항목10.name] }}</div>
-                  </Table.Td>
-                </Table.Tr>
-              </Table.Tbody>
-            </Table>
-            <div
-              class="text-center mt-20"
-              v-if="task_modal_itemProcess.dataCount.value == 0"
-            >
-              저장된 데이터가 없습니다.
-            </div>
-          </div>
-        </div>
-        <!-- END: Data List -->
-      </div>
-      <div style="text-align: left">
-        <div class="mt-5 text-right">
-          <Button
-            class="mr-2 shadow-md"
-            variant="outline-primary"
-            @click="setItemProcessModal(false)"
-            >취소</Button
-          >
-        </div>
-      </div>
-      <!--Modal 내용 끝-->
-    </Dialog.Panel>
-  </Dialog>
-  <!-- END: ItemProcess Modal Content -->
-
-  <!-- #######################################################################################################################
-  #######################################################################################################################
-  ####################################################################################################################### -->
-
-  <!-- BEGIN: Defect Modal Content -->
-  <Dialog size="xxl" :open="defectModal" @close="setDefectModal(false)">
-    <Dialog.Panel class="p-10 text-center">
-      <!--ItemProcess Modal 내용 시작-->
-      <div class="mb-3" style="font-weight: bold; font-size: x-large">
-        불량 리스트
-      </div>
-      <div class="grid grid-cols-12 gap-1 mt-1">
-        <div
-          class="flex flex-wrap itemlist-center col-span-12 mt-2 mb-2 intro-y sm:flex-nowrap"
-        >
-          <div class="hidden mx-auto md:block text-slate-500"></div>
-          <div class="ml-2">
-            <FormSelect
-              v-model="searchKey_defect"
-              class="w-30 mt-3 !box sm:mt-0"
-            >
-              <option>전체</option>
-              <option>거래처명</option>
-              <option>사업자번호</option>
-              <option>주소</option>
-              <option>비고</option>
-            </FormSelect>
-          </div>
-          <div class="w-full mt-3 sm:w-auto sm:mt-0 sm:ml-auto md:ml-2">
-            <div class="relative w-56 text-slate-500">
-              <FormInput
-                type="text"
-                class="w-56 pr-10 !box"
-                v-model="searchInput_defect"
-                @keyup.enter="
-                  () => {
-                    search_defect();
-                    pageChangeFirst_defect();
-                  }
-                "
-                placeholder="검색어를 입력해주세요"
-              />
-              <button
-                @click="
-                  () => {
-                    search_defect();
-                    pageChangeFirst_defect();
-                  }
-                "
-              >
-                <Lucide
-                  icon="Search"
-                  class="absolute inset-y-0 right-0 w-4 h-4 my-auto mr-3"
-                />
-              </button>
-            </div>
-          </div>
-        </div>
-        <!-- BEGIN: Pagination-->
-        <div
-          class="flex flex-wrap itemlist-center col-span-12 mt-0 intro-y sm:flex-nowrap"
-        >
-          <div>
-            <FormSelect v-model="sortKey_defect" class="w-30 mt-3 !box sm:mt-0">
-              <option>등록일</option>
-              <option>거래처명</option>
-              <option>사업자번호</option>
-              <option>주소</option>
-            </FormSelect>
-          </div>
-          <div class="ml-3">
-            <Button
-              class="shadow-md"
-              as="a"
-              variant="outline-primary"
-              v-if="sortOrder_defect == '오름차순'"
-              @click="sortOrderToggle_defect"
-            >
-              <Lucide icon="SortAsc" class="w-4 h-4 mr-1" />
-
-              {{ sortOrder_defect }}</Button
-            >
-            <Button
-              class="shadow-md"
-              as="a"
-              variant="outline-danger"
-              v-if="sortOrder_defect == '내림차순'"
-              @click="sortOrderToggle_defect"
-            >
-              <Lucide icon="SortDesc" class="w-4 h-4 mr-1" />
-
-              {{ sortOrder_defect }}</Button
-            >
-          </div>
-          <div class="ml-5">
-            <FormSelect
-              class="w-20 mt-3 !box sm:mt-0"
-              v-model="rowsPerPage_defect"
-              @change="pageChangeFirst_defect"
-            >
-              <option>10</option>
-              <option>25</option>
-              <option>50</option>
-              <option>100</option>
-              <option :value="task_modal_defect.dataCount.value">전체</option>
-            </FormSelect>
-          </div>
-          <div>
-            <PaginationComponent
-              class="pagination-component"
-              v-model="currentPage_defect"
-              :numberOfPages="task_modal_defect.numberOfPages.value"
-            />
-          </div>
-          <div class="hidden mx-auto md:block text-slate-500"></div>
-          <div>
-            <span class="mr-3"
-              >[ {{ task_modal_defect.dataCount }}개 데이터 조회됨 ]
-            </span>
-            <span class="mr-4">
-              [ {{ currentPage_defect }} /
-              {{ task_modal_defect.numberOfPages }} 페이지 ]</span
-            >
-          </div>
-        </div>
-        <!-- END: Pagination-->
-        <!-- BEGIN: Data List -->
-        <!-- style="height: calc(100vh - 350px)" : 브라우저 화면 창크기에 맞게 변경됨 -->
-        <div class="col-span-12 overflow-auto intro-y lg:overflow-visible">
-          <div
-            class="mr-3"
-            style="overflow-y: scroll; overflow-x: hidden; height: 580px"
-          >
-            <Table class="border-spacing-y-[6px] border-separate -mt-2">
-              <Table.Thead
-                class="bg-slate-100"
-                style="position: sticky; top: 0px; z-index: 2"
-              >
-                <Table.Tr>
-                  <Table.Th
-                    class="text-center border-b-0 whitespace-nowrap"
-                    :style="table_setting_modal_defect.순번.style"
-                  >
-                    {{ table_setting_modal_defect.순번.name }}
-                  </Table.Th>
-                  <Table.Th
-                    class="text-center border-b-0 whitespace-nowrap"
-                    :style="table_setting_modal_defect.항목1.style"
-                  >
-                    {{ table_setting_modal_defect.항목1.name }}
-                  </Table.Th>
-                  <Table.Th
-                    class="text-center border-b-0 whitespace-nowrap"
-                    :style="table_setting_modal_defect.항목2.style"
-                  >
-                    {{ table_setting_modal_defect.항목2.name }}
-                  </Table.Th>
-                  <Table.Th
-                    class="text-center border-b-0 whitespace-nowrap"
-                    :style="table_setting_modal_defect.항목3.style"
-                  >
-                    {{ table_setting_modal_defect.항목3.name }}
-                  </Table.Th>
-                  <Table.Th
-                    class="text-center border-b-0 whitespace-nowrap"
-                    :style="table_setting_modal_defect.항목4.style"
-                  >
-                    {{ table_setting_modal_defect.항목4.name }}
-                  </Table.Th>
-                  <Table.Th
-                    class="text-center border-b-0 whitespace-nowrap"
-                    :style="table_setting_modal_defect.항목5.style"
-                  >
-                    {{ table_setting_modal_defect.항목5.name }}
-                  </Table.Th>
-                </Table.Tr>
-              </Table.Thead>
-              <Table.Tbody style="position: relative; z-index: 1">
-                <Table.Tr
-                  v-for="(todo, index) in task_modal_defect.datas.value"
-                  :key="todo.NO"
-                  class="intro-x hover:bg-gray-200 active:bg-gray-300 cursor-pointer"
-                >
-                  <Table.Td
-                    class="first:rounded-l-md last:rounded-r-md text-center border-b-2 dark:bg-darkmode-600"
-                    :style="table_setting_modal_defect.순번.style"
-                    @click="importDefect(todo.NO)"
-                  >
-                    <div>
-                      {{
-                        index +
-                        1 +
-                        (currentPage_defect - 1) * rowsPerPage_defect
-                      }}
-                    </div>
-                  </Table.Td>
-                  <Table.Td
-                    class="first:rounded-l-md last:rounded-r-md text-center border-b-2 dark:bg-darkmode-600"
-                    :style="table_setting_modal_defect.항목1.style"
-                    @click="importDefect(todo.NO)"
-                  >
-                    <div>{{ todo[table_setting_modal_defect.항목1.name] }}</div>
-                  </Table.Td>
-                  <Table.Td
-                    class="first:rounded-l-md last:rounded-r-md text-center border-b-2 dark:bg-darkmode-600"
-                    :style="table_setting_modal_defect.항목2.style"
-                    @click="importDefect(todo.NO)"
-                  >
-                    <div>{{ todo[table_setting_modal_defect.항목2.name] }}</div>
-                  </Table.Td>
-                  <Table.Td
-                    class="first:rounded-l-md last:rounded-r-md text-center border-b-2 dark:bg-darkmode-600"
-                    :style="table_setting_modal_defect.항목3.style"
-                    @click="importDefect(todo.NO)"
-                  >
-                    <div>{{ todo[table_setting_modal_defect.항목3.name] }}</div>
-                  </Table.Td>
-                  <Table.Td
-                    class="first:rounded-l-md last:rounded-r-md text-center border-b-2 dark:bg-darkmode-600"
-                    :style="table_setting_modal_defect.항목4.style"
-                    @click="importDefect(todo.NO)"
-                  >
-                    <div>{{ todo[table_setting_modal_defect.항목4.name] }}</div>
-                  </Table.Td>
-                  <Table.Td
-                    class="first:rounded-l-md last:rounded-r-md text-center border-b-2 dark:bg-darkmode-600"
-                    :style="table_setting_modal_defect.항목5.style"
-                    @click="importDefect(todo.NO)"
-                  >
-                    <div>{{ todo[table_setting_modal_defect.항목5.name] }}</div>
-                  </Table.Td>
-                </Table.Tr>
-              </Table.Tbody>
-            </Table>
-            <div
-              class="text-center mt-20"
-              v-if="task_modal_defect.dataCount.value == 0"
-            >
-              저장된 데이터가 없습니다.
-            </div>
-          </div>
-        </div>
-        <!-- END: Data List -->
-      </div>
-      <div style="text-align: left">
-        <div class="mt-5 text-right">
-          <Button
-            class="mr-2 shadow-md"
-            variant="outline-primary"
-            @click="setDefectModal(false)"
-            >취소</Button
-          >
-        </div>
-      </div>
-      <!--Modal 내용 끝-->
-    </Dialog.Panel>
-  </Dialog>
-  <!-- END: Defect Modal Content -->
-
-  <!-- #######################################################################################################################
-  #######################################################################################################################
-  ####################################################################################################################### -->
-
-  <!-- BEGIN: NonWork Modal Content -->
-  <Dialog size="xxl" :open="nonworkModal" @close="setNonworkModal(false)">
-    <Dialog.Panel class="p-10 text-center">
-      <!--ItemProcess Modal 내용 시작-->
-      <div class="mb-3" style="font-weight: bold; font-size: x-large">
-        비가동 리스트
-      </div>
-      <div class="grid grid-cols-12 gap-1 mt-1">
-        <div
-          class="flex flex-wrap itemlist-center col-span-12 mt-2 mb-2 intro-y sm:flex-nowrap"
-        >
-          <div class="hidden mx-auto md:block text-slate-500"></div>
-          <div class="ml-2">
-            <FormSelect
-              v-model="searchKey_nonwork"
-              class="w-30 mt-3 !box sm:mt-0"
-            >
-              <option>전체</option>
-              <option>거래처명</option>
-              <option>사업자번호</option>
-              <option>주소</option>
-              <option>비고</option>
-            </FormSelect>
-          </div>
-          <div class="w-full mt-3 sm:w-auto sm:mt-0 sm:ml-auto md:ml-2">
-            <div class="relative w-56 text-slate-500">
-              <FormInput
-                type="text"
-                class="w-56 pr-10 !box"
-                v-model="searchInput_nonwork"
-                @keyup.enter="
-                  () => {
-                    search_nonwork();
-                    pageChangeFirst_nonwork();
-                  }
-                "
-                placeholder="검색어를 입력해주세요"
-              />
-              <button
-                @click="
-                  () => {
-                    search_nonwork();
-                    pageChangeFirst_nonwork();
-                  }
-                "
-              >
-                <Lucide
-                  icon="Search"
-                  class="absolute inset-y-0 right-0 w-4 h-4 my-auto mr-3"
-                />
-              </button>
-            </div>
-          </div>
-        </div>
-        <!-- BEGIN: Pagination-->
-        <div
-          class="flex flex-wrap itemlist-center col-span-12 mt-0 intro-y sm:flex-nowrap"
-        >
-          <div>
-            <FormSelect
-              v-model="sortKey_nonwork"
-              class="w-30 mt-3 !box sm:mt-0"
-            >
-              <option>등록일</option>
-              <option>거래처명</option>
-              <option>사업자번호</option>
-              <option>주소</option>
-            </FormSelect>
-          </div>
-          <div class="ml-3">
-            <Button
-              class="shadow-md"
-              as="a"
-              variant="outline-primary"
-              v-if="sortOrder_nonwork == '오름차순'"
-              @click="sortOrderToggle_nonwork"
-            >
-              <Lucide icon="SortAsc" class="w-4 h-4 mr-1" />
-
-              {{ sortOrder_nonwork }}</Button
-            >
-            <Button
-              class="shadow-md"
-              as="a"
-              variant="outline-danger"
-              v-if="sortOrder_nonwork == '내림차순'"
-              @click="sortOrderToggle_nonwork"
-            >
-              <Lucide icon="SortDesc" class="w-4 h-4 mr-1" />
-
-              {{ sortOrder_nonwork }}</Button
-            >
-          </div>
-          <div class="ml-5">
-            <FormSelect
-              class="w-20 mt-3 !box sm:mt-0"
-              v-model="rowsPerPage_nonwork"
-              @change="pageChangeFirst_nonwork"
-            >
-              <option>10</option>
-              <option>25</option>
-              <option>50</option>
-              <option>100</option>
-              <option :value="task_modal_nonwork.dataCount.value">전체</option>
-            </FormSelect>
-          </div>
-          <div>
-            <PaginationComponent
-              class="pagination-component"
-              v-model="currentPage_nonwork"
-              :numberOfPages="task_modal_nonwork.numberOfPages.value"
-            />
-          </div>
-          <div class="hidden mx-auto md:block text-slate-500"></div>
-          <div>
-            <span class="mr-3"
-              >[ {{ task_modal_nonwork.dataCount }}개 데이터 조회됨 ]
-            </span>
-            <span class="mr-4">
-              [ {{ currentPage_nonwork }} /
-              {{ task_modal_nonwork.numberOfPages }} 페이지 ]</span
-            >
-          </div>
-        </div>
-        <!-- END: Pagination-->
-        <!-- BEGIN: Data List -->
-        <!-- style="height: calc(100vh - 350px)" : 브라우저 화면 창크기에 맞게 변경됨 -->
-        <div class="col-span-12 overflow-auto intro-y lg:overflow-visible">
-          <div
-            class="mr-3"
-            style="overflow-y: scroll; overflow-x: hidden; height: 580px"
-          >
-            <Table class="border-spacing-y-[6px] border-separate -mt-2">
-              <Table.Thead
-                class="bg-slate-100"
-                style="position: sticky; top: 0px; z-index: 2"
-              >
-                <Table.Tr>
-                  <Table.Th
-                    class="text-center border-b-0 whitespace-nowrap"
-                    :style="table_setting_modal_nonwork.순번.style"
-                  >
-                    {{ table_setting_modal_nonwork.순번.name }}
-                  </Table.Th>
-                  <Table.Th
-                    class="text-center border-b-0 whitespace-nowrap"
-                    :style="table_setting_modal_nonwork.항목1.style"
-                  >
-                    {{ table_setting_modal_nonwork.항목1.name }}
-                  </Table.Th>
-                  <Table.Th
-                    class="text-center border-b-0 whitespace-nowrap"
-                    :style="table_setting_modal_nonwork.항목2.style"
-                  >
-                    {{ table_setting_modal_nonwork.항목2.name }}
-                  </Table.Th>
-                  <Table.Th
-                    class="text-center border-b-0 whitespace-nowrap"
-                    :style="table_setting_modal_nonwork.항목3.style"
-                  >
-                    {{ table_setting_modal_nonwork.항목3.name }}
-                  </Table.Th>
-                  <Table.Th
-                    class="text-center border-b-0 whitespace-nowrap"
-                    :style="table_setting_modal_nonwork.항목4.style"
-                  >
-                    {{ table_setting_modal_nonwork.항목4.name }}
-                  </Table.Th>
-                  <Table.Th
-                    class="text-center border-b-0 whitespace-nowrap"
-                    :style="table_setting_modal_nonwork.항목5.style"
-                  >
-                    {{ table_setting_modal_nonwork.항목5.name }}
-                  </Table.Th>
-                </Table.Tr>
-              </Table.Thead>
-              <Table.Tbody style="position: relative; z-index: 1">
-                <Table.Tr
-                  v-for="(todo, index) in task_modal_nonwork.datas.value"
-                  :key="todo.NO"
-                  class="intro-x hover:bg-gray-200 active:bg-gray-300 cursor-pointer"
-                >
-                  <Table.Td
-                    class="first:rounded-l-md last:rounded-r-md text-center border-b-2 dark:bg-darkmode-600"
-                    :style="table_setting_modal_nonwork.순번.style"
-                    @click="importNonwork(todo.NO)"
-                  >
-                    <div>
-                      {{
-                        index +
-                        1 +
-                        (currentPage_nonwork - 1) * rowsPerPage_nonwork
-                      }}
-                    </div>
-                  </Table.Td>
-                  <Table.Td
-                    class="first:rounded-l-md last:rounded-r-md text-center border-b-2 dark:bg-darkmode-600"
-                    :style="table_setting_modal_nonwork.항목1.style"
-                    @click="importNonwork(todo.NO)"
-                  >
-                    <div>
-                      {{ todo[table_setting_modal_nonwork.항목1.name] }}
-                    </div>
-                  </Table.Td>
-                  <Table.Td
-                    class="first:rounded-l-md last:rounded-r-md text-center border-b-2 dark:bg-darkmode-600"
-                    :style="table_setting_modal_nonwork.항목2.style"
-                    @click="importNonwork(todo.NO)"
-                  >
-                    <div>
-                      {{ todo[table_setting_modal_nonwork.항목2.name] }}
-                    </div>
-                  </Table.Td>
-                  <Table.Td
-                    class="first:rounded-l-md last:rounded-r-md text-center border-b-2 dark:bg-darkmode-600"
-                    :style="table_setting_modal_nonwork.항목3.style"
-                    @click="importNonwork(todo.NO)"
-                  >
-                    <div>
-                      {{ todo[table_setting_modal_nonwork.항목3.name] }}
-                    </div>
-                  </Table.Td>
-                  <Table.Td
-                    class="first:rounded-l-md last:rounded-r-md text-center border-b-2 dark:bg-darkmode-600"
-                    :style="table_setting_modal_nonwork.항목4.style"
-                    @click="importNonwork(todo.NO)"
-                  >
-                    <div>
-                      {{ todo[table_setting_modal_nonwork.항목4.name] }}
-                    </div>
-                  </Table.Td>
-                  <Table.Td
-                    class="first:rounded-l-md last:rounded-r-md text-center border-b-2 dark:bg-darkmode-600"
-                    :style="table_setting_modal_nonwork.항목5.style"
-                    @click="importNonwork(todo.NO)"
-                  >
-                    <div>
-                      {{ todo[table_setting_modal_nonwork.항목5.name] }}
-                    </div>
-                  </Table.Td>
-                </Table.Tr>
-              </Table.Tbody>
-            </Table>
-            <div
-              class="text-center mt-20"
-              v-if="task_modal_nonwork.dataCount.value == 0"
-            >
-              저장된 데이터가 없습니다.
-            </div>
-          </div>
-        </div>
-        <!-- END: Data List -->
-      </div>
-      <div style="text-align: left">
-        <div class="mt-5 text-right">
-          <Button
-            class="mr-2 shadow-md"
-            variant="outline-primary"
-            @click="setNonworkModal(false)"
-            >취소</Button
-          >
-        </div>
-      </div>
-      <!--Modal 내용 끝-->
-    </Dialog.Panel>
-  </Dialog>
-  <!-- END: NonWork Modal Content -->
 </template>

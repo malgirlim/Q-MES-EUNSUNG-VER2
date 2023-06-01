@@ -4,6 +4,20 @@ import { getCurrentInstance } from "vue";
 import { usePagination } from "../components/Pagination/useClientSidePagination";
 import { toast } from "vue3-toastify";
 
+import {
+  시스템_개발자,
+  시스템_관리자,
+  구매_관리자,
+  구매_일반,
+  영업_관리자,
+  영업_일반,
+  품질_관리자,
+  품질_일반,
+  생산_관리자,
+  생산_일반,
+} from "../composables/authData";
+import router from "../router";
+
 export function useSendApi<T>(
   url: string, // api 보낼 주소
   currentPage: Ref<number>, // 현재페이지
@@ -16,7 +30,29 @@ export function useSendApi<T>(
   const dataCount = ref(0); // 가져온 데이터의 갯수
 
   const { proxy }: any = getCurrentInstance(); // 사용자 정보 가져오기
-  const user = proxy.gstate.account.id; // 사용자 정보에서 이름 가져오기
+  let user = proxy.gstate.account.id; // 사용자 정보에서 이름 가져오기
+
+  axios
+    .get("/api/auth")
+    .then((res: any) => {
+      proxy.gstate.account = res.data;
+      user = res.data.id;
+      if (res.data.auth == "시스템개발자") proxy.gstate.level = 시스템_개발자;
+      if (res.data.auth == "시스템관리자") proxy.gstate.level = 시스템_관리자;
+      if (res.data.auth == "구매일반") proxy.gstate.level = 구매_일반;
+      if (res.data.auth == "구매관리자") proxy.gstate.level = 구매_관리자;
+      if (res.data.auth == "영업일반") proxy.gstate.level = 영업_일반;
+      if (res.data.auth == "영업관리자") proxy.gstate.level = 영업_관리자;
+      if (res.data.auth == "생산일반") proxy.gstate.level = 생산_일반;
+      if (res.data.auth == "생산관리자") proxy.gstate.level = 생산_관리자;
+      if (res.data.auth == "품질일반") proxy.gstate.level = 품질_일반;
+      if (res.data.auth == "품질관리자") proxy.gstate.level = 품질_관리자;
+    })
+    .catch(() => {
+      if (proxy.gstate.account.id == null) {
+        router.push("/login");
+      }
+    });
 
   const noti = (data: any) => {
     Notification.requestPermission();

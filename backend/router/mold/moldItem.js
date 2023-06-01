@@ -62,12 +62,12 @@ router.get("/", async (req, res) => {
     `);
 
     // 로그기록 저장
-    await logSend(
-      (type = "메뉴열람"),
-      (ct = "메뉴를 열람함."),
-      (amount = result.recordset.length ?? 0),
-      (user = req.query.user ?? "")
-    );
+    // await logSend(
+    //   (type = "메뉴열람"),
+    //   (ct = "메뉴를 열람함."),
+    //   (amount = result.recordset.length ?? 0),
+    //   (user = req.query.user ?? "")
+    // );
 
     res.send(JSON.stringify(result.recordset));
   } catch (err) {
@@ -126,6 +126,46 @@ router.post("/", async (req, res) => {
         OR CAVITY like concat('%',@input,'%')
         OR 동시여부 like concat('%',@input,'%')
         OR 비고 like concat('%',@input,'%'))
+        ORDER BY ` +
+        req.body.sortKey +
+        ` ` +
+        req.body.sortOrder +
+        `
+      `;
+    } else if (req.body.searchKey == "금형NO") {
+      sql =
+        `
+        SELECT
+          NO AS NO, 금형NO AS 금형NO, 품목NO AS 품목NO, 품번 AS 품번, 품목구분 AS 품목구분, 품명 AS 품명, 규격 AS 규격,
+          CAVITY AS CAVITY, 동시여부 AS 동시여부, 비고 AS 비고, 등록자 AS 등록자, 등록일시 AS 등록일시
+        FROM(
+          SELECT
+            [MDIT_PK] AS NO
+            ,[MDIT_MOLD_PK] AS 금형NO
+            ,[MDIT_ITEM_PK] AS 품목NO
+            ,ITEM.품번 AS 품번
+            ,ITEM.품목구분 AS 품목구분
+            ,ITEM.품명 AS 품명
+            ,ITEM.규격 AS 규격
+            ,[MDIT_CAVITY] AS CAVITY
+            ,[MDIT_SAME] AS 동시여부
+            ,[MDIT_NOTE] AS 비고
+            ,[MDIT_REGIST_NM] AS 등록자
+            ,[MDIT_REGIST_DT] AS 등록일시
+          FROM [QMES2022].[dbo].[MASTER_MOLD_ITEM_TB]
+          LEFT JOIN
+          (
+            SELECT
+              [ITEM_PK] AS NO
+              ,[ITEM_PRODUCT_NUM] AS 품번
+              ,[ITEM_DIV] AS 품목구분
+              ,[ITEM_NAME] AS 품명
+              ,[ITEM_SIZE] AS 규격
+            FROM [QMES2022].[dbo].[MASTER_ITEM_TB]
+          ) AS ITEM ON ITEM.NO = [MDIT_ITEM_PK]
+        ) AS RESULT
+        WHERE (1=1)
+        AND 금형NO = @input
         ORDER BY ` +
         req.body.sortKey +
         ` ` +
