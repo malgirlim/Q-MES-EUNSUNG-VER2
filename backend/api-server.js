@@ -39,7 +39,7 @@ app.use(
 // 로그인 - router/auth.js
 app.use("/api/auth", authRouter);
 
-// 로그 또는 알림정보 - router/info.js
+// 로그 또는 알림,공지사항정보 - router/info.js
 app.use("/api/info", infoRouter);
 
 // 기준정보 - router/masterRouter.js
