@@ -17,7 +17,7 @@ const logSend = async (type, ct, amount, user) => {
   const Pool = await pool;
   await Pool.request() // 로그기록 저장
     .input("type", type)
-    .input("menu", "공유정보_공지사항") // ############ *중요* 이거 메뉴 이름 바꿔야함 !! #########
+    .input("menu", "예방보전_설비부품교체 통보") // ############ *중요* 이거 메뉴 이름 바꿔야함 !! #########
     .input("content", ct.substr(0, 500))
     .input("amount", amount)
     .input("user", user)
@@ -35,15 +35,15 @@ router.get("/", async (req, res) => {
     const Pool = await pool;
     const result = await Pool.request().query(`
       SELECT
-        [NOTC_PK] AS NO
-        ,[NOTC_DIV] AS 구분
-        ,[NOTC_TITLE] AS 제목
-        ,[NOTC_CONTENT] AS 내용
-        ,[NOTC_NOTE] AS 비고
-        ,(SELECT [USER_NAME] FROM [QMES2022].[dbo].[MASTER_USER_TB] WHERE [USER_ID] = [NOTC_REGIST_NM]) AS 등록자
-        ,CONVERT(varchar,[NOTC_REGIST_DT],20) AS 등록일시
-      FROM [QMES2022].[dbo].[SHARE_NOTICE_TB]
-      ORDER BY [NOTC_PK] DESC
+        [NTFCP_PK] AS NO
+        ,[NTFCP_FC_PART_LIFE_PLAN_PK] AS 참조NO
+        ,[NTFCP_DIV] AS 구분
+        ,[NTFCP_CONTENT] AS 내용
+        ,[NTFCP_NOTE] AS 비고
+        ,[NTFCP_REGIST_NM] AS 등록자
+        ,CONVERT(varchar,[NTFCP_REGIST_DT],20) AS 등록일시
+      FROM [QMES2022].[dbo].[MANAGE_NOTICE_FACILITY_PART_TB]
+      ORDER BY [NTFCP_PK] DESC
     `);
 
     // 로그기록 저장
@@ -75,21 +75,20 @@ router.post("/", async (req, res) => {
       sql =
         `
         SELECT
-          NO AS NO, 구분 AS 구분, 제목 AS 제목, 내용 AS 내용, 비고 AS 비고, 등록자 AS 등록자, 등록일시 AS 등록일시
+          NO AS NO, 참조NO AS 참조NO, 구분 AS 구분, 내용 AS 내용, 비고 AS 비고, 등록자 AS 등록자, 등록일시 AS 등록일시
         FROM(
           SELECT
-            [NOTC_PK] AS NO
-            ,[NOTC_DIV] AS 구분
-            ,[NOTC_TITLE] AS 제목
-            ,[NOTC_CONTENT] AS 내용
-            ,[NOTC_NOTE] AS 비고
-            ,(SELECT [USER_NAME] FROM [QMES2022].[dbo].[MASTER_USER_TB] WHERE [USER_ID] = [NOTC_REGIST_NM]) AS 등록자
-            ,CONVERT(varchar,[NOTC_REGIST_DT],20) AS 등록일시
-          FROM [QMES2022].[dbo].[SHARE_NOTICE_TB]
+            [NTFCP_PK] AS NO
+            ,[NTFCP_FC_PART_LIFE_PLAN_PK] AS 참조NO
+            ,[NTFCP_DIV] AS 구분
+            ,[NTFCP_CONTENT] AS 내용
+            ,[NTFCP_NOTE] AS 비고
+            ,[NTFCP_REGIST_NM] AS 등록자
+            ,CONVERT(varchar,[NTFCP_REGIST_DT],20) AS 등록일시
+          FROM [QMES2022].[dbo].[MANAGE_NOTICE_FACILITY_PART_TB]
         ) AS RESULT
         WHERE (1=1)
         AND ( 구분 like concat('%',@input,'%')
-        OR 제목 like concat('%',@input,'%')
         OR 내용 like concat('%',@input,'%')
         OR 비고 like concat('%',@input,'%')
         OR 등록자 like concat('%',@input,'%')
@@ -104,17 +103,17 @@ router.post("/", async (req, res) => {
       sql =
         `
         SELECT
-          NO AS NO, 구분 AS 구분, 제목 AS 제목, 내용 AS 내용, 비고 AS 비고, 등록자 AS 등록자, 등록일시 AS 등록일시
+          NO AS NO, 참조NO AS 참조NO, 구분 AS 구분, 내용 AS 내용, 비고 AS 비고, 등록자 AS 등록자, 등록일시 AS 등록일시
         FROM(
           SELECT
-            [NOTC_PK] AS NO
-            ,[NOTC_DIV] AS 구분
-            ,[NOTC_TITLE] AS 제목
-            ,[NOTC_CONTENT] AS 내용
-            ,[NOTC_NOTE] AS 비고
-            ,(SELECT [USER_NAME] FROM [QMES2022].[dbo].[MASTER_USER_TB] WHERE [USER_ID] = [NOTC_REGIST_NM]) AS 등록자
-            ,CONVERT(varchar, [NOTC_REGIST_DT],20) AS 등록일시
-          FROM [QMES2022].[dbo].[SHARE_NOTICE_TB]
+            [NTFCP_PK] AS NO
+            ,[NTFCP_FC_PART_LIFE_PLAN_PK] AS 참조NO
+            ,[NTFCP_DIV] AS 구분
+            ,[NTFCP_CONTENT] AS 내용
+            ,[NTFCP_NOTE] AS 비고
+            ,[NTFCP_REGIST_NM] AS 등록자
+            ,CONVERT(varchar,[NTFCP_REGIST_DT],20) AS 등록일시
+          FROM [QMES2022].[dbo].[MANAGE_NOTICE_FACILITY_PART_TB]
         ) AS RESULT
         WHERE (1=1)
         AND ` +
@@ -164,8 +163,8 @@ router.post("/insert", async (req, res) => {
   try {
     const Pool = await pool;
     await Pool.request()
+      .input("참조NO", req.body.data.참조NO ?? null)
       .input("구분", req.body.data.구분 ?? "")
-      .input("제목", req.body.data.제목 ?? "")
       .input("내용", req.body.data.내용 ?? "")
       .input("비고", req.body.data.비고 ?? "")
       .input("등록자", req.body.user ?? "")
@@ -173,15 +172,15 @@ router.post("/insert", async (req, res) => {
         "등록일시",
         moment().tz("Asia/Seoul").format("YYYY-MM-DD HH:mm:ss")
       ).query(`
-        INSERT INTO [QMES2022].[dbo].[SHARE_NOTICE_TB]
-          ([NOTC_DIV]
-          ,[NOTC_TITLE]
-          ,[NOTC_CONTENT]
-          ,[NOTC_NOTE]
-          ,[NOTC_REGIST_NM]
-          ,[NOTC_REGIST_DT])
+        INSERT INTO [QMES2022].[dbo].[MANAGE_NOTICE_FACILITY_PART_TB]
+          ([NTFCP_FC_PART_LIFE_PLAN_PK]
+          ,[NTFCP_DIV]
+          ,[NTFCP_CONTENT]
+          ,[NTFCP_NOTE]
+          ,[NTFCP_REGIST_NM]
+          ,[NTFCP_REGIST_DT])
         VALUES
-          (@구분,@제목,@내용,@비고,@등록자,@등록일시)
+          (@참조NO,@구분,@내용,@비고,@등록자,@등록일시)
       `);
 
     // 로그기록 저장
@@ -212,8 +211,8 @@ router.post("/insertAll", async (req, res) => {
     const Pool = await pool;
     for (var i = 0; i < req.body.data.length; i++) {
       await Pool.request()
+        .input("참조NO", req.body.data[i].참조NO ?? null)
         .input("구분", req.body.data[i].구분 ?? "")
-        .input("제목", req.body.data[i].제목 ?? "")
         .input("내용", req.body.data[i].내용 ?? "")
         .input("비고", req.body.data[i].비고 ?? "")
         .input("등록자", req.body.user ?? "")
@@ -221,15 +220,15 @@ router.post("/insertAll", async (req, res) => {
           "등록일시",
           moment().tz("Asia/Seoul").format("YYYY-MM-DD HH:mm:ss")
         ).query(`
-        INSERT INTO [QMES2022].[dbo].[SHARE_NOTICE_TB]
-          ([NOTC_DIV]
-          ,[NOTC_TITLE]
-          ,[NOTC_CONTENT]
-          ,[NOTC_NOTE]
-          ,[NOTC_REGIST_NM]
-          ,[NOTC_REGIST_DT])
+        INSERT INTO [QMES2022].[dbo].[MANAGE_NOTICE_FACILITY_PART_TB]
+          ([NTFCP_FC_PART_LIFE_PLAN_PK]
+          ,[NTFCP_DIV]
+          ,[NTFCP_CONTENT]
+          ,[NTFCP_NOTE]
+          ,[NTFCP_REGIST_NM]
+          ,[NTFCP_REGIST_DT])
         VALUES
-          (@구분,@제목,@내용,@비고,@등록자,@등록일시)
+          (@참조NO,@구분,@내용,@비고,@등록자,@등록일시)
       `);
 
       // 로그기록 저장
@@ -260,8 +259,8 @@ router.post("/edit", async (req, res) => {
     const Pool = await pool;
     await Pool.request()
       .input("NO", req.body.data.NO ?? 0)
+      .input("참조NO", req.body.data.참조NO ?? null)
       .input("구분", req.body.data.구분 ?? "")
-      .input("제목", req.body.data.제목 ?? "")
       .input("내용", req.body.data.내용 ?? "")
       .input("비고", req.body.data.비고 ?? "")
       .input("등록자", req.body.user ?? "")
@@ -269,15 +268,15 @@ router.post("/edit", async (req, res) => {
         "등록일시",
         moment().tz("Asia/Seoul").format("YYYY-MM-DD HH:mm:ss")
       ).query(`
-        UPDATE [QMES2022].[dbo].[SHARE_NOTICE_TB]
+        UPDATE [QMES2022].[dbo].[MANAGE_NOTICE_FACILITY_PART_TB]
           SET 
-            [NOTC_DIV] = @구분
-            ,[NOTC_TITLE] = @제목
-            ,[NOTC_CONTENT] = @내용
-            ,[NOTC_NOTE] = @비고
-            ,[NOTC_REGIST_NM] = @등록자
-            ,[NOTC_REGIST_DT] = @등록일시
-          WHERE [NOTC_PK] = @NO
+            [NTFCP_FC_PART_LIFE_PLAN_PK] = @참조NO
+            ,[NTFCP_DIV] = @구분
+            ,[NTFCP_CONTENT] = @내용
+            ,[NTFCP_NOTE] = @비고
+            ,[NTFCP_REGIST_NM] = @등록자
+            ,[NTFCP_REGIST_DT] = @등록일시
+          WHERE [NTFCP_PK] = @NO
     `);
 
     // 로그기록 저장
@@ -309,21 +308,21 @@ router.post("/delete", async (req, res) => {
     for (var i = 0; i < req.body.data.length; i++) {
       const result = await Pool.request().input("key", req.body.data[i]).query(`
         SELECT
-          [NOTC_PK] AS NO
-          ,[NOTC_DIV] AS 구분
-          ,[NOTC_TITLE] AS 제목
-          ,[NOTC_CONTENT] AS 내용
-          ,[NOTC_NOTE] AS 비고
-          ,(SELECT [USER_NAME] FROM [QMES2022].[dbo].[MASTER_USER_TB] WHERE [USER_ID] = [NOTC_REGIST_NM]) AS 등록자
-          ,LEFT([NOTC_REGIST_DT],10) AS 등록일시
-        FROM [QMES2022].[dbo].[SHARE_NOTICE_TB]
-        WHERE [NOTC_PK] = @key
+          [NTFCP_PK] AS NO
+          ,[NTFCP_FC_PART_LIFE_PLAN_PK] AS 참조NO
+          ,[NTFCP_DIV] AS 구분
+          ,[NTFCP_CONTENT] AS 내용
+          ,[NTFCP_NOTE] AS 비고
+          ,[NTFCP_REGIST_NM] AS 등록자
+          ,CONVERT(varchar,[NTFCP_REGIST_DT],20) AS 등록일시
+        FROM [QMES2022].[dbo].[MANAGE_NOTICE_FACILITY_PART_TB]
+        WHERE [NTFCP_PK] = @key
       `);
 
       await Pool.request()
         .input("key", req.body.data[i])
         .query(
-          `DELETE FROM [QMES2022].[dbo].[SHARE_NOTICE_TB] WHERE [NOTC_PK] = @key`
+          `DELETE FROM [QMES2022].[dbo].[MANAGE_NOTICE_FACILITY_PART_TB] WHERE [NTFCP_PK] = @key`
         );
 
       // 로그기록 저장
