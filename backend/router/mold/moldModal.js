@@ -530,6 +530,139 @@ router.post("/mold", async (req, res) => {
 });
 
 // ###################################################################################################################
+// ###################################################   금형점검   ###################################################
+// ###################################################################################################################
+
+router.get("/moldinspect", async (req, res) => {
+  try {
+    const Pool = await pool;
+    const result = await Pool.request().query(`
+      SELECT
+        [MDIP_PK] AS NO
+        ,[MDIP_MOLD_PK] AS 금형NO
+        ,(SELECT [MOLD_CODE] FROM [QMES2022].[dbo].[MASTER_MOLD_TB] WHERE [MOLD_PK] = [MDIP_MOLD_PK]) AS 금형코드
+        ,(SELECT [MOLD_NAME] FROM [QMES2022].[dbo].[MASTER_MOLD_TB] WHERE [MOLD_PK] = [MDIP_MOLD_PK]) AS 금형명
+        ,[MDIP_DIV] AS 구분
+        ,[MDIP_CONTENT] AS 내용
+        ,[MDIP_HOW] AS 검사방법
+        ,[MDIP_STAND] AS 기준
+        ,[MDIP_UNIT] AS 단위
+        ,[MDIP_MIN] AS 최소
+        ,[MDIP_MAX] AS 최대
+        ,[MDIP_USER_ID] AS 담당자ID
+        ,(SELECT [USER_NAME] FROM [QMES2022].[dbo].[MASTER_USER_TB] WHERE [USER_ID] = [MDIP_USER_ID]) AS 담당자
+        ,[MDIP_NOTE] AS 비고
+        ,[MDIP_REGIST_NM] AS 등록자
+        ,[MDIP_REGIST_DT] AS 등록일시
+      FROM [QMES2022].[dbo].[MASTER_MOLD_INSPECT_TB]
+      ORDER BY [MDIP_PK] DESC
+    `);
+
+    res.send(JSON.stringify(result.recordset));
+  } catch (err) {
+    res.status(500);
+    res.send(err.message);
+  }
+});
+
+router.post("/moldinspect", async (req, res) => {
+  try {
+    var sql = "";
+    if (req.body.searchKey == "전체") {
+      sql =
+        `
+        SELECT
+          NO AS NO, 금형NO AS 금형NO, 금형코드 AS 금형코드, 금형명 AS 금형명, 구분 AS 구분, 내용 AS 내용, 검사방법 AS 검사방법,
+          기준 AS 기준, 단위 AS 단위, 최소 AS 최소, 최대 AS 최대, 담당자ID AS 담당자ID, 담당자 AS 담당자,
+          비고 AS 비고, 등록자 AS 등록자, 등록일시 AS 등록일시
+        FROM(
+          SELECT
+            [MDIP_PK] AS NO
+            ,[MDIP_MOLD_PK] AS 금형NO
+            ,(SELECT [MOLD_CODE] FROM [QMES2022].[dbo].[MASTER_MOLD_TB] WHERE [MOLD_PK] = [MDIP_MOLD_PK]) AS 금형코드
+            ,(SELECT [MOLD_NAME] FROM [QMES2022].[dbo].[MASTER_MOLD_TB] WHERE [MOLD_PK] = [MDIP_MOLD_PK]) AS 금형명
+            ,[MDIP_DIV] AS 구분
+            ,[MDIP_CONTENT] AS 내용
+            ,[MDIP_HOW] AS 검사방법
+            ,[MDIP_STAND] AS 기준
+            ,[MDIP_UNIT] AS 단위
+            ,[MDIP_MIN] AS 최소
+            ,[MDIP_MAX] AS 최대
+            ,[MDIP_USER_ID] AS 담당자ID
+            ,(SELECT [USER_NAME] FROM [QMES2022].[dbo].[MASTER_USER_TB] WHERE [USER_ID] = [MDIP_USER_ID]) AS 담당자
+            ,[MDIP_NOTE] AS 비고
+            ,[MDIP_REGIST_NM] AS 등록자
+            ,[MDIP_REGIST_DT] AS 등록일시
+          FROM [QMES2022].[dbo].[MASTER_MOLD_INSPECT_TB]
+        ) AS RESULT
+        WHERE (1=1)
+        AND ( 구분 like concat('%',@input,'%')
+        OR 내용 like concat('%',@input,'%')
+        OR 검사방법 like concat('%',@input,'%')
+        OR 기준 like concat('%',@input,'%')
+        OR 단위 like concat('%',@input,'%')
+        OR 최소 like concat('%',@input,'%')
+        OR 최대 like concat('%',@input,'%')
+        OR 담당자 like concat('%',@input,'%')
+        OR 비고 like concat('%',@input,'%'))
+        ORDER BY ` +
+        req.body.sortKey +
+        ` ` +
+        req.body.sortOrder +
+        `
+      `;
+    } else {
+      sql =
+        `
+        SELECT
+          NO AS NO, 금형NO AS 금형NO, 금형코드 AS 금형코드, 금형명 AS 금형명, 구분 AS 구분, 내용 AS 내용, 검사방법 AS 검사방법,
+          기준 AS 기준, 단위 AS 단위, 최소 AS 최소, 최대 AS 최대, 담당자ID AS 담당자ID, 담당자 AS 담당자,
+          비고 AS 비고, 등록자 AS 등록자, 등록일시 AS 등록일시
+        FROM(
+          SELECT
+            [MDIP_PK] AS NO
+            ,[MDIP_MOLD_PK] AS 금형NO
+            ,(SELECT [MOLD_CODE] FROM [QMES2022].[dbo].[MASTER_MOLD_TB] WHERE [MOLD_PK] = [MDIP_MOLD_PK]) AS 금형코드
+            ,(SELECT [MOLD_NAME] FROM [QMES2022].[dbo].[MASTER_MOLD_TB] WHERE [MOLD_PK] = [MDIP_MOLD_PK]) AS 금형명
+            ,[MDIP_DIV] AS 구분
+            ,[MDIP_CONTENT] AS 내용
+            ,[MDIP_HOW] AS 검사방법
+            ,[MDIP_STAND] AS 기준
+            ,[MDIP_UNIT] AS 단위
+            ,[MDIP_MIN] AS 최소
+            ,[MDIP_MAX] AS 최대
+            ,[MDIP_USER_ID] AS 담당자ID
+            ,(SELECT [USER_NAME] FROM [QMES2022].[dbo].[MASTER_USER_TB] WHERE [USER_ID] = [MDIP_USER_ID]) AS 담당자
+            ,[MDIP_NOTE] AS 비고
+            ,[MDIP_REGIST_NM] AS 등록자
+            ,[MDIP_REGIST_DT] AS 등록일시
+          FROM [QMES2022].[dbo].[MASTER_MOLD_INSPECT_TB]
+        ) AS RESULT
+        WHERE (1=1)
+        AND ` +
+        req.body.searchKey +
+        ` like concat('%',@input,'%')
+        ORDER BY ` +
+        req.body.sortKey +
+        ` ` +
+        req.body.sortOrder +
+        `
+      `;
+    }
+
+    const Pool = await pool;
+    const result = await Pool.request()
+      .input("input", req.body.searchInput)
+      .query(sql);
+
+    res.send(JSON.stringify(result.recordset));
+  } catch (err) {
+    res.status(500);
+    res.send(err.message);
+  }
+});
+
+// ###################################################################################################################
 // ###################################################   생산실적   ###################################################
 // ###################################################################################################################
 

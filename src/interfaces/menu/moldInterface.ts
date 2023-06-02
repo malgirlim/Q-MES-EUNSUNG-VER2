@@ -44,6 +44,8 @@ export interface MasterMoldInspect {
   [attribute: string]: any | undefined;
   NO?: number;
   금형NO?: number;
+  금형코드?: string;
+  금형명?: string;
   구분?: string;
   내용?: string;
   검사방법?: string;
@@ -76,6 +78,46 @@ export interface MoldUse {
   불량수?: string;
   사용횟수?: string;
   사용일자?: string;
+  비고?: string;
+  등록자?: string;
+  등록일시?: string;
+}
+
+// 금형관리 - 금형 수선 관리
+export interface MoldRepair {
+  [attribute: string]: any | undefined;
+  NO?: number;
+  금형NO?: number;
+  금형코드?: string;
+  금형명?: string;
+  구분?: string;
+  내용?: string;
+  결과?: string;
+  일자?: string;
+  비고?: string;
+  등록자?: string;
+  등록일시?: string;
+}
+
+// 금형관리 - 금형 점검내역 관리
+export interface MoldCheck {
+  [attribute: string]: any | undefined;
+  NO?: number;
+  금형점검NO?: number;
+  금형코드?: string;
+  금형명?: string;
+  점검구분?: string;
+  점검내용?: string;
+  검사방법?: string;
+  검사기준?: string;
+  검사단위?: string;
+  기준최소?: string;
+  기준최대?: string;
+  담당자?: string;
+  구분?: string;
+  내용?: string;
+  결과?: string;
+  일자?: string;
   비고?: string;
   등록자?: string;
   등록일시?: string;
