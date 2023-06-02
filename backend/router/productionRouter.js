@@ -15,6 +15,8 @@ const productionResultUseitemRouter = require("./production/productionResultUsei
 const productionResultDefectRouter = require("./production/productionResultDefect");
 const productionResultNonworkRouter = require("./production/productionResultNonwork");
 
+const productionBadReworkRouter = require("./production/productionBadRework");
+
 router.use((req, res, next) => {
   // console.log("middleware for test!");
   next();
@@ -43,5 +45,8 @@ router.use("/result/useitem", productionResultUseitemRouter);
 router.use("/result/defect", productionResultDefectRouter);
 // 주문관리 / 생산실적집계 / 비가동 - router/production/productionResultNonwork.js
 router.use("/result/nonwork", productionResultNonworkRouter);
+
+// 주문관리 / 불량재작업 - router/production/productionBadRework.js
+router.use("/badrework", productionBadReworkRouter);
 
 module.exports = router;
