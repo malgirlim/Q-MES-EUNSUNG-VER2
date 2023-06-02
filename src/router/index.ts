@@ -107,11 +107,8 @@ import MoldRepair from "../pages/mold/MoldRepair.vue";
 import MoldCheck from "../pages/mold/MoldCheck.vue";
 
 /* 모니터링 */
-import MonitoringKPI from "../pages/monitoring/MonitoringKPI.vue";
-import MonitoringOverall from "../pages/monitoring/MonitoringOverall.vue";
-import MonitoringProduction from "../pages/monitoring/MonitoringProduction.vue";
-import MonitoringProcess from "../pages/monitoring/MonitoringProcess.vue";
-import MonitoringStock from "../pages/monitoring/MonitoringStock.vue";
+import MonitoringKPI1 from "../pages/monitoring/MonitoringKPI1.vue";
+import MonitoringKPI2 from "../pages/monitoring/MonitoringKPI2.vue";
 import MonitoringDaily from "../pages/monitoring/MonitoringDaily.vue";
 import MonitoringPrevent from "../pages/monitoring/MonitoringPrevent.vue";
 import MonitoringMTBF from "../pages/monitoring/MonitoringMTBF.vue";
@@ -828,49 +825,22 @@ const routes = [
         component: MoldCheck,
       },
       {
-        path: "monitoring/kpi",
-        name: "top-menu-monitoring-kpi",
+        path: "monitoring/kpi1",
+        name: "top-menu-monitoring-kpi1",
         meta: {
-          pagename: "KPI지수 현황",
+          pagename: "설비 가동률 현황(KPI)",
           category: "모니터링",
         },
-        component: MonitoringKPI,
+        component: MonitoringKPI1,
       },
       {
-        path: "monitoring/overall",
-        name: "top-menu-monitoring-overall",
+        path: "monitoring/kpi2",
+        name: "top-menu-monitoring-kpi2",
         meta: {
-          pagename: "종합 현황",
+          pagename: "재고 비용 현황(KPI)",
           category: "모니터링",
         },
-        component: MonitoringOverall,
-      },
-      {
-        path: "monitoring/production",
-        name: "top-menu-monitoring-production",
-        meta: {
-          pagename: "생산 현황",
-          category: "모니터링",
-        },
-        component: MonitoringProduction,
-      },
-      {
-        path: "monitoring/process",
-        name: "top-menu-monitoring-process",
-        meta: {
-          pagename: "공정 현황",
-          category: "모니터링",
-        },
-        component: MonitoringProcess,
-      },
-      {
-        path: "monitoring/stock",
-        name: "top-menu-monitoring-stock",
-        meta: {
-          pagename: "재고 현황",
-          category: "모니터링",
-        },
-        component: MonitoringStock,
+        component: MonitoringKPI2,
       },
       {
         path: "monitoring/daily",
