@@ -17,7 +17,7 @@ const logSend = async (type, ct, amount, user) => {
   const Pool = await pool;
   await Pool.request() // 로그기록 저장
     .input("type", type)
-    .input("menu", "예방보전_예방보전 예보") // ############ *중요* 이거 메뉴 이름 바꿔야함 !! #########
+    .input("menu", "금형관리_금형수선관리") // ############ *중요* 이거 메뉴 이름 바꿔야함 !! #########
     .input("content", ct.substr(0, 500))
     .input("amount", amount)
     .input("user", user)
@@ -35,15 +35,19 @@ router.get("/", async (req, res) => {
     const Pool = await pool;
     const result = await Pool.request().query(`
       SELECT
-        [WNPV_PK] AS NO
-        ,[WNPV_PREVENT_PLAN_PK] AS 참조NO
-        ,[WNPV_DIV] AS 구분
-        ,[WNPV_CONTENT] AS 내용
-        ,[WNPV_NOTE] AS 비고
-        ,[WNPV_REGIST_NM] AS 등록자
-        ,CONVERT(varchar,[WNPV_REGIST_DT],20) AS 등록일시
-      FROM [QMES2022].[dbo].[MANAGE_WARNING_PREVENT_TB]
-      ORDER BY [WNPV_PK] DESC
+        [MDFX_PK] AS NO
+        ,[MDFX_MOLD_PK] AS 금형NO
+        ,(SELECT [MOLD_CODE] FROM [QMES2022].[dbo].[MASTER_MOLD_TB] WHERE [MOLD_PK] = [MDFX_MOLD_PK]) AS 금형코드
+        ,(SELECT [MOLD_NAME] FROM [QMES2022].[dbo].[MASTER_MOLD_TB] WHERE [MOLD_PK] = [MDFX_MOLD_PK]) AS 금형명
+        ,[MDFX_DIV] AS 구분
+        ,[MDFX_CONTENT] AS 내용
+        ,[MDFX_RESULT] AS 결과
+        ,CONVERT(VARCHAR, [MDFX_DATE], 23) AS 일자
+        ,[MDFX_NOTE] AS 비고
+        ,[MDFX_REGIST_NM] AS 등록자
+        ,[MDFX_REGIST_DT] AS 등록일시
+      FROM [QMES2022].[dbo].[MANAGE_MOLD_FIX_TB]
+      ORDER BY [MDFX_PK] DESC
     `);
 
     // 로그기록 저장
@@ -75,24 +79,37 @@ router.post("/", async (req, res) => {
       sql =
         `
         SELECT
-          NO AS NO, 참조NO AS 참조NO, 구분 AS 구분, 내용 AS 내용, 비고 AS 비고, 등록자 AS 등록자, 등록일시 AS 등록일시
+          NO AS NO, 금형NO AS 금형NO, 금형코드 AS 금형코드, 금형명 AS 금형명, 구분 AS 구분, 내용 AS 내용, 결과 AS 결과,
+          일자 AS 일자, 비고 AS 비고, 등록자 AS 등록자, 등록일시 AS 등록일시
         FROM(
           SELECT
-            [WNPV_PK] AS NO
-            ,[WNPV_PREVENT_PLAN_PK] AS 참조NO
-            ,[WNPV_DIV] AS 구분
-            ,[WNPV_CONTENT] AS 내용
-            ,[WNPV_NOTE] AS 비고
-            ,[WNPV_REGIST_NM] AS 등록자
-            ,CONVERT(varchar,[WNPV_REGIST_DT],20) AS 등록일시
-          FROM [QMES2022].[dbo].[MANAGE_WARNING_PREVENT_TB]
+            [MDFX_PK] AS NO
+            ,[MDFX_MOLD_PK] AS 금형NO
+            ,(SELECT [MOLD_CODE] FROM [QMES2022].[dbo].[MASTER_MOLD_TB] WHERE [MOLD_PK] = [MDFX_MOLD_PK]) AS 금형코드
+            ,(SELECT [MOLD_NAME] FROM [QMES2022].[dbo].[MASTER_MOLD_TB] WHERE [MOLD_PK] = [MDFX_MOLD_PK]) AS 금형명
+            ,[MDFX_DIV] AS 구분
+            ,[MDFX_CONTENT] AS 내용
+            ,[MDFX_RESULT] AS 결과
+            ,CONVERT(VARCHAR, [MDFX_DATE], 23) AS 일자
+            ,[MDFX_NOTE] AS 비고
+            ,[MDFX_REGIST_NM] AS 등록자
+            ,[MDFX_REGIST_DT] AS 등록일시
+          FROM [QMES2022].[dbo].[MANAGE_MOLD_FIX_TB]
         ) AS RESULT
         WHERE (1=1)
-        AND ( 구분 like concat('%',@input,'%')
+        AND CONVERT(varchar, CONVERT(datetime, 일자), 12) >= ` +
+        req.body.startDate +
+        `
+        AND CONVERT(varchar, CONVERT(datetime, 일자), 12) <= ` +
+        req.body.endDate +
+        `
+        AND ( 금형코드 like concat('%',@input,'%')
+        OR 금형명 like concat('%',@input,'%')
+        OR 구분 like concat('%',@input,'%')
         OR 내용 like concat('%',@input,'%')
-        OR 비고 like concat('%',@input,'%')
-        OR 등록자 like concat('%',@input,'%')
-        OR 등록일시 like concat('%',@input,'%'))
+        OR 결과 like concat('%',@input,'%')
+        OR 일자 like concat('%',@input,'%')
+        OR 비고 like concat('%',@input,'%'))
         ORDER BY ` +
         req.body.sortKey +
         ` ` +
@@ -103,19 +120,30 @@ router.post("/", async (req, res) => {
       sql =
         `
         SELECT
-          NO AS NO, 참조NO AS 참조NO, 구분 AS 구분, 내용 AS 내용, 비고 AS 비고, 등록자 AS 등록자, 등록일시 AS 등록일시
+          NO AS NO, 금형NO AS 금형NO, 금형코드 AS 금형코드, 금형명 AS 금형명, 구분 AS 구분, 내용 AS 내용, 결과 AS 결과,
+          일자 AS 일자, 비고 AS 비고, 등록자 AS 등록자, 등록일시 AS 등록일시
         FROM(
           SELECT
-            [WNPV_PK] AS NO
-            ,[WNPV_PREVENT_PLAN_PK] AS 참조NO
-            ,[WNPV_DIV] AS 구분
-            ,[WNPV_CONTENT] AS 내용
-            ,[WNPV_NOTE] AS 비고
-            ,[WNPV_REGIST_NM] AS 등록자
-            ,CONVERT(varchar,[WNPV_REGIST_DT],20) AS 등록일시
-          FROM [QMES2022].[dbo].[MANAGE_WARNING_PREVENT_TB]
+            [MDFX_PK] AS NO
+            ,[MDFX_MOLD_PK] AS 금형NO
+            ,(SELECT [MOLD_CODE] FROM [QMES2022].[dbo].[MASTER_MOLD_TB] WHERE [MOLD_PK] = [MDFX_MOLD_PK]) AS 금형코드
+            ,(SELECT [MOLD_NAME] FROM [QMES2022].[dbo].[MASTER_MOLD_TB] WHERE [MOLD_PK] = [MDFX_MOLD_PK]) AS 금형명
+            ,[MDFX_DIV] AS 구분
+            ,[MDFX_CONTENT] AS 내용
+            ,[MDFX_RESULT] AS 결과
+            ,CONVERT(VARCHAR, [MDFX_DATE], 23) AS 일자
+            ,[MDFX_NOTE] AS 비고
+            ,[MDFX_REGIST_NM] AS 등록자
+            ,[MDFX_REGIST_DT] AS 등록일시
+          FROM [QMES2022].[dbo].[MANAGE_MOLD_FIX_TB]
         ) AS RESULT
         WHERE (1=1)
+        AND CONVERT(varchar, CONVERT(datetime, 일자), 12) >= ` +
+        req.body.startDate +
+        `
+        AND CONVERT(varchar, CONVERT(datetime, 일자), 12) <= ` +
+        req.body.endDate +
+        `
         AND ` +
         req.body.searchKey +
         ` like concat('%',@input,'%')
@@ -167,24 +195,28 @@ router.post("/insert", async (req, res) => {
   try {
     const Pool = await pool;
     await Pool.request()
-      .input("참조NO", req.body.data.참조NO ?? null)
+      .input("금형NO", req.body.data.금형NO ?? null)
       .input("구분", req.body.data.구분 ?? "")
       .input("내용", req.body.data.내용 ?? "")
+      .input("결과", req.body.data.결과 ?? "")
+      .input("일자", req.body.data.일자 ?? "")
       .input("비고", req.body.data.비고 ?? "")
       .input("등록자", req.body.user ?? "")
       .input(
         "등록일시",
         moment().tz("Asia/Seoul").format("YYYY-MM-DD HH:mm:ss")
       ).query(`
-        INSERT INTO [QMES2022].[dbo].[MANAGE_WARNING_PREVENT_TB]
-          ([WNPV_PREVENT_PLAN_PK]
-          ,[WNPV_DIV]
-          ,[WNPV_CONTENT]
-          ,[WNPV_NOTE]
-          ,[WNPV_REGIST_NM]
-          ,[WNPV_REGIST_DT])
+        INSERT INTO [QMES2022].[dbo].[MANAGE_MOLD_FIX_TB]
+          ([MDFX_MOLD_PK]
+          ,[MDFX_DIV]
+          ,[MDFX_CONTENT]
+          ,[MDFX_RESULT]
+          ,[MDFX_DATE]
+          ,[MDFX_NOTE]
+          ,[MDFX_REGIST_NM]
+          ,[MDFX_REGIST_DT])
         VALUES
-          (@참조NO,@구분,@내용,@비고,@등록자,@등록일시)
+          (@금형NO,@구분,@내용,@결과,@일자,@비고,@등록자,@등록일시)
       `);
 
     // 로그기록 저장
@@ -215,24 +247,28 @@ router.post("/insertAll", async (req, res) => {
     const Pool = await pool;
     for (var i = 0; i < req.body.data.length; i++) {
       await Pool.request()
-        .input("참조NO", req.body.data[i].참조NO ?? null)
+        .input("금형NO", req.body.data[i].금형NO ?? null)
         .input("구분", req.body.data[i].구분 ?? "")
         .input("내용", req.body.data[i].내용 ?? "")
+        .input("결과", req.body.data[i].결과 ?? "")
+        .input("일자", req.body.data[i].일자 ?? "")
         .input("비고", req.body.data[i].비고 ?? "")
         .input("등록자", req.body.user ?? "")
         .input(
           "등록일시",
           moment().tz("Asia/Seoul").format("YYYY-MM-DD HH:mm:ss")
         ).query(`
-        INSERT INTO [QMES2022].[dbo].[MANAGE_WARNING_PREVENT_TB]
-          ([WNPV_PREVENT_PLAN_PK]
-          ,[WNPV_DIV]
-          ,[WNPV_CONTENT]
-          ,[WNPV_NOTE]
-          ,[WNPV_REGIST_NM]
-          ,[WNPV_REGIST_DT])
+        INSERT INTO [QMES2022].[dbo].[MANAGE_MOLD_FIX_TB]
+          ([MDFX_MOLD_PK]
+          ,[MDFX_DIV]
+          ,[MDFX_CONTENT]
+          ,[MDFX_RESULT]
+          ,[MDFX_DATE]
+          ,[MDFX_NOTE]
+          ,[MDFX_REGIST_NM]
+          ,[MDFX_REGIST_DT])
         VALUES
-          (@참조NO,@구분,@내용,@비고,@등록자,@등록일시)
+          (@금형NO,@구분,@내용,@결과,@일자,@비고,@등록자,@등록일시)
       `);
 
       // 로그기록 저장
@@ -263,24 +299,28 @@ router.post("/edit", async (req, res) => {
     const Pool = await pool;
     await Pool.request()
       .input("NO", req.body.data.NO ?? 0)
-      .input("참조NO", req.body.data.참조NO ?? null)
+      .input("금형NO", req.body.data.금형NO ?? null)
       .input("구분", req.body.data.구분 ?? "")
       .input("내용", req.body.data.내용 ?? "")
+      .input("결과", req.body.data.결과 ?? "")
+      .input("일자", req.body.data.일자 ?? "")
       .input("비고", req.body.data.비고 ?? "")
       .input("등록자", req.body.user ?? "")
       .input(
         "등록일시",
         moment().tz("Asia/Seoul").format("YYYY-MM-DD HH:mm:ss")
       ).query(`
-        UPDATE [QMES2022].[dbo].[MANAGE_WARNING_PREVENT_TB]
+        UPDATE [QMES2022].[dbo].[MANAGE_MOLD_FIX_TB]
           SET 
-            [WNPV_PREVENT_PLAN_PK] = @참조NO
-            ,[WNPV_DIV] = @구분
-            ,[WNPV_CONTENT] = @내용
-            ,[WNPV_NOTE] = @비고
-            ,[WNPV_REGIST_NM] = @등록자
-            ,[WNPV_REGIST_DT] = @등록일시
-          WHERE [WNPV_PK] = @NO
+            [MDFX_MOLD_PK] = @금형NO
+            ,[MDFX_DIV] = @구분
+            ,[MDFX_CONTENT] = @내용
+            ,[MDFX_RESULT] = @결과
+            ,[MDFX_DATE] = @일자
+            ,[MDFX_NOTE] = @비고
+            ,[MDFX_REGIST_NM] = @등록자
+            ,[MDFX_REGIST_DT] = @등록일시
+          WHERE [MDFX_PK] = @NO
     `);
 
     // 로그기록 저장
@@ -312,21 +352,25 @@ router.post("/delete", async (req, res) => {
     for (var i = 0; i < req.body.data.length; i++) {
       const result = await Pool.request().input("key", req.body.data[i]).query(`
         SELECT
-          [WNPV_PK] AS NO
-          ,[WNPV_PREVENT_PLAN_PK] AS 참조NO
-          ,[WNPV_DIV] AS 구분
-          ,[WNPV_CONTENT] AS 내용
-          ,[WNPV_NOTE] AS 비고
-          ,[WNPV_REGIST_NM] AS 등록자
-          ,CONVERT(varchar,[WNPV_REGIST_DT],20) AS 등록일시
-        FROM [QMES2022].[dbo].[MANAGE_WARNING_PREVENT_TB]
-        WHERE [WNPV_PK] = @key
+          [MDFX_PK] AS NO
+          ,[MDFX_MOLD_PK] AS 금형NO
+          ,(SELECT [MOLD_CODE] FROM [QMES2022].[dbo].[MASTER_MOLD_TB] WHERE [MOLD_PK] = [MDFX_MOLD_PK]) AS 금형코드
+          ,(SELECT [MOLD_NAME] FROM [QMES2022].[dbo].[MASTER_MOLD_TB] WHERE [MOLD_PK] = [MDFX_MOLD_PK]) AS 금형명
+          ,[MDFX_DIV] AS 구분
+          ,[MDFX_CONTENT] AS 내용
+          ,[MDFX_RESULT] AS 결과
+          ,CONVERT(VARCHAR, [MDFX_DATE], 23) AS 일자
+          ,[MDFX_NOTE] AS 비고
+          ,[MDFX_REGIST_NM] AS 등록자
+          ,[MDFX_REGIST_DT] AS 등록일시
+        FROM [QMES2022].[dbo].[MANAGE_MOLD_FIX_TB]
+        WHERE [MDFX_PK] = @key
       `);
 
       await Pool.request()
         .input("key", req.body.data[i])
         .query(
-          `DELETE FROM [QMES2022].[dbo].[MANAGE_WARNING_PREVENT_TB] WHERE [WNPV_PK] = @key`
+          `DELETE FROM [QMES2022].[dbo].[MANAGE_MOLD_FIX_TB] WHERE [MDFX_PK] = @key`
         );
 
       // 로그기록 저장

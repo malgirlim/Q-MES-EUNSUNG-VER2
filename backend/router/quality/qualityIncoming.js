@@ -105,7 +105,7 @@ router.get("/", async (req, res) => {
         (
           SELECT
             [ACPT_PK] AS NO
-            ,LEFT([ACPT_DATE],10) AS 수주일
+            ,CONVERT(varchar, [ACPT_DATE], 23) AS 수주일
             ,[ACPT_CODE] AS 코드
             ,[ACPT_CODE_NUM] AS 코드순번
             ,[ACPT_DIV] AS 구분
@@ -282,7 +282,7 @@ router.post("/", async (req, res) => {
             (
               SELECT
                 [ACPT_PK] AS NO
-                ,LEFT([ACPT_DATE],10) AS 수주일
+                ,CONVERT(varchar, [ACPT_DATE], 23) AS 수주일
                 ,[ACPT_CODE] AS 코드
                 ,[ACPT_CODE_NUM] AS 코드순번
                 ,[ACPT_DIV] AS 구분
@@ -473,7 +473,7 @@ router.post("/", async (req, res) => {
             (
               SELECT
                 [ACPT_PK] AS NO
-                ,LEFT([ACPT_DATE],10) AS 수주일
+                ,CONVERT(varchar, [ACPT_DATE], 23) AS 수주일
                 ,[ACPT_CODE] AS 코드
                 ,[ACPT_CODE_NUM] AS 코드순번
                 ,[ACPT_DIV] AS 구분
@@ -570,7 +570,11 @@ router.post("/", async (req, res) => {
         req.body.searchKey +
         " 조건으로 '" +
         req.body.searchInput +
-        "' 을 조회."),
+        "' 을 조회. (" +
+        req.body.startDate +
+        "-" +
+        req.body.endDate +
+        ")"),
       (amount = result.recordset.length ?? 0),
       (user = req.body.user ?? "")
     );
@@ -899,7 +903,7 @@ router.post("/delete", async (req, res) => {
           (
             SELECT
               [ACPT_PK] AS NO
-              ,LEFT([ACPT_DATE],10) AS 수주일
+              ,CONVERT(varchar, [ACPT_DATE], 23) AS 수주일
               ,[ACPT_CODE] AS 코드
               ,[ACPT_CODE_NUM] AS 코드순번
               ,[ACPT_DIV] AS 구분

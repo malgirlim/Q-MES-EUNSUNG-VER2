@@ -2399,7 +2399,7 @@ const setPrintDocumentModal = (value: boolean) => {
             variant="outline-primary"
             @click="
               () => {
-                setInsertModaInspect(false);
+                setInsertModalInspect(false);
               }
             "
             >취소</Button

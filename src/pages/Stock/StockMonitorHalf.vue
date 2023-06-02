@@ -1071,7 +1071,7 @@ const setStockLotModal = (value: boolean) => {
     <Dialog.Panel class="p-10 text-center">
       <!--stockLot Modal 내용 시작-->
       <div class="mb-3" style="font-weight: bold; font-size: x-large">
-        품목(LOT별) 재고 리스트
+        품목(LOT별) 재고 리스트 [ {{ searchDate }} ]
       </div>
       <div class="grid grid-cols-12 gap-1 mt-1">
         <div

@@ -63,7 +63,7 @@ router.get("/", async (req, res) => {
       (
         SELECT
           [ACPT_PK] AS NO
-          ,LEFT([ACPT_DATE],10) AS 수주일
+          ,CONVERT(varchar, [ACPT_DATE], 23) AS 수주일
           ,[ACPT_CODE] AS 코드
           ,[ACPT_CODE_NUM] AS 코드순번
           ,[ACPT_DIV] AS 구분
@@ -79,8 +79,8 @@ router.get("/", async (req, res) => {
           ,[ACPT_SUPPLY_COST] AS 공급가액
           ,[ACPT_TAX_COST] AS 세액
           ,[ACPT_PAY_CONDITION] AS 결제조건
-          ,LEFT([ACPT_PAY_DATE],10) AS 결제예정일
-          ,LEFT([ACPT_DELIVERY_DATE],10) AS 납기일
+          ,CONVERT(varchar, [ACPT_PAY_DATE], 23) AS 결제예정일
+          ,CONVERT(varchar, [ACPT_DELIVERY_DATE], 23) AS 납기일
           ,[ACPT_DELIVERY_ADDRESS] AS 도착지주소
           ,[ACPT_ETC] AS 기타
           ,[ACPT_NOTE] AS 비고
@@ -186,7 +186,7 @@ router.post("/", async (req, res) => {
           (
             SELECT
               [ACPT_PK] AS NO
-              ,LEFT([ACPT_DATE],10) AS 수주일
+              ,CONVERT(varchar, [ACPT_DATE], 23) AS 수주일
               ,[ACPT_CODE] AS 코드
               ,[ACPT_CODE_NUM] AS 코드순번
               ,[ACPT_DIV] AS 구분
@@ -202,8 +202,8 @@ router.post("/", async (req, res) => {
               ,[ACPT_SUPPLY_COST] AS 공급가액
               ,[ACPT_TAX_COST] AS 세액
               ,[ACPT_PAY_CONDITION] AS 결제조건
-              ,LEFT([ACPT_PAY_DATE],10) AS 결제예정일
-              ,LEFT([ACPT_DELIVERY_DATE],10) AS 납기일
+              ,CONVERT(varchar, [ACPT_PAY_DATE], 23) AS 결제예정일
+              ,CONVERT(varchar, [ACPT_DELIVERY_DATE], 23) AS 납기일
               ,[ACPT_DELIVERY_ADDRESS] AS 도착지주소
               ,[ACPT_ETC] AS 기타
               ,[ACPT_NOTE] AS 비고
@@ -304,7 +304,7 @@ router.post("/", async (req, res) => {
           (
             SELECT
               [ACPT_PK] AS NO
-              ,LEFT([ACPT_DATE],10) AS 수주일
+              ,CONVERT(varchar, [ACPT_DATE], 23) AS 수주일
               ,[ACPT_CODE] AS 코드
               ,[ACPT_CODE_NUM] AS 코드순번
               ,[ACPT_DIV] AS 구분
@@ -320,8 +320,8 @@ router.post("/", async (req, res) => {
               ,[ACPT_SUPPLY_COST] AS 공급가액
               ,[ACPT_TAX_COST] AS 세액
               ,[ACPT_PAY_CONDITION] AS 결제조건
-              ,LEFT([ACPT_PAY_DATE],10) AS 결제예정일
-              ,LEFT([ACPT_DELIVERY_DATE],10) AS 납기일
+              ,CONVERT(varchar, [ACPT_PAY_DATE], 23) AS 결제예정일
+              ,CONVERT(varchar, [ACPT_DELIVERY_DATE], 23) AS 납기일
               ,[ACPT_DELIVERY_ADDRESS] AS 도착지주소
               ,[ACPT_ETC] AS 기타
               ,[ACPT_NOTE] AS 비고
@@ -386,7 +386,11 @@ router.post("/", async (req, res) => {
         req.body.searchKey +
         " 조건으로 '" +
         req.body.searchInput +
-        "' 을 조회."),
+        "' 을 조회. (" +
+        req.body.startDate +
+        "-" +
+        req.body.endDate +
+        ")"),
       (amount = result.recordset.length ?? 0),
       (user = req.body.user ?? "")
     );
@@ -645,7 +649,7 @@ router.post("/delete", async (req, res) => {
         (
           SELECT
             [ACPT_PK] AS NO
-            ,LEFT([ACPT_DATE],10) AS 수주일
+            ,CONVERT(varchar, [ACPT_DATE], 23) AS 수주일
             ,[ACPT_CODE] AS 코드
             ,[ACPT_CODE_NUM] AS 코드순번
             ,[ACPT_DIV] AS 구분
@@ -661,8 +665,8 @@ router.post("/delete", async (req, res) => {
             ,[ACPT_SUPPLY_COST] AS 공급가액
             ,[ACPT_TAX_COST] AS 세액
             ,[ACPT_PAY_CONDITION] AS 결제조건
-            ,LEFT([ACPT_PAY_DATE],10) AS 결제예정일
-            ,LEFT([ACPT_DELIVERY_DATE],10) AS 납기일
+            ,CONVERT(varchar, [ACPT_PAY_DATE], 23) AS 결제예정일
+            ,CONVERT(varchar, [ACPT_DELIVERY_DATE], 23) AS 납기일
             ,[ACPT_DELIVERY_ADDRESS] AS 도착지주소
             ,[ACPT_ETC] AS 기타
             ,[ACPT_NOTE] AS 비고
@@ -742,7 +746,7 @@ router.get("/accept", async (req, res) => {
     const result = await Pool.request().query(`
       SELECT
         [ACPT_PK] AS NO
-        ,LEFT([ACPT_DATE],10) AS 수주일
+        ,CONVERT(varchar, [ACPT_DATE], 23) AS 수주일
         ,[ACPT_CODE] AS 코드
         ,[ACPT_CODE_NUM] AS 코드순번
         ,[ACPT_DIV] AS 구분
@@ -758,8 +762,8 @@ router.get("/accept", async (req, res) => {
         ,[ACPT_SUPPLY_COST] AS 공급가액
         ,[ACPT_TAX_COST] AS 세액
         ,[ACPT_PAY_CONDITION] AS 결제조건
-        ,LEFT([ACPT_PAY_DATE],10) AS 결제예정일
-        ,LEFT([ACPT_DELIVERY_DATE],10) AS 납기일
+        ,CONVERT(varchar, [ACPT_PAY_DATE], 23) AS 결제예정일
+        ,CONVERT(varchar, [ACPT_DELIVERY_DATE], 23) AS 납기일
         ,[ACPT_DELIVERY_ADDRESS] AS 도착지주소
         ,[ACPT_ETC] AS 기타
         ,[ACPT_NOTE] AS 비고
@@ -806,7 +810,7 @@ router.post("/accept", async (req, res) => {
         FROM(
           SELECT
             [ACPT_PK] AS NO
-            ,LEFT([ACPT_DATE],10) AS 수주일
+            ,CONVERT(varchar, [ACPT_DATE], 23) AS 수주일
             ,[ACPT_CODE] AS 코드
             ,[ACPT_CODE_NUM] AS 코드순번
             ,[ACPT_DIV] AS 구분
@@ -822,8 +826,8 @@ router.post("/accept", async (req, res) => {
             ,[ACPT_SUPPLY_COST] AS 공급가액
             ,[ACPT_TAX_COST] AS 세액
             ,[ACPT_PAY_CONDITION] AS 결제조건
-            ,LEFT([ACPT_PAY_DATE],10) AS 결제예정일
-            ,LEFT([ACPT_DELIVERY_DATE],10) AS 납기일
+            ,CONVERT(varchar, [ACPT_PAY_DATE], 23) AS 결제예정일
+            ,CONVERT(varchar, [ACPT_DELIVERY_DATE], 23) AS 납기일
             ,[ACPT_DELIVERY_ADDRESS] AS 도착지주소
             ,[ACPT_ETC] AS 기타
             ,[ACPT_NOTE] AS 비고
@@ -879,7 +883,7 @@ router.post("/accept", async (req, res) => {
         FROM(
           SELECT
             [ACPT_PK] AS NO
-            ,LEFT([ACPT_DATE],10) AS 수주일
+            ,CONVERT(varchar, [ACPT_DATE], 23) AS 수주일
             ,[ACPT_CODE] AS 코드
             ,[ACPT_CODE_NUM] AS 코드순번
             ,[ACPT_DIV] AS 구분
@@ -895,8 +899,8 @@ router.post("/accept", async (req, res) => {
             ,[ACPT_SUPPLY_COST] AS 공급가액
             ,[ACPT_TAX_COST] AS 세액
             ,[ACPT_PAY_CONDITION] AS 결제조건
-            ,LEFT([ACPT_PAY_DATE],10) AS 결제예정일
-            ,LEFT([ACPT_DELIVERY_DATE],10) AS 납기일
+            ,CONVERT(varchar, [ACPT_PAY_DATE], 23) AS 결제예정일
+            ,CONVERT(varchar, [ACPT_DELIVERY_DATE], 23) AS 납기일
             ,[ACPT_DELIVERY_ADDRESS] AS 도착지주소
             ,[ACPT_ETC] AS 기타
             ,[ACPT_NOTE] AS 비고

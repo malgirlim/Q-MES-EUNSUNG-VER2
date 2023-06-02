@@ -22,13 +22,13 @@ import { toast } from "vue3-toastify";
 
 // API 보내는 함수 및 인터페이스 불러오기
 import { useSendApi } from "../../composables/useSendApi";
-import { ShareNotice } from "../../interfaces/menu/infoInterface";
+import { ForecastNotify } from "../../interfaces/menu/infoInterface";
 
 // 컴포넌트 로드
 import MasterDetail from "../../components/Common/Detail/MasterClientDetail.vue";
 
 const { proxy }: any = getCurrentInstance();
-const user_level = proxy.gstate.level.ShareNotice; //권한레벨
+const user_level = proxy.gstate.level.OrderForecast; //권한레벨
 
 // 페이지 로딩 시 시작
 onMounted(async () => {
@@ -43,20 +43,20 @@ const pageChangeFirst = () => {
 };
 
 // dataManager 만들기
-const url = "/api/info/announ";
-const dataManager = useSendApi<ShareNotice>(url, currentPage, rowsPerPage);
+const url = "/api/info/order/forecast";
+const dataManager = useSendApi<ForecastNotify>(url, currentPage, rowsPerPage);
 
 // 테이블항목 설정 및 가로크기 조정
 const table_setting = {
   체크박스: { name: "체크박스", style: "width: 5px" },
   순번: { name: "순번", style: "width: 5px; text-align: center;" },
   항목1: { name: "구분", style: "width: 50px; text-align: center;" },
-  항목2: { name: "제목", style: "width: 100px; text-align: center;" },
+  항목2: { name: "내용", style: "width: 500px; text-align: center;" },
   항목3: { name: "비고", style: "width: 50px; text-align: center;" },
   항목4: { name: "등록자", style: "width: 50px; text-align: center;" },
   항목5: { name: "등록일시", style: "width: 50px; text-align: center;" },
-  상세보기: { name: "정보", style: "width: 5px; text-align: center;" },
-  편집: { name: "편집", style: "width: 5px; text-align: center;" },
+  상세보기: { name: "정보", style: "width: 50px; text-align: center;" },
+  편집: { name: "편집", style: "width: 50px; text-align: center;" },
 };
 
 // v-tom (모달 실시간 데이터 변동) 에 필요한 함수
@@ -172,7 +172,7 @@ const insert_check = () => {
 
 // ########################## 등록, 수정, 삭제, 상세 Modal ##########################
 // ##### 등록 Modal #####
-let insertModalData: ShareNotice;
+let insertModalData: ForecastNotify;
 const insertModal = ref(false);
 const setInsertModal = (value: boolean) => {
   if (user_level >= 3) {
@@ -210,7 +210,7 @@ const setEditModal = (value: boolean) => {
     toast.warning("액세스 권한이 없습니다.\n관리자에게 문의하세요.");
   }
 };
-let editModalData: ShareNotice; // 수정할 변수
+let editModalData: ForecastNotify; // 수정할 변수
 // 수정버튼 누르면 실행되는 함수
 const editDataFunction = async () => {
   await dataManager.editData(editModalData); // await : 이 함수가 끝나야 다음으로 넘어간다
@@ -362,7 +362,9 @@ const onFileImport = (event: any) => {
 };
 </script>
 
-##############################################################################################################
+#############################################################################################################################
+#############################################################################################################################
+#############################################################################################################################
 
 <template>
   <div v-if="user_level >= 2">
@@ -783,6 +785,11 @@ const onFileImport = (event: any) => {
     <footer>&copy;2023 QInnotek. All rights reserved.</footer>
   </div>
   <!-- END: FOOTER(COPYRIGHT) -->
+
+  <!-- #############################################################################################################################
+#############################################################################################################################
+############################################################################################################################# -->
+
   <!-- BEGIN: Insert Modal Content -->
   <Dialog size="md" :open="insertModal">
     <Dialog.Panel class="p-10 text-center">
@@ -800,7 +807,7 @@ const onFileImport = (event: any) => {
         <Tab.Panels class="mt-5">
           <Tab.Panel class="leading-relaxed">
             <div style="text-align: left">
-              <div class="mt-3">
+              <!-- <div class="mt-3">
                 <FormLabel htmlFor="vertical-form-1">구분</FormLabel>
                 <FormSelect v-model="insertModalData.구분" class="">
                   <option>전체</option>
@@ -813,13 +820,13 @@ const onFileImport = (event: any) => {
                   <option>자재</option>
                   <option>품질</option>
                 </FormSelect>
-              </div>
+              </div> -->
               <div class="mt-3">
-                <FormLabel htmlFor="vertical-form-2">제목</FormLabel>
+                <FormLabel htmlFor="vertical-form-1">구분</FormLabel>
                 <FormInput
-                  id="vertical-form-2"
+                  id="vertical-form-1"
                   type="text"
-                  v-model="insertModalData.제목"
+                  v-model="insertModalData.구분"
                   placeholder=""
                 />
               </div>
@@ -893,7 +900,7 @@ const onFileImport = (event: any) => {
         <Tab.Panels class="mt-5">
           <Tab.Panel class="leading-relaxed">
             <div style="text-align: left">
-              <div class="mt-3">
+              <!-- <div class="mt-3">
                 <FormLabel htmlFor="vertical-form-1">구분</FormLabel>
                 <FormSelect v-model="editModalData.구분" class="">
                   <option>전체</option>
@@ -906,13 +913,13 @@ const onFileImport = (event: any) => {
                   <option>자재</option>
                   <option>품질</option>
                 </FormSelect>
-              </div>
+              </div> -->
               <div class="mt-3">
-                <FormLabel htmlFor="vertical-form-2">제목</FormLabel>
+                <FormLabel htmlFor="vertical-form-2">구분</FormLabel>
                 <FormInput
                   id="vertical-form-2"
                   type="text"
-                  v-model="editModalData.제목"
+                  v-model="editModalData.구분"
                   placeholder=""
                 />
               </div>

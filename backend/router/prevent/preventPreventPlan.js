@@ -45,8 +45,8 @@ router.get("/", async (req, res) => {
         ,[PVPL_UNIT] AS 단위
         ,[PVPL_MIN] AS 최소
         ,[PVPL_MAX] AS 최대
-        ,LEFT([PVPL_DATE],10) AS 계획일
-        ,LEFT([PVPL_WARN_DATE],10) AS 예보일
+        ,CONVERT(varchar, [PVPL_DATE], 23) AS 계획일
+        ,CONVERT(varchar, [PVPL_WARN_DATE], 23) AS 예보일
         ,[PVPL_USER_ID] AS 담당자ID
         ,(SELECT [USER_NAME] FROM [QMES2022].[dbo].[MASTER_USER_TB] WHERE [USER_ID] = [PVPL_USER_ID]) AS 담당자
         ,[PVPL_NOTE] AS 비고
@@ -100,8 +100,8 @@ router.post("/", async (req, res) => {
             ,[PVPL_UNIT] AS 단위
             ,[PVPL_MIN] AS 최소
             ,[PVPL_MAX] AS 최대
-            ,LEFT([PVPL_DATE],10) AS 계획일
-            ,LEFT([PVPL_WARN_DATE],10) AS 예보일
+            ,CONVERT(varchar, [PVPL_DATE], 23) AS 계획일
+            ,CONVERT(varchar, [PVPL_WARN_DATE], 23) AS 예보일
             ,[PVPL_USER_ID] AS 담당자ID
             ,(SELECT [USER_NAME] FROM [QMES2022].[dbo].[MASTER_USER_TB] WHERE [USER_ID] = [PVPL_USER_ID]) AS 담당자
             ,[PVPL_NOTE] AS 비고
@@ -147,8 +147,8 @@ router.post("/", async (req, res) => {
             ,[PVPL_UNIT] AS 단위
             ,[PVPL_MIN] AS 최소
             ,[PVPL_MAX] AS 최대
-            ,LEFT([PVPL_DATE],10) AS 계획일
-            ,LEFT([PVPL_WARN_DATE],10) AS 예보일
+            ,CONVERT(varchar, [PVPL_DATE], 23) AS 계획일
+            ,CONVERT(varchar, [PVPL_WARN_DATE], 23) AS 예보일
             ,[PVPL_USER_ID] AS 담당자ID
             ,(SELECT [USER_NAME] FROM [QMES2022].[dbo].[MASTER_USER_TB] WHERE [USER_ID] = [PVPL_USER_ID]) AS 담당자
             ,[PVPL_NOTE] AS 비고
@@ -180,7 +180,11 @@ router.post("/", async (req, res) => {
         req.body.searchKey +
         " 조건으로 '" +
         req.body.searchInput +
-        "' 을 조회."),
+        "' 을 조회. (" +
+        req.body.startDate +
+        "-" +
+        req.body.endDate +
+        ")"),
       (amount = result.recordset.length ?? 0),
       (user = req.body.user ?? "")
     );
@@ -407,8 +411,8 @@ router.post("/delete", async (req, res) => {
           ,[PVPL_UNIT] AS 단위
           ,[PVPL_MIN] AS 최소
           ,[PVPL_MAX] AS 최대
-          ,LEFT([PVPL_DATE],10) AS 계획일
-          ,LEFT([PVPL_WARN_DATE],10) AS 예보일
+          ,CONVERT(varchar, [PVPL_DATE], 23) AS 계획일
+          ,CONVERT(varchar, [PVPL_WARN_DATE], 23) AS 예보일
           ,[PVPL_USER_ID] AS 담당자ID
           ,(SELECT [USER_NAME] FROM [QMES2022].[dbo].[MASTER_USER_TB] WHERE [USER_ID] = [PVPL_USER_ID]) AS 담당자
           ,[PVPL_NOTE] AS 비고

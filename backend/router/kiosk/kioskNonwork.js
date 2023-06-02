@@ -78,7 +78,7 @@ router.get("/", async (req, res) => {
           ,ITEM.규격 AS 규격
           ,ITEM.단위 AS 단위
           ,[WKIS_AMOUNT] AS 수량
-          ,LEFT([WKIS_START_DATE],10) AS 시작일
+          ,CONVERT(varchar, [WKIS_START_DATE], 23) AS 시작일
           ,[WKIS_NOTE] AS 비고
           ,[WKIS_REGIST_NM] AS 등록자
           ,[WKIS_REGIST_DT] AS 등록일시
@@ -233,7 +233,7 @@ router.post("/", async (req, res) => {
               ,ITEM.규격 AS 규격
               ,ITEM.단위 AS 단위
               ,[WKIS_AMOUNT] AS 수량
-              ,LEFT([WKIS_START_DATE],10) AS 시작일
+              ,CONVERT(varchar, [WKIS_START_DATE], 23) AS 시작일
               ,[WKIS_NOTE] AS 비고
               ,[WKIS_REGIST_NM] AS 등록자
               ,[WKIS_REGIST_DT] AS 등록일시
@@ -388,7 +388,7 @@ router.post("/", async (req, res) => {
               ,ITEM.규격 AS 규격
               ,ITEM.단위 AS 단위
               ,[WKIS_AMOUNT] AS 수량
-              ,LEFT([WKIS_START_DATE],10) AS 시작일
+              ,CONVERT(varchar, [WKIS_START_DATE], 23) AS 시작일
               ,[WKIS_NOTE] AS 비고
               ,[WKIS_REGIST_NM] AS 등록자
               ,[WKIS_REGIST_DT] AS 등록일시
@@ -493,7 +493,11 @@ router.post("/", async (req, res) => {
         req.body.searchKey +
         " 조건으로 '" +
         req.body.searchInput +
-        "' 을 조회."),
+        "' 을 조회. (" +
+        req.body.startDate +
+        "-" +
+        req.body.endDate +
+        ")"),
       (amount = result.recordset.length ?? 0),
       (user = req.body.user ?? "")
     );

@@ -140,7 +140,11 @@ router.post("/", async (req, res) => {
         req.body.searchKey +
         " 조건으로 '" +
         req.body.searchInput +
-        "' 을 조회."),
+        "' 을 조회. (" +
+        req.body.startDate +
+        "-" +
+        req.body.endDate +
+        ")"),
       (amount = result.recordset.length ?? 0),
       (user = req.body.user ?? "")
     );
@@ -315,7 +319,7 @@ router.post("/delete", async (req, res) => {
           ,[NOTC_CONTENT] AS 내용
           ,[NOTC_NOTE] AS 비고
           ,(SELECT [USER_NAME] FROM [QMES2022].[dbo].[MASTER_USER_TB] WHERE [USER_ID] = [NOTC_REGIST_NM]) AS 등록자
-          ,LEFT([NOTC_REGIST_DT],10) AS 등록일시
+          ,CONVERT(varchar, [NOTC_REGIST_DT], 23) AS 등록일시
         FROM [QMES2022].[dbo].[SHARE_NOTICE_TB]
         WHERE [NOTC_PK] = @key
       `);

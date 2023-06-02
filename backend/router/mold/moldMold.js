@@ -46,8 +46,8 @@ router.get("/", async (req, res) => {
         ,(SELECT [PRCS_NAME] FROM [QMES2022].[dbo].[MASTER_PROCESS_TB] WHERE [PRCS_PK] = [MOLD_PROCESS_PK]) AS 공정명
         ,[MOLD_MAKER] AS 제작사
         ,[MOLD_COST] AS 가격
-        ,LEFT([MOLD_GETDATE],10) AS 취득일자
-        ,LEFT([MOLD_LIFE],10) AS 교체수명일
+        ,CONVERT(varchar, [MOLD_GETDATE], 23) AS 취득일자
+        ,CONVERT(varchar, [MOLD_LIFE], 23) AS 교체수명일
         ,[MOLD_PLACE] AS 보관장소
         ,[MOLD_IMAGE] AS 사진
         ,[MOLD_USE] AS 사용여부
@@ -103,8 +103,8 @@ router.post("/", async (req, res) => {
             ,(SELECT [PRCS_NAME] FROM [QMES2022].[dbo].[MASTER_PROCESS_TB] WHERE [PRCS_PK] = [MOLD_PROCESS_PK]) AS 공정명
             ,[MOLD_MAKER] AS 제작사
             ,[MOLD_COST] AS 가격
-            ,LEFT([MOLD_GETDATE],10) AS 취득일자
-            ,LEFT([MOLD_LIFE],10) AS 교체수명일
+            ,CONVERT(varchar, [MOLD_GETDATE], 23) AS 취득일자
+            ,CONVERT(varchar, [MOLD_LIFE], 23) AS 교체수명일
             ,[MOLD_PLACE] AS 보관장소
             ,[MOLD_IMAGE] AS 사진
             ,[MOLD_USE] AS 사용여부
@@ -154,8 +154,8 @@ router.post("/", async (req, res) => {
             ,(SELECT [PRCS_NAME] FROM [QMES2022].[dbo].[MASTER_PROCESS_TB] WHERE [PRCS_PK] = [MOLD_PROCESS_PK]) AS 공정명
             ,[MOLD_MAKER] AS 제작사
             ,[MOLD_COST] AS 가격
-            ,LEFT([MOLD_GETDATE],10) AS 취득일자
-            ,LEFT([MOLD_LIFE],10) AS 교체수명일
+            ,CONVERT(varchar, [MOLD_GETDATE], 23) AS 취득일자
+            ,CONVERT(varchar, [MOLD_LIFE], 23) AS 교체수명일
             ,[MOLD_PLACE] AS 보관장소
             ,[MOLD_IMAGE] AS 사진
             ,[MOLD_USE] AS 사용여부
@@ -188,7 +188,11 @@ router.post("/", async (req, res) => {
         req.body.searchKey +
         " 조건으로 '" +
         req.body.searchInput +
-        "' 을 조회."),
+        "' 을 조회. (" +
+        req.body.startDate +
+        "-" +
+        req.body.endDate +
+        ")"),
       (amount = result.recordset.length ?? 0),
       (user = req.body.user ?? "")
     );
@@ -434,8 +438,8 @@ router.post("/delete", async (req, res) => {
           ,(SELECT [PRCS_NAME] FROM [QMES2022].[dbo].[MASTER_PROCESS_TB] WHERE [PRCS_PK] = [MOLD_PROCESS_PK]) AS 공정명
           ,[MOLD_MAKER] AS 제작사
           ,[MOLD_COST] AS 가격
-          ,LEFT([MOLD_GETDATE],10) AS 취득일자
-          ,LEFT([MOLD_LIFE],10) AS 교체수명일
+          ,CONVERT(varchar, [MOLD_GETDATE], 23) AS 취득일자
+          ,CONVERT(varchar, [MOLD_LIFE], 23) AS 교체수명일
           ,[MOLD_PLACE] AS 보관장소
           ,[MOLD_IMAGE] AS 사진
           ,[MOLD_USE] AS 사용여부

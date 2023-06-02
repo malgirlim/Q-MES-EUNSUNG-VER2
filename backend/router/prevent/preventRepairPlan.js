@@ -42,8 +42,8 @@ router.get("/", async (req, res) => {
         ,[FCFPL_CONTENT] AS 내용
         ,[FCFPL_HOW] AS 수리방법
         ,[FCFPL_STAND] AS 기준
-        ,LEFT([FCFPL_DATE],10) AS 계획일
-        ,LEFT([FCFPL_WARN_DATE],10) AS 예보일
+        ,CONVERT(varchar, [FCFPL_DATE], 23) AS 계획일
+        ,CONVERT(varchar, [FCFPL_WARN_DATE], 23) AS 예보일
         ,[FCFPL_USER_ID] AS 담당자ID
         ,(SELECT [USER_NAME] FROM [QMES2022].[dbo].[MASTER_USER_TB] WHERE [USER_ID] = [FCFPL_USER_ID]) AS 담당자
         ,[FCFPL_NOTE] AS 비고
@@ -94,8 +94,8 @@ router.post("/", async (req, res) => {
             ,[FCFPL_CONTENT] AS 내용
             ,[FCFPL_HOW] AS 수리방법
             ,[FCFPL_STAND] AS 기준
-            ,LEFT([FCFPL_DATE],10) AS 계획일
-            ,LEFT([FCFPL_WARN_DATE],10) AS 예보일
+            ,CONVERT(varchar, [FCFPL_DATE], 23) AS 계획일
+            ,CONVERT(varchar, [FCFPL_WARN_DATE], 23) AS 예보일
             ,[FCFPL_USER_ID] AS 담당자ID
             ,(SELECT [USER_NAME] FROM [QMES2022].[dbo].[MASTER_USER_TB] WHERE [USER_ID] = [FCFPL_USER_ID]) AS 담당자
             ,[FCFPL_NOTE] AS 비고
@@ -135,8 +135,8 @@ router.post("/", async (req, res) => {
             ,[FCFPL_CONTENT] AS 내용
             ,[FCFPL_HOW] AS 수리방법
             ,[FCFPL_STAND] AS 기준
-            ,LEFT([FCFPL_DATE],10) AS 계획일
-            ,LEFT([FCFPL_WARN_DATE],10) AS 예보일
+            ,CONVERT(varchar, [FCFPL_DATE], 23) AS 계획일
+            ,CONVERT(varchar, [FCFPL_WARN_DATE], 23) AS 예보일
             ,[FCFPL_USER_ID] AS 담당자ID
             ,(SELECT [USER_NAME] FROM [QMES2022].[dbo].[MASTER_USER_TB] WHERE [USER_ID] = [FCFPL_USER_ID]) AS 담당자
             ,[FCFPL_NOTE] AS 비고
@@ -168,7 +168,11 @@ router.post("/", async (req, res) => {
         req.body.searchKey +
         " 조건으로 '" +
         req.body.searchInput +
-        "' 을 조회."),
+        "' 을 조회. (" +
+        req.body.startDate +
+        "-" +
+        req.body.endDate +
+        ")"),
       (amount = result.recordset.length ?? 0),
       (user = req.body.user ?? "")
     );
@@ -374,8 +378,8 @@ router.post("/delete", async (req, res) => {
           ,[FCFPL_CONTENT] AS 내용
           ,[FCFPL_HOW] AS 수리방법
           ,[FCFPL_STAND] AS 기준
-          ,LEFT([FCFPL_DATE],10) AS 계획일
-          ,LEFT([FCFPL_WARN_DATE],10) AS 예보일
+          ,CONVERT(varchar, [FCFPL_DATE], 23) AS 계획일
+          ,CONVERT(varchar, [FCFPL_WARN_DATE], 23) AS 예보일
           ,[FCFPL_USER_ID] AS 담당자ID
           ,(SELECT [USER_NAME] FROM [QMES2022].[dbo].[MASTER_USER_TB] WHERE [USER_ID] = [FCFPL_USER_ID]) AS 담당자
           ,[FCFPL_NOTE] AS 비고
