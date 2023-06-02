@@ -22,7 +22,8 @@ import { toast } from "vue3-toastify";
 
 // API 보내는 함수 및 인터페이스 불러오기
 import { useSendApi } from "../../composables/useSendApi";
-import { MoldUse } from "../../interfaces/menu/moldInterface";
+import { MasterMold, MoldUse } from "../../interfaces/menu/moldInterface";
+import { ProductionResult } from "../../interfaces/menu/productionInterface";
 
 // 컴포넌트 로드
 import MasterDetail from "../../components/Common/Detail/MasterClientDetail.vue";
@@ -33,6 +34,8 @@ const user_level = proxy.gstate.level.PreventChangeNotify; //권한레벨
 // 페이지 로딩 시 시작
 onMounted(async () => {
   dataManager.loadDatas(); // 거래처 데이터 불러오기
+  molduse_modal_mold.loadDatas(); // 금형 데이터 불러오기
+  molduse_modal_produceresult.loadDatas(); // 생산실적 데이터 불러오기
 });
 
 // 페이징기능
@@ -46,14 +49,22 @@ const pageChangeFirst = () => {
 const url = "/api/mold/use";
 const dataManager = useSendApi<MoldUse>(url, currentPage, rowsPerPage);
 
+// 금형 데이터 가져오기
+const url_molduse_modal_mold = "/api/mold/modal/mold";
+const molduse_modal_mold = useSendApi<MasterMold>(
+  url_molduse_modal_mold,
+  ref(1),
+  ref(10)
+);
+
 // 테이블항목 설정 및 가로크기 조정
 const table_setting = {
   체크박스: { name: "체크박스", style: "width: 5px" },
   순번: { name: "순번", style: "width: 5px; text-align: center;" },
   항목1: { name: "사용일자", style: "width: 50px; text-align: center;" },
-  항목2: { name: "금형코드", style: "width: 50px; text-align: center;" },
-  항목3: { name: "금형명", style: "width: 50px; text-align: center;" },
-  항목4: { name: "사용횟수", style: "width: 50px; text-align: center;" },
+  항목2: { name: "사용횟수", style: "width: 50px; text-align: center;" },
+  항목3: { name: "금형코드", style: "width: 50px; text-align: center;" },
+  항목4: { name: "금형명", style: "width: 50px; text-align: center;" },
   항목5: { name: "작업코드", style: "width: 50px; text-align: center;" },
   항목6: { name: "품번", style: "width: 50px; text-align: center;" },
   항목7: { name: "품목구분", style: "width: 50px; text-align: center;" },
@@ -179,7 +190,7 @@ const insert_check = () => {
 
 // ########################## 등록, 수정, 삭제, 상세 Modal ##########################
 // ##### 등록 Modal #####
-let insertModalData: ForecastNotify;
+let insertModalData: MoldUse;
 const insertModal = ref(false);
 const setInsertModal = (value: boolean) => {
   if (user_level >= 3) {
@@ -189,6 +200,7 @@ const setInsertModal = (value: boolean) => {
     // set_담당자.value = null;
     insertModal.value = value;
     insertModalData = {}; // 변수 초기화
+    editModalData = {}; // 변수 초기화
   } else {
     toast.warning("액세스 권한이 없습니다.\n관리자에게 문의하세요.");
   }
@@ -212,12 +224,13 @@ const editModal = ref(false);
 const setEditModal = (value: boolean) => {
   if (user_level >= 3) {
     editModal.value = value;
+    insertModalData = {}; // 변수 초기화
     search();
   } else {
     toast.warning("액세스 권한이 없습니다.\n관리자에게 문의하세요.");
   }
 };
-let editModalData: ForecastNotify; // 수정할 변수
+let editModalData: MoldUse; // 수정할 변수
 // 수정버튼 누르면 실행되는 함수
 const editDataFunction = async () => {
   await dataManager.editData(editModalData); // await : 이 함수가 끝나야 다음으로 넘어간다
@@ -367,6 +380,134 @@ const onFileImport = (event: any) => {
     reader.readAsArrayBuffer(file);
   }
 };
+
+// ############################################### 생산실적 가져오기 ###############################################
+// 페이징기능
+const currentPage_produceresult = ref(1); // 현재페이지
+const rowsPerPage_produceresult = ref(10); // 한 페이지에 보여질 데이터 갯수
+const pageChangeFirst_produceresult = () => {
+  currentPage_produceresult.value = 1; // 데이터 갯수 변경 시 1페이지로 이동
+};
+
+// 품목 데이터 설정
+const url_molduse_modal_produceresult = "/api/mold/modal/produceresult";
+const molduse_modal_produceresult = useSendApi<ProductionResult>(
+  url_molduse_modal_produceresult,
+  currentPage_produceresult,
+  rowsPerPage_produceresult
+);
+
+// 테이블항목 설정 및 가로크기 조정
+const table_setting_modal_produceresult = {
+  순번: { name: "순번", style: "width: 50px; text-align: center;" },
+  항목1: { name: "작업코드", style: "width: 50px; text-align: center;" },
+  항목2: { name: "품번", style: "width: 50px; text-align: center;" },
+  항목3: { name: "품목구분", style: "width: 50px; text-align: center;" },
+  항목4: { name: "품명", style: "width: 50px; text-align: center;" },
+  항목5: { name: "규격", style: "width: 50px; text-align: center;" },
+  항목6: { name: "단위", style: "width: 50px; text-align: center;" },
+  항목7: { name: "지시수량", style: "width: 50px; text-align: center;" },
+  항목8: { name: "공정", style: "width: 50px; text-align: center;" },
+  항목9: { name: "설비명", style: "width: 50px; text-align: center;" },
+  항목10: { name: "작업자", style: "width: 50px; text-align: center;" },
+  항목11: { name: "시작일시", style: "width: 50px; text-align: center;" },
+  항목12: { name: "종료일시", style: "width: 50px; text-align: center;" },
+  항목13: { name: "생산수", style: "width: 50px; text-align: center;" },
+  항목14: { name: "불량수", style: "width: 50px; text-align: center;" },
+};
+
+// ########################## 조회기간 설정 ##########################
+const searchDate_produceresult = ref("전체기간");
+// ########################## 품목 조회  ##########################
+const searchKey_produceresult = ref("전체");
+const searchInput_produceresult = ref("");
+const sortKey_produceresult = ref("등록일");
+const sortOrder_produceresult = ref("내림차순");
+const sortOrderToggle_produceresult = () => {
+  sortOrder_produceresult.value =
+    sortOrder_produceresult.value == "내림차순" ? "오름차순" : "내림차순";
+};
+//  정렬기준이 변경되면 실행
+watch(
+  [sortKey_produceresult, sortOrder_produceresult],
+  (newValue, oldValue) => {
+    search_produceresult();
+    pageChangeFirst_produceresult();
+  }
+);
+const search_produceresult = () => {
+  // console.log(searchKey.value, searchInput.value);
+  molduse_modal_produceresult.searchDatas(
+    searchDate_produceresult.value,
+    searchKey_produceresult.value,
+    searchInput_produceresult.value,
+    sortKey_produceresult.value,
+    sortOrder_produceresult.value
+  );
+};
+
+// ########################## 모달 설정 ##########################
+const produceresultModal = ref(false);
+const setProduceResultModal = (value: boolean) => {
+  produceresultModal.value = value;
+};
+
+// 모달에서 선택한 품목을 itemProcesslist에 넣기
+const importProduceResult = (no: any) => {
+  insertModalData.생산실적NO = no;
+  insertModalData.작업코드 = molduse_modal_produceresult.dataAll.value.filter(
+    (c) => c.NO == no
+  )[0].작업코드;
+  insertModalData.품번 = molduse_modal_produceresult.dataAll.value.filter(
+    (c) => c.NO == no
+  )[0].품번;
+  insertModalData.품목구분 = molduse_modal_produceresult.dataAll.value.filter(
+    (c) => c.NO == no
+  )[0].품목구분;
+  insertModalData.품명 = molduse_modal_produceresult.dataAll.value.filter(
+    (c) => c.NO == no
+  )[0].품명;
+  insertModalData.규격 = molduse_modal_produceresult.dataAll.value.filter(
+    (c) => c.NO == no
+  )[0].규격;
+  insertModalData.단위 = molduse_modal_produceresult.dataAll.value.filter(
+    (c) => c.NO == no
+  )[0].단위;
+  insertModalData.생산수 = molduse_modal_produceresult.dataAll.value.filter(
+    (c) => c.NO == no
+  )[0].생산수;
+  insertModalData.불량수 = molduse_modal_produceresult.dataAll.value.filter(
+    (c) => c.NO == no
+  )[0].불량수;
+
+  editModalData.생산실적NO = no;
+  editModalData.작업코드 = molduse_modal_produceresult.dataAll.value.filter(
+    (c) => c.NO == no
+  )[0].작업코드;
+  editModalData.품번 = molduse_modal_produceresult.dataAll.value.filter(
+    (c) => c.NO == no
+  )[0].품번;
+  editModalData.품목구분 = molduse_modal_produceresult.dataAll.value.filter(
+    (c) => c.NO == no
+  )[0].품목구분;
+  editModalData.품명 = molduse_modal_produceresult.dataAll.value.filter(
+    (c) => c.NO == no
+  )[0].품명;
+  editModalData.규격 = molduse_modal_produceresult.dataAll.value.filter(
+    (c) => c.NO == no
+  )[0].규격;
+  editModalData.단위 = molduse_modal_produceresult.dataAll.value.filter(
+    (c) => c.NO == no
+  )[0].단위;
+  editModalData.생산수 = molduse_modal_produceresult.dataAll.value.filter(
+    (c) => c.NO == no
+  )[0].생산수;
+  editModalData.불량수 = molduse_modal_produceresult.dataAll.value.filter(
+    (c) => c.NO == no
+  )[0].불량수;
+
+  setProduceResultModal(false);
+};
 </script>
 
 #############################################################################################################################
@@ -411,52 +552,56 @@ const onFileImport = (event: any) => {
             <Lucide icon="RefreshCcw" class="w-4 h-4 mr-3" /> 새로고침
           </a>
         </div>
-        <!-- <div>
-        <Button
-          class="mr-2 shadow-md"
-          as="a"
-          size="sm"
-          variant="outline-primary"
-          @click="reset_date"
-          title="기간 초기화"
-          ><Lucide icon="CalendarX" class="w-5 h-5"
-        /></Button>
-      </div>
-      <div class="text-center">
         <div>
-          <Litepicker
-            v-model="searchDate"
-            :options="{
-              autoApply: false,
-              singleMode: false,
-              numberOfColumns: 1,
-              numberOfMonths: 1,
-              showWeekNumbers: true,
-              dropdowns: {
-                minYear: Number(min_year),
-                maxYear: Number(max_year),
-                months: true,
-                years: true,
-              },
-              lang: 'ko',
-              format: 'YY/MM/DD',
-              delimiter: ' - ',
-              buttonText: litepikerButtonText,
-            }"
-            class="block w-40 mx-auto !box"
-            placeholder="전체기간"
-          />
+          <Button
+            class="mr-2 shadow-md"
+            as="a"
+            size="sm"
+            variant="outline-primary"
+            @click="reset_date"
+            title="기간 초기화"
+            ><Lucide icon="CalendarX" class="w-5 h-5"
+          /></Button>
         </div>
-      </div> -->
+        <div class="text-center">
+          <div>
+            <Litepicker
+              v-model="searchDate"
+              :options="{
+                autoApply: false,
+                singleMode: false,
+                numberOfColumns: 1,
+                numberOfMonths: 1,
+                showWeekNumbers: true,
+                dropdowns: {
+                  minYear: Number(min_year),
+                  maxYear: Number(max_year),
+                  months: true,
+                  years: true,
+                },
+                lang: 'ko',
+                format: 'YY/MM/DD',
+                delimiter: ' - ',
+                buttonText: litepikerButtonText,
+              }"
+              class="block w-40 mx-auto !box"
+              placeholder="전체기간"
+            />
+          </div>
+        </div>
         <div class="ml-2">
           <FormSelect v-model="searchKey" class="w-30 mt-3 !box sm:mt-0">
             <option>전체</option>
-            <option>구분</option>
-            <option>제목</option>
-            <option>내용</option>
+            <option>금형코드</option>
+            <option>금형명</option>
+            <option>작업코드</option>
+            <option>품번</option>
+            <option>품목구분</option>
+            <option>품명</option>
+            <option>규격</option>
+            <option>단위</option>
+            <option>사용일자</option>
             <option>비고</option>
-            <option>등록자</option>
-            <option>등록일시</option>
           </FormSelect>
         </div>
         <div class="w-full mt-3 sm:w-auto sm:mt-0 sm:ml-auto md:ml-2">
@@ -519,12 +664,16 @@ const onFileImport = (event: any) => {
         <div>
           <FormSelect v-model="sortKey" class="w-30 mt-3 !box sm:mt-0">
             <option>등록일</option>
-            <option>구분</option>
-            <option>제목</option>
-            <option>내용</option>
+            <option>금형코드</option>
+            <option>금형명</option>
+            <option>작업코드</option>
+            <option>품번</option>
+            <option>품목구분</option>
+            <option>품명</option>
+            <option>규격</option>
+            <option>단위</option>
+            <option>사용일자</option>
             <option>비고</option>
-            <option>등록자</option>
-            <option>등록일시</option>
           </FormSelect>
         </div>
         <div class="ml-3">
@@ -652,6 +801,48 @@ const onFileImport = (event: any) => {
                 </Table.Th>
                 <Table.Th
                   class="text-center border-b-0 whitespace-nowrap font-bold"
+                  :style="table_setting.항목6.style"
+                >
+                  {{ table_setting.항목6.name }}
+                </Table.Th>
+                <Table.Th
+                  class="text-center border-b-0 whitespace-nowrap font-bold"
+                  :style="table_setting.항목7.style"
+                >
+                  {{ table_setting.항목7.name }}
+                </Table.Th>
+                <Table.Th
+                  class="text-center border-b-0 whitespace-nowrap font-bold"
+                  :style="table_setting.항목8.style"
+                >
+                  {{ table_setting.항목8.name }}
+                </Table.Th>
+                <Table.Th
+                  class="text-center border-b-0 whitespace-nowrap font-bold"
+                  :style="table_setting.항목9.style"
+                >
+                  {{ table_setting.항목9.name }}
+                </Table.Th>
+                <Table.Th
+                  class="text-center border-b-0 whitespace-nowrap font-bold"
+                  :style="table_setting.항목10.style"
+                >
+                  {{ table_setting.항목10.name }}
+                </Table.Th>
+                <Table.Th
+                  class="text-center border-b-0 whitespace-nowrap font-bold"
+                  :style="table_setting.항목11.style"
+                >
+                  {{ table_setting.항목11.name }}
+                </Table.Th>
+                <Table.Th
+                  class="text-center border-b-0 whitespace-nowrap font-bold"
+                  :style="table_setting.항목12.style"
+                >
+                  {{ table_setting.항목12.name }}
+                </Table.Th>
+                <Table.Th
+                  class="text-center border-b-0 whitespace-nowrap font-bold"
                   :style="table_setting.상세보기.style"
                 >
                   {{ table_setting.상세보기.name }}
@@ -718,6 +909,48 @@ const onFileImport = (event: any) => {
                   :style="table_setting.항목5.style"
                 >
                   <div>{{ todo[table_setting.항목5.name] }}</div>
+                </Table.Td>
+                <Table.Td
+                  class="first:rounded-l-md last:rounded-r-md text-center bg-white border-b-0 dark:bg-darkmode-600 shadow-[20px_3px_20px_#0000000b]"
+                  :style="table_setting.항목6.style"
+                >
+                  <div>{{ todo[table_setting.항목6.name] }}</div>
+                </Table.Td>
+                <Table.Td
+                  class="first:rounded-l-md last:rounded-r-md text-center bg-white border-b-0 dark:bg-darkmode-600 shadow-[20px_3px_20px_#0000000b]"
+                  :style="table_setting.항목7.style"
+                >
+                  <div>{{ todo[table_setting.항목7.name] }}</div>
+                </Table.Td>
+                <Table.Td
+                  class="first:rounded-l-md last:rounded-r-md text-center bg-white border-b-0 dark:bg-darkmode-600 shadow-[20px_3px_20px_#0000000b]"
+                  :style="table_setting.항목8.style"
+                >
+                  <div>{{ todo[table_setting.항목8.name] }}</div>
+                </Table.Td>
+                <Table.Td
+                  class="first:rounded-l-md last:rounded-r-md text-center bg-white border-b-0 dark:bg-darkmode-600 shadow-[20px_3px_20px_#0000000b]"
+                  :style="table_setting.항목9.style"
+                >
+                  <div>{{ todo[table_setting.항목9.name] }}</div>
+                </Table.Td>
+                <Table.Td
+                  class="first:rounded-l-md last:rounded-r-md text-center bg-white border-b-0 dark:bg-darkmode-600 shadow-[20px_3px_20px_#0000000b]"
+                  :style="table_setting.항목10.style"
+                >
+                  <div>{{ todo[table_setting.항목10.name] }}</div>
+                </Table.Td>
+                <Table.Td
+                  class="first:rounded-l-md last:rounded-r-md text-center bg-white border-b-0 dark:bg-darkmode-600 shadow-[20px_3px_20px_#0000000b]"
+                  :style="table_setting.항목11.style"
+                >
+                  <div>{{ todo[table_setting.항목11.name] }}</div>
+                </Table.Td>
+                <Table.Td
+                  class="first:rounded-l-md last:rounded-r-md text-center bg-white border-b-0 dark:bg-darkmode-600 shadow-[20px_3px_20px_#0000000b]"
+                  :style="table_setting.항목12.style"
+                >
+                  <div>{{ todo[table_setting.항목12.name] }}</div>
                 </Table.Td>
                 <Table.Td
                   class="first:rounded-l-md last:rounded-r-md text-center bg-white border-b-0 dark:bg-darkmode-600 shadow-[20px_3px_20px_#0000000b] py-0 relative before:block before:w-px before:h-8 before:bg-slate-200 before:absolute before:left-0 before:inset-y-0 before:my-auto before:dark:bg-darkmode-400"
@@ -798,7 +1031,7 @@ const onFileImport = (event: any) => {
 ############################################################################################################################# -->
 
   <!-- BEGIN: Insert Modal Content -->
-  <Dialog size="md" :open="insertModal">
+  <Dialog size="md" :open="insertModal" :key="insertModalData?.생산실적NO">
     <Dialog.Panel class="p-10 text-center">
       <!--추가 Modal 내용 시작-->
       <div class="mb-5" style="font-weight: bold">등록</div>
@@ -813,43 +1046,128 @@ const onFileImport = (event: any) => {
         </Tab.List>
         <Tab.Panels class="mt-5">
           <Tab.Panel class="leading-relaxed">
-            <div style="text-align: left">
-              <!-- <div class="mt-3">
-                <FormLabel htmlFor="vertical-form-1">구분</FormLabel>
-                <FormSelect v-model="insertModalData.구분" class="">
-                  <option>전체</option>
-                  <option>경영</option>
-                  <option>금형</option>
-                  <option>설비</option>
-                  <option>생산</option>
-                  <option>영업</option>
-                  <option>외주</option>
-                  <option>자재</option>
-                  <option>품질</option>
-                </FormSelect>
-              </div> -->
+            <div
+              style="
+                text-align: left;
+                overflow-y: scroll;
+                overflow-x: hidden;
+                height: 500px;
+              "
+            >
               <div class="mt-3">
-                <FormLabel htmlFor="vertical-form-1">구분</FormLabel>
+                <FormLabel htmlFor="vertical-form-1">사용일자</FormLabel>
                 <FormInput
                   id="vertical-form-1"
-                  type="text"
-                  v-model="insertModalData.구분"
+                  type="date"
+                  v-model="insertModalData.사용일자"
                   placeholder=""
                 />
               </div>
               <div class="mt-3">
-                <FormLabel htmlFor="vertical-form-2">내용</FormLabel>
-                <FormTextarea
+                <FormLabel htmlFor="vertical-form-2">사용횟수</FormLabel>
+                <FormInput
                   id="vertical-form-2"
-                  formTextareaSize="sm"
-                  v-model="insertModalData.내용"
-                >
-                </FormTextarea>
+                  type="number"
+                  v-model="insertModalData.사용횟수"
+                  placeholder=""
+                />
+              </div>
+              <div class="mt-3">
+                <FormLabel htmlFor="vertical-form-3">금형</FormLabel>
+                <select v-tom v-model="insertModalData.금형NO">
+                  <option value="" selected>=== 필수 선택 ===</option>
+                  <option
+                    :value="p.NO"
+                    v-for="p in molduse_modal_mold.dataAll.value"
+                    :key="p.NO"
+                  >
+                    {{ p.코드 }} # 금형명:{{ p.금형명 }} # 규격:{{ p.규격 }}
+                  </option>
+                </select>
+              </div>
+              <div class="mt-3">
+                <FormLabel htmlFor="vertical-form-4">작업코드</FormLabel>
+                <FormInput
+                  type="text"
+                  v-model="insertModalData.작업코드"
+                  @click="setProduceResultModal(true)"
+                  placeholder="여기를 클릭하여 생산실적을 등록해주세요."
+                />
+              </div>
+              <div class="mt-3">
+                <FormLabel htmlFor="vertical-form-5">품번</FormLabel>
+                <FormInput
+                  type="text"
+                  v-model="insertModalData.품번"
+                  placeholder=""
+                  readonly
+                />
+              </div>
+              <div class="mt-3">
+                <FormLabel htmlFor="vertical-form-6">품목구분</FormLabel>
+                <FormInput
+                  type="text"
+                  v-model="insertModalData.품목구분"
+                  placeholder=""
+                  readonly
+                />
+              </div>
+              <div class="mt-3">
+                <FormLabel htmlFor="vertical-form-6">품명</FormLabel>
+                <FormInput
+                  type="text"
+                  v-model="insertModalData.품명"
+                  placeholder=""
+                  readonly
+                />
+              </div>
+              <div class="mt-3">
+                <FormLabel htmlFor="vertical-form-6">규격</FormLabel>
+                <FormInput
+                  type="text"
+                  v-model="insertModalData.규격"
+                  placeholder=""
+                  readonly
+                />
+              </div>
+              <div class="mt-3">
+                <FormLabel htmlFor="vertical-form-6">단위</FormLabel>
+                <FormInput
+                  type="text"
+                  v-model="insertModalData.단위"
+                  placeholder=""
+                  readonly
+                />
+              </div>
+              <div class="mt-3">
+                <FormLabel htmlFor="vertical-form-6">생산수</FormLabel>
+                <FormInput
+                  type="text"
+                  v-model="insertModalData.생산수"
+                  placeholder=""
+                  readonly
+                />
+              </div>
+              <div class="mt-3">
+                <FormLabel htmlFor="vertical-form-6">불량수</FormLabel>
+                <FormInput
+                  type="text"
+                  v-model="insertModalData.불량수"
+                  placeholder=""
+                  readonly
+                />
               </div>
             </div>
           </Tab.Panel>
           <Tab.Panel class="leading-relaxed">
-            <div style="text-align: left">
+            <div
+              style="
+                text-align: left;
+                overflow-y: scroll;
+                overflow-x: hidden;
+                height: 500px;
+              "
+            >
               <div class="mt-3">
                 <FormLabel htmlFor="vertical-form-11">비고</FormLabel>
                 <FormInput
@@ -892,7 +1210,7 @@ const onFileImport = (event: any) => {
   </Dialog>
   <!-- END: Insert Modal Content -->
   <!-- BEGIN: Edit Modal Content -->
-  <Dialog size="md" :open="editModal">
+  <Dialog size="md" :open="editModal" :key="editModalData?.생산실적NO">
     <Dialog.Panel class="p-10 text-center">
       <div class="mb-5" style="font-weight: bold">수정</div>
       <Tab.Group>
@@ -906,43 +1224,151 @@ const onFileImport = (event: any) => {
         </Tab.List>
         <Tab.Panels class="mt-5">
           <Tab.Panel class="leading-relaxed">
-            <div style="text-align: left">
-              <!-- <div class="mt-3">
-                <FormLabel htmlFor="vertical-form-1">구분</FormLabel>
-                <FormSelect v-model="editModalData.구분" class="">
-                  <option>전체</option>
-                  <option>경영</option>
-                  <option>금형</option>
-                  <option>설비</option>
-                  <option>생산</option>
-                  <option>영업</option>
-                  <option>외주</option>
-                  <option>자재</option>
-                  <option>품질</option>
-                </FormSelect>
-              </div> -->
+            <div
+              style="
+                text-align: left;
+                overflow-y: scroll;
+                overflow-x: hidden;
+                height: 500px;
+              "
+            >
               <div class="mt-3">
-                <FormLabel htmlFor="vertical-form-2">구분</FormLabel>
+                <FormLabel htmlFor="vertical-form-1">사용일자</FormLabel>
                 <FormInput
-                  id="vertical-form-2"
-                  type="text"
-                  v-model="editModalData.구분"
+                  id="vertical-form-1"
+                  type="date"
+                  v-model="editModalData.사용일자"
                   placeholder=""
                 />
               </div>
               <div class="mt-3">
-                <FormLabel htmlFor="vertical-form-2">내용</FormLabel>
-                <FormTextarea
+                <FormLabel htmlFor="vertical-form-2">사용횟수</FormLabel>
+                <FormInput
                   id="vertical-form-2"
-                  formTextareaSize="sm"
-                  v-model="editModalData.내용"
-                >
-                </FormTextarea>
+                  type="number"
+                  v-model="editModalData.사용횟수"
+                  placeholder=""
+                />
+              </div>
+              <div class="mt-3">
+                <FormLabel htmlFor="vertical-form-2">금형</FormLabel>
+                <select v-tom v-model="editModalData.금형NO">
+                  <option
+                    v-if="editModalData.금형NO"
+                    :value="editModalData.금형NO"
+                    selected
+                  >
+                    {{
+                      molduse_modal_mold.dataAll.value.filter(
+                        (c) => c.NO == editModalData.금형NO
+                      )[0].코드
+                    }}
+                    # 금형명:{{
+                      molduse_modal_mold.dataAll.value.filter(
+                        (c) => c.NO == editModalData.금형NO
+                      )[0].금형명
+                    }}
+                    # 규격:{{
+                      molduse_modal_mold.dataAll.value.filter(
+                        (c) => c.NO == editModalData.금형NO
+                      )[0].규격
+                    }}
+                  </option>
+                  <option v-if="!editModalData.금형NO" value="" selected>
+                    === 필수 선택 ===
+                  </option>
+                  <option
+                    :value="p.NO"
+                    v-for="p in molduse_modal_mold.dataAll.value"
+                    :key="p.NO"
+                  >
+                    {{ p.코드 }} # 금형명:{{ p.금형명 }} # 규격:{{ p.규격 }}
+                  </option>
+                </select>
+              </div>
+              <div class="mt-3">
+                <FormLabel htmlFor="vertical-form-4">작업코드</FormLabel>
+                <FormInput
+                  type="text"
+                  v-model="editModalData.작업코드"
+                  @click="setProduceResultModal(true)"
+                  placeholder="여기를 클릭하여 생산실적을 등록해주세요."
+                />
+              </div>
+              <div class="mt-3">
+                <FormLabel htmlFor="vertical-form-5">품번</FormLabel>
+                <FormInput
+                  type="text"
+                  v-model="editModalData.품번"
+                  placeholder=""
+                  readonly
+                />
+              </div>
+              <div class="mt-3">
+                <FormLabel htmlFor="vertical-form-6">품목구분</FormLabel>
+                <FormInput
+                  type="text"
+                  v-model="editModalData.품목구분"
+                  placeholder=""
+                  readonly
+                />
+              </div>
+              <div class="mt-3">
+                <FormLabel htmlFor="vertical-form-6">품명</FormLabel>
+                <FormInput
+                  type="text"
+                  v-model="editModalData.품명"
+                  placeholder=""
+                  readonly
+                />
+              </div>
+              <div class="mt-3">
+                <FormLabel htmlFor="vertical-form-6">규격</FormLabel>
+                <FormInput
+                  type="text"
+                  v-model="editModalData.규격"
+                  placeholder=""
+                  readonly
+                />
+              </div>
+              <div class="mt-3">
+                <FormLabel htmlFor="vertical-form-6">단위</FormLabel>
+                <FormInput
+                  type="text"
+                  v-model="editModalData.단위"
+                  placeholder=""
+                  readonly
+                />
+              </div>
+              <div class="mt-3">
+                <FormLabel htmlFor="vertical-form-6">생산수</FormLabel>
+                <FormInput
+                  type="text"
+                  v-model="editModalData.생산수"
+                  placeholder=""
+                  readonly
+                />
+              </div>
+              <div class="mt-3">
+                <FormLabel htmlFor="vertical-form-6">불량수</FormLabel>
+                <FormInput
+                  type="text"
+                  v-model="editModalData.불량수"
+                  placeholder=""
+                  readonly
+                />
               </div>
             </div>
           </Tab.Panel>
           <Tab.Panel class="leading-relaxed">
-            <div style="text-align: left">
+            <div
+              style="
+                text-align: left;
+                overflow-y: scroll;
+                overflow-x: hidden;
+                height: 500px;
+              "
+            >
               <div class="mt-3">
                 <FormLabel htmlFor="vertical-form-11">비고</FormLabel>
                 <FormInput
@@ -1061,6 +1487,11 @@ const onFileImport = (event: any) => {
     </Dialog.Panel>
   </Dialog>
   <!-- END: Delete Confirmation Modal -->
+
+  <!-- #######################################################################################################################
+  #######################################################################################################################
+  ####################################################################################################################### -->
+
   <!-- BEGIN: 엑셀 다운로드 Modal -->
   <Dialog :open="excelExportModal" @close="setExcelExportModal(false)">
     <Dialog.Panel>
@@ -1207,4 +1638,442 @@ const onFileImport = (event: any) => {
     </Dialog.Panel>
   </Dialog>
   <!-- END: 프린트 출력 Modal -->
+
+  <!-- #######################################################################################################################
+  ##################################################  생산실적 리스트  ###################################################
+  ####################################################################################################################### -->
+
+  <!-- BEGIN: Produce Result Modal Content -->
+  <Dialog
+    size="xxl"
+    :open="produceresultModal"
+    @close="setProduceResultModal(false)"
+  >
+    <Dialog.Panel class="p-10 text-center">
+      <!--ItemProcess Modal 내용 시작-->
+      <div class="mb-3" style="font-weight: bold; font-size: x-large">
+        생산실적 리스트
+      </div>
+      <div class="grid grid-cols-12 gap-1 mt-1">
+        <div
+          class="flex flex-wrap itemlist-center col-span-12 mt-2 mb-2 intro-y sm:flex-nowrap"
+        >
+          <div class="hidden mx-auto md:block text-slate-500"></div>
+          <div class="ml-2">
+            <FormSelect
+              v-model="searchKey_produceresult"
+              class="w-30 mt-3 !box sm:mt-0"
+            >
+              <option>전체</option>
+              <option>작업코드</option>
+              <option>품번</option>
+              <option>품목구분</option>
+              <option>품명</option>
+              <option>규격</option>
+              <option>단위</option>
+              <option>지시수량</option>
+              <option>공정</option>
+              <option>설비명</option>
+              <option>작업자</option>
+              <option>시작일시</option>
+              <option>종료일시</option>
+              <option>생산수</option>
+              <option>불량수</option>
+              <option>비고</option>
+            </FormSelect>
+          </div>
+          <div class="w-full mt-3 sm:w-auto sm:mt-0 sm:ml-auto md:ml-2">
+            <div class="relative w-56 text-slate-500">
+              <FormInput
+                type="text"
+                class="w-56 pr-10 !box"
+                v-model="searchInput_produceresult"
+                @keyup.enter="
+                  () => {
+                    search_produceresult();
+                    pageChangeFirst_produceresult();
+                  }
+                "
+                placeholder="검색어를 입력해주세요"
+              />
+              <button
+                @click="
+                  () => {
+                    search_produceresult();
+                    pageChangeFirst_produceresult();
+                  }
+                "
+              >
+                <Lucide
+                  icon="Search"
+                  class="absolute inset-y-0 right-0 w-4 h-4 my-auto mr-3"
+                />
+              </button>
+            </div>
+          </div>
+        </div>
+        <!-- BEGIN: Pagination-->
+        <div
+          class="flex flex-wrap itemlist-center col-span-12 mt-0 intro-y sm:flex-nowrap"
+        >
+          <div>
+            <FormSelect
+              v-model="sortKey_produceresult"
+              class="w-30 mt-3 !box sm:mt-0"
+            >
+              <option>등록일</option>
+              <option>작업코드</option>
+              <option>품번</option>
+              <option>품목구분</option>
+              <option>품명</option>
+              <option>규격</option>
+              <option>단위</option>
+              <option>지시수량</option>
+              <option>공정</option>
+              <option>설비명</option>
+              <option>작업자</option>
+              <option>시작일시</option>
+              <option>종료일시</option>
+              <option>생산수</option>
+              <option>불량수</option>
+              <option>비고</option>
+            </FormSelect>
+          </div>
+          <div class="ml-3">
+            <Button
+              class="shadow-md"
+              as="a"
+              variant="outline-primary"
+              v-if="sortOrder_produceresult == '오름차순'"
+              @click="sortOrderToggle_produceresult"
+            >
+              <Lucide icon="SortAsc" class="w-4 h-4 mr-1" />
+
+              {{ sortOrder_produceresult }}</Button
+            >
+            <Button
+              class="shadow-md"
+              as="a"
+              variant="outline-danger"
+              v-if="sortOrder_produceresult == '내림차순'"
+              @click="sortOrderToggle_produceresult"
+            >
+              <Lucide icon="SortDesc" class="w-4 h-4 mr-1" />
+
+              {{ sortOrder_produceresult }}</Button
+            >
+          </div>
+          <div class="ml-5">
+            <FormSelect
+              class="w-20 mt-3 !box sm:mt-0"
+              v-model="rowsPerPage_produceresult"
+              @change="pageChangeFirst_produceresult"
+            >
+              <option>10</option>
+              <option>25</option>
+              <option>50</option>
+              <option>100</option>
+              <option :value="molduse_modal_produceresult.dataCount.value">
+                전체
+              </option>
+            </FormSelect>
+          </div>
+          <div>
+            <PaginationComponent
+              class="pagination-component"
+              v-model="currentPage_produceresult"
+              :numberOfPages="molduse_modal_produceresult.numberOfPages.value"
+            />
+          </div>
+          <div class="hidden mx-auto md:block text-slate-500"></div>
+          <div>
+            <span class="mr-3"
+              >[ {{ molduse_modal_produceresult.dataCount }}개 데이터 조회됨 ]
+            </span>
+            <span class="mr-4">
+              [ {{ currentPage_produceresult }} /
+              {{ molduse_modal_produceresult.numberOfPages }} 페이지 ]</span
+            >
+          </div>
+        </div>
+        <!-- END: Pagination-->
+        <!-- BEGIN: Data List -->
+        <!-- style="height: calc(100vh - 350px)" : 브라우저 화면 창크기에 맞게 변경됨 -->
+        <div class="col-span-12 overflow-auto intro-y lg:overflow-visible">
+          <div
+            class="mr-3"
+            style="overflow-y: scroll; overflow-x: hidden; height: 580px"
+          >
+            <Table class="border-spacing-y-[6px] border-separate -mt-2">
+              <Table.Thead
+                class="bg-slate-100"
+                style="position: sticky; top: 0px; z-index: 2"
+              >
+                <Table.Tr>
+                  <Table.Th
+                    class="text-center border-b-0 whitespace-nowrap"
+                    :style="table_setting_modal_produceresult.순번.style"
+                  >
+                    {{ table_setting_modal_produceresult.순번.name }}
+                  </Table.Th>
+                  <Table.Th
+                    class="text-center border-b-0 whitespace-nowrap"
+                    :style="table_setting_modal_produceresult.항목1.style"
+                  >
+                    {{ table_setting_modal_produceresult.항목1.name }}
+                  </Table.Th>
+                  <Table.Th
+                    class="text-center border-b-0 whitespace-nowrap"
+                    :style="table_setting_modal_produceresult.항목2.style"
+                  >
+                    {{ table_setting_modal_produceresult.항목2.name }}
+                  </Table.Th>
+                  <Table.Th
+                    class="text-center border-b-0 whitespace-nowrap"
+                    :style="table_setting_modal_produceresult.항목3.style"
+                  >
+                    {{ table_setting_modal_produceresult.항목3.name }}
+                  </Table.Th>
+                  <Table.Th
+                    class="text-center border-b-0 whitespace-nowrap"
+                    :style="table_setting_modal_produceresult.항목4.style"
+                  >
+                    {{ table_setting_modal_produceresult.항목4.name }}
+                  </Table.Th>
+                  <Table.Th
+                    class="text-center border-b-0 whitespace-nowrap"
+                    :style="table_setting_modal_produceresult.항목5.style"
+                  >
+                    {{ table_setting_modal_produceresult.항목5.name }}
+                  </Table.Th>
+                  <Table.Th
+                    class="text-center border-b-0 whitespace-nowrap"
+                    :style="table_setting_modal_produceresult.항목6.style"
+                  >
+                    {{ table_setting_modal_produceresult.항목6.name }}
+                  </Table.Th>
+                  <Table.Th
+                    class="text-center border-b-0 whitespace-nowrap"
+                    :style="table_setting_modal_produceresult.항목7.style"
+                  >
+                    {{ table_setting_modal_produceresult.항목7.name }}
+                  </Table.Th>
+                  <Table.Th
+                    class="text-center border-b-0 whitespace-nowrap"
+                    :style="table_setting_modal_produceresult.항목8.style"
+                  >
+                    {{ table_setting_modal_produceresult.항목8.name }}
+                  </Table.Th>
+                  <Table.Th
+                    class="text-center border-b-0 whitespace-nowrap"
+                    :style="table_setting_modal_produceresult.항목9.style"
+                  >
+                    {{ table_setting_modal_produceresult.항목9.name }}
+                  </Table.Th>
+                  <Table.Th
+                    class="text-center border-b-0 whitespace-nowrap"
+                    :style="table_setting_modal_produceresult.항목10.style"
+                  >
+                    {{ table_setting_modal_produceresult.항목10.name }}
+                  </Table.Th>
+                  <Table.Th
+                    class="text-center border-b-0 whitespace-nowrap"
+                    :style="table_setting_modal_produceresult.항목11.style"
+                  >
+                    {{ table_setting_modal_produceresult.항목11.name }}
+                  </Table.Th>
+                  <Table.Th
+                    class="text-center border-b-0 whitespace-nowrap"
+                    :style="table_setting_modal_produceresult.항목12.style"
+                  >
+                    {{ table_setting_modal_produceresult.항목12.name }}
+                  </Table.Th>
+                  <Table.Th
+                    class="text-center border-b-0 whitespace-nowrap"
+                    :style="table_setting_modal_produceresult.항목13.style"
+                  >
+                    {{ table_setting_modal_produceresult.항목13.name }}
+                  </Table.Th>
+                  <Table.Th
+                    class="text-center border-b-0 whitespace-nowrap"
+                    :style="table_setting_modal_produceresult.항목14.style"
+                  >
+                    {{ table_setting_modal_produceresult.항목14.name }}
+                  </Table.Th>
+                </Table.Tr>
+              </Table.Thead>
+              <Table.Tbody style="position: relative; z-index: 1">
+                <Table.Tr
+                  v-for="(todo, index) in molduse_modal_produceresult.datas
+                    .value"
+                  :key="todo.NO"
+                  class="intro-x hover:bg-gray-200 active:bg-gray-300 cursor-pointer"
+                >
+                  <Table.Td
+                    class="first:rounded-l-md last:rounded-r-md text-center border-b-2 dark:bg-darkmode-600"
+                    :style="table_setting_modal_produceresult.순번.style"
+                    @click="importProduceResult(todo.NO)"
+                  >
+                    <div>
+                      {{
+                        index +
+                        1 +
+                        (currentPage_produceresult - 1) *
+                          rowsPerPage_produceresult
+                      }}
+                    </div>
+                  </Table.Td>
+                  <Table.Td
+                    class="first:rounded-l-md last:rounded-r-md text-center border-b-2 dark:bg-darkmode-600"
+                    :style="table_setting_modal_produceresult.항목1.style"
+                    @click="importProduceResult(todo.NO)"
+                  >
+                    <div>
+                      {{ todo[table_setting_modal_produceresult.항목1.name] }}
+                    </div>
+                  </Table.Td>
+                  <Table.Td
+                    class="first:rounded-l-md last:rounded-r-md text-center border-b-2 dark:bg-darkmode-600"
+                    :style="table_setting_modal_produceresult.항목2.style"
+                    @click="importProduceResult(todo.NO)"
+                  >
+                    <div>
+                      {{ todo[table_setting_modal_produceresult.항목2.name] }}
+                    </div>
+                  </Table.Td>
+                  <Table.Td
+                    class="first:rounded-l-md last:rounded-r-md text-center border-b-2 dark:bg-darkmode-600"
+                    :style="table_setting_modal_produceresult.항목3.style"
+                    @click="importProduceResult(todo.NO)"
+                  >
+                    <div>
+                      {{ todo[table_setting_modal_produceresult.항목3.name] }}
+                    </div>
+                  </Table.Td>
+                  <Table.Td
+                    class="first:rounded-l-md last:rounded-r-md text-center border-b-2 dark:bg-darkmode-600"
+                    :style="table_setting_modal_produceresult.항목4.style"
+                    @click="importProduceResult(todo.NO)"
+                  >
+                    <div>
+                      {{ todo[table_setting_modal_produceresult.항목4.name] }}
+                    </div>
+                  </Table.Td>
+                  <Table.Td
+                    class="first:rounded-l-md last:rounded-r-md text-center border-b-2 dark:bg-darkmode-600"
+                    :style="table_setting_modal_produceresult.항목5.style"
+                    @click="importProduceResult(todo.NO)"
+                  >
+                    <div>
+                      {{ todo[table_setting_modal_produceresult.항목5.name] }}
+                    </div>
+                  </Table.Td>
+                  <Table.Td
+                    class="first:rounded-l-md last:rounded-r-md text-center border-b-2 dark:bg-darkmode-600"
+                    :style="table_setting_modal_produceresult.항목6.style"
+                    @click="importProduceResult(todo.NO)"
+                  >
+                    <div>
+                      {{ todo[table_setting_modal_produceresult.항목6.name] }}
+                    </div>
+                  </Table.Td>
+                  <Table.Td
+                    class="first:rounded-l-md last:rounded-r-md text-center border-b-2 dark:bg-darkmode-600"
+                    :style="table_setting_modal_produceresult.항목7.style"
+                    @click="importProduceResult(todo.NO)"
+                  >
+                    <div>
+                      {{ todo[table_setting_modal_produceresult.항목7.name] }}
+                    </div>
+                  </Table.Td>
+                  <Table.Td
+                    class="first:rounded-l-md last:rounded-r-md text-center border-b-2 dark:bg-darkmode-600"
+                    :style="table_setting_modal_produceresult.항목8.style"
+                    @click="importProduceResult(todo.NO)"
+                  >
+                    <div>
+                      {{ todo[table_setting_modal_produceresult.항목8.name] }}
+                    </div>
+                  </Table.Td>
+                  <Table.Td
+                    class="first:rounded-l-md last:rounded-r-md text-center border-b-2 dark:bg-darkmode-600"
+                    :style="table_setting_modal_produceresult.항목9.style"
+                    @click="importProduceResult(todo.NO)"
+                  >
+                    <div>
+                      {{ todo[table_setting_modal_produceresult.항목9.name] }}
+                    </div>
+                  </Table.Td>
+                  <Table.Td
+                    class="first:rounded-l-md last:rounded-r-md text-center border-b-2 dark:bg-darkmode-600"
+                    :style="table_setting_modal_produceresult.항목10.style"
+                    @click="importProduceResult(todo.NO)"
+                  >
+                    <div>
+                      {{ todo[table_setting_modal_produceresult.항목10.name] }}
+                    </div>
+                  </Table.Td>
+                  <Table.Td
+                    class="first:rounded-l-md last:rounded-r-md text-center border-b-2 dark:bg-darkmode-600"
+                    :style="table_setting_modal_produceresult.항목11.style"
+                    @click="importProduceResult(todo.NO)"
+                  >
+                    <div>
+                      {{ todo[table_setting_modal_produceresult.항목11.name] }}
+                    </div>
+                  </Table.Td>
+                  <Table.Td
+                    class="first:rounded-l-md last:rounded-r-md text-center border-b-2 dark:bg-darkmode-600"
+                    :style="table_setting_modal_produceresult.항목12.style"
+                    @click="importProduceResult(todo.NO)"
+                  >
+                    <div>
+                      {{ todo[table_setting_modal_produceresult.항목12.name] }}
+                    </div>
+                  </Table.Td>
+                  <Table.Td
+                    class="first:rounded-l-md last:rounded-r-md text-center border-b-2 dark:bg-darkmode-600"
+                    :style="table_setting_modal_produceresult.항목13.style"
+                    @click="importProduceResult(todo.NO)"
+                  >
+                    <div>
+                      {{ todo[table_setting_modal_produceresult.항목13.name] }}
+                    </div>
+                  </Table.Td>
+                  <Table.Td
+                    class="first:rounded-l-md last:rounded-r-md text-center border-b-2 dark:bg-darkmode-600"
+                    :style="table_setting_modal_produceresult.항목14.style"
+                    @click="importProduceResult(todo.NO)"
+                  >
+                    <div>
+                      {{ todo[table_setting_modal_produceresult.항목14.name] }}
+                    </div>
+                  </Table.Td>
+                </Table.Tr>
+              </Table.Tbody>
+            </Table>
+            <div
+              class="text-center mt-20"
+              v-if="molduse_modal_produceresult.dataCount.value == 0"
+            >
+              저장된 데이터가 없습니다.
+            </div>
+          </div>
+        </div>
+        <!-- END: Data List -->
+      </div>
+      <div style="text-align: left">
+        <div class="mt-5 text-right">
+          <Button
+            class="mr-2 shadow-md"
+            variant="outline-primary"
+            @click="setProduceResultModal(false)"
+            >취소</Button
+          >
+        </div>
+      </div>
+      <!--Modal 내용 끝-->
+    </Dialog.Panel>
+  </Dialog>
+  <!-- END: Produce Result Modal Content -->
 </template>

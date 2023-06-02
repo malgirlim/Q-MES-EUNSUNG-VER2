@@ -49,7 +49,7 @@ router.get("/", async (req, res) => {
         ,PRODUCE_RESULT.생산수 AS 생산수
         ,PRODUCE_RESULT.불량수 AS 불량수
         ,[MDUS_COUNT] AS 사용횟수
-        ,[MDUS_DATE] AS 사용일자
+        ,CONVERT(VARCHAR, [MDUS_DATE], 23) AS 사용일자
         ,[MDUS_NOTE] AS 비고
         ,[MDUS_REGIST_NM] AS 등록자
         ,[MDUS_REGIST_DT] AS 등록일시
@@ -157,7 +157,7 @@ router.post("/", async (req, res) => {
             ,PRODUCE_RESULT.생산수 AS 생산수
             ,PRODUCE_RESULT.불량수 AS 불량수
             ,[MDUS_COUNT] AS 사용횟수
-            ,[MDUS_DATE] AS 사용일자
+            ,CONVERT(VARCHAR, [MDUS_DATE], 23) AS 사용일자
             ,[MDUS_NOTE] AS 비고
             ,[MDUS_REGIST_NM] AS 등록자
             ,[MDUS_REGIST_DT] AS 등록일시
@@ -216,6 +216,12 @@ router.post("/", async (req, res) => {
           ) AS PRODUCE_RESULT ON PRODUCE_RESULT.NO = [MDUS_PRODUCE_RESULT_PK]
         ) AS RESULT
         WHERE (1=1)
+        AND CONVERT(varchar, CONVERT(datetime, 사용일자), 12) >= ` +
+        req.body.startDate +
+        `
+        AND CONVERT(varchar, CONVERT(datetime, 사용일자), 12) <= ` +
+        req.body.endDate +
+        `
         AND ( 금형코드 like concat('%',@input,'%')
         OR 금형명 like concat('%',@input,'%')
         OR 작업코드 like concat('%',@input,'%')
@@ -255,7 +261,7 @@ router.post("/", async (req, res) => {
             ,PRODUCE_RESULT.생산수 AS 생산수
             ,PRODUCE_RESULT.불량수 AS 불량수
             ,[MDUS_COUNT] AS 사용횟수
-            ,[MDUS_DATE] AS 사용일자
+            ,CONVERT(VARCHAR, [MDUS_DATE], 23) AS 사용일자
             ,[MDUS_NOTE] AS 비고
             ,[MDUS_REGIST_NM] AS 등록자
             ,[MDUS_REGIST_DT] AS 등록일시
@@ -314,6 +320,12 @@ router.post("/", async (req, res) => {
           ) AS PRODUCE_RESULT ON PRODUCE_RESULT.NO = [MDUS_PRODUCE_RESULT_PK]
         ) AS RESULT
         WHERE (1=1)
+        AND CONVERT(varchar, CONVERT(datetime, 사용일자), 12) >= ` +
+        req.body.startDate +
+        `
+        AND CONVERT(varchar, CONVERT(datetime, 사용일자), 12) <= ` +
+        req.body.endDate +
+        `
         AND ` +
         req.body.searchKey +
         ` like concat('%',@input,'%')
@@ -337,7 +349,11 @@ router.post("/", async (req, res) => {
         req.body.searchKey +
         " 조건으로 '" +
         req.body.searchInput +
-        "' 을 조회."),
+        "' 을 조회. (" +
+        req.body.startDate +
+        "-" +
+        req.body.endDate +
+        ")"),
       (amount = result.recordset.length ?? 0),
       (user = req.body.user ?? "")
     );
@@ -526,7 +542,7 @@ router.post("/delete", async (req, res) => {
           ,PRODUCE_RESULT.생산수 AS 생산수
           ,PRODUCE_RESULT.불량수 AS 불량수
           ,[MDUS_COUNT] AS 사용횟수
-          ,[MDUS_DATE] AS 사용일자
+          ,CONVERT(VARCHAR, [MDUS_DATE], 23) AS 사용일자
           ,[MDUS_NOTE] AS 비고
           ,[MDUS_REGIST_NM] AS 등록자
           ,[MDUS_REGIST_DT] AS 등록일시

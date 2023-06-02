@@ -349,7 +349,11 @@ router.post("/", async (req, res) => {
         req.body.searchKey +
         " 조건으로 '" +
         req.body.searchInput +
-        "' 을 조회."),
+        "' 을 조회. (" +
+        req.body.startDate +
+        "-" +
+        req.body.endDate +
+        ")"),
       (amount = result.recordset.length ?? 0),
       (user = req.body.user ?? "")
     );
