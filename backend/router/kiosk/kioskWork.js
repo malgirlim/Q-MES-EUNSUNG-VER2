@@ -91,7 +91,7 @@ router.get("/", async (req, res) => {
           SELECT
             [WKIS_PK] AS NO
             ,[WKIS_CODE] AS 코드
-            ,LEFT([WKIS_START_DATE],10) AS 시작일
+            ,CONVERT(varchar, [WKIS_START_DATE], 23) AS 시작일
           FROM [QMES2022].[dbo].[MANAGE_WORK_INSTRUCT_TB]
         ) AS WORK_INSTRUCT ON WORK_INSTRUCT.NO = [ISPC_WORK_INSTRUCT_PK]
         LEFT JOIN
@@ -198,7 +198,7 @@ router.post("/", async (req, res) => {
               SELECT
                 [WKIS_PK] AS NO
                 ,[WKIS_CODE] AS 코드
-                ,LEFT([WKIS_START_DATE],10) AS 시작일
+                ,CONVERT(varchar, [WKIS_START_DATE], 23) AS 시작일
               FROM [QMES2022].[dbo].[MANAGE_WORK_INSTRUCT_TB]
             ) AS WORK_INSTRUCT ON WORK_INSTRUCT.NO = [ISPC_WORK_INSTRUCT_PK]
             LEFT JOIN

@@ -105,7 +105,7 @@ router.get("/", async (req, res) => {
         (
           SELECT
             [ACPT_PK] AS NO
-            ,LEFT([ACPT_DATE],10) AS 수주일
+            ,CONVERT(varchar, [ACPT_DATE], 23) AS 수주일
             ,[ACPT_CODE] AS 코드
             ,[ACPT_CODE_NUM] AS 코드순번
             ,[ACPT_DIV] AS 구분
@@ -282,7 +282,7 @@ router.post("/", async (req, res) => {
             (
               SELECT
                 [ACPT_PK] AS NO
-                ,LEFT([ACPT_DATE],10) AS 수주일
+                ,CONVERT(varchar, [ACPT_DATE], 23) AS 수주일
                 ,[ACPT_CODE] AS 코드
                 ,[ACPT_CODE_NUM] AS 코드순번
                 ,[ACPT_DIV] AS 구분
@@ -473,7 +473,7 @@ router.post("/", async (req, res) => {
             (
               SELECT
                 [ACPT_PK] AS NO
-                ,LEFT([ACPT_DATE],10) AS 수주일
+                ,CONVERT(varchar, [ACPT_DATE], 23) AS 수주일
                 ,[ACPT_CODE] AS 코드
                 ,[ACPT_CODE_NUM] AS 코드순번
                 ,[ACPT_DIV] AS 구분
@@ -899,7 +899,7 @@ router.post("/delete", async (req, res) => {
           (
             SELECT
               [ACPT_PK] AS NO
-              ,LEFT([ACPT_DATE],10) AS 수주일
+              ,CONVERT(varchar, [ACPT_DATE], 23) AS 수주일
               ,[ACPT_CODE] AS 코드
               ,[ACPT_CODE_NUM] AS 코드순번
               ,[ACPT_DIV] AS 구분

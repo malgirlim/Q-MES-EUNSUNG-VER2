@@ -7,6 +7,8 @@ const moldMoldRouter = require("./mold/moldMold");
 const moldItemRouter = require("./mold/moldItem");
 const moldInspectRouter = require("./mold/moldInspect");
 
+const moldUseRouter = require("./mold/moldUse");
+
 router.use((req, res, next) => {
   // console.log("middleware for test!");
   next();
@@ -21,5 +23,8 @@ router.use("/mold", moldMoldRouter);
 router.use("/item", moldItemRouter);
 // 기준정보 / 금형 점검 관리 - router/mold/moldInspect.js
 router.use("/inspect", moldInspectRouter);
+
+// 금형관리 / 금형 사용 관리 - router/mold/moldUse.js
+router.use("/use", moldUseRouter);
 
 module.exports = router;

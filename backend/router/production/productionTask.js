@@ -45,7 +45,7 @@ router.get("/", async (req, res) => {
         ,ITEM.규격 AS 규격
         ,ITEM.단위 AS 단위
         ,[WKIS_AMOUNT] AS 수량
-        ,LEFT([WKIS_START_DATE],10) AS 시작일
+        ,CONVERT(varchar, [WKIS_START_DATE], 23) AS 시작일
         ,COALESCE((((SELECT COUNT(*)*2.0 FROM [QMES2022].[dbo].[MANAGE_INSTRUCT_PROCESS_TB] WHERE [ISPC_WORK_INSTRUCT_PK] = [WKIS_PK] AND [ISPC_CONDITION] = '작업완료')
           +(SELECT COUNT(*)*1.0 FROM [QMES2022].[dbo].[MANAGE_INSTRUCT_PROCESS_TB] WHERE [ISPC_WORK_INSTRUCT_PK] = [WKIS_PK] AND [ISPC_CONDITION] = '작업중'))
           / NULLIF((SELECT COUNT(*)*2.0 FROM [QMES2022].[dbo].[MANAGE_INSTRUCT_PROCESS_TB] WHERE [ISPC_WORK_INSTRUCT_PK] = [WKIS_PK]),0))*100, 0) AS 진행률
@@ -111,7 +111,7 @@ router.post("/", async (req, res) => {
             ,ITEM.규격 AS 규격
             ,ITEM.단위 AS 단위
             ,[WKIS_AMOUNT] AS 수량
-            ,LEFT([WKIS_START_DATE],10) AS 시작일
+            ,CONVERT(varchar, [WKIS_START_DATE], 23) AS 시작일
             ,COALESCE((((SELECT COUNT(*)*2.0 FROM [QMES2022].[dbo].[MANAGE_INSTRUCT_PROCESS_TB] WHERE [ISPC_WORK_INSTRUCT_PK] = [WKIS_PK] AND [ISPC_CONDITION] = '작업완료')
               +(SELECT COUNT(*)*1.0 FROM [QMES2022].[dbo].[MANAGE_INSTRUCT_PROCESS_TB] WHERE [ISPC_WORK_INSTRUCT_PK] = [WKIS_PK] AND [ISPC_CONDITION] = '작업중'))
               / NULLIF((SELECT COUNT(*)*2.0 FROM [QMES2022].[dbo].[MANAGE_INSTRUCT_PROCESS_TB] WHERE [ISPC_WORK_INSTRUCT_PK] = [WKIS_PK]),0))*100, 0) AS 진행률
@@ -170,7 +170,7 @@ router.post("/", async (req, res) => {
             ,ITEM.규격 AS 규격
             ,ITEM.단위 AS 단위
             ,[WKIS_AMOUNT] AS 수량
-            ,LEFT([WKIS_START_DATE],10) AS 시작일
+            ,CONVERT(varchar, [WKIS_START_DATE], 23) AS 시작일
             ,COALESCE((((SELECT COUNT(*)*2.0 FROM [QMES2022].[dbo].[MANAGE_INSTRUCT_PROCESS_TB] WHERE [ISPC_WORK_INSTRUCT_PK] = [WKIS_PK] AND [ISPC_CONDITION] = '작업완료')
               +(SELECT COUNT(*)*1.0 FROM [QMES2022].[dbo].[MANAGE_INSTRUCT_PROCESS_TB] WHERE [ISPC_WORK_INSTRUCT_PK] = [WKIS_PK] AND [ISPC_CONDITION] = '작업중'))
               / NULLIF((SELECT COUNT(*)*2.0 FROM [QMES2022].[dbo].[MANAGE_INSTRUCT_PROCESS_TB] WHERE [ISPC_WORK_INSTRUCT_PK] = [WKIS_PK]),0))*100, 0) AS 진행률
@@ -411,7 +411,7 @@ router.post("/delete", async (req, res) => {
           ,ITEM.규격 AS 규격
           ,ITEM.단위 AS 단위
           ,[WKIS_AMOUNT] AS 수량
-          ,LEFT([WKIS_START_DATE],10) AS 시작일
+          ,CONVERT(varchar, [WKIS_START_DATE], 23) AS 시작일
           ,[WKIS_NOTE] AS 비고
           ,[WKIS_REGIST_NM] AS 등록자
           ,[WKIS_REGIST_DT] AS 등록일시
