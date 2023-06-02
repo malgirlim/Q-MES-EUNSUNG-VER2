@@ -49,6 +49,7 @@
     "tom-select": "^2.2.2",
     "vue": "^3.2.41",
     "vue-barcode-reader": "^1.0.3",
+    "vue-chartjs": "^5.2.0",
     "vue-document-editor": "^2.2.2",
     "vue-file-toolbar-menu": "^2.2.0",
     "vue-inner-image-zoom": "^2.0.0",

@@ -10,6 +10,11 @@ import VerticalBarChart from "../components/VerticalBarChart";
 import LineChart from "../components/LineChart";
 import LoadingIcon from "../base-components/LoadingIcon";
 
+import KPIChart_line from "../components/Common/Main/KPIChart_line.vue";
+import KPIChart_bar_line from "../components/Common/Main/KPIChart_bar_line.vue";
+import KPIChart_line_filled from "../components/Common/Main/KPIChart_line_filled.vue";
+import KPIChart_bar_bar from "../components/Common/Main/KPIChart_bar_bar.vue";
+
 import dayjs from "dayjs";
 
 import RunningCard from "../components/Common/Main/RunningCard.vue";
@@ -19,7 +24,6 @@ import DisabledKPICard from "../components/Common/Main/DisabledKPICard.vue";
 import NoticeCard from "../components/Common/Main/NoticeCard.vue";
 
 import { Chart } from "chart.js";
-import ChartDataLabels from "chartjs-plugin-datalabels";
 import router from "../router";
 
 var mobilecheck = function () {
@@ -41,8 +45,6 @@ if (mobilecheck()) {
   location.href = "/mobile";
   //모바일로 접속시 이동 경로
 }
-
-Chart.register(ChartDataLabels);
 
 onMounted(async () => {
   setInterval(() => {
@@ -175,29 +177,129 @@ const switch_page_func = () => {
       <NoticeCard />
     </div>
     <!--END : KPI 표시-->
+
     <!--BEGIN : Chart 표시-->
-    <div
-      class="mt-7 grid grid-cols-1 sm:grid-cols-6 xl:grid-cols-12 gap-6 mt-5"
-    >
-      <div class="col-span-1 sm:col-span-3 xl:col-span-4 intro-y bg-white">
-        <div class="text-center mt-3 mb-3">
-          <FormLabel class="text-lg font-bold">목표대비 생산수</FormLabel>
+    <div class="mt-7 grid grid-cols-2 gap-6 mt-5">
+      <div class="p-3 col-span-1 intro-y bg-white rounded rounded-md">
+        <div class="grid grid-cols-4">
+          <div class="col-span-1 text-center">
+            <div class="mt-14 px-3">
+              <div
+                class="text-lg mx-1 py-0.5 w-full border-l-2 border-r-2 border-t-2 border-success bg-success text-white rounded-t-md"
+              >
+                <div class="flex">
+                  <div class="flex m-auto items-center">
+                    <div>
+                      <Lucide class="w-5 h-5 text-white mr-1" icon="Flag" />
+                    </div>
+                    <div>KPI</div>
+                  </div>
+                </div>
+              </div>
+              <div
+                class="mx-1 p-2 w-full text-2xl border-l-2 border-r-2 border-b-2 border-success rounded-b-md"
+              >
+                <div>설비 가동률</div>
+              </div>
+            </div>
+            <div class="mt-8">
+              <div class="px-3">
+                <div
+                  class="text-lg mx-1 py-0.5 w-full border-l-2 border-r-2 border-t-2 border-success bg-success text-white rounded-t-md"
+                >
+                  <div class="flex">
+                    <div class="flex m-auto items-center">
+                      <div>
+                        <Lucide
+                          class="w-5 h-5 text-white mr-1"
+                          icon="LineChart"
+                        />
+                      </div>
+                      <div>평균가동률</div>
+                    </div>
+                  </div>
+                </div>
+                <div
+                  class="mx-1 p-2 w-full text-2xl border-l-2 border-r-2 border-b-2 border-success rounded-b-md bg-green-200"
+                >
+                  <div>54%</div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="col-span-3">
+            <div style="height: 310px">
+              <KPIChart_bar_bar
+                :x_label="[
+                  '1월',
+                  '2월',
+                  '3월',
+                  '4월',
+                  '5월',
+                  '6월',
+                  '7월',
+                  '8월',
+                  '9월',
+                  '10월',
+                  '11월',
+                  '12월',
+                ]"
+              />
+            </div>
+          </div>
         </div>
-        <div class="p-2"><VerticalBarChart :height="265" /></div>
       </div>
-      <div class="col-span-1 sm:col-span-3 xl:col-span-4 intro-y bg-white">
-        <div class="text-center mt-3 mb-3">
-          <FormLabel class="text-lg font-bold">불량발생빈도</FormLabel>
+      <div class="p-3 col-span-1 intro-y bg-white rounded rounded-md">
+        <div class="grid grid-cols-4">
+          <div class="col-span-1 text-center">
+            <div class="mt-14 px-3">
+              <div
+                class="text-lg mx-1 py-0.5 w-full border-l-2 border-r-2 border-t-2 border-success bg-success text-white rounded-t-md"
+              >
+                <div class="flex">
+                  <div class="flex m-auto items-center">
+                    <div>
+                      <Lucide class="w-5 h-5 text-white mr-1" icon="Flag" />
+                    </div>
+                    <div>KPI</div>
+                  </div>
+                </div>
+              </div>
+              <div
+                class="mx-1 p-2 w-full text-2xl border-l-2 border-r-2 border-b-2 border-success rounded-b-md"
+              >
+                <div>재고비용</div>
+              </div>
+            </div>
+            <div class="mt-8">
+              <div class="px-3">
+                <div
+                  class="text-lg mx-1 py-0.5 w-full border-l-2 border-r-2 border-t-2 border-success bg-success text-white rounded-t-md"
+                >
+                  <div class="flex">
+                    <div class="flex m-auto items-center">
+                      <div>
+                        <Lucide
+                          class="w-5 h-5 text-white mr-1"
+                          icon="LineChart"
+                        />
+                      </div>
+                      <div>평균절감액</div>
+                    </div>
+                  </div>
+                </div>
+                <div
+                  class="mx-1 p-2 w-full text-2xl border-l-2 border-r-2 border-b-2 border-success rounded-b-md bg-green-200"
+                >
+                  <div>626만원</div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="col-span-3">
+            <div style="height: 310px"><KPIChart_line /></div>
+          </div>
         </div>
-
-        <div class="p-2"><PieChart :height="265" /></div>
-      </div>
-      <div class="col-span-1 sm:col-span-3 xl:col-span-4 intro-y bg-white">
-        <div class="text-center mt-3 mb-3">
-          <FormLabel class="text-lg font-bold">설비가동률</FormLabel>
-        </div>
-
-        <div class="p-2"><LineChart :height="265" /></div>
       </div>
     </div>
     <!--END : Chart 표시-->
