@@ -35,25 +35,21 @@ router.get("/", async (req, res) => {
     const Pool = await pool;
     const result = await Pool.request().query(`
       SELECT
-        [MDUS_PK] AS NO
-        ,[MDUS_MOLD_PK] AS 금형NO
-        ,(SELECT [MOLD_CODE] FROM [QMES2022].[dbo].[MASTER_MOLD_TB] WHERE [MOLD_PK] = [MDUS_MOLD_PK]) AS 금형코드
-        ,(SELECT [MOLD_NAME] FROM [QMES2022].[dbo].[MASTER_MOLD_TB] WHERE [MOLD_PK] = [MDUS_MOLD_PK]) AS 금형명
-        ,[MDUS_PRODUCE_RESULT_PK] AS 생산실적NO
+        [DFRW_PK] AS NO
+        ,[DFRW_PRODUCE_RESULT_PK] AS 생산실적NO
+        ,[DFRW_PRODUCE_DEFECT_PK] AS 실적불량NO
         ,PRODUCE_RESULT.작업코드 AS 작업코드
         ,PRODUCE_RESULT.품번 AS 품번
         ,PRODUCE_RESULT.품목구분 AS 품목구분
         ,PRODUCE_RESULT.품명 AS 품명
         ,PRODUCE_RESULT.규격 AS 규격
         ,PRODUCE_RESULT.단위 AS 단위
-        ,PRODUCE_RESULT.생산수 AS 생산수
-        ,PRODUCE_RESULT.불량수 AS 불량수
-        ,[MDUS_COUNT] AS 사용횟수
-        ,CONVERT(VARCHAR, [MDUS_DATE], 23) AS 사용일자
-        ,[MDUS_NOTE] AS 비고
-        ,[MDUS_REGIST_NM] AS 등록자
-        ,[MDUS_REGIST_DT] AS 등록일시
-      FROM [QMES2022].[dbo].[MANAGE_MOLD_USE_TB]
+        ,[DFRW_AMOUNT] AS 재작업수
+        ,[DFRW_DATE] AS 일자
+        ,[DFRW_NOTE] AS 비고
+        ,[DFRW_REGIST_NM] AS 등록자
+        ,[DFRW_REGIST_DT] AS 등록일시
+      FROM [QMES2022].[dbo].[MANAGE_DEFECT_REWORK_TB]
       LEFT JOIN
       (
         SELECT
@@ -105,8 +101,8 @@ router.get("/", async (req, res) => {
             FROM [QMES2022].[dbo].[MASTER_ITEM_TB]
           ) AS ITEM ON ITEM.NO = [ISPC_ITEM_PK]
         ) AS INSTRUCT_PROCESS ON INSTRUCT_PROCESS.NO = [PDRS_INST_PROCESS_PK]
-      ) AS PRODUCE_RESULT ON PRODUCE_RESULT.NO = [MDUS_PRODUCE_RESULT_PK]
-      ORDER BY [MDUS_PK] DESC
+      ) AS PRODUCE_RESULT ON PRODUCE_RESULT.NO = [DFRW_PRODUCE_RESULT_PK]
+      ORDER BY [DFRW_PK] DESC
     `);
 
     // 로그기록 저장
@@ -138,30 +134,26 @@ router.post("/", async (req, res) => {
       sql =
         `
         SELECT
-          NO AS NO, 금형NO AS 금형NO, 금형코드 AS 금형코드, 금형명 AS 금형명, 생산실적NO AS 생산실적NO, 작업코드 AS 작업코드,
-          품번 AS 품번, 품목구분 AS 품목구분, 품명 AS 품명, 규격 AS 규격, 단위 AS 단위, 생산수 AS 생산수, 불량수 AS 불량수,
-          사용횟수 AS 사용횟수, 사용일자 AS 사용일자, 비고 AS 비고, 등록자 AS 등록자, 등록일시 AS 등록일시
+          NO AS NO, 생산실적NO AS 생산실적NO, 실적불량NO AS 실적불량NO, 작업코드 AS 작업코드,
+          품번 AS 품번, 품목구분 AS 품목구분, 품명 AS 품명, 규격 AS 규격, 단위 AS 단위, 재작업수 AS 재작업수, 일자 AS 일자,
+          비고 AS 비고, 등록자 AS 등록자, 등록일시 AS 등록일시
         FROM(
           SELECT
-            [MDUS_PK] AS NO
-            ,[MDUS_MOLD_PK] AS 금형NO
-            ,(SELECT [MOLD_CODE] FROM [QMES2022].[dbo].[MASTER_MOLD_TB] WHERE [MOLD_PK] = [MDUS_MOLD_PK]) AS 금형코드
-            ,(SELECT [MOLD_NAME] FROM [QMES2022].[dbo].[MASTER_MOLD_TB] WHERE [MOLD_PK] = [MDUS_MOLD_PK]) AS 금형명
-            ,[MDUS_PRODUCE_RESULT_PK] AS 생산실적NO
+            [DFRW_PK] AS NO
+            ,[DFRW_PRODUCE_RESULT_PK] AS 생산실적NO
+            ,[DFRW_PRODUCE_DEFECT_PK] AS 실적불량NO
             ,PRODUCE_RESULT.작업코드 AS 작업코드
             ,PRODUCE_RESULT.품번 AS 품번
             ,PRODUCE_RESULT.품목구분 AS 품목구분
             ,PRODUCE_RESULT.품명 AS 품명
             ,PRODUCE_RESULT.규격 AS 규격
             ,PRODUCE_RESULT.단위 AS 단위
-            ,PRODUCE_RESULT.생산수 AS 생산수
-            ,PRODUCE_RESULT.불량수 AS 불량수
-            ,[MDUS_COUNT] AS 사용횟수
-            ,CONVERT(VARCHAR, [MDUS_DATE], 23) AS 사용일자
-            ,[MDUS_NOTE] AS 비고
-            ,[MDUS_REGIST_NM] AS 등록자
-            ,[MDUS_REGIST_DT] AS 등록일시
-          FROM [QMES2022].[dbo].[MANAGE_MOLD_USE_TB]
+            ,[DFRW_AMOUNT] AS 재작업수
+            ,[DFRW_DATE] AS 일자
+            ,[DFRW_NOTE] AS 비고
+            ,[DFRW_REGIST_NM] AS 등록자
+            ,[DFRW_REGIST_DT] AS 등록일시
+          FROM [QMES2022].[dbo].[MANAGE_DEFECT_REWORK_TB]
           LEFT JOIN
           (
             SELECT
@@ -213,24 +205,23 @@ router.post("/", async (req, res) => {
                 FROM [QMES2022].[dbo].[MASTER_ITEM_TB]
               ) AS ITEM ON ITEM.NO = [ISPC_ITEM_PK]
             ) AS INSTRUCT_PROCESS ON INSTRUCT_PROCESS.NO = [PDRS_INST_PROCESS_PK]
-          ) AS PRODUCE_RESULT ON PRODUCE_RESULT.NO = [MDUS_PRODUCE_RESULT_PK]
+          ) AS PRODUCE_RESULT ON PRODUCE_RESULT.NO = [DFRW_PRODUCE_RESULT_PK]
         ) AS RESULT
         WHERE (1=1)
-        AND CONVERT(varchar, CONVERT(datetime, 사용일자), 12) >= ` +
+        AND CONVERT(varchar, CONVERT(datetime, 일자), 12) >= ` +
         req.body.startDate +
         `
-        AND CONVERT(varchar, CONVERT(datetime, 사용일자), 12) <= ` +
+        AND CONVERT(varchar, CONVERT(datetime, 일자), 12) <= ` +
         req.body.endDate +
         `
-        AND ( 금형코드 like concat('%',@input,'%')
-        OR 금형명 like concat('%',@input,'%')
-        OR 작업코드 like concat('%',@input,'%')
+        AND ( 작업코드 like concat('%',@input,'%')
         OR 품번 like concat('%',@input,'%')
         OR 품목구분 like concat('%',@input,'%')
         OR 품명 like concat('%',@input,'%')
         OR 규격 like concat('%',@input,'%')
         OR 단위 like concat('%',@input,'%')
-        OR 사용일자 like concat('%',@input,'%')
+        OR 재작업수 like concat('%',@input,'%')
+        OR 일자 like concat('%',@input,'%')
         OR 비고 like concat('%',@input,'%'))
         ORDER BY ` +
         req.body.sortKey +
@@ -242,30 +233,26 @@ router.post("/", async (req, res) => {
       sql =
         `
         SELECT
-          NO AS NO, 금형NO AS 금형NO, 금형코드 AS 금형코드, 금형명 AS 금형명, 생산실적NO AS 생산실적NO, 작업코드 AS 작업코드,
-          품번 AS 품번, 품목구분 AS 품목구분, 품명 AS 품명, 규격 AS 규격, 단위 AS 단위, 생산수 AS 생산수, 불량수 AS 불량수,
-          사용횟수 AS 사용횟수, 사용일자 AS 사용일자, 비고 AS 비고, 등록자 AS 등록자, 등록일시 AS 등록일시
+          NO AS NO, 생산실적NO AS 생산실적NO, 실적불량NO AS 실적불량NO, 작업코드 AS 작업코드,
+          품번 AS 품번, 품목구분 AS 품목구분, 품명 AS 품명, 규격 AS 규격, 단위 AS 단위, 재작업수 AS 재작업수, 일자 AS 일자,
+          비고 AS 비고, 등록자 AS 등록자, 등록일시 AS 등록일시
         FROM(
           SELECT
-            [MDUS_PK] AS NO
-            ,[MDUS_MOLD_PK] AS 금형NO
-            ,(SELECT [MOLD_CODE] FROM [QMES2022].[dbo].[MASTER_MOLD_TB] WHERE [MOLD_PK] = [MDUS_MOLD_PK]) AS 금형코드
-            ,(SELECT [MOLD_NAME] FROM [QMES2022].[dbo].[MASTER_MOLD_TB] WHERE [MOLD_PK] = [MDUS_MOLD_PK]) AS 금형명
-            ,[MDUS_PRODUCE_RESULT_PK] AS 생산실적NO
+            [DFRW_PK] AS NO
+            ,[DFRW_PRODUCE_RESULT_PK] AS 생산실적NO
+            ,[DFRW_PRODUCE_DEFECT_PK] AS 실적불량NO
             ,PRODUCE_RESULT.작업코드 AS 작업코드
             ,PRODUCE_RESULT.품번 AS 품번
             ,PRODUCE_RESULT.품목구분 AS 품목구분
             ,PRODUCE_RESULT.품명 AS 품명
             ,PRODUCE_RESULT.규격 AS 규격
             ,PRODUCE_RESULT.단위 AS 단위
-            ,PRODUCE_RESULT.생산수 AS 생산수
-            ,PRODUCE_RESULT.불량수 AS 불량수
-            ,[MDUS_COUNT] AS 사용횟수
-            ,CONVERT(VARCHAR, [MDUS_DATE], 23) AS 사용일자
-            ,[MDUS_NOTE] AS 비고
-            ,[MDUS_REGIST_NM] AS 등록자
-            ,[MDUS_REGIST_DT] AS 등록일시
-          FROM [QMES2022].[dbo].[MANAGE_MOLD_USE_TB]
+            ,[DFRW_AMOUNT] AS 재작업수
+            ,[DFRW_DATE] AS 일자
+            ,[DFRW_NOTE] AS 비고
+            ,[DFRW_REGIST_NM] AS 등록자
+            ,[DFRW_REGIST_DT] AS 등록일시
+          FROM [QMES2022].[dbo].[MANAGE_DEFECT_REWORK_TB]
           LEFT JOIN
           (
             SELECT
@@ -317,13 +304,13 @@ router.post("/", async (req, res) => {
                 FROM [QMES2022].[dbo].[MASTER_ITEM_TB]
               ) AS ITEM ON ITEM.NO = [ISPC_ITEM_PK]
             ) AS INSTRUCT_PROCESS ON INSTRUCT_PROCESS.NO = [PDRS_INST_PROCESS_PK]
-          ) AS PRODUCE_RESULT ON PRODUCE_RESULT.NO = [MDUS_PRODUCE_RESULT_PK]
+          ) AS PRODUCE_RESULT ON PRODUCE_RESULT.NO = [DFRW_PRODUCE_RESULT_PK]
         ) AS RESULT
         WHERE (1=1)
-        AND CONVERT(varchar, CONVERT(datetime, 사용일자), 12) >= ` +
+        AND CONVERT(varchar, CONVERT(datetime, 일자), 12) >= ` +
         req.body.startDate +
         `
-        AND CONVERT(varchar, CONVERT(datetime, 사용일자), 12) <= ` +
+        AND CONVERT(varchar, CONVERT(datetime, 일자), 12) <= ` +
         req.body.endDate +
         `
         AND ` +
@@ -377,26 +364,26 @@ router.post("/insert", async (req, res) => {
   try {
     const Pool = await pool;
     await Pool.request()
-      .input("금형NO", req.body.data.금형NO ?? null)
       .input("생산실적NO", req.body.data.생산실적NO ?? null)
-      .input("사용횟수", req.body.data.사용횟수 ?? "")
-      .input("사용일자", req.body.data.사용일자 ?? "")
+      .input("실적불량NO", req.body.data.실적불량NO ?? null)
+      .input("재작업수", req.body.data.재작업수 ?? "")
+      .input("일자", req.body.data.일자 ?? "")
       .input("비고", req.body.data.비고 ?? "")
       .input("등록자", req.body.user ?? "")
       .input(
         "등록일시",
         moment().tz("Asia/Seoul").format("YYYY-MM-DD HH:mm:ss")
       ).query(`
-        INSERT INTO [QMES2022].[dbo].[MANAGE_MOLD_USE_TB]
-          ([MDUS_MOLD_PK]
-          ,[MDUS_PRODUCE_RESULT_PK]
-          ,[MDUS_COUNT]
-          ,[MDUS_DATE]
-          ,[MDUS_NOTE]
-          ,[MDUS_REGIST_NM]
-          ,[MDUS_REGIST_DT])
+        INSERT INTO [QMES2022].[dbo].[MANAGE_DEFECT_REWORK_TB]
+          ([DFRW_PRODUCE_RESULT_PK]
+          ,[DFRW_PRODUCE_DEFECT_PK]
+          ,[DFRW_AMOUNT]
+          ,[DFRW_DATE]
+          ,[DFRW_NOTE]
+          ,[DFRW_REGIST_NM]
+          ,[DFRW_REGIST_DT])
         VALUES
-          (@금형NO,@생산실적NO,@사용횟수,@사용일자,@비고,@등록자,@등록일시)
+          (@생산실적NO,@실적불량NO,@재작업수,@일자,@비고,@등록자,@등록일시)
       `);
 
     // 로그기록 저장
@@ -427,26 +414,26 @@ router.post("/insertAll", async (req, res) => {
     const Pool = await pool;
     for (var i = 0; i < req.body.data.length; i++) {
       await Pool.request()
-        .input("금형NO", req.body.data[i].금형NO ?? null)
         .input("생산실적NO", req.body.data[i].생산실적NO ?? null)
-        .input("사용횟수", req.body.data[i].사용횟수 ?? "")
-        .input("사용일자", req.body.data[i].사용일자 ?? "")
+        .input("실적불량NO", req.body.data[i].실적불량NO ?? null)
+        .input("재작업수", req.body.data[i].재작업수 ?? "")
+        .input("일자", req.body.data[i].일자 ?? "")
         .input("비고", req.body.data[i].비고 ?? "")
         .input("등록자", req.body.user ?? "")
         .input(
           "등록일시",
           moment().tz("Asia/Seoul").format("YYYY-MM-DD HH:mm:ss")
         ).query(`
-        INSERT INTO [QMES2022].[dbo].[MANAGE_MOLD_USE_TB]
-          ([MDUS_MOLD_PK]
-          ,[MDUS_PRODUCE_RESULT_PK]
-          ,[MDUS_COUNT]
-          ,[MDUS_DATE]
-          ,[MDUS_NOTE]
-          ,[MDUS_REGIST_NM]
-          ,[MDUS_REGIST_DT])
+        INSERT INTO [QMES2022].[dbo].[MANAGE_DEFECT_REWORK_TB]
+          ([DFRW_PRODUCE_RESULT_PK]
+          ,[DFRW_PRODUCE_DEFECT_PK]
+          ,[DFRW_AMOUNT]
+          ,[DFRW_DATE]
+          ,[DFRW_NOTE]
+          ,[DFRW_REGIST_NM]
+          ,[DFRW_REGIST_DT])
         VALUES
-          (@금형NO,@생산실적NO,@사용횟수,@사용일자,@비고,@등록자,@등록일시)
+          (@생산실적NO,@실적불량NO,@재작업수,@일자,@비고,@등록자,@등록일시)
       `);
 
       // 로그기록 저장
@@ -477,26 +464,26 @@ router.post("/edit", async (req, res) => {
     const Pool = await pool;
     await Pool.request()
       .input("NO", req.body.data.NO ?? 0)
-      .input("금형NO", req.body.data.금형NO ?? null)
       .input("생산실적NO", req.body.data.생산실적NO ?? null)
-      .input("사용횟수", req.body.data.사용횟수 ?? "")
-      .input("사용일자", req.body.data.사용일자 ?? "")
+      .input("실적불량NO", req.body.data.실적불량NO ?? null)
+      .input("재작업수", req.body.data.재작업수 ?? "")
+      .input("일자", req.body.data.일자 ?? "")
       .input("비고", req.body.data.비고 ?? "")
       .input("등록자", req.body.user ?? "")
       .input(
         "등록일시",
         moment().tz("Asia/Seoul").format("YYYY-MM-DD HH:mm:ss")
       ).query(`
-        UPDATE [QMES2022].[dbo].[MANAGE_MOLD_USE_TB]
+        UPDATE [QMES2022].[dbo].[MANAGE_DEFECT_REWORK_TB]
           SET 
-            [MDUS_MOLD_PK] = @금형NO
-            ,[MDUS_PRODUCE_RESULT_PK] = @생산실적NO
-            ,[MDUS_COUNT] = @사용횟수
-            ,[MDUS_DATE] = @사용일자
-            ,[MDUS_NOTE] = @비고
-            ,[MDUS_REGIST_NM] = @등록자
-            ,[MDUS_REGIST_DT] = @등록일시
-          WHERE [MDUS_PK] = @NO
+            [DFRW_PRODUCE_RESULT_PK] = @생산실적NO
+            ,[DFRW_PRODUCE_DEFECT_PK] = @실적불량NO
+            ,[DFRW_AMOUNT] = @재작업수
+            ,[DFRW_DATE] = @일자
+            ,[DFRW_NOTE] = @비고
+            ,[DFRW_REGIST_NM] = @등록자
+            ,[DFRW_REGIST_DT] = @등록일시
+          WHERE [DFRW_PK] = @NO
     `);
 
     // 로그기록 저장
@@ -528,25 +515,21 @@ router.post("/delete", async (req, res) => {
     for (var i = 0; i < req.body.data.length; i++) {
       const result = await Pool.request().input("key", req.body.data[i]).query(`
         SELECT
-          [MDUS_PK] AS NO
-          ,[MDUS_MOLD_PK] AS 금형NO
-          ,(SELECT [MOLD_CODE] FROM [QMES2022].[dbo].[MASTER_MOLD_TB] WHERE [MOLD_PK] = [MDUS_MOLD_PK]) AS 금형코드
-          ,(SELECT [MOLD_NAME] FROM [QMES2022].[dbo].[MASTER_MOLD_TB] WHERE [MOLD_PK] = [MDUS_MOLD_PK]) AS 금형명
-          ,[MDUS_PRODUCE_RESULT_PK] AS 생산실적NO
+          [DFRW_PK] AS NO
+          ,[DFRW_PRODUCE_RESULT_PK] AS 생산실적NO
+          ,[DFRW_PRODUCE_DEFECT_PK] AS 실적불량NO
           ,PRODUCE_RESULT.작업코드 AS 작업코드
           ,PRODUCE_RESULT.품번 AS 품번
           ,PRODUCE_RESULT.품목구분 AS 품목구분
           ,PRODUCE_RESULT.품명 AS 품명
           ,PRODUCE_RESULT.규격 AS 규격
           ,PRODUCE_RESULT.단위 AS 단위
-          ,PRODUCE_RESULT.생산수 AS 생산수
-          ,PRODUCE_RESULT.불량수 AS 불량수
-          ,[MDUS_COUNT] AS 사용횟수
-          ,CONVERT(VARCHAR, [MDUS_DATE], 23) AS 사용일자
-          ,[MDUS_NOTE] AS 비고
-          ,[MDUS_REGIST_NM] AS 등록자
-          ,[MDUS_REGIST_DT] AS 등록일시
-        FROM [QMES2022].[dbo].[MANAGE_MOLD_USE_TB]
+          ,[DFRW_AMOUNT] AS 재작업수
+          ,[DFRW_DATE] AS 일자
+          ,[DFRW_NOTE] AS 비고
+          ,[DFRW_REGIST_NM] AS 등록자
+          ,[DFRW_REGIST_DT] AS 등록일시
+        FROM [QMES2022].[dbo].[MANAGE_DEFECT_REWORK_TB]
         LEFT JOIN
         (
           SELECT
@@ -598,14 +581,14 @@ router.post("/delete", async (req, res) => {
               FROM [QMES2022].[dbo].[MASTER_ITEM_TB]
             ) AS ITEM ON ITEM.NO = [ISPC_ITEM_PK]
           ) AS INSTRUCT_PROCESS ON INSTRUCT_PROCESS.NO = [PDRS_INST_PROCESS_PK]
-        ) AS PRODUCE_RESULT ON PRODUCE_RESULT.NO = [MDUS_PRODUCE_RESULT_PK]
-        WHERE [MDUS_PK] = @key
+        ) AS PRODUCE_RESULT ON PRODUCE_RESULT.NO = [DFRW_PRODUCE_RESULT_PK]
+        WHERE [DFRW_PK] = @key
       `);
 
       await Pool.request()
         .input("key", req.body.data[i])
         .query(
-          `DELETE FROM [QMES2022].[dbo].[MANAGE_MOLD_USE_TB] WHERE [MDUS_PK] = @key`
+          `DELETE FROM [QMES2022].[dbo].[MANAGE_DEFECT_REWORK_TB] WHERE [DFRW_PK] = @key`
         );
 
       // 로그기록 저장

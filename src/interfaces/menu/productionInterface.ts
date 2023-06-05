@@ -188,3 +188,22 @@ export interface ProductionResultNonWork {
   등록자?: string;
   등록일시?: string;
 }
+
+// 생산관리 - 불량재작업
+export interface ProductionBadRework {
+  [attribute: string]: any | undefined;
+  NO?: number;
+  생산실적NO?: number;
+  실적불량NO?: number;
+  작업코드?: string;
+  품번?: string;
+  품목구분?: string;
+  품명?: string;
+  규격?: string;
+  단위?: string;
+  재작업수?: string;
+  일자?: string;
+  비고?: string;
+  등록자?: string;
+  등록일시?: string;
+}
