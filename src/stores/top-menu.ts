@@ -419,26 +419,6 @@ export const useTopMenuStore = defineStore("topMenu", {
             pageName: "top-menu-monitoring-kpi2",
             title: "재고비용 현황(KPI)",
           },
-          // {
-          //   icon: "FileText",
-          //   pageName: "top-menu-monitoring-overall",
-          //   title: "종합 현황",
-          // },
-          // {
-          //   icon: "FileText",
-          //   pageName: "top-menu-monitoring-production",
-          //   title: "생산 현황",
-          // },
-          // {
-          //   icon: "FileText",
-          //   pageName: "top-menu-monitoring-process",
-          //   title: "공정 현황",
-          // },
-          // {
-          //   icon: "FileText",
-          //   pageName: "top-menu-monitoring-stock",
-          //   title: "재고 현황",
-          // },
           {
             icon: "FileText",
             pageName: "top-menu-monitoring-daily",
