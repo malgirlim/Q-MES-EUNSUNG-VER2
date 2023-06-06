@@ -22,8 +22,10 @@ import { toast } from "vue3-toastify";
 
 // API 보내는 함수 및 인터페이스 불러오기
 import { useSendApi } from "../../composables/useSendApi";
-import { MasterMold, MoldUse } from "../../interfaces/menu/moldInterface";
-import { ProductionResult } from "../../interfaces/menu/productionInterface";
+import {
+  ProductionBadRework,
+  ProductionResult,
+} from "../../interfaces/menu/productionInterface";
 
 // 컴포넌트 로드
 import MasterDetail from "../../components/Common/Detail/MasterClientDetail.vue";
@@ -34,8 +36,7 @@ const user_level = proxy.gstate.level.ProductionBadRework; //권한레벨
 // 페이지 로딩 시 시작
 onMounted(async () => {
   dataManager.loadDatas(); // 거래처 데이터 불러오기
-  molduse_modal_mold.loadDatas(); // 금형 데이터 불러오기
-  molduse_modal_produceresult.loadDatas(); // 생산실적 데이터 불러오기
+  badrework_modal_produceresult.loadDatas(); // 생산실적 데이터 불러오기
 });
 
 // 페이징기능
@@ -46,33 +47,25 @@ const pageChangeFirst = () => {
 };
 
 // dataManager 만들기
-const url = "/api/mold/use";
-const dataManager = useSendApi<MoldUse>(url, currentPage, rowsPerPage);
-
-// 금형 데이터 가져오기
-const url_molduse_modal_mold = "/api/mold/modal/mold";
-const molduse_modal_mold = useSendApi<MasterMold>(
-  url_molduse_modal_mold,
-  ref(1),
-  ref(10)
+const url = "/api/production/badrework";
+const dataManager = useSendApi<ProductionBadRework>(
+  url,
+  currentPage,
+  rowsPerPage
 );
 
 // 테이블항목 설정 및 가로크기 조정
 const table_setting = {
   체크박스: { name: "체크박스", style: "width: 5px" },
   순번: { name: "순번", style: "width: 5px; text-align: center;" },
-  항목1: { name: "사용일자", style: "width: 50px; text-align: center;" },
-  항목2: { name: "사용횟수", style: "width: 50px; text-align: center;" },
-  항목3: { name: "금형코드", style: "width: 50px; text-align: center;" },
-  항목4: { name: "금형명", style: "width: 50px; text-align: center;" },
-  항목5: { name: "작업코드", style: "width: 50px; text-align: center;" },
-  항목6: { name: "품번", style: "width: 50px; text-align: center;" },
-  항목7: { name: "품목구분", style: "width: 50px; text-align: center;" },
-  항목8: { name: "품명", style: "width: 50px; text-align: center;" },
-  항목9: { name: "규격", style: "width: 50px; text-align: center;" },
-  항목10: { name: "단위", style: "width: 50px; text-align: center;" },
-  항목11: { name: "생산수", style: "width: 50px; text-align: center;" },
-  항목12: { name: "불량수", style: "width: 50px; text-align: center;" },
+  항목1: { name: "일자", style: "width: 50px; text-align: center;" },
+  항목2: { name: "재작업수", style: "width: 50px; text-align: center;" },
+  항목3: { name: "작업코드", style: "width: 50px; text-align: center;" },
+  항목4: { name: "품번", style: "width: 50px; text-align: center;" },
+  항목5: { name: "품목구분", style: "width: 50px; text-align: center;" },
+  항목6: { name: "품명", style: "width: 50px; text-align: center;" },
+  항목7: { name: "규격", style: "width: 50px; text-align: center;" },
+  항목8: { name: "단위", style: "width: 50px; text-align: center;" },
   상세보기: { name: "정보", style: "width: 50px; text-align: center;" },
   편집: { name: "편집", style: "width: 50px; text-align: center;" },
 };
@@ -190,7 +183,7 @@ const insert_check = () => {
 
 // ########################## 등록, 수정, 삭제, 상세 Modal ##########################
 // ##### 등록 Modal #####
-let insertModalData: MoldUse;
+let insertModalData: ProductionBadRework;
 const insertModal = ref(false);
 const setInsertModal = (value: boolean) => {
   if (user_level >= 3) {
@@ -230,7 +223,7 @@ const setEditModal = (value: boolean) => {
     toast.warning("액세스 권한이 없습니다.\n관리자에게 문의하세요.");
   }
 };
-let editModalData: MoldUse; // 수정할 변수
+let editModalData: ProductionBadRework; // 수정할 변수
 // 수정버튼 누르면 실행되는 함수
 const editDataFunction = async () => {
   await dataManager.editData(editModalData); // await : 이 함수가 끝나야 다음으로 넘어간다
@@ -390,9 +383,10 @@ const pageChangeFirst_produceresult = () => {
 };
 
 // 품목 데이터 설정
-const url_molduse_modal_produceresult = "/api/mold/modal/produceresult";
-const molduse_modal_produceresult = useSendApi<ProductionResult>(
-  url_molduse_modal_produceresult,
+const url_badrework_modal_produceresult =
+  "/api/production/task/modal/produceresult";
+const badrework_modal_produceresult = useSendApi<ProductionResult>(
+  url_badrework_modal_produceresult,
   currentPage_produceresult,
   rowsPerPage_produceresult
 );
@@ -437,7 +431,7 @@ watch(
 );
 const search_produceresult = () => {
   // console.log(searchKey.value, searchInput.value);
-  molduse_modal_produceresult.searchDatas(
+  badrework_modal_produceresult.searchDatas(
     searchDate_produceresult.value,
     searchKey_produceresult.value,
     searchInput_produceresult.value,
@@ -455,56 +449,44 @@ const setProduceResultModal = (value: boolean) => {
 // 모달에서 선택한 품목을 itemProcesslist에 넣기
 const importProduceResult = (no: any) => {
   insertModalData.생산실적NO = no;
-  insertModalData.작업코드 = molduse_modal_produceresult.dataAll.value.filter(
+  insertModalData.작업코드 = badrework_modal_produceresult.dataAll.value.filter(
     (c) => c.NO == no
   )[0].작업코드;
-  insertModalData.품번 = molduse_modal_produceresult.dataAll.value.filter(
+  insertModalData.품번 = badrework_modal_produceresult.dataAll.value.filter(
     (c) => c.NO == no
   )[0].품번;
-  insertModalData.품목구분 = molduse_modal_produceresult.dataAll.value.filter(
+  insertModalData.품목구분 = badrework_modal_produceresult.dataAll.value.filter(
     (c) => c.NO == no
   )[0].품목구분;
-  insertModalData.품명 = molduse_modal_produceresult.dataAll.value.filter(
+  insertModalData.품명 = badrework_modal_produceresult.dataAll.value.filter(
     (c) => c.NO == no
   )[0].품명;
-  insertModalData.규격 = molduse_modal_produceresult.dataAll.value.filter(
+  insertModalData.규격 = badrework_modal_produceresult.dataAll.value.filter(
     (c) => c.NO == no
   )[0].규격;
-  insertModalData.단위 = molduse_modal_produceresult.dataAll.value.filter(
+  insertModalData.단위 = badrework_modal_produceresult.dataAll.value.filter(
     (c) => c.NO == no
   )[0].단위;
-  insertModalData.생산수 = molduse_modal_produceresult.dataAll.value.filter(
-    (c) => c.NO == no
-  )[0].생산수;
-  insertModalData.불량수 = molduse_modal_produceresult.dataAll.value.filter(
-    (c) => c.NO == no
-  )[0].불량수;
 
   editModalData.생산실적NO = no;
-  editModalData.작업코드 = molduse_modal_produceresult.dataAll.value.filter(
+  editModalData.작업코드 = badrework_modal_produceresult.dataAll.value.filter(
     (c) => c.NO == no
   )[0].작업코드;
-  editModalData.품번 = molduse_modal_produceresult.dataAll.value.filter(
+  editModalData.품번 = badrework_modal_produceresult.dataAll.value.filter(
     (c) => c.NO == no
   )[0].품번;
-  editModalData.품목구분 = molduse_modal_produceresult.dataAll.value.filter(
+  editModalData.품목구분 = badrework_modal_produceresult.dataAll.value.filter(
     (c) => c.NO == no
   )[0].품목구분;
-  editModalData.품명 = molduse_modal_produceresult.dataAll.value.filter(
+  editModalData.품명 = badrework_modal_produceresult.dataAll.value.filter(
     (c) => c.NO == no
   )[0].품명;
-  editModalData.규격 = molduse_modal_produceresult.dataAll.value.filter(
+  editModalData.규격 = badrework_modal_produceresult.dataAll.value.filter(
     (c) => c.NO == no
   )[0].규격;
-  editModalData.단위 = molduse_modal_produceresult.dataAll.value.filter(
+  editModalData.단위 = badrework_modal_produceresult.dataAll.value.filter(
     (c) => c.NO == no
   )[0].단위;
-  editModalData.생산수 = molduse_modal_produceresult.dataAll.value.filter(
-    (c) => c.NO == no
-  )[0].생산수;
-  editModalData.불량수 = molduse_modal_produceresult.dataAll.value.filter(
-    (c) => c.NO == no
-  )[0].불량수;
 
   setProduceResultModal(false);
 };
@@ -592,15 +574,14 @@ const importProduceResult = (no: any) => {
         <div class="ml-2">
           <FormSelect v-model="searchKey" class="w-30 mt-3 !box sm:mt-0">
             <option>전체</option>
-            <option>금형코드</option>
-            <option>금형명</option>
             <option>작업코드</option>
             <option>품번</option>
             <option>품목구분</option>
             <option>품명</option>
             <option>규격</option>
             <option>단위</option>
-            <option>사용일자</option>
+            <option>재작업수</option>
+            <option>일자</option>
             <option>비고</option>
           </FormSelect>
         </div>
@@ -664,15 +645,14 @@ const importProduceResult = (no: any) => {
         <div>
           <FormSelect v-model="sortKey" class="w-30 mt-3 !box sm:mt-0">
             <option>등록일</option>
-            <option>금형코드</option>
-            <option>금형명</option>
             <option>작업코드</option>
             <option>품번</option>
             <option>품목구분</option>
             <option>품명</option>
             <option>규격</option>
             <option>단위</option>
-            <option>사용일자</option>
+            <option>재작업수</option>
+            <option>일자</option>
             <option>비고</option>
           </FormSelect>
         </div>
@@ -819,30 +799,6 @@ const importProduceResult = (no: any) => {
                 </Table.Th>
                 <Table.Th
                   class="text-center border-b-0 whitespace-nowrap font-bold"
-                  :style="table_setting.항목9.style"
-                >
-                  {{ table_setting.항목9.name }}
-                </Table.Th>
-                <Table.Th
-                  class="text-center border-b-0 whitespace-nowrap font-bold"
-                  :style="table_setting.항목10.style"
-                >
-                  {{ table_setting.항목10.name }}
-                </Table.Th>
-                <Table.Th
-                  class="text-center border-b-0 whitespace-nowrap font-bold"
-                  :style="table_setting.항목11.style"
-                >
-                  {{ table_setting.항목11.name }}
-                </Table.Th>
-                <Table.Th
-                  class="text-center border-b-0 whitespace-nowrap font-bold"
-                  :style="table_setting.항목12.style"
-                >
-                  {{ table_setting.항목12.name }}
-                </Table.Th>
-                <Table.Th
-                  class="text-center border-b-0 whitespace-nowrap font-bold"
                   :style="table_setting.상세보기.style"
                 >
                   {{ table_setting.상세보기.name }}
@@ -927,30 +883,6 @@ const importProduceResult = (no: any) => {
                   :style="table_setting.항목8.style"
                 >
                   <div>{{ todo[table_setting.항목8.name] }}</div>
-                </Table.Td>
-                <Table.Td
-                  class="first:rounded-l-md last:rounded-r-md text-center bg-white border-b-0 dark:bg-darkmode-600 shadow-[20px_3px_20px_#0000000b]"
-                  :style="table_setting.항목9.style"
-                >
-                  <div>{{ todo[table_setting.항목9.name] }}</div>
-                </Table.Td>
-                <Table.Td
-                  class="first:rounded-l-md last:rounded-r-md text-center bg-white border-b-0 dark:bg-darkmode-600 shadow-[20px_3px_20px_#0000000b]"
-                  :style="table_setting.항목10.style"
-                >
-                  <div>{{ todo[table_setting.항목10.name] }}</div>
-                </Table.Td>
-                <Table.Td
-                  class="first:rounded-l-md last:rounded-r-md text-center bg-white border-b-0 dark:bg-darkmode-600 shadow-[20px_3px_20px_#0000000b]"
-                  :style="table_setting.항목11.style"
-                >
-                  <div>{{ todo[table_setting.항목11.name] }}</div>
-                </Table.Td>
-                <Table.Td
-                  class="first:rounded-l-md last:rounded-r-md text-center bg-white border-b-0 dark:bg-darkmode-600 shadow-[20px_3px_20px_#0000000b]"
-                  :style="table_setting.항목12.style"
-                >
-                  <div>{{ todo[table_setting.항목12.name] }}</div>
                 </Table.Td>
                 <Table.Td
                   class="first:rounded-l-md last:rounded-r-md text-center bg-white border-b-0 dark:bg-darkmode-600 shadow-[20px_3px_20px_#0000000b] py-0 relative before:block before:w-px before:h-8 before:bg-slate-200 before:absolute before:left-0 before:inset-y-0 before:my-auto before:dark:bg-darkmode-400"
@@ -1055,35 +987,22 @@ const importProduceResult = (no: any) => {
               "
             >
               <div class="mt-3">
-                <FormLabel htmlFor="vertical-form-1">사용일자</FormLabel>
+                <FormLabel htmlFor="vertical-form-1">재작업일자</FormLabel>
                 <FormInput
                   id="vertical-form-1"
                   type="date"
-                  v-model="insertModalData.사용일자"
+                  v-model="insertModalData.일자"
                   placeholder=""
                 />
               </div>
               <div class="mt-3">
-                <FormLabel htmlFor="vertical-form-2">사용횟수</FormLabel>
+                <FormLabel htmlFor="vertical-form-2">재작업수</FormLabel>
                 <FormInput
                   id="vertical-form-2"
                   type="number"
-                  v-model="insertModalData.사용횟수"
+                  v-model="insertModalData.재작업수"
                   placeholder=""
                 />
-              </div>
-              <div class="mt-3">
-                <FormLabel htmlFor="vertical-form-3">금형</FormLabel>
-                <select v-tom v-model="insertModalData.금형NO">
-                  <option value="" selected>=== 필수 선택 ===</option>
-                  <option
-                    :value="p.NO"
-                    v-for="p in molduse_modal_mold.dataAll.value"
-                    :key="p.NO"
-                  >
-                    {{ p.코드 }} # 금형명:{{ p.금형명 }} # 규격:{{ p.규격 }}
-                  </option>
-                </select>
               </div>
               <div class="mt-3">
                 <FormLabel htmlFor="vertical-form-4">작업코드</FormLabel>
@@ -1135,24 +1054,6 @@ const importProduceResult = (no: any) => {
                 <FormInput
                   type="text"
                   v-model="insertModalData.단위"
-                  placeholder=""
-                  readonly
-                />
-              </div>
-              <div class="mt-3">
-                <FormLabel htmlFor="vertical-form-6">생산수</FormLabel>
-                <FormInput
-                  type="text"
-                  v-model="insertModalData.생산수"
-                  placeholder=""
-                  readonly
-                />
-              </div>
-              <div class="mt-3">
-                <FormLabel htmlFor="vertical-form-6">불량수</FormLabel>
-                <FormInput
-                  type="text"
-                  v-model="insertModalData.불량수"
                   placeholder=""
                   readonly
                 />
@@ -1233,58 +1134,22 @@ const importProduceResult = (no: any) => {
               "
             >
               <div class="mt-3">
-                <FormLabel htmlFor="vertical-form-1">사용일자</FormLabel>
+                <FormLabel htmlFor="vertical-form-1">재작업일자</FormLabel>
                 <FormInput
                   id="vertical-form-1"
                   type="date"
-                  v-model="editModalData.사용일자"
+                  v-model="editModalData.일자"
                   placeholder=""
                 />
               </div>
               <div class="mt-3">
-                <FormLabel htmlFor="vertical-form-2">사용횟수</FormLabel>
+                <FormLabel htmlFor="vertical-form-2">재작업수</FormLabel>
                 <FormInput
                   id="vertical-form-2"
                   type="number"
-                  v-model="editModalData.사용횟수"
+                  v-model="editModalData.재작업수"
                   placeholder=""
                 />
-              </div>
-              <div class="mt-3">
-                <FormLabel htmlFor="vertical-form-2">금형</FormLabel>
-                <select v-tom v-model="editModalData.금형NO">
-                  <option
-                    v-if="editModalData.금형NO"
-                    :value="editModalData.금형NO"
-                    selected
-                  >
-                    {{
-                      molduse_modal_mold.dataAll.value.filter(
-                        (c) => c.NO == editModalData.금형NO
-                      )[0].코드
-                    }}
-                    # 금형명:{{
-                      molduse_modal_mold.dataAll.value.filter(
-                        (c) => c.NO == editModalData.금형NO
-                      )[0].금형명
-                    }}
-                    # 규격:{{
-                      molduse_modal_mold.dataAll.value.filter(
-                        (c) => c.NO == editModalData.금형NO
-                      )[0].규격
-                    }}
-                  </option>
-                  <option v-if="!editModalData.금형NO" value="" selected>
-                    === 필수 선택 ===
-                  </option>
-                  <option
-                    :value="p.NO"
-                    v-for="p in molduse_modal_mold.dataAll.value"
-                    :key="p.NO"
-                  >
-                    {{ p.코드 }} # 금형명:{{ p.금형명 }} # 규격:{{ p.규격 }}
-                  </option>
-                </select>
               </div>
               <div class="mt-3">
                 <FormLabel htmlFor="vertical-form-4">작업코드</FormLabel>
@@ -1336,24 +1201,6 @@ const importProduceResult = (no: any) => {
                 <FormInput
                   type="text"
                   v-model="editModalData.단위"
-                  placeholder=""
-                  readonly
-                />
-              </div>
-              <div class="mt-3">
-                <FormLabel htmlFor="vertical-form-6">생산수</FormLabel>
-                <FormInput
-                  type="text"
-                  v-model="editModalData.생산수"
-                  placeholder=""
-                  readonly
-                />
-              </div>
-              <div class="mt-3">
-                <FormLabel htmlFor="vertical-form-6">불량수</FormLabel>
-                <FormInput
-                  type="text"
-                  v-model="editModalData.불량수"
                   placeholder=""
                   readonly
                 />
@@ -1773,7 +1620,7 @@ const importProduceResult = (no: any) => {
               <option>25</option>
               <option>50</option>
               <option>100</option>
-              <option :value="molduse_modal_produceresult.dataCount.value">
+              <option :value="badrework_modal_produceresult.dataCount.value">
                 전체
               </option>
             </FormSelect>
@@ -1782,17 +1629,17 @@ const importProduceResult = (no: any) => {
             <PaginationComponent
               class="pagination-component"
               v-model="currentPage_produceresult"
-              :numberOfPages="molduse_modal_produceresult.numberOfPages.value"
+              :numberOfPages="badrework_modal_produceresult.numberOfPages.value"
             />
           </div>
           <div class="hidden mx-auto md:block text-slate-500"></div>
           <div>
             <span class="mr-3"
-              >[ {{ molduse_modal_produceresult.dataCount }}개 데이터 조회됨 ]
+              >[ {{ badrework_modal_produceresult.dataCount }}개 데이터 조회됨 ]
             </span>
             <span class="mr-4">
               [ {{ currentPage_produceresult }} /
-              {{ molduse_modal_produceresult.numberOfPages }} 페이지 ]</span
+              {{ badrework_modal_produceresult.numberOfPages }} 페이지 ]</span
             >
           </div>
         </div>
@@ -1904,7 +1751,7 @@ const importProduceResult = (no: any) => {
               </Table.Thead>
               <Table.Tbody style="position: relative; z-index: 1">
                 <Table.Tr
-                  v-for="(todo, index) in molduse_modal_produceresult.datas
+                  v-for="(todo, index) in badrework_modal_produceresult.datas
                     .value"
                   :key="todo.NO"
                   class="intro-x hover:bg-gray-200 active:bg-gray-300 cursor-pointer"
@@ -2054,7 +1901,7 @@ const importProduceResult = (no: any) => {
             </Table>
             <div
               class="text-center mt-20"
-              v-if="molduse_modal_produceresult.dataCount.value == 0"
+              v-if="badrework_modal_produceresult.dataCount.value == 0"
             >
               저장된 데이터가 없습니다.
             </div>

@@ -45,7 +45,7 @@ router.get("/", async (req, res) => {
         ,PRODUCE_RESULT.규격 AS 규격
         ,PRODUCE_RESULT.단위 AS 단위
         ,[DFRW_AMOUNT] AS 재작업수
-        ,[DFRW_DATE] AS 일자
+        ,CONVERT(VARCHAR, [DFRW_DATE], 23) AS 일자
         ,[DFRW_NOTE] AS 비고
         ,[DFRW_REGIST_NM] AS 등록자
         ,[DFRW_REGIST_DT] AS 등록일시
@@ -149,7 +149,7 @@ router.post("/", async (req, res) => {
             ,PRODUCE_RESULT.규격 AS 규격
             ,PRODUCE_RESULT.단위 AS 단위
             ,[DFRW_AMOUNT] AS 재작업수
-            ,[DFRW_DATE] AS 일자
+            ,CONVERT(VARCHAR, [DFRW_DATE], 23) AS 일자
             ,[DFRW_NOTE] AS 비고
             ,[DFRW_REGIST_NM] AS 등록자
             ,[DFRW_REGIST_DT] AS 등록일시
@@ -248,7 +248,7 @@ router.post("/", async (req, res) => {
             ,PRODUCE_RESULT.규격 AS 규격
             ,PRODUCE_RESULT.단위 AS 단위
             ,[DFRW_AMOUNT] AS 재작업수
-            ,[DFRW_DATE] AS 일자
+            ,CONVERT(VARCHAR, [DFRW_DATE], 23) AS 일자
             ,[DFRW_NOTE] AS 비고
             ,[DFRW_REGIST_NM] AS 등록자
             ,[DFRW_REGIST_DT] AS 등록일시
@@ -525,7 +525,7 @@ router.post("/delete", async (req, res) => {
           ,PRODUCE_RESULT.규격 AS 규격
           ,PRODUCE_RESULT.단위 AS 단위
           ,[DFRW_AMOUNT] AS 재작업수
-          ,[DFRW_DATE] AS 일자
+          ,CONVERT(VARCHAR, [DFRW_DATE], 23) AS 일자
           ,[DFRW_NOTE] AS 비고
           ,[DFRW_REGIST_NM] AS 등록자
           ,[DFRW_REGIST_DT] AS 등록일시
