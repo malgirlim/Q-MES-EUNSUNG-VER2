@@ -408,6 +408,7 @@ const lot_gen = () => {
         <div class="mr-auto ml-3 mb-3">
           <Button
             class="shadow-md"
+            style="height: 30px"
             as="a"
             variant="primary"
             @click="
