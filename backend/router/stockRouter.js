@@ -1,6 +1,8 @@
 const express = require("express");
 const router = express.Router();
 
+const stockModalRouter = require("./stock/stockModal");
+
 const stockReceiveRawRouter = require("./stock/stockReceiveRaw");
 const stockReceiveHalfRouter = require("./stock/stockReceiveHalf");
 const stockReceiveFinRouter = require("./stock/stockReceiveFin");
@@ -22,10 +24,18 @@ const stockStockLOTRawRouter = require("./stock/stockStockLOTRaw");
 const stockStockLOTHalfRouter = require("./stock/stockStockLOTHalf");
 const stockStockLOTFinRouter = require("./stock/stockStockLOTFin");
 
+const stockFCLTPartReceiveRouter = require("./stock/stockFCLTPartReceive");
+const stockFCLTPartReleaseRouter = require("./stock/stockFCLTPartRelease");
+const stockFCLTPartStockRouter = require("./stock/stockFCLTPartStock");
+const stockFCLTPartStockLOTRouter = require("./stock/stockFCLTPartStockLOT");
+
 router.use((req, res, next) => {
   // console.log("middleware for test!");
   next();
 });
+
+// 재고관리 / 모달 - router/stock/stockModal.js
+router.use("/modal", stockModalRouter);
 
 // 재고관리 / 원부자재 입고 조회 - router/stock/stockReceiveRaw.js
 router.use("/receive/raw", stockReceiveRawRouter);
@@ -62,5 +72,14 @@ router.use("/stock/lot/raw", stockStockLOTRawRouter);
 router.use("/stock/lot/half", stockStockLOTHalfRouter);
 // 재고관리 / 완제품 LOT별 재고현황 - router/stock/stockStockLOTFin.js
 router.use("/stock/lot/fin", stockStockLOTFinRouter);
+
+// 재고관리 / 설비부품 입고 조회 - router/stock/stockFCLTPartReceive.js
+router.use("/fcltpart/receive", stockFCLTPartReceiveRouter);
+// 재고관리 / 설비부품 출고 조회 - router/stock/stockFCLTPartRelease.js
+router.use("/fcltpart/release", stockFCLTPartReleaseRouter);
+// 재고관리 / 설비부품 재고 조회 - router/stock/stockFCLTPartStock.js
+router.use("/fcltpart/stock", stockFCLTPartStockRouter);
+// 재고관리 / 설비부품 LOT재고 조회 - router/stock/stockFCLTPartStockLOT.js
+router.use("/fcltpart/stock/lot", stockFCLTPartStockLOTRouter);
 
 module.exports = router;
