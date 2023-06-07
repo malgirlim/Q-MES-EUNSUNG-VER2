@@ -22,10 +22,8 @@ import { toast } from "vue3-toastify";
 
 // API 보내는 함수 및 인터페이스 불러오기
 import { useSendApi } from "../../composables/useSendApi";
-import {
-  ProductionBadRework,
-  ProductionResult,
-} from "../../interfaces/menu/productionInterface";
+import { StockFCLTPartReceive } from "../../interfaces/menu/stockInterface";
+import { MasterFacilityPart } from "../../interfaces/menu/masterInterface";
 
 // 컴포넌트 로드
 import MasterDetail from "../../components/Common/Detail/MasterClientDetail.vue";
@@ -35,8 +33,8 @@ const user_level = proxy.gstate.level.StockReceiveParts; //권한레벨
 
 // 페이지 로딩 시 시작
 onMounted(async () => {
-  dataManager.loadDatas(); // 거래처 데이터 불러오기
-  badrework_modal_produceresult.loadDatas(); // 생산실적 데이터 불러오기
+  dataManager.loadDatas(); // 메인으로 쓸 데이터 불러오기\
+  fcltpartReceive_modal_facilitypart.loadDatas(); // 설비부품 데이터 불러오기
 });
 
 // 페이징기능
@@ -47,8 +45,8 @@ const pageChangeFirst = () => {
 };
 
 // dataManager 만들기
-const url = "/api/production/badrework";
-const dataManager = useSendApi<ProductionBadRework>(
+const url = "/api/stock/fcltpart/receive";
+const dataManager = useSendApi<StockFCLTPartReceive>(
   url,
   currentPage,
   rowsPerPage
@@ -58,14 +56,17 @@ const dataManager = useSendApi<ProductionBadRework>(
 const table_setting = {
   체크박스: { name: "체크박스", style: "width: 5px" },
   순번: { name: "순번", style: "width: 5px; text-align: center;" },
-  항목1: { name: "일자", style: "width: 50px; text-align: center;" },
-  항목2: { name: "재작업수", style: "width: 50px; text-align: center;" },
-  항목3: { name: "작업코드", style: "width: 50px; text-align: center;" },
-  항목4: { name: "품번", style: "width: 50px; text-align: center;" },
-  항목5: { name: "품목구분", style: "width: 50px; text-align: center;" },
-  항목6: { name: "품명", style: "width: 50px; text-align: center;" },
-  항목7: { name: "규격", style: "width: 50px; text-align: center;" },
-  항목8: { name: "단위", style: "width: 50px; text-align: center;" },
+  항목1: { name: "입고일시", style: "width: 50px; text-align: center;" },
+  항목2: { name: "구분", style: "width: 50px; text-align: center;" },
+  항목3: { name: "LOT코드", style: "width: 50px; text-align: center;" },
+  항목4: { name: "입고수", style: "width: 50px; text-align: center;" },
+  항목5: { name: "품번", style: "width: 50px; text-align: center;" },
+  항목6: { name: "설비명", style: "width: 50px; text-align: center;" },
+  항목7: { name: "부품구분", style: "width: 50px; text-align: center;" },
+  항목8: { name: "품명", style: "width: 50px; text-align: center;" },
+  항목9: { name: "규격", style: "width: 50px; text-align: center;" },
+  항목10: { name: "단위", style: "width: 50px; text-align: center;" },
+  항목11: { name: "유효일자", style: "width: 50px; text-align: center;" },
   상세보기: { name: "정보", style: "width: 50px; text-align: center;" },
   편집: { name: "편집", style: "width: 50px; text-align: center;" },
 };
@@ -183,7 +184,7 @@ const insert_check = () => {
 
 // ########################## 등록, 수정, 삭제, 상세 Modal ##########################
 // ##### 등록 Modal #####
-let insertModalData: ProductionBadRework;
+let insertModalData: StockFCLTPartReceive;
 const insertModal = ref(false);
 const setInsertModal = (value: boolean) => {
   if (user_level >= 3) {
@@ -194,6 +195,9 @@ const setInsertModal = (value: boolean) => {
     insertModal.value = value;
     insertModalData = {}; // 변수 초기화
     editModalData = {}; // 변수 초기화
+
+    insertModalData.입고일시 = dayjs().format("YYYY-MM-DD HH:mm:ss");
+    insertModalData.유효일자 = dayjs().add(1, "month").format("YYYY-MM-DD");
   } else {
     toast.warning("액세스 권한이 없습니다.\n관리자에게 문의하세요.");
   }
@@ -223,7 +227,7 @@ const setEditModal = (value: boolean) => {
     toast.warning("액세스 권한이 없습니다.\n관리자에게 문의하세요.");
   }
 };
-let editModalData: ProductionBadRework; // 수정할 변수
+let editModalData: StockFCLTPartReceive; // 수정할 변수
 // 수정버튼 누르면 실행되는 함수
 const editDataFunction = async () => {
   await dataManager.editData(editModalData); // await : 이 함수가 끝나야 다음으로 넘어간다
@@ -374,121 +378,121 @@ const onFileImport = (event: any) => {
   }
 };
 
-// ############################################### 생산실적 가져오기 ###############################################
+// ############################################### 설비부품 가져오기 ###############################################
 // 페이징기능
-const currentPage_produceresult = ref(1); // 현재페이지
-const rowsPerPage_produceresult = ref(10); // 한 페이지에 보여질 데이터 갯수
-const pageChangeFirst_produceresult = () => {
-  currentPage_produceresult.value = 1; // 데이터 갯수 변경 시 1페이지로 이동
+const currentPage_facilitypart = ref(1); // 현재페이지
+const rowsPerPage_facilitypart = ref(10); // 한 페이지에 보여질 데이터 갯수
+const pageChangeFirst_facilitypart = () => {
+  currentPage_facilitypart.value = 1; // 데이터 갯수 변경 시 1페이지로 이동
 };
 
-// 품목 데이터 설정
-const url_badrework_modal_produceresult =
-  "/api/production/task/modal/produceresult";
-const badrework_modal_produceresult = useSendApi<ProductionResult>(
-  url_badrework_modal_produceresult,
-  currentPage_produceresult,
-  rowsPerPage_produceresult
+// 모달 데이터 설정
+const url_fcltpartReceive_modal_facilitypart = "/api/stock/modal/facilitypart";
+const fcltpartReceive_modal_facilitypart = useSendApi<MasterFacilityPart>(
+  url_fcltpartReceive_modal_facilitypart,
+  currentPage_facilitypart,
+  rowsPerPage_facilitypart
 );
 
 // 테이블항목 설정 및 가로크기 조정
-const table_setting_modal_produceresult = {
+const table_setting_modal_facilitypart = {
   순번: { name: "순번", style: "width: 50px; text-align: center;" },
-  항목1: { name: "작업코드", style: "width: 50px; text-align: center;" },
+  항목1: { name: "설비명", style: "width: 50px; text-align: center;" },
   항목2: { name: "품번", style: "width: 50px; text-align: center;" },
-  항목3: { name: "품목구분", style: "width: 50px; text-align: center;" },
+  항목3: { name: "구분", style: "width: 50px; text-align: center;" },
   항목4: { name: "품명", style: "width: 50px; text-align: center;" },
-  항목5: { name: "규격", style: "width: 50px; text-align: center;" },
-  항목6: { name: "단위", style: "width: 50px; text-align: center;" },
-  항목7: { name: "지시수량", style: "width: 50px; text-align: center;" },
-  항목8: { name: "공정", style: "width: 50px; text-align: center;" },
-  항목9: { name: "설비명", style: "width: 50px; text-align: center;" },
-  항목10: { name: "작업자", style: "width: 50px; text-align: center;" },
-  항목11: { name: "시작일시", style: "width: 50px; text-align: center;" },
-  항목12: { name: "종료일시", style: "width: 50px; text-align: center;" },
-  항목13: { name: "생산수", style: "width: 50px; text-align: center;" },
-  항목14: { name: "불량수", style: "width: 50px; text-align: center;" },
+  항목5: { name: "차종", style: "width: 50px; text-align: center;" },
+  항목6: { name: "규격", style: "width: 50px; text-align: center;" },
+  항목7: { name: "단위", style: "width: 50px; text-align: center;" },
+  항목8: { name: "거래처명", style: "width: 50px; text-align: center;" },
+  항목9: { name: "안전재고", style: "width: 50px; text-align: center;" },
+  항목10: { name: "단가", style: "width: 50px; text-align: center;" },
 };
 
 // ########################## 조회기간 설정 ##########################
-const searchDate_produceresult = ref("전체기간");
+const searchDate_facilitypart = ref("전체기간");
 // ########################## 품목 조회  ##########################
-const searchKey_produceresult = ref("전체");
-const searchInput_produceresult = ref("");
-const sortKey_produceresult = ref("등록일");
-const sortOrder_produceresult = ref("내림차순");
-const sortOrderToggle_produceresult = () => {
-  sortOrder_produceresult.value =
-    sortOrder_produceresult.value == "내림차순" ? "오름차순" : "내림차순";
+const searchKey_facilitypart = ref("전체");
+const searchInput_facilitypart = ref("");
+const sortKey_facilitypart = ref("등록일");
+const sortOrder_facilitypart = ref("내림차순");
+const sortOrderToggle_facilitypart = () => {
+  sortOrder_facilitypart.value =
+    sortOrder_facilitypart.value == "내림차순" ? "오름차순" : "내림차순";
 };
 //  정렬기준이 변경되면 실행
-watch(
-  [sortKey_produceresult, sortOrder_produceresult],
-  (newValue, oldValue) => {
-    search_produceresult();
-    pageChangeFirst_produceresult();
-  }
-);
-const search_produceresult = () => {
+watch([sortKey_facilitypart, sortOrder_facilitypart], (newValue, oldValue) => {
+  search_facilitypart();
+  pageChangeFirst_facilitypart();
+});
+const search_facilitypart = () => {
   // console.log(searchKey.value, searchInput.value);
-  badrework_modal_produceresult.searchDatas(
-    searchDate_produceresult.value,
-    searchKey_produceresult.value,
-    searchInput_produceresult.value,
-    sortKey_produceresult.value,
-    sortOrder_produceresult.value
+  fcltpartReceive_modal_facilitypart.searchDatas(
+    searchDate_facilitypart.value,
+    searchKey_facilitypart.value,
+    searchInput_facilitypart.value,
+    sortKey_facilitypart.value,
+    sortOrder_facilitypart.value
   );
 };
 
 // ########################## 모달 설정 ##########################
-const produceresultModal = ref(false);
-const setProduceResultModal = (value: boolean) => {
-  produceresultModal.value = value;
+const facilitypartModal = ref(false);
+const setFacilityPartModal = (value: boolean) => {
+  facilitypartModal.value = value;
 };
 
 // 모달에서 선택한 품목을 itemProcesslist에 넣기
-const importProduceResult = (no: any) => {
-  insertModalData.생산실적NO = no;
-  insertModalData.작업코드 = badrework_modal_produceresult.dataAll.value.filter(
-    (c) => c.NO == no
-  )[0].작업코드;
-  insertModalData.품번 = badrework_modal_produceresult.dataAll.value.filter(
+const importFacilitypart = (no: any) => {
+  insertModalData.설비부품NO = no;
+  insertModalData.설비명 =
+    fcltpartReceive_modal_facilitypart.dataAll.value.filter(
+      (c) => c.NO == no
+    )[0].설비명;
+  insertModalData.부품구분 =
+    fcltpartReceive_modal_facilitypart.dataAll.value.filter(
+      (c) => c.NO == no
+    )[0].구분;
+  insertModalData.품번 =
+    fcltpartReceive_modal_facilitypart.dataAll.value.filter(
+      (c) => c.NO == no
+    )[0].품번;
+  insertModalData.품명 =
+    fcltpartReceive_modal_facilitypart.dataAll.value.filter(
+      (c) => c.NO == no
+    )[0].품명;
+  insertModalData.규격 =
+    fcltpartReceive_modal_facilitypart.dataAll.value.filter(
+      (c) => c.NO == no
+    )[0].규격;
+  insertModalData.단위 =
+    fcltpartReceive_modal_facilitypart.dataAll.value.filter(
+      (c) => c.NO == no
+    )[0].단위;
+
+  editModalData.설비부품NO = no;
+  editModalData.설비명 =
+    fcltpartReceive_modal_facilitypart.dataAll.value.filter(
+      (c) => c.NO == no
+    )[0].설비명;
+  editModalData.부품구분 =
+    fcltpartReceive_modal_facilitypart.dataAll.value.filter(
+      (c) => c.NO == no
+    )[0].부품구분;
+  editModalData.품번 = fcltpartReceive_modal_facilitypart.dataAll.value.filter(
     (c) => c.NO == no
   )[0].품번;
-  insertModalData.품목구분 = badrework_modal_produceresult.dataAll.value.filter(
-    (c) => c.NO == no
-  )[0].품목구분;
-  insertModalData.품명 = badrework_modal_produceresult.dataAll.value.filter(
+  editModalData.품명 = fcltpartReceive_modal_facilitypart.dataAll.value.filter(
     (c) => c.NO == no
   )[0].품명;
-  insertModalData.규격 = badrework_modal_produceresult.dataAll.value.filter(
+  editModalData.규격 = fcltpartReceive_modal_facilitypart.dataAll.value.filter(
     (c) => c.NO == no
   )[0].규격;
-  insertModalData.단위 = badrework_modal_produceresult.dataAll.value.filter(
+  editModalData.단위 = fcltpartReceive_modal_facilitypart.dataAll.value.filter(
     (c) => c.NO == no
   )[0].단위;
 
-  editModalData.생산실적NO = no;
-  editModalData.작업코드 = badrework_modal_produceresult.dataAll.value.filter(
-    (c) => c.NO == no
-  )[0].작업코드;
-  editModalData.품번 = badrework_modal_produceresult.dataAll.value.filter(
-    (c) => c.NO == no
-  )[0].품번;
-  editModalData.품목구분 = badrework_modal_produceresult.dataAll.value.filter(
-    (c) => c.NO == no
-  )[0].품목구분;
-  editModalData.품명 = badrework_modal_produceresult.dataAll.value.filter(
-    (c) => c.NO == no
-  )[0].품명;
-  editModalData.규격 = badrework_modal_produceresult.dataAll.value.filter(
-    (c) => c.NO == no
-  )[0].규격;
-  editModalData.단위 = badrework_modal_produceresult.dataAll.value.filter(
-    (c) => c.NO == no
-  )[0].단위;
-
-  setProduceResultModal(false);
+  setFacilityPartModal(false);
 };
 </script>
 
@@ -574,14 +578,17 @@ const importProduceResult = (no: any) => {
         <div class="ml-2">
           <FormSelect v-model="searchKey" class="w-30 mt-3 !box sm:mt-0">
             <option>전체</option>
-            <option>작업코드</option>
+            <option>구분</option>
+            <option>LOT코드</option>
+            <option>설비명</option>
+            <option>부품구분</option>
             <option>품번</option>
-            <option>품목구분</option>
             <option>품명</option>
             <option>규격</option>
             <option>단위</option>
-            <option>재작업수</option>
-            <option>일자</option>
+            <option>입고수</option>
+            <option>입고일시</option>
+            <option>유효일자</option>
             <option>비고</option>
           </FormSelect>
         </div>
@@ -645,14 +652,17 @@ const importProduceResult = (no: any) => {
         <div>
           <FormSelect v-model="sortKey" class="w-30 mt-3 !box sm:mt-0">
             <option>등록일</option>
-            <option>작업코드</option>
+            <option>구분</option>
+            <option>LOT코드</option>
+            <option>설비명</option>
+            <option>부품구분</option>
             <option>품번</option>
-            <option>품목구분</option>
             <option>품명</option>
             <option>규격</option>
             <option>단위</option>
-            <option>재작업수</option>
-            <option>일자</option>
+            <option>입고수</option>
+            <option>입고일시</option>
+            <option>유효일자</option>
             <option>비고</option>
           </FormSelect>
         </div>
@@ -799,6 +809,24 @@ const importProduceResult = (no: any) => {
                 </Table.Th>
                 <Table.Th
                   class="text-center border-b-0 whitespace-nowrap font-bold"
+                  :style="table_setting.항목9.style"
+                >
+                  {{ table_setting.항목9.name }}
+                </Table.Th>
+                <Table.Th
+                  class="text-center border-b-0 whitespace-nowrap font-bold"
+                  :style="table_setting.항목10.style"
+                >
+                  {{ table_setting.항목10.name }}
+                </Table.Th>
+                <Table.Th
+                  class="text-center border-b-0 whitespace-nowrap font-bold"
+                  :style="table_setting.항목11.style"
+                >
+                  {{ table_setting.항목11.name }}
+                </Table.Th>
+                <Table.Th
+                  class="text-center border-b-0 whitespace-nowrap font-bold"
                   :style="table_setting.상세보기.style"
                 >
                   {{ table_setting.상세보기.name }}
@@ -885,6 +913,24 @@ const importProduceResult = (no: any) => {
                   <div>{{ todo[table_setting.항목8.name] }}</div>
                 </Table.Td>
                 <Table.Td
+                  class="first:rounded-l-md last:rounded-r-md text-center bg-white border-b-0 dark:bg-darkmode-600 shadow-[20px_3px_20px_#0000000b]"
+                  :style="table_setting.항목9.style"
+                >
+                  <div>{{ todo[table_setting.항목9.name] }}</div>
+                </Table.Td>
+                <Table.Td
+                  class="first:rounded-l-md last:rounded-r-md text-center bg-white border-b-0 dark:bg-darkmode-600 shadow-[20px_3px_20px_#0000000b]"
+                  :style="table_setting.항목10.style"
+                >
+                  <div>{{ todo[table_setting.항목10.name] }}</div>
+                </Table.Td>
+                <Table.Td
+                  class="first:rounded-l-md last:rounded-r-md text-center bg-white border-b-0 dark:bg-darkmode-600 shadow-[20px_3px_20px_#0000000b]"
+                  :style="table_setting.항목11.style"
+                >
+                  <div>{{ todo[table_setting.항목11.name] }}</div>
+                </Table.Td>
+                <Table.Td
                   class="first:rounded-l-md last:rounded-r-md text-center bg-white border-b-0 dark:bg-darkmode-600 shadow-[20px_3px_20px_#0000000b] py-0 relative before:block before:w-px before:h-8 before:bg-slate-200 before:absolute before:left-0 before:inset-y-0 before:my-auto before:dark:bg-darkmode-400"
                   :style="table_setting.상세보기.style"
                 >
@@ -963,7 +1009,7 @@ const importProduceResult = (no: any) => {
 ############################################################################################################################# -->
 
   <!-- BEGIN: Insert Modal Content -->
-  <Dialog size="md" :open="insertModal" :key="insertModalData?.생산실적NO">
+  <Dialog size="md" :open="insertModal" :key="insertModalData?.설비부품NO">
     <Dialog.Panel class="p-10 text-center">
       <!--추가 Modal 내용 시작-->
       <div class="mb-5" style="font-weight: bold">등록</div>
@@ -987,46 +1033,37 @@ const importProduceResult = (no: any) => {
               "
             >
               <div class="mt-3">
-                <FormLabel htmlFor="vertical-form-1">재작업일자</FormLabel>
+                <FormLabel htmlFor="vertical-form-1">LOT코드</FormLabel>
                 <FormInput
                   id="vertical-form-1"
-                  type="date"
-                  v-model="insertModalData.일자"
-                  placeholder=""
-                />
-              </div>
-              <div class="mt-3">
-                <FormLabel htmlFor="vertical-form-2">재작업수</FormLabel>
-                <FormInput
-                  id="vertical-form-2"
-                  type="number"
-                  v-model="insertModalData.재작업수"
-                  placeholder=""
-                />
-              </div>
-              <div class="mt-3">
-                <FormLabel htmlFor="vertical-form-4">작업코드</FormLabel>
-                <FormInput
                   type="text"
-                  v-model="insertModalData.작업코드"
-                  @click="setProduceResultModal(true)"
-                  placeholder="여기를 클릭하여 생산실적을 등록해주세요."
+                  v-model="insertModalData.LOT코드"
+                  placeholder=""
                 />
               </div>
               <div class="mt-3">
-                <FormLabel htmlFor="vertical-form-5">품번</FormLabel>
+                <FormLabel htmlFor="vertical-form-4">품번</FormLabel>
                 <FormInput
                   type="text"
                   v-model="insertModalData.품번"
+                  @click="setFacilityPartModal(true)"
+                  placeholder="여기를 클릭하여 설비부품을 등록해주세요."
+                />
+              </div>
+              <div class="mt-3">
+                <FormLabel htmlFor="vertical-form-5">설비명</FormLabel>
+                <FormInput
+                  type="text"
+                  v-model="insertModalData.설비명"
                   placeholder=""
                   readonly
                 />
               </div>
               <div class="mt-3">
-                <FormLabel htmlFor="vertical-form-6">품목구분</FormLabel>
+                <FormLabel htmlFor="vertical-form-6">부품구분</FormLabel>
                 <FormInput
                   type="text"
-                  v-model="insertModalData.품목구분"
+                  v-model="insertModalData.부품구분"
                   placeholder=""
                   readonly
                 />
@@ -1056,6 +1093,31 @@ const importProduceResult = (no: any) => {
                   v-model="insertModalData.단위"
                   placeholder=""
                   readonly
+                />
+              </div>
+              <div class="mt-3">
+                <FormLabel htmlFor="vertical-form-7">입고수</FormLabel>
+                <FormInput
+                  type="number"
+                  v-model="insertModalData.입고수"
+                  placeholder=""
+                />
+              </div>
+              <div class="mt-3">
+                <FormLabel htmlFor="vertical-form-8">입고일시</FormLabel>
+                <FormInput
+                  type="datetime-local"
+                  step="10"
+                  v-model="insertModalData.입고일시"
+                  placeholder=""
+                />
+              </div>
+              <div class="mt-3">
+                <FormLabel htmlFor="vertical-form-9">유효일자</FormLabel>
+                <FormInput
+                  type="date"
+                  v-model="insertModalData.유효일자"
+                  placeholder=""
                 />
               </div>
             </div>
@@ -1111,7 +1173,7 @@ const importProduceResult = (no: any) => {
   </Dialog>
   <!-- END: Insert Modal Content -->
   <!-- BEGIN: Edit Modal Content -->
-  <Dialog size="md" :open="editModal" :key="editModalData?.생산실적NO">
+  <Dialog size="md" :open="editModal" :key="editModalData?.설비부품NO">
     <Dialog.Panel class="p-10 text-center">
       <div class="mb-5" style="font-weight: bold">수정</div>
       <Tab.Group>
@@ -1134,46 +1196,37 @@ const importProduceResult = (no: any) => {
               "
             >
               <div class="mt-3">
-                <FormLabel htmlFor="vertical-form-1">재작업일자</FormLabel>
+                <FormLabel htmlFor="vertical-form-1">LOT코드</FormLabel>
                 <FormInput
                   id="vertical-form-1"
-                  type="date"
-                  v-model="editModalData.일자"
-                  placeholder=""
-                />
-              </div>
-              <div class="mt-3">
-                <FormLabel htmlFor="vertical-form-2">재작업수</FormLabel>
-                <FormInput
-                  id="vertical-form-2"
-                  type="number"
-                  v-model="editModalData.재작업수"
-                  placeholder=""
-                />
-              </div>
-              <div class="mt-3">
-                <FormLabel htmlFor="vertical-form-4">작업코드</FormLabel>
-                <FormInput
                   type="text"
-                  v-model="editModalData.작업코드"
-                  @click="setProduceResultModal(true)"
-                  placeholder="여기를 클릭하여 생산실적을 등록해주세요."
+                  v-model="editModalData.LOT코드"
+                  placeholder=""
                 />
               </div>
               <div class="mt-3">
-                <FormLabel htmlFor="vertical-form-5">품번</FormLabel>
+                <FormLabel htmlFor="vertical-form-4">품번</FormLabel>
                 <FormInput
                   type="text"
                   v-model="editModalData.품번"
+                  @click="setFacilityPartModal(true)"
+                  placeholder="여기를 클릭하여 설비부품을 등록해주세요."
+                />
+              </div>
+              <div class="mt-3">
+                <FormLabel htmlFor="vertical-form-5">설비명</FormLabel>
+                <FormInput
+                  type="text"
+                  v-model="editModalData.설비명"
                   placeholder=""
                   readonly
                 />
               </div>
               <div class="mt-3">
-                <FormLabel htmlFor="vertical-form-6">품목구분</FormLabel>
+                <FormLabel htmlFor="vertical-form-6">부품구분</FormLabel>
                 <FormInput
                   type="text"
-                  v-model="editModalData.품목구분"
+                  v-model="editModalData.부품구분"
                   placeholder=""
                   readonly
                 />
@@ -1203,6 +1256,31 @@ const importProduceResult = (no: any) => {
                   v-model="editModalData.단위"
                   placeholder=""
                   readonly
+                />
+              </div>
+              <div class="mt-3">
+                <FormLabel htmlFor="vertical-form-7">입고수</FormLabel>
+                <FormInput
+                  type="number"
+                  v-model="editModalData.입고수"
+                  placeholder=""
+                />
+              </div>
+              <div class="mt-3">
+                <FormLabel htmlFor="vertical-form-8">입고일시</FormLabel>
+                <FormInput
+                  type="datetime-local"
+                  step="10"
+                  v-model="editModalData.입고일시"
+                  placeholder=""
+                />
+              </div>
+              <div class="mt-3">
+                <FormLabel htmlFor="vertical-form-9">유효일자</FormLabel>
+                <FormInput
+                  type="date"
+                  v-model="editModalData.유효일자"
+                  placeholder=""
                 />
               </div>
             </div>
@@ -1487,19 +1565,19 @@ const importProduceResult = (no: any) => {
   <!-- END: 프린트 출력 Modal -->
 
   <!-- #######################################################################################################################
-  ##################################################  생산실적 리스트  ###################################################
+  ##################################################  설비부품 리스트  ###################################################
   ####################################################################################################################### -->
 
-  <!-- BEGIN: Produce Result Modal Content -->
+  <!-- BEGIN: Facility Part Modal Content -->
   <Dialog
     size="xxl"
-    :open="produceresultModal"
-    @close="setProduceResultModal(false)"
+    :open="facilitypartModal"
+    @close="setFacilityPartModal(false)"
   >
     <Dialog.Panel class="p-10 text-center">
-      <!--ItemProcess Modal 내용 시작-->
+      <!-- Modal 내용 시작-->
       <div class="mb-3" style="font-weight: bold; font-size: x-large">
-        생산실적 리스트
+        설비부품 리스트
       </div>
       <div class="grid grid-cols-12 gap-1 mt-1">
         <div
@@ -1508,24 +1586,20 @@ const importProduceResult = (no: any) => {
           <div class="hidden mx-auto md:block text-slate-500"></div>
           <div class="ml-2">
             <FormSelect
-              v-model="searchKey_produceresult"
+              v-model="searchKey_facilitypart"
               class="w-30 mt-3 !box sm:mt-0"
             >
               <option>전체</option>
-              <option>작업코드</option>
+              <option>거래처명</option>
+              <option>설비명</option>
+              <option>구분</option>
               <option>품번</option>
-              <option>품목구분</option>
               <option>품명</option>
+              <option>차종</option>
               <option>규격</option>
               <option>단위</option>
-              <option>지시수량</option>
-              <option>공정</option>
-              <option>설비명</option>
-              <option>작업자</option>
-              <option>시작일시</option>
-              <option>종료일시</option>
-              <option>생산수</option>
-              <option>불량수</option>
+              <option>안전재고</option>
+              <option>단가</option>
               <option>비고</option>
             </FormSelect>
           </div>
@@ -1534,11 +1608,11 @@ const importProduceResult = (no: any) => {
               <FormInput
                 type="text"
                 class="w-56 pr-10 !box"
-                v-model="searchInput_produceresult"
+                v-model="searchInput_facilitypart"
                 @keyup.enter="
                   () => {
-                    search_produceresult();
-                    pageChangeFirst_produceresult();
+                    search_facilitypart();
+                    pageChangeFirst_facilitypart();
                   }
                 "
                 placeholder="검색어를 입력해주세요"
@@ -1546,8 +1620,8 @@ const importProduceResult = (no: any) => {
               <button
                 @click="
                   () => {
-                    search_produceresult();
-                    pageChangeFirst_produceresult();
+                    search_facilitypart();
+                    pageChangeFirst_facilitypart();
                   }
                 "
               >
@@ -1565,24 +1639,20 @@ const importProduceResult = (no: any) => {
         >
           <div>
             <FormSelect
-              v-model="sortKey_produceresult"
+              v-model="sortKey_facilitypart"
               class="w-30 mt-3 !box sm:mt-0"
             >
               <option>등록일</option>
-              <option>작업코드</option>
+              <option>거래처명</option>
+              <option>설비명</option>
+              <option>구분</option>
               <option>품번</option>
-              <option>품목구분</option>
               <option>품명</option>
+              <option>차종</option>
               <option>규격</option>
               <option>단위</option>
-              <option>지시수량</option>
-              <option>공정</option>
-              <option>설비명</option>
-              <option>작업자</option>
-              <option>시작일시</option>
-              <option>종료일시</option>
-              <option>생산수</option>
-              <option>불량수</option>
+              <option>안전재고</option>
+              <option>단가</option>
               <option>비고</option>
             </FormSelect>
           </div>
@@ -1591,36 +1661,38 @@ const importProduceResult = (no: any) => {
               class="shadow-md"
               as="a"
               variant="outline-primary"
-              v-if="sortOrder_produceresult == '오름차순'"
-              @click="sortOrderToggle_produceresult"
+              v-if="sortOrder_facilitypart == '오름차순'"
+              @click="sortOrderToggle_facilitypart"
             >
               <Lucide icon="SortAsc" class="w-4 h-4 mr-1" />
 
-              {{ sortOrder_produceresult }}</Button
+              {{ sortOrder_facilitypart }}</Button
             >
             <Button
               class="shadow-md"
               as="a"
               variant="outline-danger"
-              v-if="sortOrder_produceresult == '내림차순'"
-              @click="sortOrderToggle_produceresult"
+              v-if="sortOrder_facilitypart == '내림차순'"
+              @click="sortOrderToggle_facilitypart"
             >
               <Lucide icon="SortDesc" class="w-4 h-4 mr-1" />
 
-              {{ sortOrder_produceresult }}</Button
+              {{ sortOrder_facilitypart }}</Button
             >
           </div>
           <div class="ml-5">
             <FormSelect
               class="w-20 mt-3 !box sm:mt-0"
-              v-model="rowsPerPage_produceresult"
-              @change="pageChangeFirst_produceresult"
+              v-model="rowsPerPage_facilitypart"
+              @change="pageChangeFirst_facilitypart"
             >
               <option>10</option>
               <option>25</option>
               <option>50</option>
               <option>100</option>
-              <option :value="badrework_modal_produceresult.dataCount.value">
+              <option
+                :value="fcltpartReceive_modal_facilitypart.dataCount.value"
+              >
                 전체
               </option>
             </FormSelect>
@@ -1628,18 +1700,22 @@ const importProduceResult = (no: any) => {
           <div>
             <PaginationComponent
               class="pagination-component"
-              v-model="currentPage_produceresult"
-              :numberOfPages="badrework_modal_produceresult.numberOfPages.value"
+              v-model="currentPage_facilitypart"
+              :numberOfPages="
+                fcltpartReceive_modal_facilitypart.numberOfPages.value
+              "
             />
           </div>
           <div class="hidden mx-auto md:block text-slate-500"></div>
           <div>
             <span class="mr-3"
-              >[ {{ badrework_modal_produceresult.dataCount }}개 데이터 조회됨 ]
+              >[ {{ fcltpartReceive_modal_facilitypart.dataCount }}개 데이터
+              조회됨 ]
             </span>
             <span class="mr-4">
-              [ {{ currentPage_produceresult }} /
-              {{ badrework_modal_produceresult.numberOfPages }} 페이지 ]</span
+              [ {{ currentPage_facilitypart }} /
+              {{ fcltpartReceive_modal_facilitypart.numberOfPages }} 페이지
+              ]</span
             >
           </div>
         </div>
@@ -1659,241 +1735,181 @@ const importProduceResult = (no: any) => {
                 <Table.Tr>
                   <Table.Th
                     class="text-center border-b-0 whitespace-nowrap"
-                    :style="table_setting_modal_produceresult.순번.style"
+                    :style="table_setting_modal_facilitypart.순번.style"
                   >
-                    {{ table_setting_modal_produceresult.순번.name }}
+                    {{ table_setting_modal_facilitypart.순번.name }}
                   </Table.Th>
                   <Table.Th
                     class="text-center border-b-0 whitespace-nowrap"
-                    :style="table_setting_modal_produceresult.항목1.style"
+                    :style="table_setting_modal_facilitypart.항목1.style"
                   >
-                    {{ table_setting_modal_produceresult.항목1.name }}
+                    {{ table_setting_modal_facilitypart.항목1.name }}
                   </Table.Th>
                   <Table.Th
                     class="text-center border-b-0 whitespace-nowrap"
-                    :style="table_setting_modal_produceresult.항목2.style"
+                    :style="table_setting_modal_facilitypart.항목2.style"
                   >
-                    {{ table_setting_modal_produceresult.항목2.name }}
+                    {{ table_setting_modal_facilitypart.항목2.name }}
                   </Table.Th>
                   <Table.Th
                     class="text-center border-b-0 whitespace-nowrap"
-                    :style="table_setting_modal_produceresult.항목3.style"
+                    :style="table_setting_modal_facilitypart.항목3.style"
                   >
-                    {{ table_setting_modal_produceresult.항목3.name }}
+                    {{ table_setting_modal_facilitypart.항목3.name }}
                   </Table.Th>
                   <Table.Th
                     class="text-center border-b-0 whitespace-nowrap"
-                    :style="table_setting_modal_produceresult.항목4.style"
+                    :style="table_setting_modal_facilitypart.항목4.style"
                   >
-                    {{ table_setting_modal_produceresult.항목4.name }}
+                    {{ table_setting_modal_facilitypart.항목4.name }}
                   </Table.Th>
                   <Table.Th
                     class="text-center border-b-0 whitespace-nowrap"
-                    :style="table_setting_modal_produceresult.항목5.style"
+                    :style="table_setting_modal_facilitypart.항목5.style"
                   >
-                    {{ table_setting_modal_produceresult.항목5.name }}
+                    {{ table_setting_modal_facilitypart.항목5.name }}
                   </Table.Th>
                   <Table.Th
                     class="text-center border-b-0 whitespace-nowrap"
-                    :style="table_setting_modal_produceresult.항목6.style"
+                    :style="table_setting_modal_facilitypart.항목6.style"
                   >
-                    {{ table_setting_modal_produceresult.항목6.name }}
+                    {{ table_setting_modal_facilitypart.항목6.name }}
                   </Table.Th>
                   <Table.Th
                     class="text-center border-b-0 whitespace-nowrap"
-                    :style="table_setting_modal_produceresult.항목7.style"
+                    :style="table_setting_modal_facilitypart.항목7.style"
                   >
-                    {{ table_setting_modal_produceresult.항목7.name }}
+                    {{ table_setting_modal_facilitypart.항목7.name }}
                   </Table.Th>
                   <Table.Th
                     class="text-center border-b-0 whitespace-nowrap"
-                    :style="table_setting_modal_produceresult.항목8.style"
+                    :style="table_setting_modal_facilitypart.항목8.style"
                   >
-                    {{ table_setting_modal_produceresult.항목8.name }}
+                    {{ table_setting_modal_facilitypart.항목8.name }}
                   </Table.Th>
                   <Table.Th
                     class="text-center border-b-0 whitespace-nowrap"
-                    :style="table_setting_modal_produceresult.항목9.style"
+                    :style="table_setting_modal_facilitypart.항목9.style"
                   >
-                    {{ table_setting_modal_produceresult.항목9.name }}
+                    {{ table_setting_modal_facilitypart.항목9.name }}
                   </Table.Th>
                   <Table.Th
                     class="text-center border-b-0 whitespace-nowrap"
-                    :style="table_setting_modal_produceresult.항목10.style"
+                    :style="table_setting_modal_facilitypart.항목10.style"
                   >
-                    {{ table_setting_modal_produceresult.항목10.name }}
-                  </Table.Th>
-                  <Table.Th
-                    class="text-center border-b-0 whitespace-nowrap"
-                    :style="table_setting_modal_produceresult.항목11.style"
-                  >
-                    {{ table_setting_modal_produceresult.항목11.name }}
-                  </Table.Th>
-                  <Table.Th
-                    class="text-center border-b-0 whitespace-nowrap"
-                    :style="table_setting_modal_produceresult.항목12.style"
-                  >
-                    {{ table_setting_modal_produceresult.항목12.name }}
-                  </Table.Th>
-                  <Table.Th
-                    class="text-center border-b-0 whitespace-nowrap"
-                    :style="table_setting_modal_produceresult.항목13.style"
-                  >
-                    {{ table_setting_modal_produceresult.항목13.name }}
-                  </Table.Th>
-                  <Table.Th
-                    class="text-center border-b-0 whitespace-nowrap"
-                    :style="table_setting_modal_produceresult.항목14.style"
-                  >
-                    {{ table_setting_modal_produceresult.항목14.name }}
+                    {{ table_setting_modal_facilitypart.항목10.name }}
                   </Table.Th>
                 </Table.Tr>
               </Table.Thead>
               <Table.Tbody style="position: relative; z-index: 1">
                 <Table.Tr
-                  v-for="(todo, index) in badrework_modal_produceresult.datas
-                    .value"
+                  v-for="(todo, index) in fcltpartReceive_modal_facilitypart
+                    .datas.value"
                   :key="todo.NO"
                   class="intro-x hover:bg-gray-200 active:bg-gray-300 cursor-pointer"
                 >
                   <Table.Td
                     class="first:rounded-l-md last:rounded-r-md text-center border-b-2 dark:bg-darkmode-600"
-                    :style="table_setting_modal_produceresult.순번.style"
-                    @click="importProduceResult(todo.NO)"
+                    :style="table_setting_modal_facilitypart.순번.style"
+                    @click="importFacilitypart(todo.NO)"
                   >
                     <div>
                       {{
                         index +
                         1 +
-                        (currentPage_produceresult - 1) *
-                          rowsPerPage_produceresult
+                        (currentPage_facilitypart - 1) *
+                          rowsPerPage_facilitypart
                       }}
                     </div>
                   </Table.Td>
                   <Table.Td
                     class="first:rounded-l-md last:rounded-r-md text-center border-b-2 dark:bg-darkmode-600"
-                    :style="table_setting_modal_produceresult.항목1.style"
-                    @click="importProduceResult(todo.NO)"
+                    :style="table_setting_modal_facilitypart.항목1.style"
+                    @click="importFacilitypart(todo.NO)"
                   >
                     <div>
-                      {{ todo[table_setting_modal_produceresult.항목1.name] }}
+                      {{ todo[table_setting_modal_facilitypart.항목1.name] }}
                     </div>
                   </Table.Td>
                   <Table.Td
                     class="first:rounded-l-md last:rounded-r-md text-center border-b-2 dark:bg-darkmode-600"
-                    :style="table_setting_modal_produceresult.항목2.style"
-                    @click="importProduceResult(todo.NO)"
+                    :style="table_setting_modal_facilitypart.항목2.style"
+                    @click="importFacilitypart(todo.NO)"
                   >
                     <div>
-                      {{ todo[table_setting_modal_produceresult.항목2.name] }}
+                      {{ todo[table_setting_modal_facilitypart.항목2.name] }}
                     </div>
                   </Table.Td>
                   <Table.Td
                     class="first:rounded-l-md last:rounded-r-md text-center border-b-2 dark:bg-darkmode-600"
-                    :style="table_setting_modal_produceresult.항목3.style"
-                    @click="importProduceResult(todo.NO)"
+                    :style="table_setting_modal_facilitypart.항목3.style"
+                    @click="importFacilitypart(todo.NO)"
                   >
                     <div>
-                      {{ todo[table_setting_modal_produceresult.항목3.name] }}
+                      {{ todo[table_setting_modal_facilitypart.항목3.name] }}
                     </div>
                   </Table.Td>
                   <Table.Td
                     class="first:rounded-l-md last:rounded-r-md text-center border-b-2 dark:bg-darkmode-600"
-                    :style="table_setting_modal_produceresult.항목4.style"
-                    @click="importProduceResult(todo.NO)"
+                    :style="table_setting_modal_facilitypart.항목4.style"
+                    @click="importFacilitypart(todo.NO)"
                   >
                     <div>
-                      {{ todo[table_setting_modal_produceresult.항목4.name] }}
+                      {{ todo[table_setting_modal_facilitypart.항목4.name] }}
                     </div>
                   </Table.Td>
                   <Table.Td
                     class="first:rounded-l-md last:rounded-r-md text-center border-b-2 dark:bg-darkmode-600"
-                    :style="table_setting_modal_produceresult.항목5.style"
-                    @click="importProduceResult(todo.NO)"
+                    :style="table_setting_modal_facilitypart.항목5.style"
+                    @click="importFacilitypart(todo.NO)"
                   >
                     <div>
-                      {{ todo[table_setting_modal_produceresult.항목5.name] }}
+                      {{ todo[table_setting_modal_facilitypart.항목5.name] }}
                     </div>
                   </Table.Td>
                   <Table.Td
                     class="first:rounded-l-md last:rounded-r-md text-center border-b-2 dark:bg-darkmode-600"
-                    :style="table_setting_modal_produceresult.항목6.style"
-                    @click="importProduceResult(todo.NO)"
+                    :style="table_setting_modal_facilitypart.항목6.style"
+                    @click="importFacilitypart(todo.NO)"
                   >
                     <div>
-                      {{ todo[table_setting_modal_produceresult.항목6.name] }}
+                      {{ todo[table_setting_modal_facilitypart.항목6.name] }}
                     </div>
                   </Table.Td>
                   <Table.Td
                     class="first:rounded-l-md last:rounded-r-md text-center border-b-2 dark:bg-darkmode-600"
-                    :style="table_setting_modal_produceresult.항목7.style"
-                    @click="importProduceResult(todo.NO)"
+                    :style="table_setting_modal_facilitypart.항목7.style"
+                    @click="importFacilitypart(todo.NO)"
                   >
                     <div>
-                      {{ todo[table_setting_modal_produceresult.항목7.name] }}
+                      {{ todo[table_setting_modal_facilitypart.항목7.name] }}
                     </div>
                   </Table.Td>
                   <Table.Td
                     class="first:rounded-l-md last:rounded-r-md text-center border-b-2 dark:bg-darkmode-600"
-                    :style="table_setting_modal_produceresult.항목8.style"
-                    @click="importProduceResult(todo.NO)"
+                    :style="table_setting_modal_facilitypart.항목8.style"
+                    @click="importFacilitypart(todo.NO)"
                   >
                     <div>
-                      {{ todo[table_setting_modal_produceresult.항목8.name] }}
+                      {{ todo[table_setting_modal_facilitypart.항목8.name] }}
                     </div>
                   </Table.Td>
                   <Table.Td
                     class="first:rounded-l-md last:rounded-r-md text-center border-b-2 dark:bg-darkmode-600"
-                    :style="table_setting_modal_produceresult.항목9.style"
-                    @click="importProduceResult(todo.NO)"
+                    :style="table_setting_modal_facilitypart.항목9.style"
+                    @click="importFacilitypart(todo.NO)"
                   >
                     <div>
-                      {{ todo[table_setting_modal_produceresult.항목9.name] }}
+                      {{ todo[table_setting_modal_facilitypart.항목9.name] }}
                     </div>
                   </Table.Td>
                   <Table.Td
                     class="first:rounded-l-md last:rounded-r-md text-center border-b-2 dark:bg-darkmode-600"
-                    :style="table_setting_modal_produceresult.항목10.style"
-                    @click="importProduceResult(todo.NO)"
+                    :style="table_setting_modal_facilitypart.항목10.style"
+                    @click="importFacilitypart(todo.NO)"
                   >
                     <div>
-                      {{ todo[table_setting_modal_produceresult.항목10.name] }}
-                    </div>
-                  </Table.Td>
-                  <Table.Td
-                    class="first:rounded-l-md last:rounded-r-md text-center border-b-2 dark:bg-darkmode-600"
-                    :style="table_setting_modal_produceresult.항목11.style"
-                    @click="importProduceResult(todo.NO)"
-                  >
-                    <div>
-                      {{ todo[table_setting_modal_produceresult.항목11.name] }}
-                    </div>
-                  </Table.Td>
-                  <Table.Td
-                    class="first:rounded-l-md last:rounded-r-md text-center border-b-2 dark:bg-darkmode-600"
-                    :style="table_setting_modal_produceresult.항목12.style"
-                    @click="importProduceResult(todo.NO)"
-                  >
-                    <div>
-                      {{ todo[table_setting_modal_produceresult.항목12.name] }}
-                    </div>
-                  </Table.Td>
-                  <Table.Td
-                    class="first:rounded-l-md last:rounded-r-md text-center border-b-2 dark:bg-darkmode-600"
-                    :style="table_setting_modal_produceresult.항목13.style"
-                    @click="importProduceResult(todo.NO)"
-                  >
-                    <div>
-                      {{ todo[table_setting_modal_produceresult.항목13.name] }}
-                    </div>
-                  </Table.Td>
-                  <Table.Td
-                    class="first:rounded-l-md last:rounded-r-md text-center border-b-2 dark:bg-darkmode-600"
-                    :style="table_setting_modal_produceresult.항목14.style"
-                    @click="importProduceResult(todo.NO)"
-                  >
-                    <div>
-                      {{ todo[table_setting_modal_produceresult.항목14.name] }}
+                      {{ todo[table_setting_modal_facilitypart.항목10.name] }}
                     </div>
                   </Table.Td>
                 </Table.Tr>
@@ -1901,7 +1917,7 @@ const importProduceResult = (no: any) => {
             </Table>
             <div
               class="text-center mt-20"
-              v-if="badrework_modal_produceresult.dataCount.value == 0"
+              v-if="fcltpartReceive_modal_facilitypart.dataCount.value == 0"
             >
               저장된 데이터가 없습니다.
             </div>
@@ -1914,7 +1930,7 @@ const importProduceResult = (no: any) => {
           <Button
             class="mr-2 shadow-md"
             variant="outline-primary"
-            @click="setProduceResultModal(false)"
+            @click="setFacilityPartModal(false)"
             >취소</Button
           >
         </div>
@@ -1922,5 +1938,5 @@ const importProduceResult = (no: any) => {
       <!--Modal 내용 끝-->
     </Dialog.Panel>
   </Dialog>
-  <!-- END: Produce Result Modal Content -->
+  <!-- END: Facility Part Modal Content -->
 </template>
