@@ -13,13 +13,11 @@ import LoadingIcon from "../../base-components/LoadingIcon";
 import dayjs from "dayjs";
 
 import RunningCard from "../../components/Common/Main/RunningCard.vue";
-import DisabledRunningCard from "../../components/Common/Main/DisabledRunningCard.vue";
-import KPICard from "../../components/Common/Main/KPICard.vue";
-import DisabledKPICard from "../../components/Common/Main/DisabledKPICard.vue";
-import NoticeCard from "../../components/Common/Main/NoticeCard.vue";
+import NoticeCard2 from "../../components/Common/Main/NoticeCard2.vue";
 
-import { Chart } from "chart.js";
-import ChartDataLabels from "chartjs-plugin-datalabels";
+import KPIChart_line from "../../components/Common/Mobile/Main/KPIChart_line.vue";
+import KPIChart_bar_bar from "../../components/Common/Mobile/Main/KPIChart_bar_bar.vue";
+
 import router from "../../router";
 
 var mobilecheck = function () {
@@ -40,15 +38,13 @@ var mobilecheck = function () {
 if (mobilecheck()) {
 } else location.href = "/"; //PC로 접속시 이동 경로
 
-Chart.register(ChartDataLabels);
-
 onMounted(async () => {
   setInterval(() => {
     now.value = dayjs().format("YYYY-MM-DD HH:mm:ss");
   }, 1000);
-  setInterval(() => {
-    switch_page_func();
-  }, 5000);
+  // setInterval(() => {
+  //   switch_page_func();
+  // }, 5000);
 });
 
 // 날짜 구하기
@@ -80,69 +76,62 @@ const switch_page_func = () => {
           <Lucide icon="RefreshCcw" class="w-4 h-4 mr-1" /> 새로고침
         </a> -->
       </div>
-      <div>
-        <Button
-          class="ml-1"
-          as="a"
-          variant="primary"
-          @click="switch_page_func()"
-          ><Lucide icon="ArrowLeftRight" class="w-4 h-4" />
-        </Button>
-      </div>
     </div>
     <div class="text-center"></div>
     <!--BEGIN : 첫번째 표시-->
-    <div v-if="switch_page == 'first'" class="grid grid-cols-2 gap-4 mt-3">
+    <div class="grid grid-cols-2 gap-4 mt-3">
       <RunningCard name="검사기" :run="true" />
       <RunningCard name="제판기" :run="true" />
       <RunningCard name="인쇄기1" :run="true" />
       <RunningCard name="인쇄기2" :run="true" />
       <RunningCard name="인쇄기3" :run="false" />
       <RunningCard name="인쇄기4" :run="false" />
-    </div>
-    <!--END : 첫번째 표시-->
-    <!--BEGIN : 두번째 표시-->
-    <div v-if="switch_page == 'second'" class="grid grid-cols-2 gap-4 mt-3">
       <RunningCard name="인쇄기5" :run="false" />
       <RunningCard name="인쇄기6" :run="false" />
       <RunningCard name="인쇄기7" :run="false" />
       <RunningCard name="인쇄기8" :run="false" />
-      <DisabledRunningCard />
-      <DisabledRunningCard />
     </div>
-    <!--END : 두번째 표시-->
-    <!--BEGIN : KPI 표시-->
+    <!--END : 첫번째 표시-->
+    <!--BEGIN : 공지사항 표시-->
     <div class="mt-7 grid grid-cols-2 gap-4 mt-5">
-      <KPICard data="2%" name="설비가동률" name2="향상률" />
-      <KPICard data="5%" name="재고비용" name2="절감률" />
-      <DisabledKPICard />
-      <DisabledKPICard />
-      <NoticeCard />
+      <NoticeCard2 type="all" />
+      <NoticeCard2 type="part" />
     </div>
-    <!--END : KPI 표시-->
+    <!--END : 공지사항 표시-->
     <!--BEGIN : Chart 표시-->
     <div
       class="mt-7 grid grid-cols-1 sm:grid-cols-6 xl:grid-cols-12 gap-6 mt-5"
     >
       <div class="col-span-1 sm:col-span-3 xl:col-span-4 intro-y bg-white">
-        <div class="text-center mt-3 mb-3">
-          <FormLabel class="text-lg font-bold">목표대비 생산수</FormLabel>
+        <div class="text-center mt-3">
+          <FormLabel class="text-lg font-bold">KPI 설비가동률</FormLabel>
         </div>
-        <div class="p-2"><VerticalBarChart :height="265" /></div>
+        <div class="p-2">
+          <KPIChart_bar_bar
+            :x_label="[
+              '1월',
+              '2월',
+              '3월',
+              '4월',
+              '5월',
+              '6월',
+              '7월',
+              '8월',
+              '9월',
+              '10월',
+              '11월',
+              '12월',
+            ]"
+            :height="265"
+          />
+        </div>
       </div>
       <div class="col-span-1 sm:col-span-3 xl:col-span-4 intro-y bg-white">
-        <div class="text-center mt-3 mb-3">
-          <FormLabel class="text-lg font-bold">불량발생빈도</FormLabel>
+        <div class="text-center mt-3">
+          <FormLabel class="text-lg font-bold">KPI 재고비용</FormLabel>
         </div>
 
-        <div class="p-2"><PieChart :height="265" /></div>
-      </div>
-      <div class="col-span-1 sm:col-span-3 xl:col-span-4 intro-y bg-white">
-        <div class="text-center mt-3 mb-3">
-          <FormLabel class="text-lg font-bold">설비가동률</FormLabel>
-        </div>
-
-        <div class="p-2"><LineChart :height="265" /></div>
+        <div class="p-2"><KPIChart_line :height="265" /></div>
       </div>
     </div>
     <!--END : Chart 표시-->

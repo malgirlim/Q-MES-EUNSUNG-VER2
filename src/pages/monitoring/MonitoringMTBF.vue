@@ -12,7 +12,7 @@ import TomSelect from "tom-select";
 import * as XLSX from "xlsx";
 import { read, utils, writeFileXLSX } from "xlsx";
 import printJS from "print-js";
-import KPIChart_bar_bar from "../../components/Common/Main/KPIChart_bar_bar.vue";
+import MTBFChart_bar_bar from "../../components/Common/Monitoring/MTBFChart_bar_bar.vue";
 
 // API 보내는 함수 및 인터페이스 불러오기
 import { useSendApi } from "../../composables/useSendApi";
@@ -146,14 +146,54 @@ const table_width = [
   <!-- style="height: calc(100vh - 250px)" : 브라우저 화면 창크기에 맞게 변경됨 : 100vh - 브라우저 창 크기 -->
 
   <!-- BEGIN : 상단 그래프 -->
-  <div class="grid grid-cols-4 gap-5 mt-5 mb-5" style="height: 330px">
+  <div class="grid grid-cols-4 gap-5 mt-5 mb-5 intro-y" style="height: 330px">
     <div class="col-span-1 p-5 bg-white rounded rounded-md">
-      <div class="text-center font-bold text-xl">표시 영역</div>
+      <div class="text-center font-bold text-xl">
+        <div class="text-center">
+          <div class="mt-3">
+            <div class="px-3">
+              <div
+                class="text-lg mx-1 py-0.5 w-full border-l-2 border-r-2 border-t-2 border-success bg-success text-white rounded-t-md"
+              >
+                <div class="flex">
+                  <div class="flex m-auto items-center">
+                    <div>
+                      <Lucide
+                        class="w-5 h-5 text-white mr-1"
+                        icon="LineChart"
+                      />
+                    </div>
+                    <div>평균가동시간</div>
+                  </div>
+                </div>
+              </div>
+              <div
+                class="mx-1 p-2 w-full h-24 text-2xl border-l-2 border-r-2 border-b-2 border-success rounded-b-md bg-green-200"
+              >
+                <div class="mt-5 text-4xl">54hr</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
     <div class="col-span-3 p-5 bg-white rounded rounded-md">
       <div class="text-center font-bold text-xl">MTBF 현황</div>
-      <div style="height: 280px">
-        <KPIChart_bar_bar :x_label="['1월']" />
+      <div style="height: 270px">
+        <MTBFChart_bar_bar
+          :x_label="[
+            '검사기',
+            '제판기',
+            '인쇄1호기',
+            '인쇄2호기',
+            '인쇄3호기',
+            '인쇄4호기',
+            '인쇄5호기',
+            '인쇄6호기',
+            '인쇄7호기',
+            '인쇄8호기',
+          ]"
+        />
       </div>
     </div>
   </div>

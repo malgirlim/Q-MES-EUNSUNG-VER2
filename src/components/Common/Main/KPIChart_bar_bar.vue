@@ -11,7 +11,7 @@ import {
   BarElement,
   CategoryScale,
   LinearScale,
-} from "chart.js";
+} from "chart.js/auto";
 import { dropRight } from "lodash";
 
 ChartJS.register(
@@ -39,7 +39,7 @@ const chartData = computed<ChartData>(() => {
     labels: props.x_label,
     datasets: [
       {
-        label: "목표액",
+        label: "목표율",
         data: [40, 25, 60, 35, 45, 55, 50, 60, 85, 80, 120, 100],
         datalabels: { display: false },
         type: "bar",
@@ -47,7 +47,7 @@ const chartData = computed<ChartData>(() => {
         order: 1,
       },
       {
-        label: "실적액",
+        label: "가동율",
         data: [20, 30, 55, 40, 60, 47, 46, 40, 75, 65, 80, 90],
         type: "bar",
         datalabels: {

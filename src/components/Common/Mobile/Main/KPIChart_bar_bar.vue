@@ -36,41 +36,29 @@ const props = defineProps<{
 
 const chartData = computed<ChartData>(() => {
   return {
-    labels: [
-      "1월",
-      "2월",
-      "3월",
-      "4월",
-      "5월",
-      "6월",
-      "7월",
-      "8월",
-      "9월",
-      "10월",
-      "11월",
-      "12월",
-    ],
+    labels: props.x_label,
     datasets: [
       {
-        label: "2021",
-        data: [40, 28, 63, 38, 55, 60, 50, 55, 60, 55, 90, 80],
-        type: "line",
+        label: "목표율",
+        data: [40, 25, 60, 35, 45, 55, 50, 60, 85, 80, 120, 100],
         datalabels: { display: false },
+        type: "bar",
+        backgroundColor: "rgba(54, 162, 235, 0.5)",
         order: 1,
-        fill: true,
-        pointStyle: false,
       },
       {
-        label: "2022",
-        data: [25, 30, 55, 40, 60, 40, 37, 35, 70, 65, 80, 90],
+        label: "가동율",
+        data: [20, 30, 55, 40, 60, 47, 46, 40, 75, 65, 80, 90],
+        type: "bar",
         datalabels: {
           color: "black",
           anchor: "end",
-          font: { size: 15 },
+          //font: { size: 15 },
           align: "end",
           offset: -5,
         },
-        type: "line",
+        backgroundColor: "rgba(255, 99, 132, 1)",
+        categoryPercentage: 0.4,
         order: 0,
       },
     ],
@@ -83,19 +71,21 @@ const chartOptions = computed<ChartOptions>(() => {
     maintainAspectRatio: false,
     scales: {
       x: {
+        stacked: true,
         ticks: {
-          font: {
-            size: 15,
-          },
+          // font: {
+          //   size: 15,
+          // },
         },
       },
       y: {
+        beginAtZero: true,
         ticks: {
-          font: {
-            size: 15,
-          },
+          // font: {
+          //   size: 15,
+          // },
           callback: function (value: any) {
-            return value + "억원";
+            return value + "%";
           },
         },
       },
@@ -110,9 +100,9 @@ const chartOptions = computed<ChartOptions>(() => {
       legend: {
         align: "center",
         labels: {
-          font: {
-            size: 14,
-          },
+          // font: {
+          //   size: 14,
+          // },
         },
       },
     },

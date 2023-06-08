@@ -11,7 +11,7 @@ import {
   BarElement,
   CategoryScale,
   LinearScale,
-} from "chart.js/auto";
+} from "chart.js";
 import { dropRight } from "lodash";
 
 ChartJS.register(
@@ -36,33 +36,22 @@ const props = defineProps<{
 
 const chartData = computed<ChartData>(() => {
   return {
-    labels: [
-      "1월",
-      "2월",
-      "3월",
-      "4월",
-      "5월",
-      "6월",
-      "7월",
-      "8월",
-      "9월",
-      "10월",
-      "11월",
-      "12월",
-    ],
+    labels: props.x_label,
     datasets: [
       {
-        label: "2021",
-        data: [40, 28, 63, 38, 55, 60, 50, 55, 60, 55, 90, 80],
-        type: "line",
+        label: "목표시간",
+        data: [10, 10, 10, 10, 10, 10, 10, 10, 10, 10],
+        maxBarThickness: 100,
         datalabels: { display: false },
+        type: "bar",
+        backgroundColor: "rgba(54, 162, 235, 0.5)",
         order: 1,
-        fill: true,
-        pointStyle: false,
       },
       {
-        label: "2022",
-        data: [25, 30, 55, 40, 60, 40, 37, 35, 70, 65, 80, 90],
+        label: "측정시간",
+        maxBarThickness: 60,
+        data: [3, 7, 6, 5, 12, 8, 6, 8, 7, 6],
+        type: "bar",
         datalabels: {
           color: "black",
           anchor: "end",
@@ -70,7 +59,8 @@ const chartData = computed<ChartData>(() => {
           align: "end",
           offset: -5,
         },
-        type: "line",
+        backgroundColor: "rgba(255, 99, 132, 1)",
+
         order: 0,
       },
     ],
@@ -83,6 +73,7 @@ const chartOptions = computed<ChartOptions>(() => {
     maintainAspectRatio: false,
     scales: {
       x: {
+        stacked: true,
         ticks: {
           font: {
             size: 15,
@@ -90,12 +81,13 @@ const chartOptions = computed<ChartOptions>(() => {
         },
       },
       y: {
+        beginAtZero: true,
         ticks: {
           font: {
             size: 15,
           },
           callback: function (value: any) {
-            return value + "억원";
+            return value + "hr";
           },
         },
       },
@@ -103,7 +95,7 @@ const chartOptions = computed<ChartOptions>(() => {
     plugins: {
       title: {
         display: true,
-        text: "2022년",
+        text: "2023년",
         font: { size: 15 },
         padding: { bottom: 5, top: 5 },
       },

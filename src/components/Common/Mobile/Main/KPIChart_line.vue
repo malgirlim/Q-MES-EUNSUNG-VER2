@@ -37,40 +37,42 @@ const props = defineProps<{
 const chartData = computed<ChartData>(() => {
   return {
     labels: [
-      "1월",
-      "2월",
-      "3월",
-      "4월",
-      "5월",
-      "6월",
-      "7월",
-      "8월",
-      "9월",
-      "10월",
-      "11월",
-      "12월",
+      "1일",
+      "2일",
+      "3일",
+      "4일",
+      "5일",
+      "6일",
+      "7일",
+      "8일",
+      "9일",
+      "10일",
+      "11일",
+      "12일",
+      "13일",
+      "14일",
+      "15일",
     ],
     datasets: [
       {
-        label: "2021",
-        data: [40, 28, 63, 38, 55, 60, 50, 55, 60, 55, 90, 80],
+        label: "목표액",
+        data: [7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7],
         type: "line",
         datalabels: { display: false },
-        order: 1,
-        fill: true,
         pointStyle: false,
+        order: 1,
       },
       {
-        label: "2022",
-        data: [25, 30, 55, 40, 60, 40, 37, 35, 70, 65, 80, 90],
+        label: "재고금액",
+        data: [5, 2, 6, 4.4, 4.9, 5, 4.8, 6, 7.5, 7.5, 12, 8, 8.3, 6, 6.5],
+        type: "line",
         datalabels: {
           color: "black",
           anchor: "end",
-          font: { size: 15 },
+          // font: { size: 15 },
           align: "end",
           offset: -5,
         },
-        type: "line",
         order: 0,
       },
     ],
@@ -84,18 +86,18 @@ const chartOptions = computed<ChartOptions>(() => {
     scales: {
       x: {
         ticks: {
-          font: {
-            size: 15,
-          },
+          // font: {
+          //   size: 15,
+          // },
         },
       },
       y: {
         ticks: {
-          font: {
-            size: 15,
-          },
+          // font: {
+          //   size: 15,
+          // },
           callback: function (value: any) {
-            return value + "억원";
+            return value + "백만원";
           },
         },
       },
@@ -103,16 +105,16 @@ const chartOptions = computed<ChartOptions>(() => {
     plugins: {
       title: {
         display: true,
-        text: "2022년",
+        text: "2022년 5월",
         font: { size: 15 },
         padding: { bottom: 5, top: 5 },
       },
       legend: {
         align: "center",
         labels: {
-          font: {
-            size: 14,
-          },
+          // font: {
+          //   size: 14,
+          // },
         },
       },
     },

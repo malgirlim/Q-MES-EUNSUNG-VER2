@@ -11,7 +11,7 @@ import {
   BarElement,
   CategoryScale,
   LinearScale,
-} from "chart.js";
+} from "chart.js/auto";
 import { dropRight } from "lodash";
 
 ChartJS.register(

@@ -21,7 +21,7 @@ import RunningCard from "../components/Common/Main/RunningCard.vue";
 import DisabledRunningCard from "../components/Common/Main/DisabledRunningCard.vue";
 import KPICard from "../components/Common/Main/KPICard.vue";
 import DisabledKPICard from "../components/Common/Main/DisabledKPICard.vue";
-import NoticeCard from "../components/Common/Main/NoticeCard.vue";
+import NoticeCard2 from "../components/Common/Main/NoticeCard2.vue";
 
 import { Chart } from "chart.js";
 import router from "../router";
@@ -50,9 +50,9 @@ onMounted(async () => {
   setInterval(() => {
     now.value = dayjs().format("YYYY-MM-DD(dd) HH:mm:ss");
   }, 1000);
-  setInterval(() => {
-    switch_page_func();
-  }, 5000);
+  // setInterval(() => {
+  //   switch_page_func();
+  // }, 5000);
 });
 
 // 날짜 구하기
@@ -84,19 +84,16 @@ const switch_page_func = () => {
       <a href="" class="flex items-center ml-auto text-primary">
         <Lucide icon="RefreshCcw" class="w-4 h-4 mr-3" /> 새로고침
       </a>
-      <Button
+      <!-- <Button
         class="flex items-center ml-5"
         as="a"
         variant="primary"
         @click="switch_page_func()"
         ><Lucide icon="ArrowLeftRight" class="w-4 h-4 mr-2" />표시전환
-      </Button>
+      </Button> -->
     </div>
     <!--BEGIN : 첫번째 표시-->
-    <div
-      v-if="switch_page == 'first'"
-      class="grid grid-cols-2 sm:grid-cols-3 xl:grid-cols-6 gap-6 mt-3"
-    >
+    <div class="grid grid-cols-8 gap-6 mt-3">
       <RunningCard
         @click="$router.push('process/checker')"
         name="검사기"
@@ -122,18 +119,19 @@ const switch_page_func = () => {
         name="인쇄기3"
         :run="false"
       />
-      <RunningCard
-        @click="$router.push('process/printer4')"
-        name="인쇄기4"
-        :run="false"
-      />
+      <NoticeCard2 type="all" />
     </div>
     <!--END : 첫번째 표시-->
     <!--BEGIN : 두번째 표시-->
-    <div
-      v-if="switch_page == 'second'"
-      class="grid grid-cols-2 sm:grid-cols-3 xl:grid-cols-6 gap-6 mt-3"
-    >
+
+    <!--END : 두번째 표시-->
+    <!--BEGIN : KPI 표시-->
+    <div class="grid grid-cols-8 gap-6 mt-7">
+      <RunningCard
+        @click="$router.push('process/printer3')"
+        name="인쇄기4"
+        :run="false"
+      />
       <RunningCard
         @click="$router.push('process/printer5')"
         name="인쇄기5"
@@ -154,27 +152,7 @@ const switch_page_func = () => {
         name="인쇄기8"
         :run="false"
       />
-      <DisabledRunningCard />
-      <DisabledRunningCard />
-    </div>
-    <!--END : 두번째 표시-->
-    <!--BEGIN : KPI 표시-->
-    <div class="mt-7 grid grid-cols-6 sm:grid-cols-6 xl:grid-cols-6 gap-6 mt-5">
-      <KPICard
-        @click="$router.push('monitoring/kpi')"
-        data="2%"
-        name="설비가동률"
-        name2="향상률"
-      />
-      <KPICard
-        @click="$router.push('monitoring/kpi')"
-        data="5%"
-        name="재고비용"
-        name2="절감률"
-      />
-      <DisabledKPICard />
-      <DisabledKPICard />
-      <NoticeCard />
+      <NoticeCard2 type="part" />
     </div>
     <!--END : KPI 표시-->
 

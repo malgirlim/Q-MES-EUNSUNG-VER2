@@ -7,8 +7,12 @@ import NoticeDetail from "../Detail/NoticeDetail.vue";
 import Button from "../../../base-components/Button";
 import dayjs from "dayjs";
 
+const props = defineProps<{
+  type?: any;
+}>();
+
 // 페이지 전환
-const switch_page = ref("all");
+const switch_page = ref(props.type);
 
 // ##### 상세 Modal #####
 const detailModal = ref(false);
@@ -35,26 +39,26 @@ const days = new_notice(date_all[0]);
           <Lucide icon="BellRing" class="w-[16px] h-[16px] text-primary" />
           <div class="ml-2"><strong>공지사항</strong></div>
           <div
+            v-if="switch_page == 'all'"
             :class="[
-              'ml-8 pl-2 pr-2 border cursor-pointer rounded',
+              'ml-8 pl-2 pr-2 border rounded',
               { 'bg-success': switch_page == 'all' },
               { 'text-white': switch_page == 'all' },
               { 'border-danger': new_notice(date_all[0]) < 7 },
               { 'border-black ': new_notice(date_all[0]) > 7 },
             ]"
-            @click="switch_page = 'all'"
           >
             전체
           </div>
           <div
+            v-if="switch_page == 'part'"
             :class="[
-              'ml-3 pl-2 pr-2 border cursor-pointer rounded',
-              { 'bg-success': switch_page == 'part' },
+              'ml-8 pl-2 pr-2 border rounded',
+              { 'bg-pending': switch_page == 'part' },
               { 'text-white': switch_page == 'part' },
               { 'border-danger': new_notice(date_all[0]) < 7 },
               { 'border-black ': new_notice(date_all[0]) > 7 },
             ]"
-            @click="switch_page = 'part'"
           >
             부서
           </div>
