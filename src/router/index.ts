@@ -788,15 +788,15 @@ const routes = [
         },
         component: QualityShipment,
       },
-      {
-        path: "quality/inadequate",
-        name: "top-menu-quality-inadequate",
-        meta: {
-          pagename: "부적합 관리",
-          category: "품질관리",
-        },
-        component: QualityInadequate,
-      },
+      // {
+      //   path: "quality/inadequate",
+      //   name: "top-menu-quality-inadequate",
+      //   meta: {
+      //     pagename: "부적합 관리",
+      //     category: "품질관리",
+      //   },
+      //   component: QualityInadequate,
+      // },
       {
         path: "mold/use",
         name: "top-menu-mold-use",
