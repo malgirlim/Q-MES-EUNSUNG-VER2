@@ -6,6 +6,7 @@ const preventModalRouter = require("./prevent/preventModal");
 const preventPreventPlanRouter = require("./prevent/preventPreventPlan");
 const preventDailyPlanRouter = require("./prevent/preventDailyPlan");
 const preventRepairPlanRouter = require("./prevent/preventRepairPlan");
+const preventLifePlanRouter = require("./prevent/preventLifePlan");
 
 router.use((req, res, next) => {
   // console.log("middleware for test!");
@@ -23,5 +24,8 @@ router.use("/dailyplan", preventDailyPlanRouter);
 
 // 예방보전 / 설비수리계획 - router/prevent/preventRepairPlan.js
 router.use("/repairplan", preventRepairPlanRouter);
+
+// 예방보전 / 설비부품수명계획 - router/prevent/preventLifePlan.js
+router.use("/lifeplan", preventLifePlanRouter);
 
 module.exports = router;

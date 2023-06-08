@@ -65,3 +65,25 @@ export interface PreventRepair {
   등록자?: string;
   등록일시?: string;
 }
+
+// 예방보전 - 설비부품수명 관리
+export interface PreventLife {
+  [attribute: string]: any | undefined;
+  NO?: number;
+  설비NO?: number;
+  설비명?: string;
+  설비부품NO?: number;
+  품번?: number;
+  품목구분?: number;
+  품명?: number;
+  규격?: number;
+  단위?: number;
+  계획사용횟수?: string;
+  계획교체일?: string;
+  교체확인?: string;
+  담당자ID?: string;
+  담당자?: string;
+  비고?: string;
+  등록자?: string;
+  등록일시?: string;
+}
