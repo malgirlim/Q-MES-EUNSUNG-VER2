@@ -73,7 +73,7 @@ router.get("/", async (req, res) => {
           (
             SELECT
               [ITRC_ITEM_PK] AS 품목NO
-              ,SUM(COALESCE([ITRC_AMOUNT],0)) AS 입고수량
+              ,COALESCE(SUM(CONVERT(numeric, [ITRC_AMOUNT])),0) AS 입고수량
             FROM [QMES2022].[dbo].[MANAGE_ITEM_RECEIVE_TB]
             WHERE (1 = 1)
             AND CONVERT(VARCHAR, CONVERT(datetime, [ITRC_DT]), 12) >= '000101'
@@ -84,7 +84,7 @@ router.get("/", async (req, res) => {
           (
             SELECT
               [DLVR_ITEM_PK] AS 품목NO
-              ,SUM(COALESCE([DLVR_AMOUNT],0)) AS 출하수량
+              ,COALESCE(SUM(CONVERT(numeric, [DLVR_AMOUNT])),0) AS 출하수량
             FROM [QMES2022].[dbo].[MANAGE_DELIVERY_TB]
             WHERE (1 = 1)
             AND CONVERT(VARCHAR, CONVERT(datetime, [DLVR_DT]), 12) >= '000101'
@@ -105,7 +105,7 @@ router.get("/", async (req, res) => {
           (
             SELECT
               [ITRC_ITEM_PK] AS 품목NO
-              ,SUM(COALESCE([ITRC_AMOUNT],0)) AS 입고수량
+              ,COALESCE(SUM(CONVERT(numeric, [ITRC_AMOUNT])),0) AS 입고수량
             FROM [QMES2022].[dbo].[MANAGE_ITEM_RECEIVE_TB]
             WHERE (1 = 1)
             AND CONVERT(VARCHAR, CONVERT(datetime, [ITRC_DT]), 12) < '000101'
@@ -115,7 +115,7 @@ router.get("/", async (req, res) => {
           (
             SELECT
               [DLVR_ITEM_PK] AS 품목NO
-              ,SUM(COALESCE([DLVR_AMOUNT],0)) AS 출하수량
+              ,COALESCE(SUM(CONVERT(numeric, [DLVR_AMOUNT])),0) AS 출하수량
             FROM [QMES2022].[dbo].[MANAGE_DELIVERY_TB]
             WHERE (1 = 1)
             AND CONVERT(VARCHAR, CONVERT(datetime, [DLVR_DT]), 12) < '000101'
@@ -196,7 +196,7 @@ router.post("/", async (req, res) => {
             (
               SELECT
                 [ITRC_ITEM_PK] AS 품목NO
-                ,SUM(COALESCE([ITRC_AMOUNT],0)) AS 입고수량
+                ,COALESCE(SUM(CONVERT(numeric, [ITRC_AMOUNT])),0) AS 입고수량
               FROM [QMES2022].[dbo].[MANAGE_ITEM_RECEIVE_TB]
               WHERE (1 = 1)
               AND CONVERT(VARCHAR, CONVERT(datetime, [ITRC_DT]), 12) >= ` +
@@ -211,7 +211,7 @@ router.post("/", async (req, res) => {
             (
               SELECT
                 [DLVR_ITEM_PK] AS 품목NO
-                ,SUM(COALESCE([DLVR_AMOUNT],0)) AS 출하수량
+                ,COALESCE(SUM(CONVERT(numeric, [DLVR_AMOUNT])),0) AS 출하수량
               FROM [QMES2022].[dbo].[MANAGE_DELIVERY_TB]
               WHERE (1 = 1)
               AND CONVERT(VARCHAR, CONVERT(datetime, [DLVR_DT]), 12) >= ` +
@@ -236,7 +236,7 @@ router.post("/", async (req, res) => {
             (
               SELECT
                 [ITRC_ITEM_PK] AS 품목NO
-                ,SUM(COALESCE([ITRC_AMOUNT],0)) AS 입고수량
+                ,COALESCE(SUM(CONVERT(numeric, [ITRC_AMOUNT])),0) AS 입고수량
               FROM [QMES2022].[dbo].[MANAGE_ITEM_RECEIVE_TB]
               WHERE (1 = 1)
               AND CONVERT(VARCHAR, CONVERT(datetime, [ITRC_DT]), 12) < ` +
@@ -248,7 +248,7 @@ router.post("/", async (req, res) => {
             (
               SELECT
                 [DLVR_ITEM_PK] AS 품목NO
-                ,SUM(COALESCE([DLVR_AMOUNT],0)) AS 출하수량
+                ,COALESCE(SUM(CONVERT(numeric, [DLVR_AMOUNT])),0) AS 출하수량
               FROM [QMES2022].[dbo].[MANAGE_DELIVERY_TB]
               WHERE (1 = 1)
               AND CONVERT(VARCHAR, CONVERT(datetime, [DLVR_DT]), 12) < ` +
@@ -319,7 +319,7 @@ router.post("/", async (req, res) => {
             (
               SELECT
                 [ITRC_ITEM_PK] AS 품목NO
-                ,SUM(COALESCE([ITRC_AMOUNT],0)) AS 입고수량
+                ,COALESCE(SUM(CONVERT(numeric, [ITRC_AMOUNT])),0) AS 입고수량
               FROM [QMES2022].[dbo].[MANAGE_ITEM_RECEIVE_TB]
               WHERE (1 = 1)
               AND CONVERT(VARCHAR, CONVERT(datetime, [ITRC_DT]), 12) >= ` +
@@ -334,7 +334,7 @@ router.post("/", async (req, res) => {
             (
               SELECT
                 [DLVR_ITEM_PK] AS 품목NO
-                ,SUM(COALESCE([DLVR_AMOUNT],0)) AS 출하수량
+                ,COALESCE(SUM(CONVERT(numeric, [DLVR_AMOUNT])),0) AS 출하수량
               FROM [QMES2022].[dbo].[MANAGE_DELIVERY_TB]
               WHERE (1 = 1)
               AND CONVERT(VARCHAR, CONVERT(datetime, [DLVR_DT]), 12) >= ` +
@@ -359,7 +359,7 @@ router.post("/", async (req, res) => {
             (
               SELECT
                 [ITRC_ITEM_PK] AS 품목NO
-                ,SUM(COALESCE([ITRC_AMOUNT],0)) AS 입고수량
+                ,COALESCE(SUM(CONVERT(numeric, [ITRC_AMOUNT])),0) AS 입고수량
               FROM [QMES2022].[dbo].[MANAGE_ITEM_RECEIVE_TB]
               WHERE (1 = 1)
               AND CONVERT(VARCHAR, CONVERT(datetime, [ITRC_DT]), 12) < ` +
@@ -371,7 +371,7 @@ router.post("/", async (req, res) => {
             (
               SELECT
                 [DLVR_ITEM_PK] AS 품목NO
-                ,SUM(COALESCE([DLVR_AMOUNT],0)) AS 출하수량
+                ,COALESCE(SUM(CONVERT(numeric, [DLVR_AMOUNT])),0) AS 출하수량
               FROM [QMES2022].[dbo].[MANAGE_DELIVERY_TB]
               WHERE (1 = 1)
               AND CONVERT(VARCHAR, CONVERT(datetime, [DLVR_DT]), 12) < ` +
