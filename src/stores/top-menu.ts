@@ -374,11 +374,11 @@ export const useTopMenuStore = defineStore("topMenu", {
             pageName: "top-menu-quality-shipment",
             title: "출하검사",
           },
-          {
-            icon: "FileText",
-            pageName: "top-menu-quality-inadequate",
-            title: "부적합 관리",
-          },
+          // {
+          //   icon: "FileText",
+          //   pageName: "top-menu-quality-inadequate",
+          //   title: "부적합 관리",
+          // },
         ],
       },
       {
