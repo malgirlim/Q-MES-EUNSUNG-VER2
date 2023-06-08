@@ -201,9 +201,10 @@ export interface StockFCLTPartRelease {
 // 재고 관리 - 설비부품 품목별 재고현황
 export interface StockStockFCLTPart {
   [attribute: string]: any | undefined;
-  품목NO?: number;
-  품목구분?: string;
+  설비부품NO?: number;
   품번?: string;
+  설비명?: string;
+  부품구분?: string;
   품명?: string;
   규격?: string;
   단위?: string;
@@ -217,10 +218,11 @@ export interface StockStockFCLTPart {
 // 재고 관리 - 설비부품 LOT별 재고현황
 export interface StockStockFCLTPartLOT {
   [attribute: string]: any | undefined;
-  품목NO?: number;
+  설비부품NO?: number;
   LOT코드?: string;
-  품목구분?: string;
   품번?: string;
+  설비명?: string;
+  부품구분?: string;
   품명?: string;
   규격?: string;
   단위?: string;

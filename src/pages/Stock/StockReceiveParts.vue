@@ -478,7 +478,7 @@ const importFacilitypart = (no: any) => {
   editModalData.부품구분 =
     fcltpartReceive_modal_facilitypart.dataAll.value.filter(
       (c) => c.NO == no
-    )[0].부품구분;
+    )[0].구분;
   editModalData.품번 = fcltpartReceive_modal_facilitypart.dataAll.value.filter(
     (c) => c.NO == no
   )[0].품번;

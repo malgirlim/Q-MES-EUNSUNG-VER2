@@ -62,7 +62,7 @@ const table_setting = {
   체크박스: { name: "체크박스", style: "width: 50px" },
   순번: { name: "순번", style: "width: 50px; text-align: center;" },
   항목1: { name: "품목구분", style: "width: 50px; text-align: center;" },
-  항목2: { name: "품번", style: "width: 200px; text-align: center;" },
+  항목2: { name: "품번", style: "width: 50px; text-align: center;" },
   항목3: { name: "품명", style: "width: 50px; text-align: center;" },
   항목4: { name: "이미지", style: "width: 50px; text-align: center;" },
   항목5: { name: "구분", style: "width: 50px; text-align: center;" },
