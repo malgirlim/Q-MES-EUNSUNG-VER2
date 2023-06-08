@@ -335,7 +335,7 @@ export const useTopMenuStore = defineStore("topMenu", {
           {
             icon: "FileText",
             pageName: "top-menu-stock-use-parts",
-            title: "설비부품 사용등록",
+            title: "설비부품 출고등록",
           },
           {
             icon: "FileText",
