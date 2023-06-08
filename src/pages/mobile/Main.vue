@@ -5,14 +5,11 @@ import { FormLabel } from "../../base-components/Form";
 
 import Lucide from "../../base-components/Lucide";
 import Button from "../../base-components/Button";
-import PieChart from "../../components/PieChart";
-import VerticalBarChart from "../../components/VerticalBarChart";
-import LineChart from "../../components/LineChart";
 import LoadingIcon from "../../base-components/LoadingIcon";
 
 import dayjs from "dayjs";
 
-import RunningCard from "../../components/Common/Main/RunningCard.vue";
+import RunningCard from "../../components/Common/Mobile/Main/RunningCard.vue";
 import NoticeCard2 from "../../components/Common/Main/NoticeCard2.vue";
 
 import KPIChart_line from "../../components/Common/Mobile/Main/KPIChart_line.vue";

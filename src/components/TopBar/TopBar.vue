@@ -398,6 +398,12 @@ const setDebugMode = () => {
             프로그램 정보
           </Menu.Item>
           <Menu.Devider class="bg-white/[0.08]" />
+          <Menu.Item
+            class="hover:bg-white/5"
+            @click="$router.push('/setting/mobile-alert/order-forecast')"
+          >
+            <Lucide icon="BellPlus" class="w-4 h-4 mr-2" /> 모바일 알림설정
+          </Menu.Item>
           <Menu.Item class="hover:bg-white/5" @click="setDebugMode()">
             <div class="flex" v-if="proxy.gstate.debug.active != 'on'">
               <Lucide icon="ToggleLeft" class="w-4 h-4 mr-2" /> 디버그모드(OFF)

@@ -161,7 +161,10 @@ const switch_page_func = () => {
       <div class="p-3 col-span-1 intro-y bg-white rounded rounded-md">
         <div class="grid grid-cols-4">
           <div class="col-span-1 text-center">
-            <div class="mt-14 px-3">
+            <div
+              class="mt-14 px-3 cursor-pointer"
+              @click="$router.push('monitoring/kpi1')"
+            >
               <div
                 class="text-lg mx-1 py-0.5 w-full border-l-2 border-r-2 border-t-2 border-success bg-success text-white rounded-t-md"
               >
@@ -230,7 +233,10 @@ const switch_page_func = () => {
       <div class="p-3 col-span-1 intro-y bg-white rounded rounded-md">
         <div class="grid grid-cols-4">
           <div class="col-span-1 text-center">
-            <div class="mt-14 px-3">
+            <div
+              class="mt-14 px-3 cursor-pointer"
+              @click="$router.push('monitoring/kpi2')"
+            >
               <div
                 class="text-lg mx-1 py-0.5 w-full border-l-2 border-r-2 border-t-2 border-success bg-success text-white rounded-t-md"
               >

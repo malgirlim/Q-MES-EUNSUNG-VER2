@@ -97,7 +97,7 @@ const chartOptions = computed<ChartOptions>(() => {
             size: 15,
           },
           callback: function (value: any) {
-            return value + "백만원";
+            return value.toLocaleString() + "백만원";
           },
         },
       },
