@@ -13,6 +13,305 @@ router.use((req, res, next) => {
 });
 
 // ###################################################################################################################
+// ###################################################   품목   ###################################################
+// ###################################################################################################################
+
+router.get("/item", async (req, res) => {
+  try {
+    const Pool = await pool;
+    const result = await Pool.request().query(`
+      SELECT
+        [ITEM_PK] AS NO
+        ,[ITEM_CLIENT_PK] AS 거래처NO
+        ,CLIENT.거래처명 AS 거래처명
+        ,[ITEM_DIV] AS 구분
+        ,[ITEM_PRODUCT_NUM] AS 품번
+        ,[ITEM_NAME] AS 품명
+        ,[ITEM_CAR] AS 차종
+        ,[ITEM_SIZE] AS 규격
+        ,[ITEM_UNIT] AS 단위
+        ,[ITEM_SAFE] AS 안전재고
+        ,[ITEM_COST] AS 단가
+        ,[ITEM_NOTE] AS 비고
+        ,[ITEM_REGIST_NM] AS 등록자
+        ,[ITEM_REGIST_DT] AS 등록일시
+      FROM [QMES2022].[dbo].[MASTER_ITEM_TB]
+      LEFT JOIN
+      (
+        SELECT
+          [CLNT_PK] AS NO
+          ,[CLNT_NAME] AS 거래처명
+        FROM [QMES2022].[dbo].[MASTER_CLIENT_TB]
+      ) AS CLIENT ON CLIENT.NO = [ITEM_CLIENT_PK]
+      ORDER BY [ITEM_PK] DESC
+    `);
+
+    res.send(JSON.stringify(result.recordset));
+  } catch (err) {
+    res.status(500);
+    res.send(err.message);
+  }
+});
+
+router.post("/item", async (req, res) => {
+  try {
+    var sql = "";
+    if (req.body.searchKey == "전체") {
+      sql =
+        `
+        SELECT
+          NO AS NO, 거래처NO AS 거래처NO, 거래처명 AS 거래처명, 구분 AS 구분, 품번 AS 품번, 품명 AS 품명, 차종 AS 차종,
+          규격 AS 규격, 단위 AS 단위, 안전재고 AS 안전재고, 단가 AS 단가, 비고 AS 비고,
+          등록자 AS 등록자, 등록일시 AS 등록일시
+        FROM(
+          SELECT
+            [ITEM_PK] AS NO
+            ,[ITEM_CLIENT_PK] AS 거래처NO
+            ,CLIENT.거래처명 AS 거래처명
+            ,[ITEM_DIV] AS 구분
+            ,[ITEM_PRODUCT_NUM] AS 품번
+            ,[ITEM_NAME] AS 품명
+            ,[ITEM_CAR] AS 차종
+            ,[ITEM_SIZE] AS 규격
+            ,[ITEM_UNIT] AS 단위
+            ,[ITEM_SAFE] AS 안전재고
+            ,[ITEM_COST] AS 단가
+            ,[ITEM_NOTE] AS 비고
+            ,[ITEM_REGIST_NM] AS 등록자
+            ,[ITEM_REGIST_DT] AS 등록일시
+          FROM [QMES2022].[dbo].[MASTER_ITEM_TB]
+          LEFT JOIN
+          (
+            SELECT
+              [CLNT_PK] AS NO
+              ,[CLNT_NAME] AS 거래처명
+            FROM [QMES2022].[dbo].[MASTER_CLIENT_TB]
+          ) AS CLIENT ON CLIENT.NO = [ITEM_CLIENT_PK]
+        ) AS RESULT
+        WHERE (1=1)
+        AND ( 구분 like concat('%',@input,'%')
+        OR 품번 like concat('%',@input,'%')
+        OR 품명 like concat('%',@input,'%')
+        OR 차종 like concat('%',@input,'%')
+        OR 규격 like concat('%',@input,'%')
+        OR 단위 like concat('%',@input,'%')
+        OR 안전재고 like concat('%',@input,'%')
+        OR 단가 like concat('%',@input,'%')
+        OR 비고 like concat('%',@input,'%'))
+        ORDER BY ` +
+        req.body.sortKey +
+        ` ` +
+        req.body.sortOrder +
+        `
+      `;
+    } else {
+      sql =
+        `
+        SELECT
+          NO AS NO, 거래처NO AS 거래처NO, 거래처명 AS 거래처명, 구분 AS 구분, 품번 AS 품번, 품명 AS 품명, 차종 AS 차종,
+          규격 AS 규격, 단위 AS 단위, 안전재고 AS 안전재고, 단가 AS 단가, 비고 AS 비고,
+          등록자 AS 등록자, 등록일시 AS 등록일시
+        FROM(
+          SELECT
+            [ITEM_PK] AS NO
+            ,[ITEM_CLIENT_PK] AS 거래처NO
+            ,CLIENT.거래처명 AS 거래처명
+            ,[ITEM_DIV] AS 구분
+            ,[ITEM_PRODUCT_NUM] AS 품번
+            ,[ITEM_NAME] AS 품명
+            ,[ITEM_CAR] AS 차종
+            ,[ITEM_SIZE] AS 규격
+            ,[ITEM_UNIT] AS 단위
+            ,[ITEM_SAFE] AS 안전재고
+            ,[ITEM_COST] AS 단가
+            ,[ITEM_NOTE] AS 비고
+            ,[ITEM_REGIST_NM] AS 등록자
+            ,[ITEM_REGIST_DT] AS 등록일시
+          FROM [QMES2022].[dbo].[MASTER_ITEM_TB] 
+          LEFT JOIN
+          (
+            SELECT
+              [CLNT_PK] AS NO
+              ,[CLNT_NAME] AS 거래처명
+            FROM [QMES2022].[dbo].[MASTER_CLIENT_TB]
+          ) AS CLIENT ON CLIENT.NO = [ITEM_CLIENT_PK]
+        ) AS RESULT
+        WHERE (1=1)
+        AND ` +
+        req.body.searchKey +
+        ` like concat('%',@input,'%')
+        ORDER BY ` +
+        req.body.sortKey +
+        ` ` +
+        req.body.sortOrder +
+        `
+      `;
+    }
+
+    const Pool = await pool;
+    const result = await Pool.request()
+      .input("input", req.body.searchInput)
+      .query(sql);
+
+    res.send(JSON.stringify(result.recordset));
+  } catch (err) {
+    res.status(500);
+    res.send(err.message);
+  }
+});
+
+// ###################################################################################################################
+// ###################################################   품목(원부자재)   ###################################################
+// ###################################################################################################################
+
+router.get("/itemraw", async (req, res) => {
+  try {
+    const Pool = await pool;
+    const result = await Pool.request().query(`
+      SELECT
+        [ITEM_PK] AS NO
+        ,[ITEM_CLIENT_PK] AS 거래처NO
+        ,CLIENT.거래처명 AS 거래처명
+        ,[ITEM_DIV] AS 구분
+        ,[ITEM_PRODUCT_NUM] AS 품번
+        ,[ITEM_NAME] AS 품명
+        ,[ITEM_CAR] AS 차종
+        ,[ITEM_SIZE] AS 규격
+        ,[ITEM_UNIT] AS 단위
+        ,[ITEM_SAFE] AS 안전재고
+        ,[ITEM_COST] AS 단가
+        ,[ITEM_NOTE] AS 비고
+        ,[ITEM_REGIST_NM] AS 등록자
+        ,[ITEM_REGIST_DT] AS 등록일시
+      FROM [QMES2022].[dbo].[MASTER_ITEM_TB]
+      LEFT JOIN
+      (
+        SELECT
+          [CLNT_PK] AS NO
+          ,[CLNT_NAME] AS 거래처명
+        FROM [QMES2022].[dbo].[MASTER_CLIENT_TB]
+      ) AS CLIENT ON CLIENT.NO = [ITEM_CLIENT_PK]
+      WHERE [ITEM_DIV] = '원부자재'
+      ORDER BY [ITEM_PK] DESC
+    `);
+
+    res.send(JSON.stringify(result.recordset));
+  } catch (err) {
+    res.status(500);
+    res.send(err.message);
+  }
+});
+
+router.post("/itemraw", async (req, res) => {
+  try {
+    var sql = "";
+    if (req.body.searchKey == "전체") {
+      sql =
+        `
+        SELECT
+          NO AS NO, 거래처NO AS 거래처NO, 거래처명 AS 거래처명, 구분 AS 구분, 품번 AS 품번, 품명 AS 품명, 차종 AS 차종,
+          규격 AS 규격, 단위 AS 단위, 안전재고 AS 안전재고, 단가 AS 단가, 비고 AS 비고,
+          등록자 AS 등록자, 등록일시 AS 등록일시
+        FROM(
+          SELECT
+            [ITEM_PK] AS NO
+            ,[ITEM_CLIENT_PK] AS 거래처NO
+            ,CLIENT.거래처명 AS 거래처명
+            ,[ITEM_DIV] AS 구분
+            ,[ITEM_PRODUCT_NUM] AS 품번
+            ,[ITEM_NAME] AS 품명
+            ,[ITEM_CAR] AS 차종
+            ,[ITEM_SIZE] AS 규격
+            ,[ITEM_UNIT] AS 단위
+            ,[ITEM_SAFE] AS 안전재고
+            ,[ITEM_COST] AS 단가
+            ,[ITEM_NOTE] AS 비고
+            ,[ITEM_REGIST_NM] AS 등록자
+            ,[ITEM_REGIST_DT] AS 등록일시
+          FROM [QMES2022].[dbo].[MASTER_ITEM_TB]
+          LEFT JOIN
+          (
+            SELECT
+              [CLNT_PK] AS NO
+              ,[CLNT_NAME] AS 거래처명
+            FROM [QMES2022].[dbo].[MASTER_CLIENT_TB]
+          ) AS CLIENT ON CLIENT.NO = [ITEM_CLIENT_PK]
+          WHERE [ITEM_DIV] = '원부자재'
+        ) AS RESULT
+        WHERE (1=1)
+        AND ( 구분 like concat('%',@input,'%')
+        OR 품번 like concat('%',@input,'%')
+        OR 품명 like concat('%',@input,'%')
+        OR 차종 like concat('%',@input,'%')
+        OR 규격 like concat('%',@input,'%')
+        OR 단위 like concat('%',@input,'%')
+        OR 안전재고 like concat('%',@input,'%')
+        OR 단가 like concat('%',@input,'%')
+        OR 비고 like concat('%',@input,'%'))
+        ORDER BY ` +
+        req.body.sortKey +
+        ` ` +
+        req.body.sortOrder +
+        `
+      `;
+    } else {
+      sql =
+        `
+        SELECT
+          NO AS NO, 거래처NO AS 거래처NO, 거래처명 AS 거래처명, 구분 AS 구분, 품번 AS 품번, 품명 AS 품명, 차종 AS 차종,
+          규격 AS 규격, 단위 AS 단위, 안전재고 AS 안전재고, 단가 AS 단가, 비고 AS 비고,
+          등록자 AS 등록자, 등록일시 AS 등록일시
+        FROM(
+          SELECT
+            [ITEM_PK] AS NO
+            ,[ITEM_CLIENT_PK] AS 거래처NO
+            ,CLIENT.거래처명 AS 거래처명
+            ,[ITEM_DIV] AS 구분
+            ,[ITEM_PRODUCT_NUM] AS 품번
+            ,[ITEM_NAME] AS 품명
+            ,[ITEM_CAR] AS 차종
+            ,[ITEM_SIZE] AS 규격
+            ,[ITEM_UNIT] AS 단위
+            ,[ITEM_SAFE] AS 안전재고
+            ,[ITEM_COST] AS 단가
+            ,[ITEM_NOTE] AS 비고
+            ,[ITEM_REGIST_NM] AS 등록자
+            ,[ITEM_REGIST_DT] AS 등록일시
+          FROM [QMES2022].[dbo].[MASTER_ITEM_TB] 
+          LEFT JOIN
+          (
+            SELECT
+              [CLNT_PK] AS NO
+              ,[CLNT_NAME] AS 거래처명
+            FROM [QMES2022].[dbo].[MASTER_CLIENT_TB]
+          ) AS CLIENT ON CLIENT.NO = [ITEM_CLIENT_PK]
+          WHERE [ITEM_DIV] = '원부자재'
+        ) AS RESULT
+        WHERE (1=1)
+        AND ` +
+        req.body.searchKey +
+        ` like concat('%',@input,'%')
+        ORDER BY ` +
+        req.body.sortKey +
+        ` ` +
+        req.body.sortOrder +
+        `
+      `;
+    }
+
+    const Pool = await pool;
+    const result = await Pool.request()
+      .input("input", req.body.searchInput)
+      .query(sql);
+
+    res.send(JSON.stringify(result.recordset));
+  } catch (err) {
+    res.status(500);
+    res.send(err.message);
+  }
+});
+
+// ###################################################################################################################
 // ###################################################   설비부품   ###################################################
 // ###################################################################################################################
 
