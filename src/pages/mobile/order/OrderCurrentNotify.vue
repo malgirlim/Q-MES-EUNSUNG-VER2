@@ -49,8 +49,8 @@ const pageChangeFirst = () => {
 };
 
 // dataManager 만들기
-const url = "/api/order/accept";
-const dataManager = useSendApi<OrderAccept>(url, currentPage, rowsPerPage);
+const url = "/api/info/order/notify";
+const dataManager = useSendApi<ForecastNotify>(url, currentPage, rowsPerPage);
 
 // 테이블항목 설정 및 가로크기 조정
 const table_setting = {

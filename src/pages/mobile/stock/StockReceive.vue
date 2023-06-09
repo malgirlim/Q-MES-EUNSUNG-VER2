@@ -357,19 +357,16 @@ const stock_stockLot = useSendApi<StockStockLOT>(
 // 테이블항목 설정 및 가로크기 조정
 const table_setting_stockLot = {
   순번: { name: "순번", style: "width: 50px; text-align: center;" },
-  항목1: { name: "LOT코드", style: "width: 50px; text-align: center;" },
-  항목2: { name: "품목구분", style: "width: 50px; text-align: center;" },
-  항목3: { name: "품번", style: "width: 50px; text-align: center;" },
-  항목4: { name: "품명", style: "width: 50px; text-align: center;" },
-  항목5: { name: "규격", style: "width: 50px; text-align: center;" },
-  항목6: { name: "단위", style: "width: 50px; text-align: center;" },
-  항목7: { name: "기초재공재고", style: "width: 50px; text-align: center;" },
-  항목8: { name: "기초재고", style: "width: 50px; text-align: center;" },
-  항목9: { name: "입고", style: "width: 50px; text-align: center;" },
-  항목10: { name: "재공", style: "width: 50px; text-align: center;" },
-  항목11: { name: "사용", style: "width: 50px; text-align: center;" },
-  항목12: { name: "기말재공재고", style: "width: 50px; text-align: center;" },
-  항목13: { name: "기말재고", style: "width: 50px; text-align: center;" },
+  항목1: { name: "품번", style: "width: 50px; text-align: center;" },
+  항목2: { name: "품명", style: "width: 50px; text-align: center;" },
+  항목3: { name: "LOT코드", style: "width: 50px; text-align: center;" },
+  항목4: { name: "기초재공재고", style: "width: 50px; text-align: center;" },
+  항목5: { name: "기초재고", style: "width: 50px; text-align: center;" },
+  항목6: { name: "입고", style: "width: 50px; text-align: center;" },
+  항목7: { name: "재공", style: "width: 50px; text-align: center;" },
+  항목8: { name: "사용", style: "width: 50px; text-align: center;" },
+  항목9: { name: "기말재공재고", style: "width: 50px; text-align: center;" },
+  항목10: { name: "기말재고", style: "width: 50px; text-align: center;" },
 };
 
 // ########################## 조회기간 설정 ##########################
@@ -684,34 +681,31 @@ const importFacilitypart = (no: any) => {
               </tr>
               <tr class="h-7 px-1">
                 <td class="border-2 border-gray-500">
-                  {{ todo[table_setting.항목6.name].toLocaleString() }}
-                </td>
-                <td class="border-2 border-gray-500">
-                  {{ todo[table_setting.항목7.name].toLocaleString() }}
-                </td>
-                <td class="border-2 border-gray-500">
                   {{ todo[table_setting.항목8.name].toLocaleString() }}
                 </td>
-              </tr>
-              <tr class="h-7 px-1 font-bold bg-slate-200">
-                <td class="border-2 border-gray-500">기초재공재고</td>
-                <td class="border-2 border-gray-500">기초재고</td>
-                <td class="border-2 border-gray-500">안전재고</td>
-              </tr>
-              <tr class="h-7 px-1">
                 <td class="border-2 border-gray-500">
                   {{ todo[table_setting.항목9.name].toLocaleString() }}
                 </td>
                 <td class="border-2 border-gray-500">
                   {{ todo[table_setting.항목10.name].toLocaleString() }}
                 </td>
-                <td rowspan="3" class="border-2 border-gray-500">
-                  {{ Number(todo[table_setting.항목13.name]).toLocaleString() }}
+              </tr>
+              <tr class="h-7 px-1 font-bold bg-slate-200">
+                <td class="border-2 border-gray-500">기초재공재고</td>
+                <td class="border-2 border-gray-500">기초재고</td>
+              </tr>
+              <tr class="h-7 px-1">
+                <td class="border-2 border-gray-500">
+                  {{ todo[table_setting.항목6.name].toLocaleString() }}
+                </td>
+                <td class="border-2 border-gray-500">
+                  {{ todo[table_setting.항목7.name].toLocaleString() }}
                 </td>
               </tr>
               <tr class="h-7 px-1 font-bold bg-slate-200">
                 <td class="border-2 border-gray-500">기말재공재고</td>
                 <td class="border-2 border-gray-500">기말재고</td>
+                <td class="border-2 border-gray-500">안전재고</td>
               </tr>
 
               <tr class="h-7 px-1">
@@ -720,6 +714,9 @@ const importFacilitypart = (no: any) => {
                 </td>
                 <td class="border-2 border-gray-500">
                   {{ todo[table_setting.항목12.name].toLocaleString() }}
+                </td>
+                <td class="border-2 border-gray-500">
+                  {{ Number(todo[table_setting.항목13.name]).toLocaleString() }}
                 </td>
               </tr>
               <tr>
@@ -1104,7 +1101,8 @@ const importFacilitypart = (no: any) => {
     <Dialog.Panel class="p-5 text-center" style="top: -7%">
       <!--stockLot Modal 내용 시작-->
       <div class="mb-3 mt-3" style="font-weight: bold; font-size: x-large">
-        품목(LOT별) 재고 리스트
+        <div>품목(LOT별) 재고 리스트</div>
+        <div class="mt-3">[{{ searchDate }}]</div>
       </div>
       <div class="grid grid-cols-12 gap-1 mt-1">
         <!-- BEGIN: Pagination-->
@@ -1161,8 +1159,8 @@ const importFacilitypart = (no: any) => {
                 <tbody class="text-center">
                   <tr class="h-7 font-bold bg-slate-200">
                     <td class="w-1/3 border-2 border-gray-500">순번</td>
-                    <td class="w-1/3 border-2 border-gray-500">품목구분</td>
                     <td class="w-1/3 border-2 border-gray-500">품번</td>
+                    <td class="w-1/3 border-2 border-gray-500">품명</td>
                   </tr>
                   <tr>
                     <td class="border-2 border-gray-500">
@@ -1173,10 +1171,10 @@ const importFacilitypart = (no: any) => {
                       }}
                     </td>
                     <td class="border-2 border-gray-500">
-                      {{ todo[table_setting_stockLot.항목2.name] }}
+                      {{ todo[table_setting_stockLot.항목1.name] }}
                     </td>
                     <td class="border-2 border-gray-500">
-                      {{ todo[table_setting_stockLot.항목3.name] }}
+                      {{ todo[table_setting_stockLot.항목2.name] }}
                     </td>
                   </tr>
                   <tr class="h-7 px-1 font-bold bg-slate-200">
@@ -1186,33 +1184,35 @@ const importFacilitypart = (no: any) => {
                   </tr>
                   <tr class="h-7 px-1">
                     <td colspan="3" class="border-2 border-gray-500">
-                      {{ todo[table_setting_stockLot.항목1.name] }}
+                      {{ todo[table_setting_stockLot.항목3.name] }}
                     </td>
                   </tr>
                   <tr class="h-7 px-1 font-bold bg-slate-200">
-                    <td colspan="3" class="border-2 border-gray-500">품명</td>
-                  </tr>
-                  <tr class="h-7 px-1">
-                    <td colspan="3" class="border-2 border-gray-500">
-                      {{ todo[table_setting_stockLot.항목4.name] }}
-                    </td>
-                  </tr>
-                  <tr class="h-7 px-1 font-bold bg-slate-200">
-                    <td colspan="3" class="border-2 border-gray-500">규격</td>
-                  </tr>
-                  <tr class="h-7 px-1">
-                    <td colspan="3" class="border-2 border-gray-500">
-                      {{ todo[table_setting_stockLot.항목5.name] }}
-                    </td>
-                  </tr>
-                  <tr class="h-7 px-1 font-bold bg-slate-200">
-                    <td class="border-2 border-gray-500">단위</td>
                     <td class="border-2 border-gray-500">기조재공재고</td>
-                    <td class="border-2 border-gray-500">기초재고입고</td>
+                    <td class="border-2 border-gray-500">기조재고</td>
                   </tr>
                   <tr class="h-7 px-1">
                     <td class="border-2 border-gray-500">
-                      {{ todo[table_setting_stockLot.항목6.name] }}
+                      {{
+                        todo[table_setting_stockLot.항목4.name].toLocaleString()
+                      }}
+                    </td>
+                    <td class="border-2 border-gray-500">
+                      {{
+                        todo[table_setting_stockLot.항목5.name].toLocaleString()
+                      }}
+                    </td>
+                  </tr>
+                  <tr class="h-7 px-1 font-bold bg-slate-200">
+                    <td class="border-2 border-gray-500">입고</td>
+                    <td class="border-2 border-gray-500">재공</td>
+                    <td class="border-2 border-gray-500">사용</td>
+                  </tr>
+                  <tr class="h-7 px-1">
+                    <td class="border-2 border-gray-500">
+                      {{
+                        todo[table_setting_stockLot.항목6.name].toLocaleString()
+                      }}
                     </td>
                     <td class="border-2 border-gray-500">
                       {{
@@ -1226,9 +1226,8 @@ const importFacilitypart = (no: any) => {
                     </td>
                   </tr>
                   <tr class="h-7 px-1 font-bold bg-slate-200">
-                    <td class="border-2 border-gray-500">재공</td>
-                    <td class="border-2 border-gray-500">사용</td>
                     <td class="border-2 border-gray-500">기말재공재고</td>
+                    <td class="border-2 border-gray-500">기말재고</td>
                   </tr>
                   <tr class="h-7 px-1">
                     <td class="border-2 border-gray-500">
@@ -1240,13 +1239,6 @@ const importFacilitypart = (no: any) => {
                       {{
                         todo[
                           table_setting_stockLot.항목10.name
-                        ].toLocaleString()
-                      }}
-                    </td>
-                    <td class="border-2 border-gray-500">
-                      {{
-                        todo[
-                          table_setting_stockLot.항목11.name
                         ].toLocaleString()
                       }}
                     </td>
