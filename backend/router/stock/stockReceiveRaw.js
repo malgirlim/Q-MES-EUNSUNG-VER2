@@ -283,7 +283,7 @@ router.post("/insert", async (req, res) => {
         "등록일시",
         moment().tz("Asia/Seoul").format("YYYY-MM-DD HH:mm:ss")
       ).query(`
-        INSERT INTO [QMES2022].[dbo].[MANAGE_ORDER_TB]
+        INSERT INTO [QMES2022].[dbo].[MANAGE_ITEM_RECEIVE_TB]
           ([ITRC_PRODUCE_RESULT_PK]
           ,[ITRC_PROCESS_INSPECT_PK]
           ,[ITRC_DEFECT_REWORK_PK]
