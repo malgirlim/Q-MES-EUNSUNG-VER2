@@ -19,10 +19,13 @@ import { toast } from "vue3-toastify";
 
 // API 보내는 함수 및 인터페이스 불러오기
 import { useSendApi } from "../../../composables/useSendApi";
-import { PreventDailyCheck } from "../../../interfaces/menu/preventInterface";
+import {
+  PreventDaily,
+  PreventDailyCheck,
+} from "../../../interfaces/menu/preventInterface";
 
 // 컴포넌트 로드
-import DailyCheck from "../../../components/Common/Mobile/Prevent/DailyCheck.vue";
+// import DailyCheck from "../../../components/Common/Mobile/Prevent/DailyCheck.vue";
 
 const { proxy }: any = getCurrentInstance();
 const user_level = proxy.gstate.level.OrderCurrent; //권한레벨
@@ -30,6 +33,7 @@ const user_level = proxy.gstate.level.OrderCurrent; //권한레벨
 // 페이지 로딩 시 시작
 onMounted(async () => {
   dataManager.loadDatas(); // 메인으로 쓸 데이터 불러오기
+  dailyresult.loadDatas(); // 점검결과 불러오기
   setTimeout(() => {
     menu_fix.value = ".";
   }, 500);
@@ -56,6 +60,10 @@ const dataManager = useSendApi<PreventDailyCheck>(
   currentPage,
   rowsPerPage
 );
+
+// 점검결과 가져오기
+const url_dailyresult = "/api/prevent/dailyresult";
+const dailyresult = useSendApi<PreventDaily>(url_dailyresult, ref(1), ref(10));
 
 // 테이블항목 설정 및 가로크기 조정
 const table_setting = {
@@ -95,11 +103,37 @@ const noti = (data: string) => {
   });
 };
 
-// ##### 점검시작 Modal #####
+// ########################## 점검시작 Modal ##########################
+let updateData: PreventDaily;
+
 const checkCheckBox = ref(false);
 const checkModal = ref(false);
 const setCheckModal = (value: boolean) => {
+  updateData = dailyresult.dataSearchAll;
+  // console.log(updateData);
   checkModal.value = value;
+};
+const checkCheckConfirm = async () => {
+  for (var data of updateData.value) {
+    if (data.검사방법 == "치수검사") {
+      if (
+        Number(data.최소) <= Number(data.결과내용) &&
+        Number(data.최대) >= Number(data.결과내용)
+      ) {
+        data.결과 = "적합";
+      } else data.결과 = "부적합";
+
+      if (
+        data.결과내용 == "" ||
+        data.결과내용 == null ||
+        data.결과내용 == undefined
+      )
+        data.결과 = "미점검";
+    }
+    await dailyresult.editData(data);
+  }
+  await dataManager.loadDatas();
+  await setCheckModal(false);
 };
 </script>
 
@@ -169,8 +203,21 @@ const setCheckModal = (value: boolean) => {
                 :style="table_setting.항목2.style"
               >
                 <div>
-                  <Button variant="primary" @click="setCheckModal(true)"
-                    >시작</Button
+                  <Button
+                    variant="primary"
+                    @click="
+                      async () => {
+                        await dailyresult.searchDatas(
+                          dayjs().format('YY/MM/DD - YY/MM/DD'),
+                          '설비NO',
+                          todo.설비NO,
+                          'NO',
+                          '오름차순'
+                        );
+                        await setCheckModal(true);
+                      }
+                    "
+                    >점검</Button
                   >
                 </div>
                 <!-- <div>
@@ -228,7 +275,155 @@ const setCheckModal = (value: boolean) => {
   <Dialog :open="checkModal" size="md">
     <Dialog.Panel style="top: -7%">
       <div class="p-1 text-center"></div>
-      <div><DailyCheck /></div>
+      <div>
+        <div class="p-5">
+          <div
+            class="text-md"
+            style="height: 480px; overflow-y: visible; overflow-x: hidden"
+          >
+            <div v-for="(todo, index) in updateData" :key="todo.NO">
+              <table class="w-full">
+                <tbody class="border-2 border-primary text-center">
+                  <tr>
+                    <td
+                      class="font-bold border-r-2 border-b-2 border-primary bg-slate-200 h-8"
+                    >
+                      순서
+                    </td>
+                    <td
+                      class="font-bold border-b-2 border-primary bg-slate-200"
+                      colspan="4"
+                    >
+                      점검항목
+                    </td>
+                  </tr>
+                  <tr>
+                    <td class="border-r-2 border-b-2 border-primary h-8">
+                      {{ index + 1 }}
+                    </td>
+                    <td class="border-b-2 border-primary" colspan="4">
+                      <div>{{ todo.내용 }}</div>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td
+                      class="font-bold border-r-2 border-b-2 border-primary bg-slate-200 h-8"
+                      colspan="3"
+                    >
+                      판정기준
+                    </td>
+                    <td
+                      class="font-bold border-b-2 border-primary bg-slate-200"
+                    >
+                      점검결과
+                    </td>
+                  </tr>
+                  <tr>
+                    <td
+                      class="border-r-2 border-b-2 border-primary h-8"
+                      colspan="3"
+                    >
+                      {{ todo.기준 }}
+                    </td>
+                    <td rowspan="3">
+                      <div v-if="todo.검사방법 == '육안검사'">
+                        <!--설비점검-->
+                        <div class="text-left ml-4">
+                          <label class="cursor-pointer"
+                            ><div class="flex items-center mb-3">
+                              <input
+                                class="mr-2 mb-1 transition-all duration-100 ease-in-out shadow-sm border-slate-200 cursor-pointer focus:ring-4 focus:ring-offset-0 focus:ring-primary focus:ring-opacity-20 dark:bg-darkmode-800 dark:border-transparent dark:focus:ring-slate-700 dark:focus:ring-opacity-50 [&[type='radio']]:checked:bg-primary [&[type='radio']]:checked:border-primary [&[type='radio']]:checked:border-opacity-10"
+                                :name="'result' + index"
+                                @click="todo.결과 = '양호'"
+                                type="radio"
+                                :checked="todo.결과 == '양호'"
+                              />
+                              <div class="text-success">양호</div>
+                            </div></label
+                          >
+                          <label class="cursor-pointer"
+                            ><div class="flex items-center mb-3">
+                              <input
+                                class="mr-2 mb-1 transition-all duration-100 ease-in-out shadow-sm border-slate-200 cursor-pointer focus:ring-4 focus:ring-offset-0 focus:ring-primary focus:ring-opacity-20 dark:bg-darkmode-800 dark:border-transparent dark:focus:ring-slate-700 dark:focus:ring-opacity-50 [&[type='radio']]:checked:bg-primary [&[type='radio']]:checked:border-primary [&[type='radio']]:checked:border-opacity-10"
+                                :name="'result' + index"
+                                @click="todo.결과 = '점검필요'"
+                                type="radio"
+                                :checked="todo.결과 == '점검필요'"
+                              />
+                              <div class="text-pending">점검필요</div>
+                            </div></label
+                          >
+                          <label class="cursor-pointer"
+                            ><div class="flex items-center">
+                              <input
+                                class="mr-2 mb-1 transition-all duration-100 ease-in-out shadow-sm border-slate-200 cursor-pointer focus:ring-4 focus:ring-offset-0 focus:ring-primary focus:ring-opacity-20 dark:bg-darkmode-800 dark:border-transparent dark:focus:ring-slate-700 dark:focus:ring-opacity-50 [&[type='radio']]:checked:bg-primary [&[type='radio']]:checked:border-primary [&[type='radio']]:checked:border-opacity-10"
+                                :name="'result' + index"
+                                @click="todo.결과 = '불량'"
+                                type="radio"
+                                :checked="todo.결과 == '불량'"
+                              />
+                              <div class="text-danger">불량</div>
+                            </div></label
+                          >
+                        </div>
+                      </div>
+
+                      <div v-if="todo.검사방법 == '치수검사'">
+                        <!--수치점검-->
+                        <div class="text-center">
+                          <div class="my-3">
+                            <FormInput
+                              class="text-center px-0 w-24"
+                              type="text"
+                              placeholder="수치입력"
+                              v-model="todo.결과내용"
+                              :value="todo.결과내용"
+                            />
+                          </div>
+                          <div v-if="todo.결과 == '적합'">
+                            <label class="text-success mr-1">●</label>적합
+                          </div>
+                          <div v-if="todo.결과 == '부적합'">
+                            <label class="text-danger mr-1">●</label>부적합
+                          </div>
+                          <div v-if="todo.결과 == '미점검'">
+                            <label class="mr-1">●</label>미점검
+                          </div>
+                        </div>
+                      </div>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td
+                      class="font-bold border-r-2 border-b-2 border-primary bg-slate-200 h-8"
+                    >
+                      단위
+                    </td>
+                    <td
+                      class="font-bold border-r-2 border-b-2 border-primary bg-slate-200"
+                    >
+                      최소
+                    </td>
+                    <td
+                      class="font-bold border-r-2 border-b-2 border-primary bg-slate-200"
+                    >
+                      최대
+                    </td>
+                  </tr>
+                  <tr>
+                    <td class="border-r-2 border-primary h-8">
+                      {{ todo.단위 }}
+                    </td>
+                    <td class="border-r-2 border-primary">{{ todo.최소 }}</td>
+                    <td class="border-r-2 border-primary">{{ todo.최대 }}</td>
+                  </tr>
+                </tbody>
+              </table>
+              <div class="mt-5"></div>
+            </div>
+          </div>
+        </div>
+      </div>
       <label class="cursor-pointer"
         ><div class="flex text-center text-md mb-5">
           <div class="flex m-auto">
@@ -254,7 +449,7 @@ const setCheckModal = (value: boolean) => {
           type="button"
           class="w-24 mr-10"
           :disabled="!checkCheckBox"
-          @click="setCheckModal(false)"
+          @click="checkCheckConfirm()"
         >
           확인
         </Button>

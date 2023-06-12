@@ -40,7 +40,9 @@ router.get("/", async (req, res) => {
         ,MIDDLE.설비명 AS 설비명
         ,SUM(MIDDLE.점검수) AS 점검수
         ,SUM(MIDDLE.점검확인수) AS 점검확인수
-        ,CASE WHEN ((SUM(MIDDLE.점검수) - SUM(MIDDLE.점검확인수)) > 0) THEN '미점검' ELSE '점검완료' END AS 점검현황
+        ,CASE WHEN (SUM(MIDDLE.점검확인수) = 0) THEN '미점검'
+              WHEN ((SUM(MIDDLE.점검수) - SUM(MIDDLE.점검확인수)) = 0) THEN '점검완료'
+              ELSE '점검중' END AS 점검현황
       FROM
       (
         SELECT
@@ -110,7 +112,9 @@ router.post("/", async (req, res) => {
             ,MIDDLE.설비명 AS 설비명
             ,SUM(MIDDLE.점검수) AS 점검수
             ,SUM(MIDDLE.점검확인수) AS 점검확인수
-            ,CASE WHEN ((SUM(MIDDLE.점검수) - SUM(MIDDLE.점검확인수)) > 0) THEN '미점검' ELSE '점검완료' END AS 점검현황
+            ,CASE WHEN (SUM(MIDDLE.점검확인수) = 0) THEN '미점검'
+                  WHEN ((SUM(MIDDLE.점검수) - SUM(MIDDLE.점검확인수)) = 0) THEN '점검완료'
+                  ELSE '점검중' END AS 점검현황
           FROM
           (
             SELECT
@@ -161,7 +165,9 @@ router.post("/", async (req, res) => {
             ,MIDDLE.설비명 AS 설비명
             ,SUM(MIDDLE.점검수) AS 점검수
             ,SUM(MIDDLE.점검확인수) AS 점검확인수
-            ,CASE WHEN ((SUM(MIDDLE.점검수) - SUM(MIDDLE.점검확인수)) > 0) THEN '미점검' ELSE '점검완료' END AS 점검현황
+            ,CASE WHEN (SUM(MIDDLE.점검확인수) = 0) THEN '미점검'
+                  WHEN ((SUM(MIDDLE.점검수) - SUM(MIDDLE.점검확인수)) = 0) THEN '점검완료'
+                  ELSE '점검중' END AS 점검현황
           FROM
           (
             SELECT
