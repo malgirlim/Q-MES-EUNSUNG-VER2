@@ -36,26 +36,12 @@ const setDeleteUserModal = (value: boolean) => {
   <!--BEGIN: 설정 항목들 -->
   <div class="mt-5 grid grid-cols-12 gap-1">
     <div class="col-span-2 border-r-2 border-slate-200" style="height: 640px">
-      <div><MobileAlertSelect 설비수리예보_variant="primary" /></div>
+      <div><MobileAlertSelect 안전재고미달통보_variant="primary" /></div>
     </div>
     <div class="intro-y col-span-3 border-r-2 border-slate-200">
       <div class="flex items-center text-xl font-bold ml-5">
         <div><Lucide class="mb-0.5 mr-1" icon="Settings2" /></div>
         <div>발송조건</div>
-        <div class="ml-5">
-          <FormSelect class="w-32" model-value="검사기"
-            ><option>검사기</option>
-            <option>제판기</option>
-            <option>인쇄기1</option>
-            <option>인쇄기2</option>
-            <option>인쇄기3</option>
-            <option>인쇄기4</option>
-            <option>인쇄기5</option>
-            <option>인쇄기6</option>
-            <option>인쇄기7</option>
-            <option>인쇄기8</option>
-          </FormSelect>
-        </div>
         <div class="ml-5">
           <Button
             class="mb-1 w-20 h-6 text-base"
@@ -97,13 +83,6 @@ const setDeleteUserModal = (value: boolean) => {
             </div>
             <div class="mr-3"><Lucide icon="ChevronRight" /></div>
             <div class="w-[50%]">오후 4시</div>
-          </div>
-          <div class="flex items-center">
-            <div class="w-[30%] mx-2 text-center">
-              <div>발송시점</div>
-            </div>
-            <div class="mr-3"><Lucide icon="ChevronRight" /></div>
-            <div class="w-[50%]">3일전</div>
           </div>
         </div>
       </div>
@@ -168,7 +147,7 @@ const setDeleteUserModal = (value: boolean) => {
           <div class="flex items-center">
             <div class="flex m-auto mt-5">
               <img
-                src="../../../assets/images/kakao_template/PreventRepairForecast.png"
+                src="../../../assets/images/kakao_template/StockSafeNotify.png"
               />
             </div>
           </div>
@@ -202,10 +181,6 @@ const setDeleteUserModal = (value: boolean) => {
       <div class="mb-3">
         <div class="text-left mb-1">발송시간</div>
         <div><FormInput type="time" model-value="16:00" /></div>
-      </div>
-      <div class="mb-3">
-        <div class="text-left mb-1">발송시점</div>
-        <div><FormInput type="number" model-value="3" /></div>
       </div>
 
       <div>
