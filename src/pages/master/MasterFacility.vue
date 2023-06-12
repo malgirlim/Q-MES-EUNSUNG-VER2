@@ -890,6 +890,7 @@ const handleFileUpload = (event: any) => {
             @click="
               async () => {
                 insertDataFunction();
+                submitFile();
               }
             "
             >확인</Button

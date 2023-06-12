@@ -5,8 +5,11 @@ const router = express.Router();
 
 var request = require("request");
 
-const active = true;
-const time = dayjs().format("YYYY-MM-DD HH:mm:ss");
+const now = dayjs().format("HH:mm");
+
+const active = true; // 기능 활성화 여부
+const time = "16:59"; // 설정 시간
+
 const receive_num = "";
 
 const kakaoSendData = {
@@ -26,10 +29,18 @@ const options = {
   json: true,
 };
 
-setInterval(() => {
-  // request.post(options, function (err, res, body) {
-  //   console.log(res.body.result);
-  // });
-}, 60000);
+request_post(); //최초 즉시 실행
+
+setInterval(() => request_post(), 60000); // 이후 60초마다 실행
+
+function request_post() {
+  if (active == true && time == dayjs().format("HH:mm")) {
+    request.post(options, function (err, res, body) {
+      console.log(
+        dayjs().format("YYYY-MM-DD HH:mm:ss") + ": " + res.body.result
+      );
+    });
+  }
+}
 
 module.exports = router;
