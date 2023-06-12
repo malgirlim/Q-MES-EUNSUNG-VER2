@@ -49,7 +49,7 @@ const pageChangeFirst = () => {
 };
 
 // dataManager 만들기
-const url = "/api/info/prevent/prevent/forecast";
+const url = "/api/info/stock/safe/notify";
 const dataManager = useSendApi<ForecastNotify>(url, currentPage, rowsPerPage);
 
 // 테이블항목 설정 및 가로크기 조정

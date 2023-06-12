@@ -8,6 +8,8 @@ const infoAnnounRouter = require("./info/infoAnnoun");
 const orderForecastRouter = require("./info/orderForecast");
 const orderNotifyRouter = require("./info/orderNotify");
 
+const stockSafeNotifyRouter = require("./info/stockSafeNotify");
+
 const preventPreventForecastRouter = require("./info/preventPreventForecast");
 const preventPreventNotifyRouter = require("./info/preventPreventNotify");
 
@@ -35,6 +37,9 @@ router.use("/announ", infoAnnounRouter);
 router.use("/order/forecast", orderForecastRouter);
 // 주문관리 / 수주대비납품 통보 - router/info/orderNotify.js
 router.use("/order/notify", orderNotifyRouter);
+
+// 재고관리 / 안전재고미달 통보 - router/info/stockSafeNotify.js
+router.use("/stock/safe/notify", stockSafeNotifyRouter);
 
 // 예방보전 / 예방보전 예보 - router/info/preventPreventForecast.js
 router.use("/prevent/prevent/forecast", preventPreventForecastRouter);
