@@ -19,8 +19,7 @@ import { toast } from "vue3-toastify";
 
 // API 보내는 함수 및 인터페이스 불러오기
 import { useSendApi } from "../../../composables/useSendApi";
-import { OrderAccept } from "../../../interfaces/menu/orderInterface";
-import { MasterClient } from "../../../interfaces/menu/MasterInterface";
+import { PreventDailyCheck } from "../../../interfaces/menu/preventInterface";
 
 // 컴포넌트 로드
 import DailyCheck from "../../../components/Common/Mobile/Prevent/DailyCheck.vue";
@@ -30,7 +29,7 @@ const user_level = proxy.gstate.level.OrderCurrent; //권한레벨
 
 // 페이지 로딩 시 시작
 onMounted(async () => {
-  dataManager.loadDatas(); // 거래처 데이터 불러오기
+  dataManager.loadDatas(); // 메인으로 쓸 데이터 불러오기
   setTimeout(() => {
     menu_fix.value = ".";
   }, 500);
@@ -51,8 +50,12 @@ const pageChangeFirst = () => {
 };
 
 // dataManager 만들기
-const url = "/api/order/accept";
-const dataManager = useSendApi<OrderAccept>(url, currentPage, rowsPerPage);
+const url = "/api/prevent/dailycheck";
+const dataManager = useSendApi<PreventDailyCheck>(
+  url,
+  currentPage,
+  rowsPerPage
+);
 
 // 테이블항목 설정 및 가로크기 조정
 const table_setting = {
@@ -137,7 +140,7 @@ const setCheckModal = (value: boolean) => {
               </Table.Th>
               <Table.Th
                 class="px-2 text-center w-3/12 border-b-0 whitespace-nowrap font-bold"
-                :style="table_setting.항목2.style"
+                :style="table_setting.항목3.style"
               >
                 {{ table_setting.항목3.name }}
               </Table.Th>
@@ -146,7 +149,7 @@ const setCheckModal = (value: boolean) => {
           <Table.Tbody style="position: relative; z-index: 1">
             <Table.Tr
               v-for="(todo, index) in dataManager.datas.value"
-              :key="todo.NO"
+              :key="todo.설비NO"
               class="intro-x"
             >
               <Table.Td
@@ -159,7 +162,7 @@ const setCheckModal = (value: boolean) => {
                 class="px-2 first:rounded-l-md last:rounded-r-md text-center bg-white border-b-0 dark:bg-darkmode-600 shadow-[20px_3px_20px_#0000000b]"
                 :style="table_setting.항목1.style"
               >
-                <div>인쇄기1</div>
+                <div>{{ todo[table_setting.항목1.name] }}</div>
               </Table.Td>
               <Table.Td
                 class="px-2 first:rounded-l-md last:rounded-r-md bg-white border-b-0 dark:bg-darkmode-600 shadow-[20px_3px_20px_#0000000b]"
@@ -178,11 +181,17 @@ const setCheckModal = (value: boolean) => {
               </Table.Td>
               <Table.Td
                 class="px-2 first:rounded-l-md last:rounded-r-md bg-white border-b-0 dark:bg-darkmode-600 shadow-[20px_3px_20px_#0000000b]"
-                :style="table_setting.항목2.style"
+                :style="table_setting.항목3.style"
               >
-                <div class="text-danger">미점검</div>
-                <!-- <div class="text-pending">점검중</div>
-                <div class="text-success">점검완료</div> -->
+                <div v-if="todo.점검현황 == '미점검'" class="text-danger">
+                  미점검
+                </div>
+                <div v-if="todo.점검현황 == '점검중'" class="text-pending">
+                  점검중
+                </div>
+                <div v-if="todo.점검현황 == '점검완료'" class="text-success">
+                  점검완료
+                </div>
               </Table.Td>
             </Table.Tr>
           </Table.Tbody>
