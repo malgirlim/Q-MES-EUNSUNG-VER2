@@ -43,6 +43,14 @@ const pageChangeFirst = () => {
 const url = "/api/prevent/preventplan";
 const dataManager = useSendApi<PreventPrevent>(url, currentPage, rowsPerPage);
 
+// 예방보전 결과 데이터
+const url_preventresult = "/api/prevent/preventresult";
+const preventresult = useSendApi<PreventPrevent>(
+  url_preventresult,
+  ref(1),
+  ref(10)
+);
+
 // 설비 데이터
 const url_prevent_facility = "/api/prevent/modal/facility";
 const prevent_facility = useSendApi<MasterFacility>(
@@ -70,6 +78,7 @@ const table_setting = {
   항목9: { name: "계획일", style: "width: 50px; text-align: center;" },
   항목10: { name: "예보일", style: "width: 50px; text-align: center;" },
   항목11: { name: "담당자", style: "width: 50px; text-align: center;" },
+  검사: { name: "검사", style: "width: 50px; text-align: center;" },
   상세보기: { name: "정보", style: "width: 50px; text-align: center;" },
   편집: { name: "편집", style: "width: 50px; text-align: center;" },
 };
@@ -369,6 +378,22 @@ const onFileImport = (event: any) => {
     };
     reader.readAsArrayBuffer(file);
   }
+};
+
+// ##############################  예방보전 결과 등록 모달  ##################################
+const preventResultInsertModal = ref(false);
+const setPreventResultInsertModal = (value: boolean) => {
+  if (user_level >= 3) {
+    preventResultInsertModal.value = value;
+    search();
+  } else {
+    toast.warning("액세스 권한이 없습니다.\n관리자에게 문의하세요.");
+  }
+};
+// 수정버튼 누르면 실행되는 함수
+const preventResultInsertFunction = async () => {
+  await preventresult.insertData(editModalData); // await : 이 함수가 끝나야 다음으로 넘어간다
+  search();
 };
 </script>
 
@@ -700,6 +725,12 @@ const onFileImport = (event: any) => {
                 </Table.Th>
                 <Table.Th
                   class="text-center border-b-0 whitespace-nowrap font-bold"
+                  :style="table_setting.검사.style"
+                >
+                  {{ table_setting.검사.name }}
+                </Table.Th>
+                <Table.Th
+                  class="text-center border-b-0 whitespace-nowrap font-bold"
                   :style="table_setting.상세보기.style"
                 >
                   {{ table_setting.상세보기.name }}
@@ -802,6 +833,24 @@ const onFileImport = (event: any) => {
                   :style="table_setting.항목11.style"
                 >
                   <div>{{ todo[table_setting.항목11.name] }}</div>
+                </Table.Td>
+                <Table.Td
+                  class="first:rounded-l-md last:rounded-r-md text-center bg-white border-b-0 dark:bg-darkmode-600 shadow-[20px_3px_20px_#0000000b] py-0 relative before:block before:w-px before:h-8 before:bg-slate-200 before:absolute before:left-0 before:inset-y-0 before:my-auto before:dark:bg-darkmode-400"
+                  :style="table_setting.검사.style"
+                >
+                  <div>
+                    <Button
+                      variant="primary"
+                      @click="
+                        () => {
+                          editModalData = todo;
+                          setPreventResultInsertModal(true);
+                        }
+                      "
+                    >
+                      검사
+                    </Button>
+                  </div>
                 </Table.Td>
                 <Table.Td
                   class="first:rounded-l-md last:rounded-r-md text-center bg-white border-b-0 dark:bg-darkmode-600 shadow-[20px_3px_20px_#0000000b] py-0 relative before:block before:w-px before:h-8 before:bg-slate-200 before:absolute before:left-0 before:inset-y-0 before:my-auto before:dark:bg-darkmode-400"
@@ -1505,4 +1554,190 @@ const onFileImport = (event: any) => {
     </Dialog.Panel>
   </Dialog>
   <!-- END: 프린트 출력 Modal -->
+  <!-- 
+  ##########################################################################################################################
+  ##########################################################################################################################
+  ########################################################################################################################## -->
+
+  <!-- BEGIN: preventResultInsert Modal Content -->
+  <Dialog
+    size="md"
+    :open="preventResultInsertModal"
+    @close="setPreventResultInsertModal(false)"
+  >
+    <Dialog.Panel class="p-10 text-center">
+      <div class="mb-5" style="font-weight: bold">검사 등록</div>
+      <Tab.Group>
+        <Tab.List variant="boxed-tabs">
+          <Tab>
+            <Tab.Button class="w-full py-2" as="button"> 기본 내용 </Tab.Button>
+          </Tab>
+          <Tab>
+            <Tab.Button class="w-full py-2" as="button"> 추가 내용 </Tab.Button>
+          </Tab>
+        </Tab.List>
+        <Tab.Panels class="mt-5">
+          <Tab.Panel class="leading-relaxed">
+            <div
+              style="
+                text-align: left;
+                overflow-y: scroll;
+                overflow-x: hidden;
+                height: 500px;
+              "
+            >
+              <div class="mt-3">
+                <FormLabel htmlFor="vertical-form-1">설비</FormLabel>
+                <!-- <label class="text-danger"><sup>*</sup></label> -->
+                <FormInput
+                  id="vertical-form-1"
+                  type="text"
+                  v-model="editModalData.설비명"
+                  placeholder=""
+                  readonly
+                />
+              </div>
+              <div class="mt-3">
+                <FormLabel htmlFor="vertical-form-1">구분</FormLabel>
+                <!-- <label class="text-danger"><sup>*</sup></label> -->
+                <FormInput
+                  id="vertical-form-1"
+                  type="text"
+                  v-model="editModalData.구분"
+                  placeholder=""
+                  readonly
+                />
+              </div>
+              <!-- <div v-if="set_구분 == ''" class="text-danger text-xs mt-1">
+                구분이 선택되지 않았습니다.
+              </div> -->
+              <div class="mt-3">
+                <FormLabel htmlFor="vertical-form-4">내용</FormLabel>
+                <FormInput
+                  id="vertical-form-4"
+                  type="text"
+                  v-model="editModalData.내용"
+                  placeholder=""
+                  readonly
+                />
+              </div>
+              <div class="mt-3">
+                <FormLabel htmlFor="vertical-form-4">검사방법</FormLabel>
+                <FormInput
+                  id="vertical-form-4"
+                  type="text"
+                  v-model="editModalData.검사방법"
+                  placeholder=""
+                  readonly
+                />
+              </div>
+              <div class="mt-3">
+                <FormLabel htmlFor="vertical-form-6">기준</FormLabel>
+                <FormInput
+                  id="vertical-form-6"
+                  type="text"
+                  v-model="editModalData.기준"
+                  placeholder=""
+                  readonly
+                />
+              </div>
+              <div class="mt-3">
+                <FormLabel htmlFor="vertical-form-7">단위</FormLabel>
+                <FormInput
+                  id="vertical-form-7"
+                  type="text"
+                  v-model="editModalData.단위"
+                  placeholder=""
+                  readonly
+                />
+              </div>
+              <div class="mt-3">
+                <FormLabel htmlFor="vertical-form-8">최소</FormLabel>
+                <FormInput
+                  id="vertical-form-8"
+                  type="number"
+                  v-model="editModalData.최소"
+                  placeholder=""
+                  readonly
+                />
+              </div>
+              <div class="mt-3">
+                <FormLabel htmlFor="vertical-form-9">최대</FormLabel>
+                <FormInput
+                  id="vertical-form-9"
+                  type="number"
+                  v-model="editModalData.최대"
+                  placeholder=""
+                  readonly
+                />
+              </div>
+              <div class="mt-3">
+                <FormLabel htmlFor="vertical-form-10">결과내용</FormLabel>
+                <FormInput
+                  id="vertical-form-10"
+                  type="text"
+                  v-model="editModalData.결과내용"
+                  placeholder=""
+                />
+              </div>
+              <div v-if="editModalData.검사방법 == '육안검사'" class="mt-3">
+                <FormLabel htmlFor="vertical-form-11">결과</FormLabel>
+                <FormSelect v-model="editModalData.결과" class="">
+                  <option selected>양호</option>
+                  <option>점검필요</option>
+                  <option>불량</option>
+                </FormSelect>
+              </div>
+              <div v-if="editModalData.검사방법 == '치수검사'" class="mt-3">
+                <FormLabel htmlFor="vertical-form-11">결과</FormLabel>
+                <FormSelect v-model="editModalData.결과" class="">
+                  <option selected>적합</option>
+                  <option>부적합</option>
+                </FormSelect>
+              </div>
+            </div>
+          </Tab.Panel>
+          <Tab.Panel class="leading-relaxed">
+            <div style="text-align: left">
+              <div class="mt-3">
+                <FormLabel htmlFor="vertical-form-11">비고</FormLabel>
+                <FormInput
+                  id="vertical-form-11"
+                  type="text"
+                  v-model="editModalData.비고"
+                  placeholder=""
+                />
+              </div>
+            </div>
+          </Tab.Panel>
+        </Tab.Panels>
+      </Tab.Group>
+      <div style="text-align: left">
+        <div class="mt-5 text-right">
+          <Button
+            class="mr-2 shadow-md"
+            variant="primary"
+            @click="
+              () => {
+                preventResultInsertFunction();
+                setPreventResultInsertModal(false);
+              }
+            "
+            >확인</Button
+          >
+          <Button
+            class="mr-2 shadow-md"
+            variant="outline-primary"
+            @click="
+              () => {
+                setPreventResultInsertModal(false);
+              }
+            "
+            >취소</Button
+          >
+        </div>
+      </div>
+    </Dialog.Panel>
+  </Dialog>
+  <!-- END: preventResultInsert Modal Content -->
 </template>
