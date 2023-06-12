@@ -141,6 +141,7 @@ import SettingMobileAlertPreventDailyNotify from "../pages/setting/mobile-alert/
 import SettingMobileAlertPreventRepairForecast from "../pages/setting/mobile-alert/PreventRepairForecast.vue";
 import SettingMobileAlertPreventRepairNotify from "../pages/setting/mobile-alert/PreventRepairNotify.vue";
 import SettingMobileAlertPreventChangeNotify from "../pages/setting/mobile-alert/PreventChangeNotify.vue";
+import SettingMobileAlertStockSafeNotify from "../pages/setting/mobile-alert/StockSafeNotify.vue";
 
 /* 모바일 */
 import MobileMain from "../pages/mobile/Main.vue";
@@ -1086,6 +1087,15 @@ const routes = [
           category: "설정",
         },
         component: SettingMobileAlertPreventChangeNotify,
+      },
+      {
+        path: "setting/mobile-alert/stock-safe-notify",
+        name: "top-menu-aseeing-mobile-alert-stock-safe-notify",
+        meta: {
+          pagename: "모바일 알림설정",
+          category: "설정",
+        },
+        component: SettingMobileAlertStockSafeNotify,
       },
     ],
   },
