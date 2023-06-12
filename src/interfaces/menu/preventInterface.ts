@@ -26,6 +26,7 @@ export interface PreventPrevent {
 export interface PreventDaily {
   [attribute: string]: any | undefined;
   NO?: number;
+  일상점검계획NO?: number;
   설비NO?: number;
   설비명?: string;
   구분?: string;
@@ -42,6 +43,17 @@ export interface PreventDaily {
   비고?: string;
   등록자?: string;
   등록일시?: string;
+}
+
+// 예방보전 - 일상점검 확인리스트
+export interface PreventDailyCheck {
+  [attribute: string]: any | undefined;
+  NO?: number;
+  설비NO?: number;
+  설비명?: string;
+  점검수?: string;
+  점검확인수?: string;
+  점검현황?: string;
 }
 
 // 예방보전 - 설비수리 관리

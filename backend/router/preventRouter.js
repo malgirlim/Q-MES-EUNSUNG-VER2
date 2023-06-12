@@ -4,8 +4,13 @@ const router = express.Router();
 const preventModalRouter = require("./prevent/preventModal");
 
 const preventPreventPlanRouter = require("./prevent/preventPreventPlan");
+
 const preventDailyPlanRouter = require("./prevent/preventDailyPlan");
+const preventDailyCheckRouter = require("./prevent/preventDailyCheck");
+const preventDailyResultRouter = require("./prevent/preventDailyResult");
+
 const preventRepairPlanRouter = require("./prevent/preventRepairPlan");
+
 const preventLifePlanRouter = require("./prevent/preventLifePlan");
 
 router.use((req, res, next) => {
@@ -21,6 +26,10 @@ router.use("/preventplan", preventPreventPlanRouter);
 
 // 예방보전 / 일상점검계획 - router/prevent/preventDailyPlan.js
 router.use("/dailyplan", preventDailyPlanRouter);
+// 예방보전 / 일상점검확인 - router/prevent/preventDailyCheck.js
+router.use("/dailycheck", preventDailyCheckRouter);
+// 예방보전 / 일상점검관리 - router/prevent/preventDailyResult.js
+router.use("/dailyresult", preventDailyResultRouter);
 
 // 예방보전 / 설비수리계획 - router/prevent/preventRepairPlan.js
 router.use("/repairplan", preventRepairPlanRouter);
