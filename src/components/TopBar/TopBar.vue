@@ -383,9 +383,9 @@ const setDebugMode = () => {
             <Lucide icon="Lock" class="w-4 h-4 mr-2" /> 비밀번호 변경
           </Menu.Item>
 
-          <Menu.Item class="hover:bg-white/5">
+          <!-- <Menu.Item class="hover:bg-white/5">
             <Lucide icon="HelpCircle" class="w-4 h-4 mr-2" /> 도움말
-          </Menu.Item>
+          </Menu.Item> -->
           <Menu.Item
             class="hover:bg-white/5"
             @click="router.push('/admin/log')"
