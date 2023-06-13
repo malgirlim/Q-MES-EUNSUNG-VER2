@@ -46,7 +46,7 @@ const table_setting = {
   체크박스: { name: "체크박스", style: "width: 50px" },
   순번: { name: "순번", style: "width: 50px; text-align: center;" },
   항목1: { name: "사업자번호", style: "width: 50px; text-align: center;" },
-  항목2: { name: "거래처명", style: "width: 200px; text-align: center;" },
+  항목2: { name: "거래처명", style: "width: 50px; text-align: center;" },
   항목3: { name: "담당자", style: "width: 50px; text-align: center;" },
   항목4: { name: "전화번호", style: "width: 50px; text-align: center;" },
   항목5: { name: "휴대폰번호", style: "width: 50px; text-align: center;" },

@@ -24,6 +24,10 @@ import {
 import { OrderFacilityPart } from "../../../interfaces/menu/orderInterface";
 import PaginationComponent from "../../../components/Pagination/PaginationComponent.vue"; // 페이징설정
 
+const props = defineProps<{
+  data?: any;
+}>();
+
 // 페이지 로딩 시 시작
 onMounted(() => {
   order_facilityPart.loadDatas(); // 품목 데이터 불러오기
@@ -342,7 +346,7 @@ const search_item = () => {
               ><strong>사업자등록번호</strong>
             </Table.Td>
             <Table.Td class="px-1 py-1 text-center" colspan="3">
-              <div class="p-1">126-81-10319</div>
+              <div class="p-1">{{ props.data?.사업자등록번호 }}</div>
             </Table.Td>
           </Table.Tr>
           <Table.Tr class="intro-y">
@@ -352,7 +356,7 @@ const search_item = () => {
               ><strong>상호</strong>
             </Table.Td>
             <Table.Td style="width: 250px" class="px-1 py-1 text-center">
-              <div class="p-1">(주)은성프린터스</div>
+              <div class="p-1">{{ props.data?.상호 }}</div>
             </Table.Td>
             <Table.Td
               class="px-1 py-1 text-center bg-gray-300"
@@ -360,7 +364,7 @@ const search_item = () => {
               ><strong>대표자</strong>
             </Table.Td>
             <Table.Td style="width: 250px" class="px-1 py-1 text-center">
-              <div class="p-1">차준은</div>
+              <div class="p-1">{{ props.data?.대표자 }}</div>
             </Table.Td>
           </Table.Tr>
           <Table.Tr class="intro-y">
@@ -371,7 +375,7 @@ const search_item = () => {
             </Table.Td>
             <Table.Td class="px-1 py-1 text-center" colspan="3">
               <div class="p-1">
-                경기도 이천시 이섭대천로1032번길 78 (율현동 91-1)
+                {{ props.data?.주소 }}
               </div>
             </Table.Td>
           </Table.Tr>
@@ -382,7 +386,7 @@ const search_item = () => {
               ><strong>업태</strong>
             </Table.Td>
             <Table.Td class="px-1 py-1 text-center">
-              <div class="p-1">제조</div>
+              <div class="p-1">{{ props.data?.업태 }}</div>
             </Table.Td>
             <Table.Td
               class="px-1 py-1 text-center bg-gray-300"
@@ -390,7 +394,7 @@ const search_item = () => {
               ><strong>종목</strong>
             </Table.Td>
             <Table.Td class="px-1 py-1 text-center">
-              <div class="p-1">옵셋인쇄</div>
+              <div class="p-1">{{ props.data?.종목 }}</div>
             </Table.Td>
           </Table.Tr>
         </Table.Tbody>

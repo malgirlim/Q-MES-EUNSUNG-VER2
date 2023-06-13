@@ -1382,7 +1382,7 @@ const importNonwork = (no: any) => {
                       {{ table_setting.항목11.name }}
                     </Table.Th>
                     <Table.Th
-                      class="text-center border-b-0 whitespace-nowrap font-bold"
+                      class="px-0 text-center border-b-0 whitespace-nowrap font-bold"
                       :style="table_setting.항목12.style"
                     >
                       {{ table_setting.항목12.name }}
@@ -1420,14 +1420,15 @@ const importNonwork = (no: any) => {
                       class="first:rounded-l-md last:rounded-r-md text-center bg-white border-b-0 dark:bg-darkmode-600 shadow-[20px_3px_20px_#0000000b]"
                       :style="table_setting.항목1.style"
                     >
-                      <div>
+                      <!-- <div>
                         <label
                           class="text-blue-500"
                           style="cursor: pointer"
                           @click="setPrintDocumentModal(true)"
                           >{{ todo[table_setting.항목1.name] }}
                         </label>
-                      </div>
+                      </div> -->
+                      {{ todo[table_setting.항목1.name] }}
                     </Table.Td>
                     <Table.Td
                       class="first:rounded-l-md last:rounded-r-md text-center bg-white border-b-0 dark:bg-darkmode-600 shadow-[20px_3px_20px_#0000000b]"
@@ -1491,7 +1492,7 @@ const importNonwork = (no: any) => {
                     </Table.Td>
                     <Table.Td
                       :class="[
-                        'first:rounded-l-md last:rounded-r-md text-center bg-white border-b-0 dark:bg-darkmode-600 shadow-[20px_3px_20px_#0000000b]',
+                        'px-0 first:rounded-l-md last:rounded-r-md text-center bg-white border-b-0 dark:bg-darkmode-600 shadow-[20px_3px_20px_#0000000b]',
                         { 'text-gray-500': todo.진행상황 == '작업보류' },
                         { 'text-danger': todo.진행상황 == '작업반려' },
                         { 'text-black': todo.진행상황 == '작업미확인' },
@@ -1502,28 +1503,30 @@ const importNonwork = (no: any) => {
                       :style="table_setting.항목12.style"
                     >
                       <div class="flex items-center">
-                        <div>
-                          <Lucide
-                            class="w-5 h-5 mr-1"
-                            :icon="
-                              todo.진행상황 == '작업보류'
-                                ? 'MinusCircle'
-                                : todo.진행상황 == '작업반려'
-                                ? 'XCircle'
-                                : todo.진행상황 == '작업미확인'
-                                ? 'HelpCircle'
-                                : todo.진행상황 == '작업대기'
-                                ? 'PauseCircle'
-                                : todo.진행상황 == '작업중'
-                                ? 'PlayCircle'
-                                : todo.진행상황 == '작업완료'
-                                ? 'CheckCircle'
-                                : 'AlertCircle'
-                            "
-                          />
-                        </div>
-                        <div>
-                          {{ todo[table_setting.항목12.name] }}
+                        <div class="flex m-auto">
+                          <div>
+                            <Lucide
+                              class="w-5 h-5 mr-1"
+                              :icon="
+                                todo.진행상황 == '작업보류'
+                                  ? 'MinusCircle'
+                                  : todo.진행상황 == '작업반려'
+                                  ? 'XCircle'
+                                  : todo.진행상황 == '작업미확인'
+                                  ? 'HelpCircle'
+                                  : todo.진행상황 == '작업대기'
+                                  ? 'PauseCircle'
+                                  : todo.진행상황 == '작업중'
+                                  ? 'PlayCircle'
+                                  : todo.진행상황 == '작업완료'
+                                  ? 'CheckCircle'
+                                  : 'AlertCircle'
+                              "
+                            />
+                          </div>
+                          <div>
+                            {{ todo[table_setting.항목12.name] }}
+                          </div>
                         </div>
                       </div>
                     </Table.Td>

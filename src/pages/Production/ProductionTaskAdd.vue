@@ -1011,14 +1011,15 @@ const search_itemReceive = () => {
                       ]"
                       :style="table_setting.항목1.style"
                     >
-                      <div>
+                      <!-- <div>
                         <label
                           class="text-blue-500"
                           style="cursor: pointer"
                           @click="setPrintDocumentModal(true)"
                           >{{ todo[table_setting.항목1.name] }}
                         </label>
-                      </div>
+                      </div> -->
+                      {{ todo[table_setting.항목1.name] }}
                     </Table.Td>
                     <Table.Td
                       :class="[
@@ -1242,13 +1243,13 @@ const search_itemReceive = () => {
                       </Table.Th>
 
                       <Table.Th
-                        class="text-center border-b-0 whitespace-nowrap font-bold"
+                        class="px-1 text-center border-b-0 whitespace-nowrap font-bold"
                         :style="table_setting_process.항목7.style"
                       >
                         {{ table_setting_process.항목7.name }}
                       </Table.Th>
                       <Table.Th
-                        class="text-center border-b-0 whitespace-nowrap font-bold"
+                        class="px-1 text-center border-b-0 whitespace-nowrap font-bold"
                         :style="table_setting_process.편집.style"
                       >
                         {{ table_setting_process.편집.name }}
@@ -1346,7 +1347,7 @@ const search_itemReceive = () => {
                       </Table.Td>
                       <Table.Td
                         :class="[
-                          'first:rounded-l-md last:rounded-r-md text-center bg-white border-b-0 dark:bg-darkmode-600 shadow-[20px_3px_20px_#0000000b]',
+                          'px-1 first:rounded-l-md last:rounded-r-md text-center bg-white border-b-0 dark:bg-darkmode-600 shadow-[20px_3px_20px_#0000000b]',
                           { 'bg-warning': radioSelect_Process == todo.NO },
                           { 'text-gray-500': todo.진행상황 == '작업보류' },
                           { 'text-danger': todo.진행상황 == '작업반려' },
@@ -1386,7 +1387,7 @@ const search_itemReceive = () => {
 
                       <Table.Td
                         :class="[
-                          'first:rounded-l-md last:rounded-r-md text-center bg-white border-b-0 dark:bg-darkmode-600 shadow-[20px_3px_20px_#0000000b]',
+                          'px-1 first:rounded-l-md last:rounded-r-md text-center bg-white border-b-0 dark:bg-darkmode-600 shadow-[20px_3px_20px_#0000000b]',
                           { 'bg-warning': radioSelect_Process == todo.NO },
                         ]"
                         :style="table_setting_process.편집.style"

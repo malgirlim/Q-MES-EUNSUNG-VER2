@@ -688,14 +688,15 @@ const noti = (data: string) => {
                   class="first:rounded-l-md last:rounded-r-md text-center bg-white border-b-0 dark:bg-darkmode-600 shadow-[20px_3px_20px_#0000000b]"
                   :style="table_setting.항목2.style"
                 >
-                  <div>
+                  <!-- <div>
                     <label
                       class="text-blue-500"
                       style="cursor: pointer"
                       @click="setOrderModal(true)"
                       >{{ todo[table_setting.항목2.name] }}
                     </label>
-                  </div>
+                  </div> -->
+                  {{ todo[table_setting.항목2.name] }}
                 </Table.Td>
                 <Table.Td
                   class="first:rounded-l-md last:rounded-r-md text-center bg-white border-b-0 dark:bg-darkmode-600 shadow-[20px_3px_20px_#0000000b]"

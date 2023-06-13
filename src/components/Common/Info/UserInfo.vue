@@ -1,9 +1,20 @@
 <script setup lang="ts">
+import { ref } from "vue";
 import Lucide from "../../../base-components/Lucide";
 import Table from "../../../base-components/Table";
+
+// API 보내는 함수 및 인터페이스 불러오기
+import { useSendApi } from "../../../composables/useSendApi";
+import { MasterUser } from "../../../interfaces/menu/MasterInterface";
+
 const props = defineProps<{
   data?: any;
 }>();
+
+// dataManager 만들기
+const url = "/api/master/user/info";
+const dataManager = useSendApi<MasterUser>(url, ref(1), ref(10));
+dataManager.searchDatas("", "", props.data?.id, "", "");
 </script>
 <template>
   <div class="flex items-center mt-3">
@@ -15,8 +26,13 @@ const props = defineProps<{
       />
     </div>
     <div class="ml-4 mr-auto">
-      <div class="text-base font-medium text-left">{{ data.name }}</div>
-      <div class="text-slate-500">{{ data.part }} {{ data.rank }}</div>
+      <div class="text-base font-medium text-left">
+        {{ dataManager.dataSearchAll.value[0]?.아이디 }}
+      </div>
+      <div class="text-slate-500">
+        {{ dataManager.dataSearchAll.value[0]?.부서명 }}
+        {{ dataManager.dataSearchAll.value[0]?.직급 }}
+      </div>
     </div>
   </div>
 
@@ -28,16 +44,22 @@ const props = defineProps<{
           아이디</Table.Td
         >
         <Table.Td
-          class="border-0 py-2"
+          class="border-0 py-2 text-left"
           style="border-left-width: 2px"
-          v-if="props.data?.id == null || props.data?.id == ''"
+          v-if="
+            dataManager.dataSearchAll.value[0]?.아이디 == null ||
+            dataManager.dataSearchAll.value[0]?.아이디 == ''
+          "
           >-</Table.Td
         >
         <Table.Td
-          class="border-0 py-2"
+          class="border-0 py-2 text-left"
           style="border-left-width: 2px"
-          v-if="props.data?.id != null && props.data?.id != ''"
-          >{{ props.data?.id }}</Table.Td
+          v-if="
+            dataManager.dataSearchAll.value[0]?.아이디 != null &&
+            dataManager.dataSearchAll.value[0]?.아이디 != ''
+          "
+          >{{ dataManager.dataSearchAll.value[0]?.아이디 }}</Table.Td
         >
       </Table.Tr>
       <Table.Tr>
@@ -46,16 +68,22 @@ const props = defineProps<{
           이름</Table.Td
         >
         <Table.Td
-          class="border-0 py-2"
+          class="border-0 py-2 text-left"
           style="border-left-width: 2px"
-          v-if="props.data?.name == null || props.data?.name == ''"
+          v-if="
+            dataManager.dataSearchAll.value[0]?.이름 == null ||
+            dataManager.dataSearchAll.value[0]?.이름 == ''
+          "
           >-</Table.Td
         >
         <Table.Td
-          class="border-0 py-2"
+          class="border-0 py-2 text-left"
           style="border-left-width: 2px"
-          v-if="props.data?.name != null && props.data?.name != ''"
-          >{{ props.data?.name }}</Table.Td
+          v-if="
+            dataManager.dataSearchAll.value[0]?.이름 != null &&
+            dataManager.dataSearchAll.value[0]?.이름 != ''
+          "
+          >{{ dataManager.dataSearchAll.value[0]?.이름 }}</Table.Td
         >
       </Table.Tr>
       <Table.Tr>
@@ -64,16 +92,22 @@ const props = defineProps<{
           연락처</Table.Td
         >
         <Table.Td
-          class="border-0 py-2"
+          class="border-0 py-2 text-left"
           style="border-left-width: 2px"
-          v-if="props.data?.항목03 == null || props.data?.항목03 == ''"
+          v-if="
+            dataManager.dataSearchAll.value[0]?.연락처 == null ||
+            dataManager.dataSearchAll.value[0]?.연락처 == ''
+          "
           >-</Table.Td
         >
         <Table.Td
-          class="border-0 py-2"
+          class="border-0 py-2 text-left"
           style="border-left-width: 2px"
-          v-if="props.data?.항목03 != null && props.data?.항목03 != ''"
-          >{{ props.data?.항목03 }}</Table.Td
+          v-if="
+            dataManager.dataSearchAll.value[0]?.연락처 != null &&
+            dataManager.dataSearchAll.value[0]?.연락처 != ''
+          "
+          >{{ dataManager.dataSearchAll.value[0]?.연락처 }}</Table.Td
         >
       </Table.Tr>
       <Table.Tr>
@@ -82,16 +116,22 @@ const props = defineProps<{
           이메일</Table.Td
         >
         <Table.Td
-          class="border-0 py-2"
+          class="border-0 py-2 text-left"
           style="border-left-width: 2px"
-          v-if="props.data?.항목04 == null || props.data?.항목04 == ''"
+          v-if="
+            dataManager.dataSearchAll.value[0]?.이메일 == null ||
+            dataManager.dataSearchAll.value[0]?.이메일 == ''
+          "
           >-</Table.Td
         >
         <Table.Td
-          class="border-0 py-2"
+          class="border-0 py-2 text-left"
           style="border-left-width: 2px"
-          v-if="props.data?.항목04 != null && props.data?.항목04 != ''"
-          >{{ props.data?.항목04 }}</Table.Td
+          v-if="
+            dataManager.dataSearchAll.value[0]?.이메일 != null &&
+            dataManager.dataSearchAll.value[0]?.이메일 != ''
+          "
+          >{{ dataManager.dataSearchAll.value[0]?.이메일 }}</Table.Td
         >
       </Table.Tr>
       <Table.Tr>
@@ -100,16 +140,22 @@ const props = defineProps<{
           부서명</Table.Td
         >
         <Table.Td
-          class="border-0 py-2"
+          class="border-0 py-2 text-left"
           style="border-left-width: 2px"
-          v-if="props.data?.항목05 == null || props.data?.항목05 == ''"
+          v-if="
+            dataManager.dataSearchAll.value[0]?.부서명 == null ||
+            dataManager.dataSearchAll.value[0]?.부서명 == ''
+          "
           >-</Table.Td
         >
         <Table.Td
-          class="border-0 py-2"
+          class="border-0 py-2 text-left"
           style="border-left-width: 2px"
-          v-if="props.data?.항목05 != null && props.data?.항목05 != ''"
-          >{{ props.data?.항목05 }}</Table.Td
+          v-if="
+            dataManager.dataSearchAll.value[0]?.부서명 != null &&
+            dataManager.dataSearchAll.value[0]?.부서명 != ''
+          "
+          >{{ dataManager.dataSearchAll.value[0]?.부서명 }}</Table.Td
         >
       </Table.Tr>
       <Table.Tr>
@@ -118,16 +164,22 @@ const props = defineProps<{
           직책</Table.Td
         >
         <Table.Td
-          class="border-0 py-2"
+          class="border-0 py-2 text-left"
           style="border-left-width: 2px"
-          v-if="props.data?.항목06 == null || props.data?.항목06 == ''"
+          v-if="
+            dataManager.dataSearchAll.value[0]?.직책 == null ||
+            dataManager.dataSearchAll.value[0]?.직책 == ''
+          "
           >-</Table.Td
         >
         <Table.Td
-          class="border-0 py-2"
+          class="border-0 py-2 text-left"
           style="border-left-width: 2px"
-          v-if="props.data?.항목06 != null && props.data?.항목06 != ''"
-          >{{ props.data?.항목06 }}</Table.Td
+          v-if="
+            dataManager.dataSearchAll.value[0]?.직책 != null &&
+            dataManager.dataSearchAll.value[0]?.직책 != ''
+          "
+          >{{ dataManager.dataSearchAll.value[0]?.직책 }}</Table.Td
         >
       </Table.Tr>
       <Table.Tr>
@@ -136,16 +188,22 @@ const props = defineProps<{
           직급</Table.Td
         >
         <Table.Td
-          class="border-0 py-2"
+          class="border-0 py-2 text-left"
           style="border-left-width: 2px"
-          v-if="props.data?.항목07 == null || props.data?.항목07 == ''"
+          v-if="
+            dataManager.dataSearchAll.value[0]?.직급 == null ||
+            dataManager.dataSearchAll.value[0]?.직급 == ''
+          "
           >-</Table.Td
         >
         <Table.Td
-          class="border-0 py-2"
+          class="border-0 py-2 text-left"
           style="border-left-width: 2px"
-          v-if="props.data?.항목07 != null && props.data?.항목07 != ''"
-          >{{ props.data?.항목07 }}</Table.Td
+          v-if="
+            dataManager.dataSearchAll.value[0]?.직급 != null &&
+            dataManager.dataSearchAll.value[0]?.직급 != ''
+          "
+          >{{ dataManager.dataSearchAll.value[0]?.직급 }}</Table.Td
         >
       </Table.Tr>
     </Table.Tbody>

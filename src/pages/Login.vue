@@ -146,12 +146,12 @@ axios.get("/api/auth").then((res: any) => {
                 로그인
               </Button>
             </div>
-            <div
+            <!-- <div
               class="mt-10 text-center intro-x xl:mt-24 text-slate-600 dark:text-slate-500 xl:text-left"
             >
               사용자 등록 및 계정 분실 관련 문의<br />
               담당자 : 홍길동 대리 (010-1234-1234)
-            </div>
+            </div> -->
           </div>
         </div>
         <!-- END: Login Form -->

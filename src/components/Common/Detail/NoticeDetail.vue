@@ -23,45 +23,45 @@ const props = defineProps<{
               />
               등록일시</Table.Td
             >
-            <Table.Td class="border-0 py-2" style="border-left-width: 2px"
-              >2023-04-03 00:00</Table.Td
-            >
+            <Table.Td class="border-0 py-2" style="border-left-width: 2px">{{
+              props.data?.등록일시
+            }}</Table.Td>
           </Table.Tr>
           <Table.Tr>
             <Table.Td class="flex border-0 py-2" style="width: 170px"
               ><Lucide icon="Megaphone" class="w-4 h-4 mr-2 text-slate-500" />
-              수신</Table.Td
+              구분</Table.Td
             >
-            <Table.Td class="border-0 py-2" style="border-left-width: 2px"
-              >전체</Table.Td
-            >
+            <Table.Td class="border-0 py-2" style="border-left-width: 2px">{{
+              props.data?.구분
+            }}</Table.Td>
           </Table.Tr>
           <Table.Tr>
             <Table.Td class="flex border-0 py-2"
               ><Lucide icon="Tag" class="w-4 h-4 mr-2 text-slate-500" />
               제목</Table.Td
             >
-            <Table.Td class="border-0 py-2" style="border-left-width: 2px"
-              >전체 공지사항 1</Table.Td
-            >
+            <Table.Td class="border-0 py-2" style="border-left-width: 2px">{{
+              props.data?.제목
+            }}</Table.Td>
           </Table.Tr>
           <Table.Tr>
             <Table.Td class="flex border-0 py-2"
               ><Lucide icon="FileText" class="w-4 h-4 mr-2 text-slate-500" />
               내용</Table.Td
             >
-            <Table.Td class="border-0 py-2" style="border-left-width: 2px"
-              >공지사항 내용입니다.</Table.Td
-            >
+            <Table.Td class="border-0 py-2" style="border-left-width: 2px">{{
+              props.data?.내용
+            }}</Table.Td>
           </Table.Tr>
           <Table.Tr>
             <Table.Td class="flex border-0 py-2"
               ><Lucide icon="UserPlus" class="w-4 h-4 mr-2 text-slate-500" />
-              작성자</Table.Td
+              등록자</Table.Td
             >
-            <Table.Td class="border-0 py-2" style="border-left-width: 2px"
-              >관리자</Table.Td
-            >
+            <Table.Td class="border-0 py-2" style="border-left-width: 2px">{{
+              props.data?.등록자
+            }}</Table.Td>
           </Table.Tr>
         </Table.Tbody>
       </div>

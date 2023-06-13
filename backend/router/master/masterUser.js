@@ -200,7 +200,6 @@ router.post("/info", async (req, res) => {
         WHERE (1=1)
         AND 아이디 = @input
       `;
-
     const Pool = await pool;
     const result = await Pool.request()
       .input("input", req.body.searchInput)
