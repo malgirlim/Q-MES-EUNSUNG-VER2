@@ -157,13 +157,13 @@ const imgpath = "../src/assets/temp/test1.png";
               v-if="props.data?.사진 == null || props.data?.사진 == ''"
               >-</Table.Td
             >
-            <!-- <Table.Td
+            <Table.Td
               class="border-0 py-2"
               style="border-left-width: 2px"
               v-if="props.data?.사진 != null && props.data?.사진 != ''"
               >{{ props.data?.사진 }}</Table.Td
-            > -->
-            <Table.Td
+            >
+            <!-- <Table.Td
               class="border-0 py-2"
               style="border-left-width: 2px"
               v-if="props.data?.사진 != null && props.data?.사진 != ''"
@@ -174,7 +174,7 @@ const imgpath = "../src/assets/temp/test1.png";
                 :hideCloseButton="true"
                 :hasSpacer="true"
               />
-            </Table.Td>
+            </Table.Td> -->
           </Table.Tr>
           <Table.Tr>
             <Table.Td class="flex border-0 py-2"

@@ -61,7 +61,7 @@ const table_setting = {
   항목1: { name: "라인", style: "width: 50px; text-align: center;" },
   항목2: { name: "설비명", style: "width: 200px; text-align: center;" },
   항목3: { name: "규격", style: "width: 50px; text-align: center;" },
-  항목4: { name: "항목4", style: "width: 50px; text-align: center;" },
+  항목4: { name: "사진", style: "width: 50px; text-align: center;" },
   항목5: { name: "항목5", style: "width: 50px; text-align: center;" },
   항목6: { name: "항목6", style: "width: 50px; text-align: center;" },
   항목7: { name: "항목7", style: "width: 50px; text-align: center;" },
@@ -224,6 +224,12 @@ const deleteDataFunction = async () => {
 const detailModal = ref(false);
 const setDetailModal = (value: boolean) => {
   detailModal.value = value;
+};
+
+// ##### 사진열기 Modal #####
+const photoModal = ref(false);
+const setPhotoModal = (value: boolean) => {
+  photoModal.value = value;
 };
 
 // ########################## 체크박스 설정 ##########################
@@ -636,6 +642,12 @@ const handleFileUpload = (event: any) => {
                 </Table.Th>
                 <Table.Th
                   class="text-center border-b-0 whitespace-nowrap font-bold"
+                  :style="table_setting.항목4.style"
+                >
+                  {{ table_setting.항목4.name }}
+                </Table.Th>
+                <Table.Th
+                  class="text-center border-b-0 whitespace-nowrap font-bold"
                   :style="table_setting.상세보기.style"
                 >
                   {{ table_setting.상세보기.name }}
@@ -690,6 +702,21 @@ const handleFileUpload = (event: any) => {
                   :style="table_setting.항목3.style"
                 >
                   <div>{{ todo[table_setting.항목3.name] }}</div>
+                </Table.Td>
+                <Table.Td
+                  class="first:rounded-l-md last:rounded-r-md text-center bg-white border-b-0 dark:bg-darkmode-600 shadow-[20px_3px_20px_#0000000b]"
+                  :style="table_setting.항목4.style"
+                >
+                  <div
+                    class="flex"
+                    v-if="todo[table_setting.항목4.name] != ''"
+                    @click="setPhotoModal(true)"
+                  >
+                    <div class="flex m-auto text-success cursor-pointer">
+                      <div><Lucide class="w-5 h-5 mr-1" icon="Image" /></div>
+                      <div>등록됨</div>
+                    </div>
+                  </div>
                 </Table.Td>
                 <Table.Td
                   class="first:rounded-l-md last:rounded-r-md text-center bg-white border-b-0 dark:bg-darkmode-600 shadow-[20px_3px_20px_#0000000b] py-0 relative before:block before:w-px before:h-8 before:bg-slate-200 before:absolute before:left-0 before:inset-y-0 before:my-auto before:dark:bg-darkmode-400"
@@ -1305,4 +1332,54 @@ const handleFileUpload = (event: any) => {
     </Dialog.Panel>
   </Dialog>
   <!-- END: 프린트 출력 Modal -->
+  <!-- BEGIN: 사진열기 Modal Content -->
+  <Dialog
+    size="xl"
+    :open="photoModal"
+    @close="
+      () => {
+        setPhotoModal(false);
+      }
+    "
+  >
+    <Dialog.Panel>
+      <div class="p-5 text-center">
+        <div class="text-2xl font-bold">사진 상세보기</div>
+        <div class="mt-5 mb-5">
+          <img
+            class="mx-auto"
+            src="../../../backend/uploads/hwp_logo1686549034501.png"
+          />
+        </div>
+        <a
+          href="../../../backend/uploads/hwp_logo1686549034501.png"
+          download
+          style="outline: none"
+        >
+          <Button
+            variant="outline-primary"
+            as="a"
+            type="button"
+            class="w-24 mr-5"
+          >
+            다운로드
+          </Button>
+        </a>
+        <Button
+          variant="outline-primary"
+          as="a"
+          type="button"
+          @click="
+            () => {
+              setPhotoModal(false);
+            }
+          "
+          class="w-24 mr-1"
+        >
+          닫기
+        </Button>
+      </div>
+    </Dialog.Panel>
+  </Dialog>
+  <!-- END: 사진열기 Modal Content -->
 </template>
