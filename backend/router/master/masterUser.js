@@ -180,6 +180,44 @@ router.post("/", async (req, res) => {
   }
 });
 
+router.post("/info", async (req, res) => {
+  try {
+    var sql = "";
+    sql = `
+        SELECT
+          아이디 AS 아이디, 비밀번호 AS 비밀번호, 이름 AS 이름, 연락처 AS 연락처, 이메일 AS 이메일,
+          부서명 AS 부서명, 직책 AS 직책, 직급 AS 직급, 권한 AS 권한, 등록자 AS 등록자, 등록일시 AS 등록일시
+        FROM(
+        SELECT
+          [USER_ID] AS 아이디,
+          [USER_PW] AS 비밀번호,
+          [USER_NAME] AS 이름,
+          [USER_PHONE] AS 연락처,
+          [USER_EMAIL] AS 이메일,
+          [USER_DEPART] AS 부서명,
+          [USER_POSITION] AS 직책,
+          [USER_RANK] AS 직급,
+          [USER_AUTH] AS 권한,
+          [USER_REGIST_NM] AS 등록자,
+          [USER_REGIST_DT] AS 등록일시
+        FROM [QMES2022].[dbo].[MASTER_USER_TB]
+        ) AS RESULT
+        WHERE (1=1)
+        AND 아이디 = @input
+      `;
+
+    const Pool = await pool;
+    const result = await Pool.request()
+      .input("input", req.body.searchInput)
+      .query(sql);
+
+    res.send(JSON.stringify(result.recordset));
+  } catch (err) {
+    res.status(500);
+    res.send(err.message);
+  }
+});
+
 // 등록
 router.post("/insert", async (req, res) => {
   try {
