@@ -21,7 +21,6 @@ const preventRouter = require("./router/preventRouter");
 const kioskRouter = require("./router/kioskRouter");
 
 const uploadRouter = require("./router/uploadRouter");
-const smsRouter = require("./router/smsRouter");
 const kakaoRouter = require("./router/kakaoRouter");
 
 app.use(
@@ -71,9 +70,6 @@ app.use("/api/kiosk", kioskRouter);
 
 // 파일 업로드 - uploadRouter.js
 app.use("/api/upload", uploadRouter);
-
-// SMS 전송 - smsRouter.js
-app.use("/api/sms", smsRouter);
 
 // 카카오알림톡 전송 - kakaoRouter.js
 app.use("/api/kakao", kakaoRouter);

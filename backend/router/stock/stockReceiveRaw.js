@@ -259,69 +259,69 @@ router.post("/", async (req, res) => {
 });
 
 // 등록
-// router.post("/insert", async (req, res) => {
-//   try {
-//     const Pool = await pool;
-//     await Pool.request()
-//       .input("수주NO", req.body.data.수주NO ?? null)
-//       .input("발주코드", req.body.data.발주코드 ?? "")
-//       .input("발주구분", req.body.data.발주구분 ?? "")
-//       .input("발주일자", req.body.data.발주일자 ?? "")
-//       .input("거래처NO", req.body.data.거래처NO ?? null)
-//       .input("품목NO", req.body.data.품목NO ?? null)
-//       .input("발주수량", req.body.data.발주수량 ?? "")
-//       .input("단가", req.body.data.단가 ?? "")
-//       .input("공급가액", req.body.data.공급가액 ?? "")
-//       .input("세액", req.body.data.세액 ?? "")
-//       .input("납기일", req.body.data.납기일 ?? "")
-//       .input("도착지주소", req.body.data.도착지주소 ?? "")
-//       .input("기타", req.body.data.기타 ?? "")
-//       .input("비고", req.body.data.비고 ?? "")
-//       .input("등록자", req.body.user ?? "")
-//       .input(
-//         "등록일시",
-//         moment().tz("Asia/Seoul").format("YYYY-MM-DD HH:mm:ss")
-//       ).query(`
-//         INSERT INTO [QMES2022].[dbo].[MANAGE_ORDER_TB]
-//           ([ITRC_DIV]
-//           ,[ITRC_PRODUCE_RESULT_PK]
-//           ,[ITRC_PROCESS_INSPECT_PK]
-//           ,[ITRC_DEFECT_REWORK_PK]
-//           ,[ITRC_IMPORT_INSPECT_PK]
-//           ,[ITRC_ITEM_PK]
-//           ,[ITRC_CODE]
-//           ,[ITRC_AMOUNT]
-//           ,[ITRC_DT]
-//           ,[ITRC_EXPIRE_DATE]
-//           ,[ITRC_NOTE]
-//           ,[ITRC_REGIST_NM]
-//           ,[ITRC_REGIST_DT])
-//             VALUES
-//           ('직접 입고', null,null,null,null,@거래처NO,@품목NO,@발주수량,@단가,@공급가액,@세액,@납기일,@도착지주소,
-//             @기타,@비고,@등록자,@등록일시)
-//     `);
+router.post("/insert", async (req, res) => {
+  try {
+    const Pool = await pool;
+    await Pool.request()
+      .input("생산실적NO", req.body.data.생산실적NO ?? null)
+      .input("공정검사NO", req.body.data.공정검사NO ?? null)
+      .input("불량재작업NO", req.body.data.불량재작업NO ?? null)
+      .input("수입검사NO", req.body.data.수입검사NO ?? null)
+      .input("품목NO", req.body.data.품목NO ?? null)
+      .input("구분", req.body.data.구분 ?? "")
+      .input(
+        "입고일시",
+        moment(req.body.data.입고일시).format("YYYY-MM-DD HH:mm:ss") ??
+          moment().tz("Asia/Seoul").format("YYYY-MM-DD HH:mm:ss")
+      )
+      .input("입고코드", req.body.data.입고코드 ?? "")
+      .input("입고수", req.body.data.입고수 ?? "")
+      .input("유효일자", req.body.data.유효일자 ?? "")
+      .input("비고", req.body.data.비고 ?? "")
+      .input("등록자", req.body.user ?? "")
+      .input(
+        "등록일시",
+        moment().tz("Asia/Seoul").format("YYYY-MM-DD HH:mm:ss")
+      ).query(`
+        INSERT INTO [QMES2022].[dbo].[MANAGE_ITEM_RECEIVE_TB]
+          ([ITRC_PRODUCE_RESULT_PK]
+          ,[ITRC_PROCESS_INSPECT_PK]
+          ,[ITRC_DEFECT_REWORK_PK]
+          ,[ITRC_IMPORT_INSPECT_PK]
+          ,[ITRC_ITEM_PK]
+          ,[ITRC_DIV]
+          ,[ITRC_DT]
+          ,[ITRC_CODE]
+          ,[ITRC_AMOUNT]
+          ,[ITRC_EXPIRE_DATE]
+          ,[ITRC_NOTE]
+          ,[ITRC_REGIST_NM]
+          ,[ITRC_REGIST_DT])
+        VALUES
+          (@생산실적NO,@공정검사NO,@불량재작업NO,@수입검사NO,@품목NO,@구분,@입고일시,@입고코드,@입고수,@유효일자,@비고,@등록자,@등록일시)
+    `);
 
-//     // 로그기록 저장
-//     await logSend(
-//       (type = "등록"),
-//       (ct = JSON.stringify(req.body.data) + " 을 등록."),
-//       (amount = 1),
-//       (user = req.body.user ?? "")
-//     );
+    // 로그기록 저장
+    await logSend(
+      (type = "등록"),
+      (ct = JSON.stringify(req.body.data) + " 을 등록."),
+      (amount = 1),
+      (user = req.body.user ?? "")
+    );
 
-//     res.send("등록완료");
-//   } catch (err) {
-//     // 로그기록 저장
-//     await logSend(
-//       (type = "에러"),
-//       (ct = err.message ?? ""),
-//       (amount = 0),
-//       (user = req.body.user ?? "")
-//     );
-//     res.status(500);
-//     res.send(err.message);
-//   }
-// });
+    res.send("등록완료");
+  } catch (err) {
+    // 로그기록 저장
+    await logSend(
+      (type = "에러"),
+      (ct = err.message ?? ""),
+      (amount = 0),
+      (user = req.body.user ?? "")
+    );
+    res.status(500);
+    res.send(err.message);
+  }
+});
 
 // // 한번에 등록
 // router.post("/insertAll", async (req, res) => {

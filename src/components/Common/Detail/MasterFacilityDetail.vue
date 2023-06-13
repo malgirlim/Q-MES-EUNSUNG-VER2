@@ -1,7 +1,8 @@
 <script setup lang="ts">
 import Lucide from "../../../base-components/Lucide";
 import Table from "../../../base-components/Table";
-import "zoom-vanilla.js/dist/zoom-vanilla.min.js";
+import InnerImageZoom from "vue-inner-image-zoom";
+import "vue-inner-image-zoom/lib/vue-inner-image-zoom.css";
 
 const props = defineProps<{
   data?: any;
@@ -167,11 +168,11 @@ const imgpath = "../src/assets/temp/test1.png";
               style="border-left-width: 2px"
               v-if="props.data?.사진 != null && props.data?.사진 != ''"
             >
-              <img
+              <inner-image-zoom
                 :src="imgpath"
-                class="rounded-md"
-                data-action="zoom"
-                style="width: 120px"
+                :zoomScale="1"
+                :hideCloseButton="true"
+                :hasSpacer="true"
               />
             </Table.Td>
           </Table.Tr>

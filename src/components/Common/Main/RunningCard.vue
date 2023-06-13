@@ -16,11 +16,12 @@ const props = defineProps<{
         'before:content-[\'\'] before:w-[90%] before:shadow-[0px_3px_20px_#0000000b] before:bg-slate-50 before:h-full before:mt-3 before:absolute before:rounded-md before:mx-auto before:inset-x-0 before:dark:bg-darkmode-400/70',
       ]"
     >
-    <div :class="[
-      'p-4 box',
-      {'bg-cyan-300' : props?.run == true},
-      {'bg-red-300' : props?.run == false},
-      ]"
+      <div
+        :class="[
+          'p-4 box',
+          { 'bg-cyan-300': props?.run == true },
+          { 'bg-red-300': props?.run == false },
+        ]"
       >
         <div class="flex">
           <Lucide icon="Factory" class="w-[28px] h-[28px] text-primary" />
@@ -47,13 +48,8 @@ const props = defineProps<{
         <div class="mt-1 text-2xl font-bold">
           {{ props.name }}
         </div>
-        <div v-if="props?.run == true" class="mt-0 text-base">
-          가동중
-        </div>
-        <div v-if="props?.run == false" class="mt-0 text-base">
-          비가동중
-        </div>
-       
+        <div v-if="props?.run == true" class="mt-0 text-base">가동중</div>
+        <div v-if="props?.run == false" class="mt-0 text-base">비가동중</div>
       </div>
     </div>
   </div>

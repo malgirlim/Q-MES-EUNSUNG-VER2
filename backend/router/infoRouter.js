@@ -5,8 +5,14 @@ const infoLogRouter = require("./info/infoLog");
 
 const infoAnnounRouter = require("./info/infoAnnoun");
 
+const infoAlertLogRouter = require("./info/infoAlertLog");
+const infoAlertSettingRouter = require("./info/infoAlertSetting");
+const infoAlertUserRouter = require("./info/infoAlertUser");
+
 const orderForecastRouter = require("./info/orderForecast");
 const orderNotifyRouter = require("./info/orderNotify");
+
+const stockSafeNotifyRouter = require("./info/stockSafeNotify");
 
 const preventPreventForecastRouter = require("./info/preventPreventForecast");
 const preventPreventNotifyRouter = require("./info/preventPreventNotify");
@@ -31,10 +37,20 @@ router.use("/log", infoLogRouter);
 // 공유정보 / 공지사항 - router/info/infoAnnoun.js
 router.use("/announ", infoAnnounRouter);
 
+// 정보 / 알림 / 로그 - router/info/infoAlertLog.js
+router.use("/alert/log", infoAlertLogRouter);
+// 정보 / 알림 / 설정 - router/info/infoAlertSetting.js
+router.use("/alert/setting", infoAlertSettingRouter);
+// 정보 / 알림 / 발송대상 - router/info/infoAlertUser.js
+router.use("/alert/user", infoAlertUserRouter);
+
 // 주문관리 / 수주대비납품 예보 - router/info/orderForecast.js
 router.use("/order/forecast", orderForecastRouter);
 // 주문관리 / 수주대비납품 통보 - router/info/orderNotify.js
 router.use("/order/notify", orderNotifyRouter);
+
+// 재고관리 / 안전재고미달 통보 - router/info/stockSafeNotify.js
+router.use("/stock/safe/notify", stockSafeNotifyRouter);
 
 // 예방보전 / 예방보전 예보 - router/info/preventPreventForecast.js
 router.use("/prevent/prevent/forecast", preventPreventForecastRouter);

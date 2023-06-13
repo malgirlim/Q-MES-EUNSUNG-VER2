@@ -61,9 +61,9 @@ const facilitystand_facility = useSendApi<MasterFacility>(
 const table_setting = {
   체크박스: { name: "체크박스", style: "width: 50px" },
   순번: { name: "순번", style: "width: 50px; text-align: center;" },
-  항목1: { name: "설비명", style: "width: 50px; text-align: center;" },
-  항목2: { name: "구분", style: "width: 200px; text-align: center;" },
-  항목3: { name: "내용", style: "width: 50px; text-align: center;" },
+  항목1: { name: "설비명", style: "width: 100px; text-align: center;" },
+  항목2: { name: "구분", style: "width: 50px; text-align: center;" },
+  항목3: { name: "내용", style: "width: 100px; text-align: center;" },
   항목4: { name: "비고", style: "width: 50px; text-align: center;" },
   항목5: { name: "항목5", style: "width: 50px; text-align: center;" },
   항목6: { name: "항목6", style: "width: 50px; text-align: center;" },

@@ -55,8 +55,8 @@ const dataManager = useSendApi<QualityProcess>(url, currentPage, rowsPerPage);
 
 // 테이블항목 설정 및 가로크기 조정
 const table_setting = {
-  체크박스: { name: "체크박스", style: "width: 50px" },
-  순번: { name: "순번", style: "width: 50px; text-align: center;" },
+  체크박스: { name: "체크박스", style: "width: 25px" },
+  순번: { name: "순번", style: "width: 25px; text-align: center;" },
   항목1: { name: "요청일시", style: "width: 50px; text-align: center;" },
   항목2: { name: "작업코드", style: "width: 50px; text-align: center;" },
   항목3: { name: "공정", style: "width: 50px; text-align: center;" },
@@ -70,7 +70,7 @@ const table_setting = {
   항목11: { name: "입고수량", style: "width: 50px; text-align: center;" },
   항목12: { name: "결과", style: "width: 50px; text-align: center;" },
   상세보기: { name: "정보", style: "width: 120px; text-align: center;" },
-  편집: { name: "검사 및 입고", style: "width: 50px; text-align: center;" },
+  편집: { name: "검사 및 입고", style: "width: 120px; text-align: center;" },
 };
 
 // v-tom (모달 실시간 데이터 변동) 에 필요한 함수
@@ -685,7 +685,7 @@ const checkDataFunction = async () => {
                 {{ table_setting.상세보기.name }}
               </Table.Th>
               <Table.Th
-                class="text-center border-b-0 whitespace-nowrap font-bold"
+                class="px-1 text-center border-b-0 whitespace-nowrap font-bold"
                 :style="table_setting.편집.style"
               >
                 {{ table_setting.편집.name }}
@@ -810,7 +810,7 @@ const checkDataFunction = async () => {
                 </div>
               </Table.Td>
               <Table.Td
-                class="first:rounded-l-md last:rounded-r-md text-center bg-white border-b-0 dark:bg-darkmode-600 shadow-[20px_3px_20px_#0000000b] py-0 relative before:block before:w-px before:h-8 before:bg-slate-200 before:absolute before:left-0 before:inset-y-0 before:my-auto before:dark:bg-darkmode-400"
+                class="px-1 first:rounded-l-md last:rounded-r-md text-center bg-white border-b-0 dark:bg-darkmode-600 shadow-[20px_3px_20px_#0000000b] py-0 relative before:block before:w-px before:h-8 before:bg-slate-200 before:absolute before:left-0 before:inset-y-0 before:my-auto before:dark:bg-darkmode-400"
                 :style="table_setting.편집.style"
               >
                 <div
