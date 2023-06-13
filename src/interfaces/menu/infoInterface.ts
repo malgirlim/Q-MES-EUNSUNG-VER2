@@ -22,6 +22,45 @@ export interface ShareNotice {
   등록일시?: string;
 }
 
+// 알림 - 알림 설정 관리
+export interface AlertSetting {
+  [attribute: string]: any | undefined;
+  NO?: number;
+  구분?: string;
+  설비NO?: number;
+  설비명?: string;
+  기능사용?: string;
+  발송시간?: string;
+  발송시점?: number;
+  비고?: string;
+  등록자?: string;
+  등록일시?: string;
+}
+
+// 알림 - 알림 대상 관리
+export interface AlertUser {
+  [attribute: string]: any | undefined;
+  NO?: number;
+  구분?: string;
+  제목?: string;
+  내용?: string;
+  비고?: string;
+  등록자?: string;
+  등록일시?: string;
+}
+
+// 알림 - 알림 로그 관리
+export interface AlertLog {
+  [attribute: string]: any | undefined;
+  NO?: number;
+  구분?: string;
+  제목?: string;
+  내용?: string;
+  비고?: string;
+  등록자?: string;
+  등록일시?: string;
+}
+
 // 알림 - 예보 통보 관리
 export interface ForecastNotify {
   [attribute: string]: any | undefined;
