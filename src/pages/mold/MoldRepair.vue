@@ -655,12 +655,12 @@ const onFileImport = (event: any) => {
                 >
                   {{ table_setting.항목6.name }}
                 </Table.Th>
-                <Table.Th
+                <!-- <Table.Th
                   class="text-center border-b-0 whitespace-nowrap font-bold"
                   :style="table_setting.상세보기.style"
                 >
                   {{ table_setting.상세보기.name }}
-                </Table.Th>
+                </Table.Th> -->
                 <Table.Th
                   class="text-center border-b-0 whitespace-nowrap font-bold"
                   :style="table_setting.편집.style"
@@ -730,7 +730,7 @@ const onFileImport = (event: any) => {
                 >
                   <div>{{ todo[table_setting.항목6.name] }}</div>
                 </Table.Td>
-                <Table.Td
+                <!-- <Table.Td
                   class="first:rounded-l-md last:rounded-r-md text-center bg-white border-b-0 dark:bg-darkmode-600 shadow-[20px_3px_20px_#0000000b] py-0 relative before:block before:w-px before:h-8 before:bg-slate-200 before:absolute before:left-0 before:inset-y-0 before:my-auto before:dark:bg-darkmode-400"
                   :style="table_setting.상세보기.style"
                 >
@@ -749,7 +749,7 @@ const onFileImport = (event: any) => {
                       상세
                     </a>
                   </div>
-                </Table.Td>
+                </Table.Td> -->
                 <Table.Td
                   class="first:rounded-l-md last:rounded-r-md text-center bg-white border-b-0 dark:bg-darkmode-600 shadow-[20px_3px_20px_#0000000b] py-0 relative before:block before:w-px before:h-8 before:bg-slate-200 before:absolute before:left-0 before:inset-y-0 before:my-auto before:dark:bg-darkmode-400"
                   :style="table_setting.편집.style"

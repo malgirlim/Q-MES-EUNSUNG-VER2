@@ -1009,7 +1009,7 @@ const search_item = () => {
             class="mr-2 shadow-md"
             variant="outline-primary"
             @click="setAcceptModal(false)"
-            >Close</Button
+            >취소</Button
           >
         </div>
       </div>
@@ -1264,7 +1264,7 @@ const search_item = () => {
             class="mr-2 shadow-md"
             variant="outline-primary"
             @click="setClientModal(false)"
-            >Close</Button
+            >취소</Button
           >
         </div>
       </div>
@@ -1514,7 +1514,7 @@ const search_item = () => {
             class="mr-2 shadow-md"
             variant="outline-primary"
             @click="setItemModal(false, 0)"
-            >Close</Button
+            >취소</Button
           >
         </div>
       </div>

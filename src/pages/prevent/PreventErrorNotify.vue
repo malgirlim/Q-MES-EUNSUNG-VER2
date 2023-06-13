@@ -373,7 +373,7 @@ const onFileImport = (event: any) => {
       <div
         class="flex flex-wrap items-center col-span-12 mt-2 mb-2 intro-y sm:flex-nowrap"
       >
-        <Button
+        <!-- <Button
           class="mr-2 shadow-md"
           as="a"
           variant="primary"
@@ -385,7 +385,7 @@ const onFileImport = (event: any) => {
         >
           <Lucide icon="FilePlus" class="w-4 h-4 mr-2" />
           등록
-        </Button>
+        </Button> -->
         <Button
           class="mr-2 shadow-md"
           as="a"
@@ -497,10 +497,10 @@ const onFileImport = (event: any) => {
                 <Lucide icon="FileDown" class="w-4 h-4 mr-2" />
                 Excel 다운로드
               </Menu.Item>
-              <Menu.Item @click="setExcelImportModal(true)">
+              <!-- <Menu.Item @click="setExcelImportModal(true)">
                 <Lucide icon="FileUp" class="w-4 h-4 mr-2" />
                 Excel 업로드
-              </Menu.Item>
+              </Menu.Item> -->
             </Menu.Items>
           </Menu>
         </div>
@@ -643,7 +643,7 @@ const onFileImport = (event: any) => {
                 >
                   {{ table_setting.항목5.name }}
                 </Table.Th>
-                <Table.Th
+                <!-- <Table.Th
                   class="text-center border-b-0 whitespace-nowrap font-bold"
                   :style="table_setting.상세보기.style"
                 >
@@ -654,7 +654,7 @@ const onFileImport = (event: any) => {
                   :style="table_setting.편집.style"
                 >
                   {{ table_setting.편집.name }}
-                </Table.Th>
+                </Table.Th> -->
               </Table.Tr>
             </Table.Thead>
             <Table.Tbody style="position: relative; z-index: 1">
@@ -711,46 +711,6 @@ const onFileImport = (event: any) => {
                   :style="table_setting.항목5.style"
                 >
                   <div>{{ todo[table_setting.항목5.name] }}</div>
-                </Table.Td>
-                <Table.Td
-                  class="first:rounded-l-md last:rounded-r-md text-center bg-white border-b-0 dark:bg-darkmode-600 shadow-[20px_3px_20px_#0000000b] py-0 relative before:block before:w-px before:h-8 before:bg-slate-200 before:absolute before:left-0 before:inset-y-0 before:my-auto before:dark:bg-darkmode-400"
-                  :style="table_setting.상세보기.style"
-                >
-                  <div class="flex items-center justify-center text-cyan-700">
-                    <a
-                      class="flex items-center mr-3"
-                      href="#"
-                      @click="
-                        () => {
-                          editModalData = todo;
-                          setDetailModal(true);
-                        }
-                      "
-                    >
-                      <Lucide icon="ListPlus" class="w-5 h-5 mr-1" />
-                      상세
-                    </a>
-                  </div>
-                </Table.Td>
-                <Table.Td
-                  class="first:rounded-l-md last:rounded-r-md text-center bg-white border-b-0 dark:bg-darkmode-600 shadow-[20px_3px_20px_#0000000b] py-0 relative before:block before:w-px before:h-8 before:bg-slate-200 before:absolute before:left-0 before:inset-y-0 before:my-auto before:dark:bg-darkmode-400"
-                  :style="table_setting.편집.style"
-                >
-                  <div class="flex items-center justify-center text-danger">
-                    <a
-                      class="flex items-center mr-3"
-                      href="#"
-                      @click="
-                        () => {
-                          editModalData = todo;
-                          setEditModal(true);
-                        }
-                      "
-                    >
-                      <Lucide icon="Edit" class="w-4 h-4 mr-1" />
-                      수정
-                    </a>
-                  </div>
                 </Table.Td>
               </Table.Tr>
             </Table.Tbody>

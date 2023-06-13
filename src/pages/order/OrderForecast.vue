@@ -497,10 +497,10 @@ const onFileImport = (event: any) => {
                 <Lucide icon="FileDown" class="w-4 h-4 mr-2" />
                 Excel 다운로드
               </Menu.Item>
-              <Menu.Item @click="setExcelImportModal(true)">
+              <!-- <Menu.Item @click="setExcelImportModal(true)">
                 <Lucide icon="FileUp" class="w-4 h-4 mr-2" />
                 Excel 업로드
-              </Menu.Item>
+              </Menu.Item> -->
             </Menu.Items>
           </Menu>
         </div>
