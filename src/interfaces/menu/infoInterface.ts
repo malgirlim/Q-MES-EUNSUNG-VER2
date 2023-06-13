@@ -41,9 +41,13 @@ export interface AlertSetting {
 export interface AlertUser {
   [attribute: string]: any | undefined;
   NO?: number;
-  구분?: string;
-  제목?: string;
-  내용?: string;
+  알림설정NO?: number;
+  사용자ID?: string;
+  이름?: string;
+  연락처?: string;
+  부서명?: string;
+  직책?: string;
+  직급?: string;
   비고?: string;
   등록자?: string;
   등록일시?: string;
@@ -56,7 +60,7 @@ export interface AlertLog {
   구분?: string;
   제목?: string;
   내용?: string;
-  비고?: string;
+  확인?: string;
   등록자?: string;
   등록일시?: string;
 }

@@ -35,15 +35,31 @@ router.get("/", async (req, res) => {
     const Pool = await pool;
     const result = await Pool.request().query(`
       SELECT
-        [NOTC_PK] AS NO
-        ,[NOTC_DIV] AS 구분
-        ,[NOTC_TITLE] AS 제목
-        ,[NOTC_CONTENT] AS 내용
-        ,[NOTC_NOTE] AS 비고
-        ,(SELECT [USER_NAME] FROM [QMES2022].[dbo].[MASTER_USER_TB] WHERE [USER_ID] = [NOTC_REGIST_NM]) AS 등록자
-        ,CONVERT(varchar,[NOTC_REGIST_DT],20) AS 등록일시
-      FROM [QMES2022].[dbo].[SHARE_NOTICE_TB]
-      ORDER BY [NOTC_PK] DESC
+        [ALUS_PK] AS NO
+        ,[ALUS_ALST_PK] AS 알림설정NO
+        ,[ALUS_USER_ID] AS 사용자ID
+        ,MASTER_USER.이름 AS 이름
+        ,MASTER_USER.연락처 AS 연락처
+        ,MASTER_USER.부서명 AS 부서명
+        ,MASTER_USER.직책 AS 직책
+        ,MASTER_USER.직급 AS 직급
+        ,[ALUS_NOTE] AS 비고
+        ,[ALUS_REGIST_NM] AS 등록자
+        ,[ALUS_REGIST_DT] AS 등록일시
+      FROM [QMES2022].[dbo].[MANAGE_ALERT_USER_TB]
+      LEFT JOIN
+      (
+        SELECT
+          [USER_ID] AS 아이디,
+          [USER_NAME] AS 이름,
+          [USER_PHONE] AS 연락처,
+          [USER_EMAIL] AS 이메일,
+          [USER_DEPART] AS 부서명,
+          [USER_POSITION] AS 직책,
+          [USER_RANK] AS 직급
+        FROM [QMES2022].[dbo].[MASTER_USER_TB]
+      ) AS MASTER_USER ON MASTER_USER.아이디 = [ALUS_USER_ID]
+      ORDER BY [ALUS_PK] DESC
     `);
 
     // 로그기록 저장
@@ -75,25 +91,83 @@ router.post("/", async (req, res) => {
       sql =
         `
         SELECT
-          NO AS NO, 구분 AS 구분, 제목 AS 제목, 내용 AS 내용, 비고 AS 비고, 등록자 AS 등록자, 등록일시 AS 등록일시
+          NO AS NO, 알림설정NO AS 알림설정NO, 사용자ID AS 사용자ID, 이름 AS 이름, 연락처 AS 연락처, 부서명 AS 부서명,
+          직책 AS 직책, 직급 AS 직급, 비고 AS 비고, 등록자 AS 등록자, 등록일시 AS 등록일시
         FROM(
           SELECT
-            [NOTC_PK] AS NO
-            ,[NOTC_DIV] AS 구분
-            ,[NOTC_TITLE] AS 제목
-            ,[NOTC_CONTENT] AS 내용
-            ,[NOTC_NOTE] AS 비고
-            ,(SELECT [USER_NAME] FROM [QMES2022].[dbo].[MASTER_USER_TB] WHERE [USER_ID] = [NOTC_REGIST_NM]) AS 등록자
-            ,CONVERT(varchar,[NOTC_REGIST_DT],20) AS 등록일시
-          FROM [QMES2022].[dbo].[SHARE_NOTICE_TB]
+            [ALUS_PK] AS NO
+            ,[ALUS_ALST_PK] AS 알림설정NO
+            ,[ALUS_USER_ID] AS 사용자ID
+            ,MASTER_USER.이름 AS 이름
+            ,MASTER_USER.연락처 AS 연락처
+            ,MASTER_USER.부서명 AS 부서명
+            ,MASTER_USER.직책 AS 직책
+            ,MASTER_USER.직급 AS 직급
+            ,[ALUS_NOTE] AS 비고
+            ,[ALUS_REGIST_NM] AS 등록자
+            ,[ALUS_REGIST_DT] AS 등록일시
+          FROM [QMES2022].[dbo].[MANAGE_ALERT_USER_TB]
+          LEFT JOIN
+          (
+            SELECT
+              [USER_ID] AS 아이디,
+              [USER_NAME] AS 이름,
+              [USER_PHONE] AS 연락처,
+              [USER_EMAIL] AS 이메일,
+              [USER_DEPART] AS 부서명,
+              [USER_POSITION] AS 직책,
+              [USER_RANK] AS 직급
+            FROM [QMES2022].[dbo].[MASTER_USER_TB]
+          ) AS MASTER_USER ON MASTER_USER.아이디 = [ALUS_USER_ID]
         ) AS RESULT
         WHERE (1=1)
-        AND ( 구분 like concat('%',@input,'%')
-        OR 제목 like concat('%',@input,'%')
-        OR 내용 like concat('%',@input,'%')
-        OR 비고 like concat('%',@input,'%')
-        OR 등록자 like concat('%',@input,'%')
-        OR 등록일시 like concat('%',@input,'%'))
+        AND ( 이름 like concat('%',@input,'%')
+        OR 연락처 like concat('%',@input,'%')
+        OR 부서명 like concat('%',@input,'%')
+        OR 직책 like concat('%',@input,'%')
+        OR 직급 like concat('%',@input,'%')
+        OR 비고 like concat('%',@input,'%'))
+        ORDER BY ` +
+        req.body.sortKey +
+        ` ` +
+        req.body.sortOrder +
+        `
+      `;
+    } else if (req.body.searchKey == "알림설정NO") {
+      sql =
+        `
+        SELECT
+          NO AS NO, 알림설정NO AS 알림설정NO, 사용자ID AS 사용자ID, 이름 AS 이름, 연락처 AS 연락처, 부서명 AS 부서명,
+          직책 AS 직책, 직급 AS 직급, 비고 AS 비고, 등록자 AS 등록자, 등록일시 AS 등록일시
+        FROM(
+          SELECT
+            [ALUS_PK] AS NO
+            ,[ALUS_ALST_PK] AS 알림설정NO
+            ,[ALUS_USER_ID] AS 사용자ID
+            ,MASTER_USER.이름 AS 이름
+            ,MASTER_USER.연락처 AS 연락처
+            ,MASTER_USER.부서명 AS 부서명
+            ,MASTER_USER.직책 AS 직책
+            ,MASTER_USER.직급 AS 직급
+            ,[ALUS_NOTE] AS 비고
+            ,[ALUS_REGIST_NM] AS 등록자
+            ,[ALUS_REGIST_DT] AS 등록일시
+          FROM [QMES2022].[dbo].[MANAGE_ALERT_USER_TB]
+          LEFT JOIN
+          (
+            SELECT
+              [USER_ID] AS 아이디,
+              [USER_NAME] AS 이름,
+              [USER_PHONE] AS 연락처,
+              [USER_EMAIL] AS 이메일,
+              [USER_DEPART] AS 부서명,
+              [USER_POSITION] AS 직책,
+              [USER_RANK] AS 직급
+            FROM [QMES2022].[dbo].[MASTER_USER_TB]
+          ) AS MASTER_USER ON MASTER_USER.아이디 = [ALUS_USER_ID]
+        ) AS RESULT
+        WHERE (1=1)
+        AND 알림설정NO = @input
         ORDER BY ` +
         req.body.sortKey +
         ` ` +
@@ -104,17 +178,34 @@ router.post("/", async (req, res) => {
       sql =
         `
         SELECT
-          NO AS NO, 구분 AS 구분, 제목 AS 제목, 내용 AS 내용, 비고 AS 비고, 등록자 AS 등록자, 등록일시 AS 등록일시
+          NO AS NO, 알림설정NO AS 알림설정NO, 사용자ID AS 사용자ID, 이름 AS 이름, 연락처 AS 연락처, 부서명 AS 부서명,
+          직책 AS 직책, 직급 AS 직급, 비고 AS 비고, 등록자 AS 등록자, 등록일시 AS 등록일시
         FROM(
           SELECT
-            [NOTC_PK] AS NO
-            ,[NOTC_DIV] AS 구분
-            ,[NOTC_TITLE] AS 제목
-            ,[NOTC_CONTENT] AS 내용
-            ,[NOTC_NOTE] AS 비고
-            ,(SELECT [USER_NAME] FROM [QMES2022].[dbo].[MASTER_USER_TB] WHERE [USER_ID] = [NOTC_REGIST_NM]) AS 등록자
-            ,CONVERT(varchar, [NOTC_REGIST_DT],20) AS 등록일시
-          FROM [QMES2022].[dbo].[SHARE_NOTICE_TB]
+            [ALUS_PK] AS NO
+            ,[ALUS_ALST_PK] AS 알림설정NO
+            ,[ALUS_USER_ID] AS 사용자ID
+            ,MASTER_USER.이름 AS 이름
+            ,MASTER_USER.연락처 AS 연락처
+            ,MASTER_USER.부서명 AS 부서명
+            ,MASTER_USER.직책 AS 직책
+            ,MASTER_USER.직급 AS 직급
+            ,[ALUS_NOTE] AS 비고
+            ,[ALUS_REGIST_NM] AS 등록자
+            ,[ALUS_REGIST_DT] AS 등록일시
+          FROM [QMES2022].[dbo].[MANAGE_ALERT_USER_TB]
+          LEFT JOIN
+          (
+            SELECT
+              [USER_ID] AS 아이디,
+              [USER_NAME] AS 이름,
+              [USER_PHONE] AS 연락처,
+              [USER_EMAIL] AS 이메일,
+              [USER_DEPART] AS 부서명,
+              [USER_POSITION] AS 직책,
+              [USER_RANK] AS 직급
+            FROM [QMES2022].[dbo].[MASTER_USER_TB]
+          ) AS MASTER_USER ON MASTER_USER.아이디 = [ALUS_USER_ID]
         ) AS RESULT
         WHERE (1=1)
         AND ` +
@@ -168,24 +259,22 @@ router.post("/insert", async (req, res) => {
   try {
     const Pool = await pool;
     await Pool.request()
-      .input("구분", req.body.data.구분 ?? "")
-      .input("제목", req.body.data.제목 ?? "")
-      .input("내용", req.body.data.내용 ?? "")
+      .input("알림설정NO", req.body.data.알림설정NO ?? null)
+      .input("사용자ID", req.body.data.사용자ID ?? "")
       .input("비고", req.body.data.비고 ?? "")
       .input("등록자", req.body.user ?? "")
       .input(
         "등록일시",
         moment().tz("Asia/Seoul").format("YYYY-MM-DD HH:mm:ss")
       ).query(`
-        INSERT INTO [QMES2022].[dbo].[SHARE_NOTICE_TB]
-          ([NOTC_DIV]
-          ,[NOTC_TITLE]
-          ,[NOTC_CONTENT]
-          ,[NOTC_NOTE]
-          ,[NOTC_REGIST_NM]
-          ,[NOTC_REGIST_DT])
+        INSERT INTO [QMES2022].[dbo].[MANAGE_ALERT_USER_TB]
+          ([ALUS_ALST_PK]
+          ,[ALUS_USER_ID]
+          ,[ALUS_NOTE]
+          ,[ALUS_REGIST_NM]
+          ,[ALUS_REGIST_DT])
         VALUES
-          (@구분,@제목,@내용,@비고,@등록자,@등록일시)
+          (@알림설정NO,@사용자ID,@비고,@등록자,@등록일시)
       `);
 
     // 로그기록 저장
@@ -216,24 +305,22 @@ router.post("/insertAll", async (req, res) => {
     const Pool = await pool;
     for (var i = 0; i < req.body.data.length; i++) {
       await Pool.request()
-        .input("구분", req.body.data[i].구분 ?? "")
-        .input("제목", req.body.data[i].제목 ?? "")
-        .input("내용", req.body.data[i].내용 ?? "")
+        .input("알림설정NO", req.body.data[i].알림설정NO ?? null)
+        .input("사용자ID", req.body.data[i].사용자ID ?? "")
         .input("비고", req.body.data[i].비고 ?? "")
         .input("등록자", req.body.user ?? "")
         .input(
           "등록일시",
           moment().tz("Asia/Seoul").format("YYYY-MM-DD HH:mm:ss")
         ).query(`
-        INSERT INTO [QMES2022].[dbo].[SHARE_NOTICE_TB]
-          ([NOTC_DIV]
-          ,[NOTC_TITLE]
-          ,[NOTC_CONTENT]
-          ,[NOTC_NOTE]
-          ,[NOTC_REGIST_NM]
-          ,[NOTC_REGIST_DT])
+        INSERT INTO [QMES2022].[dbo].[MANAGE_ALERT_USER_TB]
+          ([ALUS_ALST_PK]
+          ,[ALUS_USER_ID]
+          ,[ALUS_NOTE]
+          ,[ALUS_REGIST_NM]
+          ,[ALUS_REGIST_DT])
         VALUES
-          (@구분,@제목,@내용,@비고,@등록자,@등록일시)
+          (@알림설정NO,@사용자ID,@비고,@등록자,@등록일시)
       `);
 
       // 로그기록 저장
@@ -263,25 +350,23 @@ router.post("/edit", async (req, res) => {
   try {
     const Pool = await pool;
     await Pool.request()
-      .input("NO", req.body.data.NO ?? 0)
-      .input("구분", req.body.data.구분 ?? "")
-      .input("제목", req.body.data.제목 ?? "")
-      .input("내용", req.body.data.내용 ?? "")
+      .input("NO", req.body.data.아이디 ?? 0)
+      .input("알림설정NO", req.body.data.알림설정NO ?? null)
+      .input("사용자ID", req.body.data.사용자ID ?? "")
       .input("비고", req.body.data.비고 ?? "")
       .input("등록자", req.body.user ?? "")
       .input(
         "등록일시",
         moment().tz("Asia/Seoul").format("YYYY-MM-DD HH:mm:ss")
       ).query(`
-        UPDATE [QMES2022].[dbo].[SHARE_NOTICE_TB]
+        UPDATE [QMES2022].[dbo].[MANAGE_ALERT_USER_TB]
           SET 
-            [NOTC_DIV] = @구분
-            ,[NOTC_TITLE] = @제목
-            ,[NOTC_CONTENT] = @내용
-            ,[NOTC_NOTE] = @비고
-            ,[NOTC_REGIST_NM] = @등록자
-            ,[NOTC_REGIST_DT] = @등록일시
-          WHERE [NOTC_PK] = @NO
+            [ALUS_ALST_PK] = @알림설정NO
+            ,[ALUS_USER_ID] = @사용자ID
+            ,[ALUS_NOTE] = @비고
+            ,[ALUS_REGIST_NM] = @등록자
+            ,[ALUS_REGIST_DT] = @등록일시
+          WHERE [ALUS_PK] = @NO
     `);
 
     // 로그기록 저장
@@ -313,21 +398,37 @@ router.post("/delete", async (req, res) => {
     for (var i = 0; i < req.body.data.length; i++) {
       const result = await Pool.request().input("key", req.body.data[i]).query(`
         SELECT
-          [NOTC_PK] AS NO
-          ,[NOTC_DIV] AS 구분
-          ,[NOTC_TITLE] AS 제목
-          ,[NOTC_CONTENT] AS 내용
-          ,[NOTC_NOTE] AS 비고
-          ,(SELECT [USER_NAME] FROM [QMES2022].[dbo].[MASTER_USER_TB] WHERE [USER_ID] = [NOTC_REGIST_NM]) AS 등록자
-          ,CONVERT(varchar, [NOTC_REGIST_DT], 23) AS 등록일시
-        FROM [QMES2022].[dbo].[SHARE_NOTICE_TB]
-        WHERE [NOTC_PK] = @key
+          [ALUS_PK] AS NO
+          ,[ALUS_ALST_PK] AS 알림설정NO
+          ,[ALUS_USER_ID] AS 사용자ID
+          ,MASTER_USER.이름 AS 이름
+          ,MASTER_USER.연락처 AS 연락처
+          ,MASTER_USER.부서명 AS 부서명
+          ,MASTER_USER.직책 AS 직책
+          ,MASTER_USER.직급 AS 직급
+          ,[ALUS_NOTE] AS 비고
+          ,[ALUS_REGIST_NM] AS 등록자
+          ,[ALUS_REGIST_DT] AS 등록일시
+        FROM [QMES2022].[dbo].[MANAGE_ALERT_USER_TB]
+        LEFT JOIN
+        (
+          SELECT
+            [USER_ID] AS 아이디,
+            [USER_NAME] AS 이름,
+            [USER_PHONE] AS 연락처,
+            [USER_EMAIL] AS 이메일,
+            [USER_DEPART] AS 부서명,
+            [USER_POSITION] AS 직책,
+            [USER_RANK] AS 직급
+          FROM [QMES2022].[dbo].[MASTER_USER_TB]
+        ) AS MASTER_USER ON MASTER_USER.아이디 = [ALUS_USER_ID]
+        WHERE [ALUS_PK] = @key
       `);
 
       await Pool.request()
         .input("key", req.body.data[i])
         .query(
-          `DELETE FROM [QMES2022].[dbo].[SHARE_NOTICE_TB] WHERE [NOTC_PK] = @key`
+          `DELETE FROM [QMES2022].[dbo].[MANAGE_ALERT_USER_TB] WHERE [ALUS_PK] = @key`
         );
 
       // 로그기록 저장

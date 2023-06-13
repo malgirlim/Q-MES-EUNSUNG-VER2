@@ -8,6 +8,7 @@ const infoAnnounRouter = require("./info/infoAnnoun");
 const infoAlertLogRouter = require("./info/infoAlertLog");
 const infoAlertSettingRouter = require("./info/infoAlertSetting");
 const infoAlertUserRouter = require("./info/infoAlertUser");
+const infoAlertModalRouter = require("./info/infoAlertModal");
 
 const orderForecastRouter = require("./info/orderForecast");
 const orderNotifyRouter = require("./info/orderNotify");
@@ -43,6 +44,8 @@ router.use("/alert/log", infoAlertLogRouter);
 router.use("/alert/setting", infoAlertSettingRouter);
 // 정보 / 알림 / 발송대상 - router/info/infoAlertUser.js
 router.use("/alert/user", infoAlertUserRouter);
+// 정보 / 알림 / 모달 - router/info/infoAlertModal.js
+router.use("/alert/modal", infoAlertModalRouter);
 
 // 주문관리 / 수주대비납품 예보 - router/info/orderForecast.js
 router.use("/order/forecast", orderForecastRouter);

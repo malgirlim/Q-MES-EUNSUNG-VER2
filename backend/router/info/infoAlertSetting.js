@@ -40,7 +40,7 @@ router.get("/", async (req, res) => {
         ,[ALST_FACILITY_PK] AS 설비NO
         ,(SELECT [FCLT_NAME] FROM [QMES2022].[dbo].[MASTER_FACILITY_TB] WHERE [FCLT_PK] = [ALST_FACILITY_PK]) AS 설비명
         ,[ALST_USE] AS 기능사용
-        ,[ALST_TIME] AS 발송시간
+        ,CONVERT(VARCHAR, [ALST_TIME], 8) AS 발송시간
         ,[ALST_POINT] AS 발송시점
         ,[ALST_NOTE] AS 비고
         ,[ALST_REGIST_NM] AS 등록자
@@ -87,7 +87,7 @@ router.post("/", async (req, res) => {
             ,[ALST_FACILITY_PK] AS 설비NO
             ,(SELECT [FCLT_NAME] FROM [QMES2022].[dbo].[MASTER_FACILITY_TB] WHERE [FCLT_PK] = [ALST_FACILITY_PK]) AS 설비명
             ,[ALST_USE] AS 기능사용
-            ,[ALST_TIME] AS 발송시간
+            ,CONVERT(VARCHAR, [ALST_TIME], 8) AS 발송시간
             ,[ALST_POINT] AS 발송시점
             ,[ALST_NOTE] AS 비고
             ,[ALST_REGIST_NM] AS 등록자
@@ -120,7 +120,7 @@ router.post("/", async (req, res) => {
             ,[ALST_FACILITY_PK] AS 설비NO
             ,(SELECT [FCLT_NAME] FROM [QMES2022].[dbo].[MASTER_FACILITY_TB] WHERE [FCLT_PK] = [ALST_FACILITY_PK]) AS 설비명
             ,[ALST_USE] AS 기능사용
-            ,[ALST_TIME] AS 발송시간
+            ,CONVERT(VARCHAR, [ALST_TIME], 8) AS 발송시간
             ,[ALST_POINT] AS 발송시점
             ,[ALST_NOTE] AS 비고
             ,[ALST_REGIST_NM] AS 등록자
@@ -181,7 +181,7 @@ router.post("/insert", async (req, res) => {
     await Pool.request()
       .input("구분", req.body.data.구분 ?? "")
       .input("설비NO", req.body.data.설비NO ?? null)
-      .input("기능사용", req.body.data.기능사용 ?? "")
+      .input("기능사용", req.body.data.기능사용 ?? "OFF")
       .input("발송시간", req.body.data.발송시간 ?? "")
       .input("발송시점", req.body.data.발송시점 ?? 0)
       .input("비고", req.body.data.비고 ?? "")
@@ -341,7 +341,7 @@ router.post("/delete", async (req, res) => {
           ,[ALST_FACILITY_PK] AS 설비NO
           ,(SELECT [FCLT_NAME] FROM [QMES2022].[dbo].[MASTER_FACILITY_TB] WHERE [FCLT_PK] = [ALST_FACILITY_PK]) AS 설비명
           ,[ALST_USE] AS 기능사용
-          ,[ALST_TIME] AS 발송시간
+          ,CONVERT(VARCHAR, [ALST_TIME], 8) AS 발송시간
           ,[ALST_POINT] AS 발송시점
           ,[ALST_NOTE] AS 비고
           ,[ALST_REGIST_NM] AS 등록자
