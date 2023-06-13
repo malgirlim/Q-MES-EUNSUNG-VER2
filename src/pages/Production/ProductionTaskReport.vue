@@ -1294,14 +1294,15 @@ const importNonwork = (no: any) => {
                       ]"
                       :style="table_setting.항목1.style"
                     >
-                      <div>
+                      <!-- <div>
                         <label
                           class="text-blue-500"
                           style="cursor: pointer"
                           @click="setPrintDocumentModal(true)"
                           >{{ todo[table_setting.항목1.name] }}
                         </label>
-                      </div>
+                      </div> -->
+                      {{ todo[table_setting.항목1.name] }}
                     </Table.Td>
                     <Table.Td
                       :class="[

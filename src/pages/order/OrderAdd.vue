@@ -6,6 +6,15 @@ import OrderAdd from "../../components/Common/Order/OrderAdd.vue";
 
 const { proxy }: any = getCurrentInstance();
 const user_level = proxy.gstate.level.OrderAdd; //권한레벨
+
+const companyInfo = {
+  사업자등록번호: "126-81-10319",
+  상호: "(주)은성프린터스",
+  대표자: "차준은",
+  주소: "경기도 이천시 이섭대천로1032번길 78 (율현동 91-1)",
+  업태: "제조",
+  종목: "옵셋인쇄",
+};
 </script>
 
 <template>
@@ -14,7 +23,7 @@ const user_level = proxy.gstate.level.OrderAdd; //권한레벨
       <div class="text-2xl text-center mb-5 intro-y">
         <strong>수주등록</strong>
       </div>
-      <div><OrderAdd /></div>
+      <div><OrderAdd :data="companyInfo" /></div>
     </div>
   </div>
 

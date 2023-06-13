@@ -615,7 +615,7 @@ const menu_list = [
           <div
             class="flex flex-wrap items-center justify-center p-3 lg:flex-nowrap"
           >
-            <div class="w-full mb-4 mr-auto lg:w-1/2 lg:mb-0">
+            <!-- <div class="w-full mb-4 mr-auto lg:w-1/2 lg:mb-0">
               <div class="flex text-xs text-slate-500">
                 <div class="mr-auto">시스템 사용률</div>
                 <div>20%</div>
@@ -629,10 +629,10 @@ const menu_list = [
                   :aria-valuemax="100"
                 ></Progress.Bar>
               </Progress>
-            </div>
+            </div> -->
             <Button
               variant="outline-secondary"
-              class="px-2 py-1 mr-2"
+              class="px-2 py-1 mr-2 ml-auto"
               @click="
                 (event) => {
                   event.preventDefault();

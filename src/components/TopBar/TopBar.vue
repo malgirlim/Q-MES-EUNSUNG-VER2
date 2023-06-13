@@ -305,7 +305,7 @@ const setDebugMode = () => {
       </div>
       END: Search -->
       <!-- BEGIN: Notifications -->
-      <Popover class="mr-4 intro-x sm:mr-6">
+      <!-- <Popover class="mr-4 intro-x sm:mr-6">
         <Popover.Button
           class="relative text-white/70 outline-none block before:content-[''] before:w-[8px] before:h-[8px] before:rounded-full before:absolute before:top-[-2px] before:right-0 before:bg-danger"
         >
@@ -351,7 +351,7 @@ const setDebugMode = () => {
             </div>
           </div>
         </Popover.Panel>
-      </Popover>
+      </Popover> -->
       <!-- END: Notifications -->
       <!-- BEGIN: Account Menu -->
 

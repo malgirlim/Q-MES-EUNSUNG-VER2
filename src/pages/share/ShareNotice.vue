@@ -25,7 +25,7 @@ import { useSendApi } from "../../composables/useSendApi";
 import { ShareNotice } from "../../interfaces/menu/infoInterface";
 
 // 컴포넌트 로드
-import MasterDetail from "../../components/Common/Detail/MasterClientDetail.vue";
+import NoticeDetail from "../../components/Common/Detail/NoticeDetail.vue";
 
 const { proxy }: any = getCurrentInstance();
 const user_level = proxy.gstate.level.ShareNotice; //권한레벨
@@ -52,7 +52,7 @@ const table_setting = {
   순번: { name: "순번", style: "width: 5px; text-align: center;" },
   항목1: { name: "구분", style: "width: 50px; text-align: center;" },
   항목2: { name: "제목", style: "width: 100px; text-align: center;" },
-  항목3: { name: "비고", style: "width: 50px; text-align: center;" },
+  항목3: { name: "내용", style: "width: 50px; text-align: center;" },
   항목4: { name: "등록자", style: "width: 50px; text-align: center;" },
   항목5: { name: "등록일시", style: "width: 50px; text-align: center;" },
   상세보기: { name: "정보", style: "width: 5px; text-align: center;" },
@@ -981,7 +981,7 @@ const onFileImport = (event: any) => {
     "
   >
     <Dialog.Panel>
-      <MasterDetail :data="editModalData" />
+      <NoticeDetail :data="editModalData" />
       <div class="px-5 pb-8 text-center">
         <Button
           variant="outline-primary"

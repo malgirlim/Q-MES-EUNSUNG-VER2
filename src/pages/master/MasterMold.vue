@@ -28,7 +28,7 @@ import {
 } from "../../interfaces/menu/MasterInterface";
 
 // 컴포넌트 로드
-import MasterDetail from "../../components/Common/Detail/MasterBOMDetail.vue";
+import MoldDetail from "../../components/Common/Detail/MasterMoldDetail.vue";
 import DocumentPrint from "../../components/Common/Print/Template/TaskAdd(Std)/Main.vue";
 
 const { proxy }: any = getCurrentInstance();
@@ -2651,7 +2651,7 @@ const setPrintDocumentModal = (value: boolean) => {
     "
   >
     <Dialog.Panel>
-      <MasterDetail :data="editModalData" />
+      <MoldDetail :data="editModalData" />
       <div class="px-5 pb-8 text-center">
         <Button
           variant="outline-primary"
