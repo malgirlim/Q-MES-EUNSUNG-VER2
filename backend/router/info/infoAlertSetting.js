@@ -40,7 +40,7 @@ router.get("/", async (req, res) => {
         ,[ALST_FACILITY_PK] AS 설비NO
         ,(SELECT [FCLT_NAME] FROM [QMES2022].[dbo].[MASTER_FACILITY_TB] WHERE [FCLT_PK] = [ALST_FACILITY_PK]) AS 설비명
         ,[ALST_USE] AS 기능사용
-        ,CONVERT(VARCHAR, [ALST_TIME], 8) AS 발송시간
+        ,CONVERT(VARCHAR(5),[ALST_TIME],8) AS 발송시간
         ,[ALST_POINT] AS 발송시점
         ,[ALST_NOTE] AS 비고
         ,[ALST_REGIST_NM] AS 등록자
@@ -87,7 +87,7 @@ router.post("/", async (req, res) => {
             ,[ALST_FACILITY_PK] AS 설비NO
             ,(SELECT [FCLT_NAME] FROM [QMES2022].[dbo].[MASTER_FACILITY_TB] WHERE [FCLT_PK] = [ALST_FACILITY_PK]) AS 설비명
             ,[ALST_USE] AS 기능사용
-            ,CONVERT(VARCHAR, [ALST_TIME], 8) AS 발송시간
+            ,CONVERT(VARCHAR(5),[ALST_TIME],8) AS 발송시간
             ,[ALST_POINT] AS 발송시점
             ,[ALST_NOTE] AS 비고
             ,[ALST_REGIST_NM] AS 등록자
@@ -120,7 +120,7 @@ router.post("/", async (req, res) => {
             ,[ALST_FACILITY_PK] AS 설비NO
             ,(SELECT [FCLT_NAME] FROM [QMES2022].[dbo].[MASTER_FACILITY_TB] WHERE [FCLT_PK] = [ALST_FACILITY_PK]) AS 설비명
             ,[ALST_USE] AS 기능사용
-            ,CONVERT(VARCHAR, [ALST_TIME], 8) AS 발송시간
+            ,CONVERT(VARCHAR(5),[ALST_TIME],8) AS 발송시간
             ,[ALST_POINT] AS 발송시점
             ,[ALST_NOTE] AS 비고
             ,[ALST_REGIST_NM] AS 등록자
@@ -341,7 +341,7 @@ router.post("/delete", async (req, res) => {
           ,[ALST_FACILITY_PK] AS 설비NO
           ,(SELECT [FCLT_NAME] FROM [QMES2022].[dbo].[MASTER_FACILITY_TB] WHERE [FCLT_PK] = [ALST_FACILITY_PK]) AS 설비명
           ,[ALST_USE] AS 기능사용
-          ,CONVERT(VARCHAR, [ALST_TIME], 8) AS 발송시간
+          ,CONVERT(VARCHAR(5),[ALST_TIME],8) AS 발송시간
           ,[ALST_POINT] AS 발송시점
           ,[ALST_NOTE] AS 비고
           ,[ALST_REGIST_NM] AS 등록자

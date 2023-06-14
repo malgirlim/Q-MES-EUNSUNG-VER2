@@ -57,6 +57,7 @@ export interface AlertUser {
 export interface AlertLog {
   [attribute: string]: any | undefined;
   NO?: number;
+  발송대상ID?: string;
   구분?: string;
   제목?: string;
   내용?: string;

@@ -36,6 +36,7 @@ router.get("/", async (req, res) => {
     const result = await Pool.request().query(`
       SELECT
         [ALLG_PK] AS NO
+        ,[ALLG_USER_ID] AS 발송대상ID
         ,[ALLG_DIV] AS 구분
         ,[ALLG_TITLE] AS 제목
         ,[ALLG_CONTENT] AS 내용
@@ -75,10 +76,12 @@ router.post("/", async (req, res) => {
       sql =
         `
         SELECT
-          NO AS NO, 구분 AS 구분, 제목 AS 제목, 내용 AS 내용, 확인 AS 확인, 등록자 AS 등록자, 등록일시 AS 등록일시
+          NO AS NO, 발송대상ID AS 발송대상ID, 구분 AS 구분, 제목 AS 제목, 내용 AS 내용, 확인 AS 확인,
+          등록자 AS 등록자, 등록일시 AS 등록일시
         FROM(
           SELECT
             [ALLG_PK] AS NO
+            ,[ALLG_USER_ID] AS 발송대상ID
             ,[ALLG_DIV] AS 구분
             ,[ALLG_TITLE] AS 제목
             ,[ALLG_CONTENT] AS 내용
@@ -88,7 +91,8 @@ router.post("/", async (req, res) => {
           FROM [QMES2022].[dbo].[MANAGE_ALERT_LOG_TB]
         ) AS RESULT
         WHERE (1=1)
-        AND ( 구분 like concat('%',@input,'%')
+        AND ( 발송대상ID like concat('%',@input,'%')
+        OR 구분 like concat('%',@input,'%')
         OR 제목 like concat('%',@input,'%')
         OR 내용 like concat('%',@input,'%')
         OR 확인 like concat('%',@input,'%')
@@ -104,10 +108,12 @@ router.post("/", async (req, res) => {
       sql =
         `
         SELECT
-          NO AS NO, 구분 AS 구분, 제목 AS 제목, 내용 AS 내용, 확인 AS 확인, 등록자 AS 등록자, 등록일시 AS 등록일시
+          NO AS NO, 발송대상ID AS 발송대상ID, 구분 AS 구분, 제목 AS 제목, 내용 AS 내용, 확인 AS 확인,
+          등록자 AS 등록자, 등록일시 AS 등록일시
         FROM(
           SELECT
             [ALLG_PK] AS NO
+            ,[ALLG_USER_ID] AS 발송대상ID
             ,[ALLG_DIV] AS 구분
             ,[ALLG_TITLE] AS 제목
             ,[ALLG_CONTENT] AS 내용
@@ -168,6 +174,7 @@ router.post("/insert", async (req, res) => {
   try {
     const Pool = await pool;
     await Pool.request()
+      .input("발송대상ID", req.body.data.발송대상ID ?? "")
       .input("구분", req.body.data.구분 ?? "")
       .input("제목", req.body.data.제목 ?? "")
       .input("내용", req.body.data.내용 ?? "")
@@ -178,14 +185,15 @@ router.post("/insert", async (req, res) => {
         moment().tz("Asia/Seoul").format("YYYY-MM-DD HH:mm:ss")
       ).query(`
         INSERT INTO [QMES2022].[dbo].[MANAGE_ALERT_LOG_TB]
-          ([ALLG_DIV]
+          ([ALLG_USER_ID]
+          ,[ALLG_DIV]
           ,[ALLG_TITLE]
           ,[ALLG_CONTENT]
           ,[ALLG_CHECK]
           ,[ALLG_REGIST_NM]
           ,[ALLG_REGIST_DT])
         VALUES
-          (@구분,@제목,@내용,@확인,@등록자,@등록일시)
+          (@발송대상ID,@구분,@제목,@내용,@확인,@등록자,@등록일시)
       `);
 
     // 로그기록 저장
@@ -216,6 +224,7 @@ router.post("/insertAll", async (req, res) => {
     const Pool = await pool;
     for (var i = 0; i < req.body.data.length; i++) {
       await Pool.request()
+        .input("발송대상ID", req.body.data[i].발송대상ID ?? "")
         .input("구분", req.body.data[i].구분 ?? "")
         .input("제목", req.body.data[i].제목 ?? "")
         .input("내용", req.body.data[i].내용 ?? "")
@@ -226,14 +235,15 @@ router.post("/insertAll", async (req, res) => {
           moment().tz("Asia/Seoul").format("YYYY-MM-DD HH:mm:ss")
         ).query(`
         INSERT INTO [QMES2022].[dbo].[MANAGE_ALERT_LOG_TB]
-          ([ALLG_DIV]
+          ([ALLG_USER_ID]
+          ,[ALLG_DIV]
           ,[ALLG_TITLE]
           ,[ALLG_CONTENT]
           ,[ALLG_CHECK]
           ,[ALLG_REGIST_NM]
           ,[ALLG_REGIST_DT])
         VALUES
-          (@구분,@제목,@내용,@확인,@등록자,@등록일시)
+          (@발송대상ID,@구분,@제목,@내용,@확인,@등록자,@등록일시)
       `);
 
       // 로그기록 저장
@@ -264,6 +274,7 @@ router.post("/edit", async (req, res) => {
     const Pool = await pool;
     await Pool.request()
       .input("NO", req.body.data.NO ?? 0)
+      .input("발송대상ID", req.body.data.발송대상ID ?? "")
       .input("구분", req.body.data.구분 ?? "")
       .input("제목", req.body.data.제목 ?? "")
       .input("내용", req.body.data.내용 ?? "")
@@ -275,7 +286,8 @@ router.post("/edit", async (req, res) => {
       ).query(`
         UPDATE [QMES2022].[dbo].[MANAGE_ALERT_LOG_TB]
           SET 
-            [ALLG_DIV] = @구분
+            [ALLG_USER_ID] = @발송대상ID
+            ,[ALLG_DIV] = @구분
             ,[ALLG_TITLE] = @제목
             ,[ALLG_CONTENT] = @내용
             ,[ALLG_CHECK] = @확인
@@ -314,6 +326,7 @@ router.post("/delete", async (req, res) => {
       const result = await Pool.request().input("key", req.body.data[i]).query(`
         SELECT
           [ALLG_PK] AS NO
+          ,[ALLG_USER_ID] AS 발송대상ID
           ,[ALLG_DIV] AS 구분
           ,[ALLG_TITLE] AS 제목
           ,[ALLG_CONTENT] AS 내용
