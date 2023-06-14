@@ -185,6 +185,8 @@ router.get("/", async (req, res) => {
           [USER_POSITION] AS 직책,
           [USER_RANK] AS 직급
         FROM [QMES2022].[dbo].[MASTER_USER_TB]
+        WHERE [USER_ID] != 'admin'
+        AND [USER_ID] != 'kiosk'
       ) AS RESULT_USER ON RESULT_USER.아이디 = [PDRS_USER_ID]
       ORDER BY [PDRS_PK] DESC
     `);

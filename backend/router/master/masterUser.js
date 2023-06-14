@@ -196,6 +196,8 @@ router.post("/info", async (req, res) => {
           [USER_POSITION] AS 직책,
           [USER_RANK] AS 직급
         FROM [QMES2022].[dbo].[MASTER_USER_TB]
+        WHERE [USER_ID] != 'admin'
+        AND [USER_ID] != 'kiosk'
         ) AS RESULT
         WHERE (1=1)
         AND 아이디 = @input

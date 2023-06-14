@@ -126,6 +126,8 @@ async function getSendUser(알림설정NO) {
           [USER_POSITION] AS 직책,
           [USER_RANK] AS 직급
         FROM [QMES2022].[dbo].[MASTER_USER_TB]
+        WHERE [USER_ID] != 'admin'
+        AND [USER_ID] != 'kiosk'
       ) AS MASTER_USER ON MASTER_USER.아이디 = [ALUS_USER_ID]
       WHERE [ALUS_ALST_PK] = ` +
         알림설정NO +
@@ -216,18 +218,18 @@ async function insertAlertLog(user, data, res) {
       )
       .input("확인", "NO" ?? "")
       .input("등록자", "시스템" ?? "")
-      .input("등록일시", dayjs().format("YYYY-MM-DD HH:mm:ss")).query(`
-                  INSERT INTO [QMES2022].[dbo].[MANAGE_ALERT_LOG_TB]
-                    ([ALLG_USER_ID]
-                    ,[ALLG_DIV]
-                    ,[ALLG_TITLE]
-                    ,[ALLG_CONTENT]
-                    ,[ALLG_CHECK]
-                    ,[ALLG_REGIST_NM]
-                    ,[ALLG_REGIST_DT])
-                  VALUES
-                    (@발송대상ID,@구분,@제목,@내용,@확인,@등록자,@등록일시)
-                `);
+      .input("등록일시", dayjs().format("YYYY-MM-DD HH:mm:ss"))
+      .query(`INSERT INTO [QMES2022].[dbo].[MANAGE_ALERT_LOG_TB]
+                ([ALLG_USER_ID]
+                ,[ALLG_DIV]
+                ,[ALLG_TITLE]
+                ,[ALLG_CONTENT]
+                ,[ALLG_CHECK]
+                ,[ALLG_REGIST_NM]
+                ,[ALLG_REGIST_DT])
+              VALUES
+                (@발송대상ID,@구분,@제목,@내용,@확인,@등록자,@등록일시)
+      `);
   } catch (err) {
     console.log(err.message);
   }
@@ -257,17 +259,17 @@ async function insertForecastNotify(data) {
       )
       .input("비고", "" ?? "")
       .input("등록자", "시스템" ?? "")
-      .input("등록일시", dayjs().format("YYYY-MM-DD HH:mm:ss")).query(`
-                    INSERT INTO [QMES2022].[dbo].[MANAGE_WARNING_DELIVERY_TB]
-                      ([WNDL_ACCEPT_PK]
-                      ,[WNDL_DIV]
-                      ,[WNDL_CONTENT]
-                      ,[WNDL_NOTE]
-                      ,[WNDL_REGIST_NM]
-                      ,[WNDL_REGIST_DT])
-                    VALUES
-                      (@참조NO,@구분,@내용,@비고,@등록자,@등록일시)
-                  `);
+      .input("등록일시", dayjs().format("YYYY-MM-DD HH:mm:ss"))
+      .query(`INSERT INTO [QMES2022].[dbo].[MANAGE_WARNING_DELIVERY_TB]
+                ([WNDL_ACCEPT_PK]
+                ,[WNDL_DIV]
+                ,[WNDL_CONTENT]
+                ,[WNDL_NOTE]
+                ,[WNDL_REGIST_NM]
+                ,[WNDL_REGIST_DT])
+              VALUES
+                (@참조NO,@구분,@내용,@비고,@등록자,@등록일시)
+      `);
   } catch (err) {
     console.log(err.message);
   }
