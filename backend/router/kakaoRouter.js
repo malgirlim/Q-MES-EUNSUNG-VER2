@@ -2,7 +2,7 @@ const express = require("express");
 const router = express.Router();
 
 const OrderForecast = require("./kakao/OrderForecast");
-// const OrderNotify = require("./kakao/OrderNotify");
+const OrderNotify = require("./kakao/OrderNotify");
 // const PreventChangeNotify = require("./kakao/PreventChangeNotify");
 // const PreventDailyNotify = require("./kakao/PreventDailyNotify");
 // const PreventErrorNotify = require("./kakao/PreventErrorNotify");

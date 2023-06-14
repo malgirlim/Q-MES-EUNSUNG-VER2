@@ -100,6 +100,8 @@ router.get("/", async (req, res) => {
           [USER_POSITION] AS 직책,
           [USER_RANK] AS 직급
         FROM [QMES2022].[dbo].[MASTER_USER_TB]
+        WHERE [USER_ID] != 'admin'
+        AND [USER_ID] != 'kiosk'
       ) AS USERS ON USERS.아이디 = [ISPC_USER_ID]
       LEFT JOIN
       (
