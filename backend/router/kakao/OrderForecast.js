@@ -39,7 +39,7 @@ async function request_post() {
       // 보낼 데이터가 여러개인 경우가 있으므로 for문 실행
       for (let data of send_data) {
         // 발송시점의 기준을 판단
-        if (data.납기잔여일 == judge.발송시점) {
+        if (0 <= data.납기잔여일 && data.납기잔여일 <= judge.발송시점) {
           kakaoSendData.납기잔여일 = data.납기잔여일 ?? "";
           kakaoSendData.수주코드 = data.수주코드 ?? "";
           kakaoSendData.거래처명 = data.거래처명 ?? "";
@@ -146,12 +146,12 @@ async function getSendData() {
     const result = await Pool.request().query(`
       SELECT
         수주NO AS 수주NO
-        ,CAST(납기잔여일 AS VARCHAR) AS 납기잔여일
-        ,CAST(수주코드 AS VARCHAR) AS 수주코드
-        ,CAST(거래처명 AS VARCHAR) AS 거래처명
-        ,CAST(품명 AS VARCHAR) AS 품명
-        ,CAST(수량 AS VARCHAR) AS 수량
-        ,CAST(납기일 AS VARCHAR) AS 납기일
+        ,납기잔여일 AS 납기잔여일
+        ,수주코드 AS 수주코드
+        ,거래처명 AS 거래처명
+        ,품명 AS 품명
+        ,수량 AS 수량
+        ,납기일 AS 납기일
         ,수량 - 납품수 AS 남은수량
       FROM
       (
