@@ -1,4 +1,4 @@
-import { createApp } from "vue";
+import { createApp, getCurrentInstance } from "vue";
 import { reactive } from "vue";
 import { createPinia } from "pinia";
 import App from "./App.vue";
@@ -6,6 +6,47 @@ import router from "./router";
 import Vue3Toasity from "vue3-toastify";
 import "vue3-toastify/dist/index.css";
 import "./assets/css/app.css";
+
+import axios from "axios";
+import {
+  시스템_개발자,
+  시스템_관리자,
+  구매_관리자,
+  구매_일반,
+  영업_관리자,
+  영업_일반,
+  품질_관리자,
+  품질_일반,
+  생산_관리자,
+  생산_일반,
+} from "./composables/authData";
+
+//const { proxy }: any = getCurrentInstance();
+
+let auth_account: any = { id: null, name: "", part: "", rank: "", auth: "" };
+let auth_level: any = {};
+
+await axios
+  .get("/api/auth")
+  .then((res: any) => {
+    auth_account = res.data;
+    if (res.data.auth == "시스템개발자") auth_level = 시스템_개발자;
+    if (res.data.auth == "시스템관리자") auth_level = 시스템_관리자;
+    if (res.data.auth == "구매일반") auth_level = 구매_일반;
+    if (res.data.auth == "구매관리자") auth_level = 구매_관리자;
+    if (res.data.auth == "영업일반") auth_level = 영업_일반;
+    if (res.data.auth == "영업관리자") auth_level = 영업_관리자;
+    if (res.data.auth == "생산일반") auth_level = 생산_일반;
+    if (res.data.auth == "생산관리자") auth_level = 생산_관리자;
+    if (res.data.auth == "품질일반") auth_level = 품질_일반;
+    if (res.data.auth == "품질관리자") auth_level = 품질_관리자;
+    //if (res.data.auth == "시스템개발자") show_debug_button.value = true;
+  })
+  .catch((res) => {
+    if (auth_account.id == null) {
+      router.push("/login");
+    }
+  });
 
 const app = createApp(App);
 app.use(router);
@@ -15,123 +56,10 @@ app.use(Vue3Toasity, {
   autoClose: 2000,
 });
 
-app.mount("#app");
-
 app.config.globalProperties.gstate = reactive({
-  account: {
-    id: null,
-    name: "",
-    part: "",
-    rank: "",
-    auth: "",
-  },
-  form: {
-    loginId: "",
-    loginPw: "",
-  },
-  level: {
-    ShareNotice: 2,
-    MasterUser: 2,
-    MasterClient: 2,
-    MasterProduct: 2,
-    MasterBOM: 2,
-    MasterFacility: 2,
-    MasterProcess: 2,
-    MasterMold: 2,
-    MasterCodeBad: 2,
-    MasterCodeNonOP: 2,
-    MasterFacilityParts: 2,
-    MasterQualityStd: 2,
-    MasterFacilityStd: 2,
-    MasterStockStd: 2,
-    MasterRecipe: 2,
-    OrderAdd: 2,
-    OrderCurrent: 2,
-    OrderForecast: 2,
-    OrderNotify: 2,
-    OrderDelivery: 2,
-    OrderOrder: 2,
-    OrderOrderCurrent: 2,
-    OrderFacilityParts: 2,
-    OrderFacilityPartsCurrent: 2,
-    ProductionPlanAdd: 2,
-    ProductionTaskAdd: 2,
-    ProductionTaskCurrent: 2,
-    ProductionTaskReport: 2,
-    ProductionBadRework: 2,
-    ProcessLOT: 2,
-    ProcessLOTTrack: 2,
-    ProcessXXX: 2,
-    StockReceiveRaw: 2,
-    StockWIPRaw: 2,
-    StockWIPMonitorRaw: 2,
-    StockUseRaw: 2,
-    StockMonitorRaw: 2,
-    StockReceiveHalf: 2,
-    StockWIPHalf: 2,
-    StockWIPMonitorHalf: 2,
-    StockUseHalf: 2,
-    StockMonitorHalf: 2,
-    StockReceiveFinish: 2,
-    StockMonitorFinish: 2,
-    StockReceiveParts: 2,
-    StockUseParts: 2,
-    StockMonitorParts: 2,
-    QualityStandard: 2,
-    QualityReport: 2,
-    QualityIncoming: 2,
-    QualityProcess: 2,
-    QualityShipment: 2,
-    MoldUse: 2,
-    MoldRepair: 2,
-    MoldCheck: 2,
-    MonitoringKPI1: 2,
-    MonitoringKPI2: 2,
-    MonitoringDaily: 2,
-    MonitoringPrevent: 2,
-    MonitoringMTBF: 2,
-    MonitoringMTTR: 2,
-    MonitoringOEE: 2,
-    PreventPlan: 2,
-    PreventDailyPlan: 2,
-    PreventRepairPlan: 2,
-    PreventLifePlan: 2,
-    PreventForecast: 2,
-    PreventNotice: 2,
-    PreventErrorNotify: 2,
-    PreventDailyNotify: 2,
-    PreventRepairForecast: 2,
-    PreventRepairNotify: 2,
-    PreventChangeNotify: 2,
-    AdminLog: 2,
-    AlertOrderForecast: 2,
-    AlertOrderNotify: 2,
-    AlertPreventForecast: 2,
-    AlertPreventNotice: 2,
-    AlertPreventErrorNotify: 2,
-    AlertPreventDailyNotify: 2,
-    AlertPreventRepairForecast: 2,
-    AlertPreventRepairNotify: 2,
-    AlertPreventChangeNotify: 2,
-    AlertStockSafeNotify: 2,
-    MobileOrderCurrentForecast: 2,
-    MobileOrderCurrentNotify: 2,
-    MobileOrderTaskReport: 2,
-    MobileStockReceive: 2,
-    MobileStockDelivery: 2,
-    MobileStockLOTPrint: 2,
-    MobileStockLOTTrack: 2,
-    MobileStockSafeNotify: 2,
-    MobilePreventDailyCheck: 2,
-    MobilePreventDailyCheckNotify: 2,
-    MobilePreventForecast: 2,
-    MobilePreventNotify: 2,
-    MobilePreventRepairForecast: 2,
-    MobilePreventRepairNotify: 2,
-    MobilePreventChangeNotify: 2,
-    MobilePreventErrorNotify: 2,
-  },
-  debug: {
-    active: null,
-  },
+  account: auth_account,
+  level: auth_level,
+  debug: { active: null },
 });
+
+app.mount("#app");

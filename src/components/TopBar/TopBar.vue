@@ -61,6 +61,7 @@ const logout = () => {
       proxy.gstate.account.id = null;
       proxy.gstate.account.name = "";
       proxy.gstate.account.rank = "";
+      proxy.gstate.account.level = {};
       router.push("/login");
     });
 };

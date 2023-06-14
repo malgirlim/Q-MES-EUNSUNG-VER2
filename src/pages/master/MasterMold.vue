@@ -32,7 +32,7 @@ import MoldDetail from "../../components/Common/Detail/MasterMoldDetail.vue";
 import DocumentPrint from "../../components/Common/Print/Template/TaskAdd(Std)/Main.vue";
 
 const { proxy }: any = getCurrentInstance();
-const user_level = proxy.gstate.level.MasterProcess; //권한레벨
+const user_level = proxy.gstate.level.MasterMold; //권한레벨
 
 // 페이지 로딩 시 시작
 onMounted(async () => {
@@ -243,7 +243,7 @@ const insertDataFunction = async () => {
 // ##### 수정 Modal #####
 const editModal = ref(false);
 const setEditModal = (value: boolean) => {
-  if (user_level >= 3) {
+  if (user_level >= 4) {
     editModal.value = value;
     search();
   } else {
@@ -261,7 +261,7 @@ const editDataFunction = async () => {
 // ##### 삭제 Modal #####
 const deleteModal = ref(false);
 const setDeleteModal = (value: boolean) => {
-  if (user_level >= 4) {
+  if (user_level >= 5) {
     deleteModal.value = value;
   } else {
     toast.warning("액세스 권한이 없습니다.\n관리자에게 문의하세요.");

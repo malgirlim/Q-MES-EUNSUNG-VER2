@@ -29,7 +29,7 @@ import {
 import Detail from "../../components/Common/Detail/StockReceiveRawDetail.vue";
 
 const { proxy }: any = getCurrentInstance();
-const user_level = proxy.gstate.level.StockMonitorRaw; //권한레벨
+const user_level = proxy.gstate.level.StockMonitorFinish; //권한레벨
 
 // 페이지 로딩 시 시작
 onMounted(async () => {
@@ -167,7 +167,7 @@ const editDataFunction = async () => {
 // ##### 삭제 Modal #####
 const deleteModal = ref(false);
 const setDeleteModal = (value: boolean) => {
-  if (user_level >= 4) {
+  if (user_level >= 5) {
     deleteModal.value = value;
   } else {
     toast.warning("액세스 권한이 없습니다.\n관리자에게 문의하세요.");

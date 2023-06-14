@@ -99,7 +99,6 @@ import QualityReport from "../pages/quality/QualityReport.vue";
 import QualityIncoming from "../pages/quality/QualityIncoming.vue";
 import QualityProcess from "../pages/quality/QualityProcess.vue";
 import QualityShipment from "../pages/quality/QualityShipment.vue";
-import QualityInadequate from "../pages/quality/QualityInadequate.vue";
 
 /* 금형관리 */
 import MoldUse from "../pages/mold/MoldUse.vue";
