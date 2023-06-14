@@ -400,7 +400,7 @@ const setDebugMode = () => {
           <Menu.Devider class="bg-white/[0.08]" />
           <Menu.Item
             class="hover:bg-white/5"
-            @click="$router.push('/setting/mobile-alert/order-forecast')"
+            @click="$router.push('/setting/alert/order-forecast')"
           >
             <Lucide icon="BellPlus" class="w-4 h-4 mr-2" /> 모바일 알림설정
           </Menu.Item>

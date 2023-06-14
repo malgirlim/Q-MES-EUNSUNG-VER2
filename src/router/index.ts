@@ -132,16 +132,16 @@ import PreventChangeNotify from "../pages/prevent/PreventChangeNotify.vue";
 import AdminLog from "../pages/admin/AdminLog.vue";
 
 /* 설정메뉴 */
-import SettingMobileAlertOrderForecast from "../pages/setting/mobile-alert/OrderForecast.vue";
-import SettingMobileAlertOrderNotify from "../pages/setting/mobile-alert/OrderNotify.vue";
-import SettingMobileAlertPreventForecast from "../pages/setting/mobile-alert/PreventForecast.vue";
-import SettingMobileAlertPreventNotice from "../pages/setting/mobile-alert/PreventNotice.vue";
-import SettingMobileAlertPreventErrorNotify from "../pages/setting/mobile-alert/PreventErrorNotify.vue";
-import SettingMobileAlertPreventDailyNotify from "../pages/setting/mobile-alert/PreventDailyNotify.vue";
-import SettingMobileAlertPreventRepairForecast from "../pages/setting/mobile-alert/PreventRepairForecast.vue";
-import SettingMobileAlertPreventRepairNotify from "../pages/setting/mobile-alert/PreventRepairNotify.vue";
-import SettingMobileAlertPreventChangeNotify from "../pages/setting/mobile-alert/PreventChangeNotify.vue";
-import SettingMobileAlertStockSafeNotify from "../pages/setting/mobile-alert/StockSafeNotify.vue";
+import SettingAlertOrderForecast from "../pages/setting/alert/OrderForecast.vue";
+import SettingAlertOrderNotify from "../pages/setting/alert/OrderNotify.vue";
+import SettingAlertPreventForecast from "../pages/setting/alert/PreventForecast.vue";
+import SettingAlertPreventNotice from "../pages/setting/alert/PreventNotice.vue";
+import SettingAlertPreventErrorNotify from "../pages/setting/alert/PreventErrorNotify.vue";
+import SettingAlertPreventDailyNotify from "../pages/setting/alert/PreventDailyNotify.vue";
+import SettingAlertPreventRepairForecast from "../pages/setting/alert/PreventRepairForecast.vue";
+import SettingAlertPreventRepairNotify from "../pages/setting/alert/PreventRepairNotify.vue";
+import SettingAlertPreventChangeNotify from "../pages/setting/alert/PreventChangeNotify.vue";
+import SettingAlertStockSafeNotify from "../pages/setting/alert/StockSafeNotify.vue";
 
 /* 모바일 */
 import MobileMain from "../pages/mobile/Main.vue";
@@ -1011,94 +1011,94 @@ const routes = [
         component: AdminLog,
       },
       {
-        path: "setting/mobile-alert/order-forecast",
-        name: "top-menu-aseeing-mobile-alert-order-forecast",
+        path: "setting/alert/order-forecast",
+        name: "top-menu-aseeing-alert-order-forecast",
         meta: {
-          pagename: "모바일 알림설정",
+          pagename: "알림설정",
           category: "설정",
         },
-        component: SettingMobileAlertOrderForecast,
+        component: SettingAlertOrderForecast,
       },
       {
-        path: "setting/mobile-alert/order-notify",
-        name: "top-menu-aseeing-mobile-alert-order-notify",
+        path: "setting/alert/order-notify",
+        name: "top-menu-aseeing-alert-order-notify",
         meta: {
-          pagename: "모바일 알림설정",
+          pagename: "알림설정",
           category: "설정",
         },
-        component: SettingMobileAlertOrderNotify,
+        component: SettingAlertOrderNotify,
       },
       {
-        path: "setting/mobile-alert/prevent-forecast",
-        name: "top-menu-aseeing-mobile-alert-prevent-forecast",
+        path: "setting/alert/prevent-forecast",
+        name: "top-menu-aseeing-alert-prevent-forecast",
         meta: {
-          pagename: "모바일 알림설정",
+          pagename: "알림설정",
           category: "설정",
         },
-        component: SettingMobileAlertPreventForecast,
+        component: SettingAlertPreventForecast,
       },
       {
-        path: "setting/mobile-alert/prevent-notice",
-        name: "top-menu-aseeing-mobile-alert-prevent-notice",
+        path: "setting/alert/prevent-notice",
+        name: "top-menu-aseeing-alert-prevent-notice",
         meta: {
-          pagename: "모바일 알림설정",
+          pagename: "알림설정",
           category: "설정",
         },
-        component: SettingMobileAlertPreventNotice,
+        component: SettingAlertPreventNotice,
       },
       {
-        path: "setting/mobile-alert/prevent-error-notify",
-        name: "top-menu-aseeing-mobile-alert-prevent-error-notify",
+        path: "setting/alert/prevent-error-notify",
+        name: "top-menu-aseeing-alert-prevent-error-notify",
         meta: {
-          pagename: "모바일 알림설정",
+          pagename: "알림설정",
           category: "설정",
         },
-        component: SettingMobileAlertPreventErrorNotify,
+        component: SettingAlertPreventErrorNotify,
       },
       {
-        path: "setting/mobile-alert/prevent-daily-notify",
-        name: "top-menu-aseeing-mobile-alert-prevent-daily-notify",
+        path: "setting/alert/prevent-daily-notify",
+        name: "top-menu-aseeing-alert-prevent-daily-notify",
         meta: {
-          pagename: "모바일 알림설정",
+          pagename: "알림설정",
           category: "설정",
         },
-        component: SettingMobileAlertPreventDailyNotify,
+        component: SettingAlertPreventDailyNotify,
       },
       {
-        path: "setting/mobile-alert/prevent-repair-forecast",
-        name: "top-menu-aseeing-mobile-alert-prevent-repair-forecast",
+        path: "setting/alert/prevent-repair-forecast",
+        name: "top-menu-aseeing-alert-prevent-repair-forecast",
         meta: {
-          pagename: "모바일 알림설정",
+          pagename: "알림설정",
           category: "설정",
         },
-        component: SettingMobileAlertPreventRepairForecast,
+        component: SettingAlertPreventRepairForecast,
       },
       {
-        path: "setting/mobile-alert/prevent-repair-notify",
-        name: "top-menu-aseeing-mobile-alert-prevent-repair-notify",
+        path: "setting/alert/prevent-repair-notify",
+        name: "top-menu-aseeing-alert-prevent-repair-notify",
         meta: {
-          pagename: "모바일 알림설정",
+          pagename: "알림설정",
           category: "설정",
         },
-        component: SettingMobileAlertPreventRepairNotify,
+        component: SettingAlertPreventRepairNotify,
       },
       {
-        path: "setting/mobile-alert/prevent-change-notify",
-        name: "top-menu-aseeing-mobile-alert-prevent-change-notify",
+        path: "setting/alert/prevent-change-notify",
+        name: "top-menu-aseeing-alert-prevent-change-notify",
         meta: {
-          pagename: "모바일 알림설정",
+          pagename: "알림설정",
           category: "설정",
         },
-        component: SettingMobileAlertPreventChangeNotify,
+        component: SettingAlertPreventChangeNotify,
       },
       {
-        path: "setting/mobile-alert/stock-safe-notify",
-        name: "top-menu-aseeing-mobile-alert-stock-safe-notify",
+        path: "setting/alert/stock-safe-notify",
+        name: "top-menu-aseeing-alert-stock-safe-notify",
         meta: {
-          pagename: "모바일 알림설정",
+          pagename: "알림설정",
           category: "설정",
         },
-        component: SettingMobileAlertStockSafeNotify,
+        component: SettingAlertStockSafeNotify,
       },
     ],
   },

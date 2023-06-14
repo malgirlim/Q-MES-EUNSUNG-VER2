@@ -48,7 +48,7 @@ const chartData = computed<ChartData>(() => {
       // },
       {
         label: "불량수",
-        data: [8, 15, 24, 18, 2, 0],
+        data: [2, 1, 8, 15, 24, 18, 2, 0],
         type: "bar",
         datalabels: {
           color: "black",
@@ -74,7 +74,7 @@ const chartOptions = computed<ChartOptions>(() => {
         stacked: true,
         ticks: {
           font: {
-            size: 13,
+            size: 10,
           },
         },
       },

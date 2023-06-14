@@ -214,6 +214,8 @@ const switch_page_func = () => {
             <div style="height: 310px">
               <KPIChart_Test
                 :x_label="[
+                  '중량',
+                  '발란싱',
                   '초기',
                   '흑점.흑줄',
                   '미성형.이물',

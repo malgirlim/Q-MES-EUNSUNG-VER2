@@ -6,7 +6,7 @@ import Table from "../../../base-components/Table";
 import Button from "../../../base-components/Button";
 import Lucide from "../../../base-components/Lucide";
 import PaginationComponent from "../../../components/Pagination/PaginationComponent.vue"; // 페이징설정
-import MobileAlertSelect from "../../../components/Common/Setting/MobileAlertSelect.vue";
+import AlertSelect from "../../../components/Common/Setting/AlertSelect.vue";
 
 // API 보내는 함수 및 인터페이스 불러오기
 import { useSendApi } from "../../../composables/useSendApi";
@@ -28,7 +28,7 @@ onMounted(async () => {
   await alertSetting.searchDatas(
     "전체기간",
     "구분",
-    "PreventChangeNotify",
+    "PreventDailyNotify",
     "",
     ""
   ); // 설정 데이터 불러오기
@@ -59,7 +59,7 @@ const SearchData = async () => {
   await alertSetting.searchDatas(
     "전체기간",
     "구분",
-    "PreventChangeNotify",
+    "PreventDailyNotify",
     "",
     ""
   ); // 설정 데이터 불러오기
@@ -81,7 +81,7 @@ const setInsertRuleModal = (value: boolean) => {
   SearchData();
   insertRuleModal.value = value;
   alertRuleModalData = {
-    구분: "PreventChangeNotify",
+    구분: "PreventDailyNotify",
     설비NO: alertSettingFacilityNO.value,
   }; // 초기화
 };
@@ -207,13 +207,13 @@ const importUser = (no: any) => {
 <template>
   <div class="mt-5 mb-3 text-xl font-bold">
     <div class="flex items-center">
-      <Lucide class="mb-0.5 mr-1" icon="BellPlus" /> 모바일 알림설정
+      <Lucide class="mb-0.5 mr-1" icon="BellPlus" /> 알림설정
     </div>
   </div>
   <!--BEGIN: 설정 항목들 -->
   <div class="mt-5 grid grid-cols-12 gap-1">
     <div class="col-span-2 border-r-2 border-slate-200" style="height: 640px">
-      <div><MobileAlertSelect 설비부품교체시기통보_variant="primary" /></div>
+      <div><AlertSelect 일상점검확인통보_variant="primary" /></div>
     </div>
     <div class="intro-y col-span-3 border-r-2 border-slate-200">
       <div class="flex items-center text-xl font-bold ml-5">
@@ -370,7 +370,7 @@ const importUser = (no: any) => {
           <div class="flex items-center">
             <div class="flex m-auto mt-5">
               <img
-                src="../../../assets/images/kakao_template/PreventChangeNotify.png"
+                src="../../../assets/images/kakao_template/PreventDailyNotify.png"
               />
             </div>
           </div>

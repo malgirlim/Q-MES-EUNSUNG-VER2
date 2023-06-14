@@ -16,7 +16,7 @@ import { toast } from "vue3-toastify";
 
 // API 보내는 함수 및 인터페이스 불러오기
 import { useSendApi } from "../../composables/useSendApi";
-import { MasterUser } from "../../interfaces/menu/MasterInterface";
+import { MasterUser } from "../../interfaces/menu/masterInterface";
 
 // 페이징기능
 import { onMounted, watch } from "vue";
@@ -34,12 +34,12 @@ const pageChange = () => {
 };
 
 // 권한메뉴 전환
-const auth_page = ref(0);
+// const auth_page = ref(0);
 
-const auth_page_change = (page: any) => {
-  auth_page.value = page;
-  return auth_page;
-};
+// const auth_page_change = (page: any) => {
+//   auth_page.value = page;
+//   return auth_page;
+// };
 
 // api 보내기
 const url = "/api/master/user";
@@ -160,7 +160,7 @@ const insert_check = () => {
 //수정 Modal
 const editModal = ref(false);
 const setEditModal = (value: boolean) => {
-  if (user_level >= 3) {
+  if (user_level >= 4) {
     editModal.value = value;
     search();
   } else {
@@ -172,7 +172,7 @@ let editModalData: MasterUser; // 수정할 변수
 //삭제 Modal
 const deleteConfirmationModal = ref(false);
 const setDeleteConfirmationModal = (value: boolean) => {
-  if (user_level >= 4) {
+  if (user_level >= 5) {
     deleteConfirmationModal.value = value;
   } else {
     toast.warning("액세스 권한이 없습니다.\n관리자에게 문의하세요.");
@@ -186,15 +186,15 @@ const deleteDataFunction = async () => {
 };
 
 //권한Modal
-const authModal = ref(false);
-const setAuthModal = (value: boolean) => {
-  if (user_level >= 3) {
-    authModal.value = value;
-  } else {
-    toast.warning("액세스 권한이 없습니다.\n관리자에게 문의하세요.");
-  }
-};
-const authButtonRef = ref(null);
+// const authModal = ref(false);
+// const setAuthModal = (value: boolean) => {
+//   if (user_level >= 3) {
+//     authModal.value = value;
+//   } else {
+//     toast.warning("액세스 권한이 없습니다.\n관리자에게 문의하세요.");
+//   }
+// };
+// const authButtonRef = ref(null);
 
 // print.js 프린트 기능
 
@@ -998,7 +998,7 @@ const menu_list = [
   <!-- END: Edit Modal Content -->
 
   <!-- BEGIN: Auth Modal Content -->
-  <Dialog size="lg" :open="authModal">
+  <!-- <Dialog size="lg" :open="authModal">
     <Dialog.Panel class="p-8 text-center">
       <div class="mb-5" style="font-weight: bold">권한 설정</div>
 
@@ -1109,7 +1109,7 @@ const menu_list = [
         </div>
       </div>
     </Dialog.Panel>
-  </Dialog>
+  </Dialog> -->
   <!-- END: Auth Modal Content -->
   <!-- BEGIN: Delete Confirmation Modal -->
   <Dialog
