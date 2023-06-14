@@ -29,6 +29,7 @@ import NoticeDetail from "../../components/Common/Detail/NoticeDetail.vue";
 
 const { proxy }: any = getCurrentInstance();
 const user_level = proxy.gstate.level.ShareNotice; //권한레벨
+console.log(user_level);
 
 // 페이지 로딩 시 시작
 onMounted(async () => {

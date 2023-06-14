@@ -143,343 +143,358 @@ const table_width = [
 </script>
 
 <template>
-  <!-- style="height: calc(100vh - 250px)" : 브라우저 화면 창크기에 맞게 변경됨 : 100vh - 브라우저 창 크기 -->
-
-  <!-- BEGIN : 상단 그래프 -->
-  <div class="grid grid-cols-4 gap-5 mt-5 mb-5 intro-y" style="height: 330px">
-    <div class="col-span-1 p-5 bg-white rounded rounded-md">
-      <div class="text-center font-bold text-xl">
-        <div class="text-center">
-          <div class="mt-3">
-            <div class="px-3">
-              <div
-                class="text-lg mx-1 py-0.5 w-full border-l-2 border-r-2 border-t-2 border-success bg-success text-white rounded-t-md"
-              >
-                <div class="flex">
-                  <div class="flex m-auto items-center">
-                    <div>
-                      <Lucide
-                        class="w-5 h-5 text-white mr-1"
-                        icon="LineChart"
-                      />
+  <div v-if="user_level >= 2">
+    <!-- style="height: calc(100vh - 250px)" : 브라우저 화면 창크기에 맞게 변경됨 : 100vh - 브라우저 창 크기 -->
+    <!-- BEGIN : 상단 그래프 -->
+    <div class="grid grid-cols-4 gap-5 mt-5 mb-5 intro-y" style="height: 330px">
+      <div class="col-span-1 p-5 bg-white rounded rounded-md">
+        <div class="text-center font-bold text-xl">
+          <div class="text-center">
+            <div class="mt-3">
+              <div class="px-3">
+                <div
+                  class="text-lg mx-1 py-0.5 w-full border-l-2 border-r-2 border-t-2 border-success bg-success text-white rounded-t-md"
+                >
+                  <div class="flex">
+                    <div class="flex m-auto items-center">
+                      <div>
+                        <Lucide
+                          class="w-5 h-5 text-white mr-1"
+                          icon="LineChart"
+                        />
+                      </div>
+                      <div>평균설비수리시간</div>
                     </div>
-                    <div>평균설비수리시간</div>
                   </div>
                 </div>
-              </div>
-              <div
-                class="mx-1 p-2 w-full h-24 text-2xl border-l-2 border-r-2 border-b-2 border-success rounded-b-md bg-green-200"
-              >
-                <div class="mt-5 text-4xl">6.8hr</div>
+                <div
+                  class="mx-1 p-2 w-full h-24 text-2xl border-l-2 border-r-2 border-b-2 border-success rounded-b-md bg-green-200"
+                >
+                  <div class="mt-5 text-4xl">6.8hr</div>
+                </div>
               </div>
             </div>
           </div>
         </div>
       </div>
-    </div>
-    <div class="col-span-3 p-5 bg-white rounded rounded-md">
-      <div class="text-center font-bold text-xl">MTTR 현황</div>
-      <div style="height: 270px">
-        <MTTRChart_bar_bar
-          :x_label="[
-            '검사기',
-            '제판기',
-            '인쇄1호기',
-            '인쇄2호기',
-            '인쇄3호기',
-            '인쇄4호기',
-            '인쇄5호기',
-            '인쇄6호기',
-            '인쇄7호기',
-            '인쇄8호기',
-          ]"
-        />
-      </div>
-    </div>
-  </div>
-  <!-- END : 상단 그래프 -->
-  <!-- BEGIN : 하단 리스트 -->
-  <!-- <hr class="text-slate-200 intro-y mt-2 mb-1" style="border: solid 1px" /> -->
-  <!-- END : 하단 리스트 -->
-  <div class="grid grid-cols-12 gap-1 mt-1">
-    <div
-      class="flex flex-wrap items-center col-span-12 mt-2 mb-2 intro-y sm:flex-nowrap"
-    >
-      <div class="hidden mx-auto md:block text-slate-500"></div>
-      <div class="mr-5">
-        <a href="" class="flex items-center ml-auto text-primary">
-          <Lucide icon="RefreshCcw" class="w-4 h-4 mr-3" /> 새로고침
-        </a>
-      </div>
-      <div>
-        <Button
-          class="mr-2 shadow-md"
-          as="a"
-          size="sm"
-          variant="outline-primary"
-          @click="reset_date"
-          title="기간 초기화"
-          ><Lucide icon="CalendarX" class="w-5 h-5"
-        /></Button>
-      </div>
-      <div class="text-center">
-        <div>
-          <Litepicker
-            v-model="now2"
-            :options="{
-              autoApply: false,
-              singleMode: false,
-              numberOfColumns: 1,
-              numberOfMonths: 1,
-              showWeekNumbers: true,
-              dropdowns: {
-                minYear: Number(min_year),
-                maxYear: Number(max_year),
-                months: true,
-                years: true,
-              },
-              lang: 'ko',
-              format: 'YY/MM/DD',
-              delimiter: ' - ',
-              buttonText: {
-                reset: '새로고침',
-                apply: '적용',
-                cancel: '취소',
-              },
-            }"
-            class="block w-40 mx-auto !box"
-            placeholder="전체기간"
+      <div class="col-span-3 p-5 bg-white rounded rounded-md">
+        <div class="text-center font-bold text-xl">MTTR 현황</div>
+        <div style="height: 270px">
+          <MTTRChart_bar_bar
+            :x_label="[
+              '검사기',
+              '제판기',
+              '인쇄1호기',
+              '인쇄2호기',
+              '인쇄3호기',
+              '인쇄4호기',
+              '인쇄5호기',
+              '인쇄6호기',
+              '인쇄7호기',
+              '인쇄8호기',
+            ]"
           />
         </div>
       </div>
-      <div class="ml-2">
-        <FormSelect modelValue="전체" class="w-30 mt-3 !box sm:mt-0">
-          <option>전체</option>
-          <option>품목코드</option>
-          <option>거래처명</option>
-          <option>품명</option>
-          <option>규격</option>
-          <option>비고</option>
-        </FormSelect>
-      </div>
-      <div class="w-full mt-3 sm:w-auto sm:mt-0 sm:ml-auto md:ml-2">
-        <div class="relative w-56 text-slate-500">
-          <FormInput
-            type="text"
-            class="w-56 pr-10 !box"
-            v-model="searchInput"
-            @keyup.enter="
-              () => {
-                search();
-                pageChange();
-              }
-            "
-            placeholder="검색어를 입력해주세요"
-          />
-          <button
-            @click="
-              {
-                search();
-                pageChange();
-              }
-            "
-          >
-            <Lucide
-              icon="Search"
-              class="absolute inset-y-0 right-0 w-4 h-4 my-auto mr-3"
-            />
-          </button>
-        </div>
-      </div>
-      <div class="ml-2">
-        <!-- BEGIN: Pagination Pages-->
-        <FormSelect
-          class="w-20 mt-3 !box sm:mt-0"
-          v-model="rowsPerPage"
-          @change="pageChange"
-        >
-          <option>10</option>
-          <option>25</option>
-          <option>35</option>
-          <option>50</option>
-        </FormSelect>
-        <!-- END: Pagination Pages-->
-      </div>
-      <div class="ml-2">
-        <Menu>
-          <Menu.Button :as="Button" class="px-2 !box">
-            <span class="flex items-center justify-center w-5 h-5">
-              <Lucide icon="MoreVertical" class="w-4 h-4" />
-            </span>
-          </Menu.Button>
-          <Menu.Items style="width: 170px">
-            <Menu.Item @click="setPrintModal(true)">
-              <Lucide icon="Printer" class="w-4 h-4 mr-2" />
-              Print (PDF출력)
-            </Menu.Item>
-            <Menu.Item @click="setExcelExportModal(true)">
-              <Lucide icon="FileDown" class="w-4 h-4 mr-2" />
-              Excel 다운로드
-            </Menu.Item>
-          </Menu.Items>
-        </Menu>
-      </div>
     </div>
-    <!-- BEGIN: Pagination-->
-    <div
-      class="flex flex-wrap items-center col-span-12 mt-0 intro-y sm:flex-nowrap"
-    >
-      <div class="hidden mx-auto md:block text-slate-500"></div>
-      <div>
-        <span class="mr-3">[ {{ dataCount }}개 데이터 조회됨 ] </span>
-        <span class="mr-5"
-          >[ {{ currentPage }} / {{ numberOfPages }} 페이지 ]</span
-        >
-        <!-- END: Pagination-->
-      </div>
-    </div>
-    <!-- BEGIN: Data List -->
-    <!-- style="height: calc(100vh - 350px)" : 브라우저 화면 창크기에 맞게 변경됨 -->
-    <div class="col-span-12 overflow-auto intro-y lg:overflow-visible">
+    <!-- END : 상단 그래프 -->
+    <!-- BEGIN : 하단 리스트 -->
+    <!-- <hr class="text-slate-200 intro-y mt-2 mb-1" style="border: solid 1px" /> -->
+    <!-- END : 하단 리스트 -->
+    <div class="grid grid-cols-12 gap-1 mt-1">
       <div
-        class="mr-3"
-        style="overflow-y: scroll; overflow-x: hidden; height: 280px"
+        class="flex flex-wrap items-center col-span-12 mt-2 mb-2 intro-y sm:flex-nowrap"
       >
-        <Table class="border-spacing-y-[8px] border-separate -mt-2">
-          <Table.Thead
-            class="bg-slate-100"
-            style="position: sticky; top: 0px; z-index: 2"
-          >
-            <Table.Tr>
-              <Table.Th
-                class="text-center border-b-0 whitespace-nowrap"
-                :style="table_width[1]"
-              >
-                순번
-              </Table.Th>
-              <Table.Th
-                class="text-center border-b-0 whitespace-nowrap"
-                :style="table_width[2]"
-              >
-                항목1
-              </Table.Th>
-              <Table.Th
-                class="text-center border-b-0 whitespace-nowrap"
-                :style="table_width[3]"
-              >
-                항목2
-              </Table.Th>
-              <Table.Th
-                class="text-center border-b-0 whitespace-nowrap"
-                :style="table_width[4]"
-              >
-                항목3
-              </Table.Th>
-              <Table.Th
-                class="text-center border-b-0 whitespace-nowrap"
-                :style="table_width[5]"
-              >
-                항목4
-              </Table.Th>
-              <Table.Th
-                class="text-center border-b-0 whitespace-nowrap"
-                :style="table_width[6]"
-              >
-                항목5
-              </Table.Th>
-              <Table.Th
-                class="text-center border-b-0 whitespace-nowrap"
-                :style="table_width[7]"
-              >
-                항목6
-              </Table.Th>
-              <Table.Th
-                class="text-center border-b-0 whitespace-nowrap"
-                :style="table_width[8]"
-              >
-                항목7
-              </Table.Th>
-              <Table.Th
-                class="text-center border-b-0 whitespace-nowrap"
-                :style="table_width[9]"
-              >
-                항목8
-              </Table.Th>
-            </Table.Tr>
-          </Table.Thead>
-          <Table.Tbody style="position: relative; z-index: 1">
-            <Table.Tr
-              v-for="(todo, index) in datas"
-              :key="todo.NO"
-              class="intro-x"
+        <div class="hidden mx-auto md:block text-slate-500"></div>
+        <div class="mr-5">
+          <a href="" class="flex items-center ml-auto text-primary">
+            <Lucide icon="RefreshCcw" class="w-4 h-4 mr-3" /> 새로고침
+          </a>
+        </div>
+        <div>
+          <Button
+            class="mr-2 shadow-md"
+            as="a"
+            size="sm"
+            variant="outline-primary"
+            @click="reset_date"
+            title="기간 초기화"
+            ><Lucide icon="CalendarX" class="w-5 h-5"
+          /></Button>
+        </div>
+        <div class="text-center">
+          <div>
+            <Litepicker
+              v-model="now2"
+              :options="{
+                autoApply: false,
+                singleMode: false,
+                numberOfColumns: 1,
+                numberOfMonths: 1,
+                showWeekNumbers: true,
+                dropdowns: {
+                  minYear: Number(min_year),
+                  maxYear: Number(max_year),
+                  months: true,
+                  years: true,
+                },
+                lang: 'ko',
+                format: 'YY/MM/DD',
+                delimiter: ' - ',
+                buttonText: {
+                  reset: '새로고침',
+                  apply: '적용',
+                  cancel: '취소',
+                },
+              }"
+              class="block w-40 mx-auto !box"
+              placeholder="전체기간"
+            />
+          </div>
+        </div>
+        <div class="ml-2">
+          <FormSelect modelValue="전체" class="w-30 mt-3 !box sm:mt-0">
+            <option>전체</option>
+            <option>품목코드</option>
+            <option>거래처명</option>
+            <option>품명</option>
+            <option>규격</option>
+            <option>비고</option>
+          </FormSelect>
+        </div>
+        <div class="w-full mt-3 sm:w-auto sm:mt-0 sm:ml-auto md:ml-2">
+          <div class="relative w-56 text-slate-500">
+            <FormInput
+              type="text"
+              class="w-56 pr-10 !box"
+              v-model="searchInput"
+              @keyup.enter="
+                () => {
+                  search();
+                  pageChange();
+                }
+              "
+              placeholder="검색어를 입력해주세요"
+            />
+            <button
+              @click="
+                {
+                  search();
+                  pageChange();
+                }
+              "
             >
-              <Table.Td
-                class="first:rounded-l-md last:rounded-r-md w-5 text-center bg-white border-b-0 dark:bg-darkmode-600 shadow-[20px_3px_20px_#0000000b]"
-                :style="table_width[1]"
-              >
-                <div>{{ index + 1 + (currentPage - 1) * rowsPerPage }}</div>
-              </Table.Td>
-              <Table.Td
-                class="first:rounded-l-md last:rounded-r-md w-10 text-center bg-white border-b-0 dark:bg-darkmode-600 shadow-[20px_3px_20px_#0000000b]"
-                :style="table_width[2]"
-              >
-                <div>예시데이터1</div>
-              </Table.Td>
-              <Table.Td
-                class="first:rounded-l-md last:rounded-r-md w-10 text-center bg-white border-b-0 dark:bg-darkmode-600 shadow-[20px_3px_20px_#0000000b]"
-                :style="table_width[3]"
-              >
-                <div>예시데이터2</div>
-              </Table.Td>
-              <Table.Td
-                class="first:rounded-l-md last:rounded-r-md bg-white border-b-0 dark:bg-darkmode-600 shadow-[20px_3px_20px_#0000000b]"
-                :style="table_width[4]"
-              >
-                <div>예시데이터3</div>
-              </Table.Td>
-              <Table.Td
-                class="first:rounded-l-md last:rounded-r-md w-50 bg-white border-b-0 dark:bg-darkmode-600 shadow-[20px_3px_20px_#0000000b]"
-                :style="table_width[5]"
-              >
-                <div>예시데이터4</div>
-              </Table.Td>
-              <Table.Td
-                class="first:rounded-l-md last:rounded-r-md w-5 bg-white border-b-0 dark:bg-darkmode-600 shadow-[20px_3px_20px_#0000000b]"
-                :style="table_width[6]"
-              >
-                <div>예시데이터5</div>
-              </Table.Td>
-              <Table.Td
-                class="first:rounded-l-md last:rounded-r-md w-10 text-center bg-white border-b-0 dark:bg-darkmode-600 shadow-[20px_3px_20px_#0000000b]"
-                :style="table_width[7]"
-              >
-                <div>예시데이터6</div>
-              </Table.Td>
-              <Table.Td
-                class="first:rounded-l-md last:rounded-r-md w-10 text-center bg-white border-b-0 dark:bg-darkmode-600 shadow-[20px_3px_20px_#0000000b]"
-                :style="table_width[8]"
-              >
-                <div>예시데이터7</div>
-              </Table.Td>
-              <Table.Td
-                class="first:rounded-l-md last:rounded-r-md w-10 text-center bg-white border-b-0 dark:bg-darkmode-600 shadow-[20px_3px_20px_#0000000b]"
-                :style="table_width[9]"
-              >
-                <div>예시데이터8</div>
-              </Table.Td>
-            </Table.Tr>
-          </Table.Tbody>
-        </Table>
-        <div class="text-center mt-20" v-if="dataCount == 0">
-          저장된 데이터가 없습니다.
+              <Lucide
+                icon="Search"
+                class="absolute inset-y-0 right-0 w-4 h-4 my-auto mr-3"
+              />
+            </button>
+          </div>
+        </div>
+        <div class="ml-2">
+          <!-- BEGIN: Pagination Pages-->
+          <FormSelect
+            class="w-20 mt-3 !box sm:mt-0"
+            v-model="rowsPerPage"
+            @change="pageChange"
+          >
+            <option>10</option>
+            <option>25</option>
+            <option>35</option>
+            <option>50</option>
+          </FormSelect>
+          <!-- END: Pagination Pages-->
+        </div>
+        <div class="ml-2">
+          <Menu>
+            <Menu.Button :as="Button" class="px-2 !box">
+              <span class="flex items-center justify-center w-5 h-5">
+                <Lucide icon="MoreVertical" class="w-4 h-4" />
+              </span>
+            </Menu.Button>
+            <Menu.Items style="width: 170px">
+              <Menu.Item @click="setPrintModal(true)">
+                <Lucide icon="Printer" class="w-4 h-4 mr-2" />
+                Print (PDF출력)
+              </Menu.Item>
+              <Menu.Item @click="setExcelExportModal(true)">
+                <Lucide icon="FileDown" class="w-4 h-4 mr-2" />
+                Excel 다운로드
+              </Menu.Item>
+            </Menu.Items>
+          </Menu>
         </div>
       </div>
+      <!-- BEGIN: Pagination-->
+      <div
+        class="flex flex-wrap items-center col-span-12 mt-0 intro-y sm:flex-nowrap"
+      >
+        <div class="hidden mx-auto md:block text-slate-500"></div>
+        <div>
+          <span class="mr-3">[ {{ dataCount }}개 데이터 조회됨 ] </span>
+          <span class="mr-5"
+            >[ {{ currentPage }} / {{ numberOfPages }} 페이지 ]</span
+          >
+          <!-- END: Pagination-->
+        </div>
+      </div>
+      <!-- BEGIN: Data List -->
+      <!-- style="height: calc(100vh - 350px)" : 브라우저 화면 창크기에 맞게 변경됨 -->
+      <div class="col-span-12 overflow-auto intro-y lg:overflow-visible">
+        <div
+          class="mr-3"
+          style="overflow-y: scroll; overflow-x: hidden; height: 280px"
+        >
+          <Table class="border-spacing-y-[8px] border-separate -mt-2">
+            <Table.Thead
+              class="bg-slate-100"
+              style="position: sticky; top: 0px; z-index: 2"
+            >
+              <Table.Tr>
+                <Table.Th
+                  class="text-center border-b-0 whitespace-nowrap"
+                  :style="table_width[1]"
+                >
+                  순번
+                </Table.Th>
+                <Table.Th
+                  class="text-center border-b-0 whitespace-nowrap"
+                  :style="table_width[2]"
+                >
+                  항목1
+                </Table.Th>
+                <Table.Th
+                  class="text-center border-b-0 whitespace-nowrap"
+                  :style="table_width[3]"
+                >
+                  항목2
+                </Table.Th>
+                <Table.Th
+                  class="text-center border-b-0 whitespace-nowrap"
+                  :style="table_width[4]"
+                >
+                  항목3
+                </Table.Th>
+                <Table.Th
+                  class="text-center border-b-0 whitespace-nowrap"
+                  :style="table_width[5]"
+                >
+                  항목4
+                </Table.Th>
+                <Table.Th
+                  class="text-center border-b-0 whitespace-nowrap"
+                  :style="table_width[6]"
+                >
+                  항목5
+                </Table.Th>
+                <Table.Th
+                  class="text-center border-b-0 whitespace-nowrap"
+                  :style="table_width[7]"
+                >
+                  항목6
+                </Table.Th>
+                <Table.Th
+                  class="text-center border-b-0 whitespace-nowrap"
+                  :style="table_width[8]"
+                >
+                  항목7
+                </Table.Th>
+                <Table.Th
+                  class="text-center border-b-0 whitespace-nowrap"
+                  :style="table_width[9]"
+                >
+                  항목8
+                </Table.Th>
+              </Table.Tr>
+            </Table.Thead>
+            <Table.Tbody style="position: relative; z-index: 1">
+              <Table.Tr
+                v-for="(todo, index) in datas"
+                :key="todo.NO"
+                class="intro-x"
+              >
+                <Table.Td
+                  class="first:rounded-l-md last:rounded-r-md w-5 text-center bg-white border-b-0 dark:bg-darkmode-600 shadow-[20px_3px_20px_#0000000b]"
+                  :style="table_width[1]"
+                >
+                  <div>{{ index + 1 + (currentPage - 1) * rowsPerPage }}</div>
+                </Table.Td>
+                <Table.Td
+                  class="first:rounded-l-md last:rounded-r-md w-10 text-center bg-white border-b-0 dark:bg-darkmode-600 shadow-[20px_3px_20px_#0000000b]"
+                  :style="table_width[2]"
+                >
+                  <div>예시데이터1</div>
+                </Table.Td>
+                <Table.Td
+                  class="first:rounded-l-md last:rounded-r-md w-10 text-center bg-white border-b-0 dark:bg-darkmode-600 shadow-[20px_3px_20px_#0000000b]"
+                  :style="table_width[3]"
+                >
+                  <div>예시데이터2</div>
+                </Table.Td>
+                <Table.Td
+                  class="first:rounded-l-md last:rounded-r-md bg-white border-b-0 dark:bg-darkmode-600 shadow-[20px_3px_20px_#0000000b]"
+                  :style="table_width[4]"
+                >
+                  <div>예시데이터3</div>
+                </Table.Td>
+                <Table.Td
+                  class="first:rounded-l-md last:rounded-r-md w-50 bg-white border-b-0 dark:bg-darkmode-600 shadow-[20px_3px_20px_#0000000b]"
+                  :style="table_width[5]"
+                >
+                  <div>예시데이터4</div>
+                </Table.Td>
+                <Table.Td
+                  class="first:rounded-l-md last:rounded-r-md w-5 bg-white border-b-0 dark:bg-darkmode-600 shadow-[20px_3px_20px_#0000000b]"
+                  :style="table_width[6]"
+                >
+                  <div>예시데이터5</div>
+                </Table.Td>
+                <Table.Td
+                  class="first:rounded-l-md last:rounded-r-md w-10 text-center bg-white border-b-0 dark:bg-darkmode-600 shadow-[20px_3px_20px_#0000000b]"
+                  :style="table_width[7]"
+                >
+                  <div>예시데이터6</div>
+                </Table.Td>
+                <Table.Td
+                  class="first:rounded-l-md last:rounded-r-md w-10 text-center bg-white border-b-0 dark:bg-darkmode-600 shadow-[20px_3px_20px_#0000000b]"
+                  :style="table_width[8]"
+                >
+                  <div>예시데이터7</div>
+                </Table.Td>
+                <Table.Td
+                  class="first:rounded-l-md last:rounded-r-md w-10 text-center bg-white border-b-0 dark:bg-darkmode-600 shadow-[20px_3px_20px_#0000000b]"
+                  :style="table_width[9]"
+                >
+                  <div>예시데이터8</div>
+                </Table.Td>
+              </Table.Tr>
+            </Table.Tbody>
+          </Table>
+          <div class="text-center mt-20" v-if="dataCount == 0">
+            저장된 데이터가 없습니다.
+          </div>
+        </div>
+      </div>
+
+      <!-- END: Data List -->
     </div>
-
-    <!-- END: Data List -->
   </div>
-
+  <!-- BEGIN : 권한 경고 -->
+  <div class="intro-y" v-if="user_level < 2">
+    <div class="mt-20 items-center text-center">
+      <div>
+        <Lucide icon="AlertTriangle" class="w-20 h-20 mx-auto text-warning" />
+      </div>
+      <div class="mt-3 text-2xl">ACCESS DENIED</div>
+    </div>
+    <div class="mt-5 text-center">액세스 권한이 없습니다.</div>
+    <div class="mt-2 text-center">
+      IT 관리자에게 연락하여 액세스 권한을 요청하세요.
+    </div>
+  </div>
+  <!-- END : 권한 없을 때 -->
   <!-- BEGIN: FOOTER(COPYRIGHT) -->
+  <!-- BEGIN: Insert Modal Content -->
   <div class="intro-y mt-5 mr-5" style="text-align: right">
     <footer>&copy;2023 QInnotek. All rights reserved.</footer>
   </div>

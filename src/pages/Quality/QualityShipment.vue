@@ -348,450 +348,469 @@ const checkDataFunction = async () => {
 ##############################################################################################################
 
 <template>
-  <!-- style="height: calc(100vh - 250px)" : 브라우저 화면 창크기에 맞게 변경됨 : 100vh - 브라우저 창 크기 -->
-  <div class="grid grid-cols-12 gap-1 mt-1">
-    <div
-      class="flex flex-wrap items-center col-span-12 mt-2 mb-2 intro-y sm:flex-nowrap"
-    >
-      <Button
-        class="mr-2 shadow-md"
-        as="a"
-        variant="primary"
-        @click="
-          () => {
-            setInsertModal(true);
-          }
-        "
+  <div v-if="user_level >= 2">
+    <!-- style="height: calc(100vh - 250px)" : 브라우저 화면 창크기에 맞게 변경됨 : 100vh - 브라우저 창 크기 -->
+    <div class="grid grid-cols-12 gap-1 mt-1">
+      <div
+        class="flex flex-wrap items-center col-span-12 mt-2 mb-2 intro-y sm:flex-nowrap"
       >
-        <Lucide icon="FilePlus" class="w-4 h-4 mr-2" />
-        등록
-      </Button>
-      <Button
-        class="mr-2 shadow-md"
-        as="a"
-        variant="danger"
-        @click="
-          () => {
-            setDeleteModal(true);
-          }
-        "
-      >
-        <Lucide icon="Trash2" class="w-4 h-4 mr-2" /> 삭제</Button
-      >
-      <div class="hidden mx-auto md:block text-slate-500"></div>
-      <div class="mr-5">
-        <a href="" class="flex items-center ml-auto text-primary">
-          <Lucide icon="RefreshCcw" class="w-4 h-4 mr-3" /> 새로고침
-        </a>
-      </div>
-      <div>
         <Button
           class="mr-2 shadow-md"
           as="a"
-          size="sm"
-          variant="outline-primary"
-          @click="reset_date"
-          title="기간 초기화"
-          ><Lucide icon="CalendarX" class="w-5 h-5"
-        /></Button>
-      </div>
-      <div class="text-center">
+          variant="primary"
+          @click="
+            () => {
+              setInsertModal(true);
+            }
+          "
+        >
+          <Lucide icon="FilePlus" class="w-4 h-4 mr-2" />
+          등록
+        </Button>
+        <Button
+          class="mr-2 shadow-md"
+          as="a"
+          variant="danger"
+          @click="
+            () => {
+              setDeleteModal(true);
+            }
+          "
+        >
+          <Lucide icon="Trash2" class="w-4 h-4 mr-2" /> 삭제</Button
+        >
+        <div class="hidden mx-auto md:block text-slate-500"></div>
+        <div class="mr-5">
+          <a href="" class="flex items-center ml-auto text-primary">
+            <Lucide icon="RefreshCcw" class="w-4 h-4 mr-3" /> 새로고침
+          </a>
+        </div>
         <div>
-          <Litepicker
-            v-model="searchDate"
-            :options="{
-              autoApply: false,
-              singleMode: false,
-              numberOfColumns: 1,
-              numberOfMonths: 1,
-              showWeekNumbers: true,
-              dropdowns: {
-                minYear: Number(min_year),
-                maxYear: Number(max_year),
-                months: true,
-                years: true,
-              },
-              lang: 'ko',
-              format: 'YY/MM/DD',
-              delimiter: ' - ',
-              buttonText: litepikerButtonText,
-            }"
-            class="block w-40 mx-auto !box"
-            placeholder="전체기간"
-          />
+          <Button
+            class="mr-2 shadow-md"
+            as="a"
+            size="sm"
+            variant="outline-primary"
+            @click="reset_date"
+            title="기간 초기화"
+            ><Lucide icon="CalendarX" class="w-5 h-5"
+          /></Button>
         </div>
-      </div>
-      <div class="ml-2">
-        <FormSelect v-model="searchKey" class="w-30 mt-3 !box sm:mt-0">
-          <option>전체</option>
-          <option>발주코드</option>
-          <option>발주품번</option>
-          <option>발주품명</option>
-          <option>전달사항</option>
-          <option>샘플수량</option>
-          <option>입고수량</option>
-          <option>결과</option>
-          <option>비고</option>
-        </FormSelect>
-      </div>
-      <div class="w-full mt-3 sm:w-auto sm:mt-0 sm:ml-auto md:ml-2">
-        <div class="relative w-56 text-slate-500">
-          <FormInput
-            type="text"
-            class="w-56 pr-10 !box"
-            v-model="searchInput"
-            @keyup.enter="
-              () => {
-                search();
-                pageChangeFirst();
-              }
-            "
-            placeholder="검색어를 입력해주세요"
-          />
-          <button
-            @click="
-              () => {
-                search();
-                pageChangeFirst();
-              }
-            "
-          >
-            <Lucide
-              icon="Search"
-              class="absolute inset-y-0 right-0 w-4 h-4 my-auto mr-3"
+        <div class="text-center">
+          <div>
+            <Litepicker
+              v-model="searchDate"
+              :options="{
+                autoApply: false,
+                singleMode: false,
+                numberOfColumns: 1,
+                numberOfMonths: 1,
+                showWeekNumbers: true,
+                dropdowns: {
+                  minYear: Number(min_year),
+                  maxYear: Number(max_year),
+                  months: true,
+                  years: true,
+                },
+                lang: 'ko',
+                format: 'YY/MM/DD',
+                delimiter: ' - ',
+                buttonText: litepikerButtonText,
+              }"
+              class="block w-40 mx-auto !box"
+              placeholder="전체기간"
             />
-          </button>
+          </div>
         </div>
-      </div>
-      <div class="ml-2 mr-4">
-        <Menu>
-          <Menu.Button :as="Button" class="px-2 !box">
-            <span class="flex items-center justify-center w-5 h-5">
-              <Lucide icon="MoreVertical" class="w-4 h-4" />
-            </span>
-          </Menu.Button>
-          <Menu.Items style="width: 170px">
-            <Menu.Item @click="setPrintModal(true)">
-              <Lucide icon="Printer" class="w-4 h-4 mr-2" />
-              Print (PDF출력)
-            </Menu.Item>
-            <Menu.Item @click="setExcelExportModal(true)">
-              <Lucide icon="FileDown" class="w-4 h-4 mr-2" />
-              Excel 다운로드
-            </Menu.Item>
-            <Menu.Item @click="setExcelImportModal(true)">
-              <Lucide icon="FileUp" class="w-4 h-4 mr-2" />
-              Excel 업로드
-            </Menu.Item>
-          </Menu.Items>
-        </Menu>
-      </div>
-    </div>
-    <!-- BEGIN: Pagination-->
-    <div
-      class="flex flex-wrap items-center col-span-12 mt-0 intro-y sm:flex-nowrap"
-    >
-      <div>
-        <FormSelect v-model="sortKey" class="w-30 mt-3 !box sm:mt-0">
-          <option>등록일</option>
-          <option>발주코드</option>
-          <option>발주품번</option>
-          <option>발주품명</option>
-          <option>전달사항</option>
-          <option>샘플수량</option>
-          <option>입고수량</option>
-          <option>결과</option>
-        </FormSelect>
-      </div>
-      <div class="ml-3">
-        <Button
-          class="shadow-md"
-          as="a"
-          variant="outline-primary"
-          v-if="sortOrder == '오름차순'"
-          @click="sortOrderToggle"
-        >
-          <Lucide icon="SortAsc" class="w-4 h-4 mr-1" />
-
-          {{ sortOrder }}</Button
-        >
-        <Button
-          class="shadow-md"
-          as="a"
-          variant="outline-danger"
-          v-if="sortOrder == '내림차순'"
-          @click="sortOrderToggle"
-        >
-          <Lucide icon="SortDesc" class="w-4 h-4 mr-1" />
-
-          {{ sortOrder }}</Button
-        >
-      </div>
-      <div class="ml-5">
-        <FormSelect
-          class="w-20 mt-3 !box sm:mt-0"
-          v-model="rowsPerPage"
-          @change="pageChangeFirst"
-        >
-          <option>10</option>
-          <option>25</option>
-          <option>50</option>
-          <option>100</option>
-          <option :value="dataManager.dataCount.value">전체</option>
-        </FormSelect>
-      </div>
-      <div>
-        <PaginationComponent
-          class="pagination-component"
-          v-model="currentPage"
-          :numberOfPages="dataManager.numberOfPages.value"
-          @click="resetCheckBox()"
-        />
-      </div>
-      <div class="hidden mx-auto md:block text-slate-500"></div>
-      <div>
-        <span class="mr-3"
-          >[ {{ dataManager.dataCount }}개 데이터 조회됨 ]
-        </span>
-        <span class="mr-4">
-          [ {{ currentPage }} / {{ dataManager.numberOfPages }} 페이지 ]</span
-        >
-      </div>
-    </div>
-    <!-- END: Pagination-->
-    <!-- BEGIN: Data List -->
-    <!-- style="height: calc(100vh - 350px)" : 브라우저 화면 창크기에 맞게 변경됨 -->
-    <div class="col-span-12 overflow-auto intro-y lg:overflow-visible">
-      <div
-        class="mr-3"
-        style="overflow-y: scroll; overflow-x: hidden; height: 580px"
-      >
-        <Table class="border-spacing-y-[8px] border-separate -mt-2">
-          <Table.Thead
-            class="bg-slate-100"
-            style="position: sticky; top: 0px; z-index: 2"
-          >
-            <Table.Tr>
-              <Table.Th
-                class="text-center border-b-0 whitespace-nowrap"
-                id="checkbox"
-                :style="table_setting.체크박스.style"
-              >
-                <Input
-                  class="transition-all duration-100 ease-in-out shadow-sm border-slate-200 cursor-pointer rounded focus:ring-4 focus:ring-offset-0 focus:ring-primary focus:ring-opacity-20 [&[type='checkbox']]:checked:bg-primary [&[type='checkbox']]:checked:border-primary [&[type='checkbox']]:checked:border-opacity-10 [&:disabled:not(:checked)]:bg-slate-100 [&:disabled:not(:checked)]:cursor-not-allowed [&:disabled:checked]:opacity-70 [&:disabled:checked]:cursor-not-allowed"
-                  id="checkbox_all"
-                  type="checkbox"
-                  :value="mainCheckBox"
-                  @click="
-                    () => {
-                      checkAll(mainCheckBox);
-                      mainCheckBox = !mainCheckBox;
-                    }
-                  "
-                />
-              </Table.Th>
-              <Table.Th
-                class="text-center border-b-0 whitespace-nowrap font-bold"
-                :style="table_setting.순번.style"
-              >
-                {{ table_setting.순번.name }}
-              </Table.Th>
-              <Table.Th
-                class="text-center border-b-0 whitespace-nowrap font-bold"
-                :style="table_setting.항목1.style"
-              >
-                {{ table_setting.항목1.name }}
-              </Table.Th>
-              <Table.Th
-                class="text-center border-b-0 whitespace-nowrap font-bold"
-                :style="table_setting.항목2.style"
-              >
-                {{ table_setting.항목2.name }}
-              </Table.Th>
-              <Table.Th
-                class="text-center border-b-0 whitespace-nowrap font-bold"
-                :style="table_setting.항목3.style"
-              >
-                {{ table_setting.항목3.name }}
-              </Table.Th>
-              <Table.Th
-                class="text-center border-b-0 whitespace-nowrap font-bold"
-                :style="table_setting.항목4.style"
-              >
-                {{ table_setting.항목4.name }}
-              </Table.Th>
-              <Table.Th
-                class="text-center border-b-0 whitespace-nowrap font-bold"
-                :style="table_setting.항목5.style"
-              >
-                {{ table_setting.항목5.name }}
-              </Table.Th>
-              <Table.Th
-                class="text-center border-b-0 whitespace-nowrap font-bold"
-                :style="table_setting.항목6.style"
-              >
-                {{ table_setting.항목6.name }}
-              </Table.Th>
-              <Table.Th
-                class="text-center border-b-0 whitespace-nowrap font-bold"
-                :style="table_setting.항목7.style"
-              >
-                {{ table_setting.항목7.name }}
-              </Table.Th>
-              <Table.Th
-                class="text-center border-b-0 whitespace-nowrap font-bold"
-                :style="table_setting.항목8.style"
-              >
-                {{ table_setting.항목8.name }}
-              </Table.Th>
-              <Table.Th
-                class="text-center border-b-0 whitespace-nowrap font-bold"
-                :style="table_setting.상세보기.style"
-              >
-                {{ table_setting.상세보기.name }}
-              </Table.Th>
-              <Table.Th
-                class="text-center border-b-0 whitespace-nowrap font-bold"
-                :style="table_setting.편집.style"
-              >
-                {{ table_setting.편집.name }}
-              </Table.Th>
-            </Table.Tr>
-          </Table.Thead>
-          <Table.Tbody style="position: relative; z-index: 1">
-            <Table.Tr
-              v-for="(todo, index) in dataManager.datas.value"
-              :key="todo.NO"
-              class="intro-x"
+        <div class="ml-2">
+          <FormSelect v-model="searchKey" class="w-30 mt-3 !box sm:mt-0">
+            <option>전체</option>
+            <option>발주코드</option>
+            <option>발주품번</option>
+            <option>발주품명</option>
+            <option>전달사항</option>
+            <option>샘플수량</option>
+            <option>입고수량</option>
+            <option>결과</option>
+            <option>비고</option>
+          </FormSelect>
+        </div>
+        <div class="w-full mt-3 sm:w-auto sm:mt-0 sm:ml-auto md:ml-2">
+          <div class="relative w-56 text-slate-500">
+            <FormInput
+              type="text"
+              class="w-56 pr-10 !box"
+              v-model="searchInput"
+              @keyup.enter="
+                () => {
+                  search();
+                  pageChangeFirst();
+                }
+              "
+              placeholder="검색어를 입력해주세요"
+            />
+            <button
+              @click="
+                () => {
+                  search();
+                  pageChangeFirst();
+                }
+              "
             >
-              <Table.Td
-                class="first:rounded-l-md last:rounded-r-md text-center bg-white border-b-0 dark:bg-darkmode-600 shadow-[20px_3px_20px_#0000000b]"
-                id="checkbox"
-                :style="table_setting.체크박스.style"
-              >
-                <input
-                  class="transition-all duration-100 ease-in-out shadow-sm border-slate-200 cursor-pointer rounded focus:ring-4 focus:ring-offset-0 focus:ring-primary focus:ring-opacity-20 [&[type='checkbox']]:checked:bg-primary [&[type='checkbox']]:checked:border-primary [&[type='checkbox']]:checked:border-opacity-10 [&:disabled:not(:checked)]:bg-slate-100 [&:disabled:not(:checked)]:cursor-not-allowed [&:disabled:checked]:opacity-70 [&:disabled:checked]:cursor-not-allowed"
-                  id="checkbox"
-                  type="checkbox"
-                  :value="todo.NO"
-                  v-model="checkDebug"
-                />
-              </Table.Td>
-              <Table.Td
-                class="first:rounded-l-md last:rounded-r-md text-center bg-white border-b-0 dark:bg-darkmode-600 shadow-[20px_3px_20px_#0000000b]"
-                :style="table_setting.순번.style"
-              >
-                <div>{{ index + 1 + (currentPage - 1) * rowsPerPage }}</div>
-              </Table.Td>
-              <Table.Td
-                class="first:rounded-l-md last:rounded-r-md text-center bg-white border-b-0 dark:bg-darkmode-600 shadow-[20px_3px_20px_#0000000b]"
-                :style="table_setting.항목1.style"
-              >
-                <div>{{ todo[table_setting.항목1.name] }}</div>
-              </Table.Td>
-              <Table.Td
-                class="first:rounded-l-md last:rounded-r-md text-center bg-white border-b-0 dark:bg-darkmode-600 shadow-[20px_3px_20px_#0000000b]"
-                :style="table_setting.항목2.style"
-              >
-                <div>{{ todo[table_setting.항목2.name] }}</div>
-              </Table.Td>
-              <Table.Td
-                class="first:rounded-l-md last:rounded-r-md text-center bg-white border-b-0 dark:bg-darkmode-600 shadow-[20px_3px_20px_#0000000b]"
-                :style="table_setting.항목3.style"
-              >
-                <div>{{ todo[table_setting.항목3.name] }}</div>
-              </Table.Td>
-              <Table.Td
-                class="first:rounded-l-md last:rounded-r-md text-center bg-white border-b-0 dark:bg-darkmode-600 shadow-[20px_3px_20px_#0000000b]"
-                :style="table_setting.항목4.style"
-              >
-                <div>{{ todo[table_setting.항목4.name] }}</div>
-              </Table.Td>
-              <Table.Td
-                class="first:rounded-l-md last:rounded-r-md text-center bg-white border-b-0 dark:bg-darkmode-600 shadow-[20px_3px_20px_#0000000b]"
-                :style="table_setting.항목5.style"
-              >
-                <div>{{ todo[table_setting.항목5.name] }}</div>
-              </Table.Td>
-              <Table.Td
-                class="first:rounded-l-md last:rounded-r-md text-center bg-white border-b-0 dark:bg-darkmode-600 shadow-[20px_3px_20px_#0000000b]"
-                :style="table_setting.항목6.style"
-              >
-                <div>{{ todo[table_setting.항목6.name] }}</div>
-              </Table.Td>
-              <Table.Td
-                class="first:rounded-l-md last:rounded-r-md text-center bg-white border-b-0 dark:bg-darkmode-600 shadow-[20px_3px_20px_#0000000b]"
-                :style="table_setting.항목7.style"
-              >
-                <div>{{ todo[table_setting.항목7.name] }}</div>
-              </Table.Td>
-              <Table.Td
-                class="first:rounded-l-md last:rounded-r-md text-center bg-white border-b-0 dark:bg-darkmode-600 shadow-[20px_3px_20px_#0000000b]"
-                :style="table_setting.항목8.style"
-              >
-                <div>{{ todo[table_setting.항목8.name] }}</div>
-              </Table.Td>
-              <Table.Td
-                class="first:rounded-l-md last:rounded-r-md text-center bg-white border-b-0 dark:bg-darkmode-600 shadow-[20px_3px_20px_#0000000b] py-0 relative before:block before:w-px before:h-8 before:bg-slate-200 before:absolute before:left-0 before:inset-y-0 before:my-auto before:dark:bg-darkmode-400"
-                :style="table_setting.상세보기.style"
-              >
-                <div class="flex items-center justify-center text-cyan-700">
-                  <a
-                    class="flex items-center mr-3"
-                    href="#"
-                    @click="
-                      () => {
-                        editModalData = todo;
-                        setPhotoModal(true);
-                      }
-                    "
-                  >
-                    <Lucide icon="ListPlus" class="w-5 h-5 mr-1" />
-                    품질기준서
-                  </a>
-                </div>
-              </Table.Td>
-              <Table.Td
-                class="first:rounded-l-md last:rounded-r-md text-center bg-white border-b-0 dark:bg-darkmode-600 shadow-[20px_3px_20px_#0000000b] py-0 relative before:block before:w-px before:h-8 before:bg-slate-200 before:absolute before:left-0 before:inset-y-0 before:my-auto before:dark:bg-darkmode-400"
-                :style="table_setting.편집.style"
-              >
-                <div
-                  v-if="todo.결과 == '미검사'"
-                  class="flex items-center justify-center text-danger"
-                >
-                  <a
-                    class="flex items-center mr-3"
-                    href="#"
-                    @click="
-                      () => {
-                        editModalData = todo;
-                        deliveryData.NO = todo.납품NO;
-                        setEditModal(true);
-                      }
-                    "
-                  >
-                    <Lucide icon="Edit" class="w-4 h-4 mr-1" />
-                    검사
-                  </a>
-                </div>
-                <div
-                  v-else
-                  class="flex items-center justify-center text-success"
-                >
-                  <Lucide icon="CheckCircle" class="w-4 h-4 mr-1" />
-                  검사완료
-                </div>
-              </Table.Td>
-            </Table.Tr>
-          </Table.Tbody>
-        </Table>
-        <div class="text-center mt-20" v-if="dataManager.dataCount.value == 0">
-          저장된 데이터가 없습니다.
+              <Lucide
+                icon="Search"
+                class="absolute inset-y-0 right-0 w-4 h-4 my-auto mr-3"
+              />
+            </button>
+          </div>
+        </div>
+        <div class="ml-2 mr-4">
+          <Menu>
+            <Menu.Button :as="Button" class="px-2 !box">
+              <span class="flex items-center justify-center w-5 h-5">
+                <Lucide icon="MoreVertical" class="w-4 h-4" />
+              </span>
+            </Menu.Button>
+            <Menu.Items style="width: 170px">
+              <Menu.Item @click="setPrintModal(true)">
+                <Lucide icon="Printer" class="w-4 h-4 mr-2" />
+                Print (PDF출력)
+              </Menu.Item>
+              <Menu.Item @click="setExcelExportModal(true)">
+                <Lucide icon="FileDown" class="w-4 h-4 mr-2" />
+                Excel 다운로드
+              </Menu.Item>
+              <Menu.Item @click="setExcelImportModal(true)">
+                <Lucide icon="FileUp" class="w-4 h-4 mr-2" />
+                Excel 업로드
+              </Menu.Item>
+            </Menu.Items>
+          </Menu>
         </div>
       </div>
+      <!-- BEGIN: Pagination-->
+      <div
+        class="flex flex-wrap items-center col-span-12 mt-0 intro-y sm:flex-nowrap"
+      >
+        <div>
+          <FormSelect v-model="sortKey" class="w-30 mt-3 !box sm:mt-0">
+            <option>등록일</option>
+            <option>발주코드</option>
+            <option>발주품번</option>
+            <option>발주품명</option>
+            <option>전달사항</option>
+            <option>샘플수량</option>
+            <option>입고수량</option>
+            <option>결과</option>
+          </FormSelect>
+        </div>
+        <div class="ml-3">
+          <Button
+            class="shadow-md"
+            as="a"
+            variant="outline-primary"
+            v-if="sortOrder == '오름차순'"
+            @click="sortOrderToggle"
+          >
+            <Lucide icon="SortAsc" class="w-4 h-4 mr-1" />
+
+            {{ sortOrder }}</Button
+          >
+          <Button
+            class="shadow-md"
+            as="a"
+            variant="outline-danger"
+            v-if="sortOrder == '내림차순'"
+            @click="sortOrderToggle"
+          >
+            <Lucide icon="SortDesc" class="w-4 h-4 mr-1" />
+
+            {{ sortOrder }}</Button
+          >
+        </div>
+        <div class="ml-5">
+          <FormSelect
+            class="w-20 mt-3 !box sm:mt-0"
+            v-model="rowsPerPage"
+            @change="pageChangeFirst"
+          >
+            <option>10</option>
+            <option>25</option>
+            <option>50</option>
+            <option>100</option>
+            <option :value="dataManager.dataCount.value">전체</option>
+          </FormSelect>
+        </div>
+        <div>
+          <PaginationComponent
+            class="pagination-component"
+            v-model="currentPage"
+            :numberOfPages="dataManager.numberOfPages.value"
+            @click="resetCheckBox()"
+          />
+        </div>
+        <div class="hidden mx-auto md:block text-slate-500"></div>
+        <div>
+          <span class="mr-3"
+            >[ {{ dataManager.dataCount }}개 데이터 조회됨 ]
+          </span>
+          <span class="mr-4">
+            [ {{ currentPage }} / {{ dataManager.numberOfPages }} 페이지 ]</span
+          >
+        </div>
+      </div>
+      <!-- END: Pagination-->
+      <!-- BEGIN: Data List -->
+      <!-- style="height: calc(100vh - 350px)" : 브라우저 화면 창크기에 맞게 변경됨 -->
+      <div class="col-span-12 overflow-auto intro-y lg:overflow-visible">
+        <div
+          class="mr-3"
+          style="overflow-y: scroll; overflow-x: hidden; height: 580px"
+        >
+          <Table class="border-spacing-y-[8px] border-separate -mt-2">
+            <Table.Thead
+              class="bg-slate-100"
+              style="position: sticky; top: 0px; z-index: 2"
+            >
+              <Table.Tr>
+                <Table.Th
+                  class="text-center border-b-0 whitespace-nowrap"
+                  id="checkbox"
+                  :style="table_setting.체크박스.style"
+                >
+                  <Input
+                    class="transition-all duration-100 ease-in-out shadow-sm border-slate-200 cursor-pointer rounded focus:ring-4 focus:ring-offset-0 focus:ring-primary focus:ring-opacity-20 [&[type='checkbox']]:checked:bg-primary [&[type='checkbox']]:checked:border-primary [&[type='checkbox']]:checked:border-opacity-10 [&:disabled:not(:checked)]:bg-slate-100 [&:disabled:not(:checked)]:cursor-not-allowed [&:disabled:checked]:opacity-70 [&:disabled:checked]:cursor-not-allowed"
+                    id="checkbox_all"
+                    type="checkbox"
+                    :value="mainCheckBox"
+                    @click="
+                      () => {
+                        checkAll(mainCheckBox);
+                        mainCheckBox = !mainCheckBox;
+                      }
+                    "
+                  />
+                </Table.Th>
+                <Table.Th
+                  class="text-center border-b-0 whitespace-nowrap font-bold"
+                  :style="table_setting.순번.style"
+                >
+                  {{ table_setting.순번.name }}
+                </Table.Th>
+                <Table.Th
+                  class="text-center border-b-0 whitespace-nowrap font-bold"
+                  :style="table_setting.항목1.style"
+                >
+                  {{ table_setting.항목1.name }}
+                </Table.Th>
+                <Table.Th
+                  class="text-center border-b-0 whitespace-nowrap font-bold"
+                  :style="table_setting.항목2.style"
+                >
+                  {{ table_setting.항목2.name }}
+                </Table.Th>
+                <Table.Th
+                  class="text-center border-b-0 whitespace-nowrap font-bold"
+                  :style="table_setting.항목3.style"
+                >
+                  {{ table_setting.항목3.name }}
+                </Table.Th>
+                <Table.Th
+                  class="text-center border-b-0 whitespace-nowrap font-bold"
+                  :style="table_setting.항목4.style"
+                >
+                  {{ table_setting.항목4.name }}
+                </Table.Th>
+                <Table.Th
+                  class="text-center border-b-0 whitespace-nowrap font-bold"
+                  :style="table_setting.항목5.style"
+                >
+                  {{ table_setting.항목5.name }}
+                </Table.Th>
+                <Table.Th
+                  class="text-center border-b-0 whitespace-nowrap font-bold"
+                  :style="table_setting.항목6.style"
+                >
+                  {{ table_setting.항목6.name }}
+                </Table.Th>
+                <Table.Th
+                  class="text-center border-b-0 whitespace-nowrap font-bold"
+                  :style="table_setting.항목7.style"
+                >
+                  {{ table_setting.항목7.name }}
+                </Table.Th>
+                <Table.Th
+                  class="text-center border-b-0 whitespace-nowrap font-bold"
+                  :style="table_setting.항목8.style"
+                >
+                  {{ table_setting.항목8.name }}
+                </Table.Th>
+                <Table.Th
+                  class="text-center border-b-0 whitespace-nowrap font-bold"
+                  :style="table_setting.상세보기.style"
+                >
+                  {{ table_setting.상세보기.name }}
+                </Table.Th>
+                <Table.Th
+                  class="text-center border-b-0 whitespace-nowrap font-bold"
+                  :style="table_setting.편집.style"
+                >
+                  {{ table_setting.편집.name }}
+                </Table.Th>
+              </Table.Tr>
+            </Table.Thead>
+            <Table.Tbody style="position: relative; z-index: 1">
+              <Table.Tr
+                v-for="(todo, index) in dataManager.datas.value"
+                :key="todo.NO"
+                class="intro-x"
+              >
+                <Table.Td
+                  class="first:rounded-l-md last:rounded-r-md text-center bg-white border-b-0 dark:bg-darkmode-600 shadow-[20px_3px_20px_#0000000b]"
+                  id="checkbox"
+                  :style="table_setting.체크박스.style"
+                >
+                  <input
+                    class="transition-all duration-100 ease-in-out shadow-sm border-slate-200 cursor-pointer rounded focus:ring-4 focus:ring-offset-0 focus:ring-primary focus:ring-opacity-20 [&[type='checkbox']]:checked:bg-primary [&[type='checkbox']]:checked:border-primary [&[type='checkbox']]:checked:border-opacity-10 [&:disabled:not(:checked)]:bg-slate-100 [&:disabled:not(:checked)]:cursor-not-allowed [&:disabled:checked]:opacity-70 [&:disabled:checked]:cursor-not-allowed"
+                    id="checkbox"
+                    type="checkbox"
+                    :value="todo.NO"
+                    v-model="checkDebug"
+                  />
+                </Table.Td>
+                <Table.Td
+                  class="first:rounded-l-md last:rounded-r-md text-center bg-white border-b-0 dark:bg-darkmode-600 shadow-[20px_3px_20px_#0000000b]"
+                  :style="table_setting.순번.style"
+                >
+                  <div>{{ index + 1 + (currentPage - 1) * rowsPerPage }}</div>
+                </Table.Td>
+                <Table.Td
+                  class="first:rounded-l-md last:rounded-r-md text-center bg-white border-b-0 dark:bg-darkmode-600 shadow-[20px_3px_20px_#0000000b]"
+                  :style="table_setting.항목1.style"
+                >
+                  <div>{{ todo[table_setting.항목1.name] }}</div>
+                </Table.Td>
+                <Table.Td
+                  class="first:rounded-l-md last:rounded-r-md text-center bg-white border-b-0 dark:bg-darkmode-600 shadow-[20px_3px_20px_#0000000b]"
+                  :style="table_setting.항목2.style"
+                >
+                  <div>{{ todo[table_setting.항목2.name] }}</div>
+                </Table.Td>
+                <Table.Td
+                  class="first:rounded-l-md last:rounded-r-md text-center bg-white border-b-0 dark:bg-darkmode-600 shadow-[20px_3px_20px_#0000000b]"
+                  :style="table_setting.항목3.style"
+                >
+                  <div>{{ todo[table_setting.항목3.name] }}</div>
+                </Table.Td>
+                <Table.Td
+                  class="first:rounded-l-md last:rounded-r-md text-center bg-white border-b-0 dark:bg-darkmode-600 shadow-[20px_3px_20px_#0000000b]"
+                  :style="table_setting.항목4.style"
+                >
+                  <div>{{ todo[table_setting.항목4.name] }}</div>
+                </Table.Td>
+                <Table.Td
+                  class="first:rounded-l-md last:rounded-r-md text-center bg-white border-b-0 dark:bg-darkmode-600 shadow-[20px_3px_20px_#0000000b]"
+                  :style="table_setting.항목5.style"
+                >
+                  <div>{{ todo[table_setting.항목5.name] }}</div>
+                </Table.Td>
+                <Table.Td
+                  class="first:rounded-l-md last:rounded-r-md text-center bg-white border-b-0 dark:bg-darkmode-600 shadow-[20px_3px_20px_#0000000b]"
+                  :style="table_setting.항목6.style"
+                >
+                  <div>{{ todo[table_setting.항목6.name] }}</div>
+                </Table.Td>
+                <Table.Td
+                  class="first:rounded-l-md last:rounded-r-md text-center bg-white border-b-0 dark:bg-darkmode-600 shadow-[20px_3px_20px_#0000000b]"
+                  :style="table_setting.항목7.style"
+                >
+                  <div>{{ todo[table_setting.항목7.name] }}</div>
+                </Table.Td>
+                <Table.Td
+                  class="first:rounded-l-md last:rounded-r-md text-center bg-white border-b-0 dark:bg-darkmode-600 shadow-[20px_3px_20px_#0000000b]"
+                  :style="table_setting.항목8.style"
+                >
+                  <div>{{ todo[table_setting.항목8.name] }}</div>
+                </Table.Td>
+                <Table.Td
+                  class="first:rounded-l-md last:rounded-r-md text-center bg-white border-b-0 dark:bg-darkmode-600 shadow-[20px_3px_20px_#0000000b] py-0 relative before:block before:w-px before:h-8 before:bg-slate-200 before:absolute before:left-0 before:inset-y-0 before:my-auto before:dark:bg-darkmode-400"
+                  :style="table_setting.상세보기.style"
+                >
+                  <div class="flex items-center justify-center text-cyan-700">
+                    <a
+                      class="flex items-center mr-3"
+                      href="#"
+                      @click="
+                        () => {
+                          editModalData = todo;
+                          setPhotoModal(true);
+                        }
+                      "
+                    >
+                      <Lucide icon="ListPlus" class="w-5 h-5 mr-1" />
+                      품질기준서
+                    </a>
+                  </div>
+                </Table.Td>
+                <Table.Td
+                  class="first:rounded-l-md last:rounded-r-md text-center bg-white border-b-0 dark:bg-darkmode-600 shadow-[20px_3px_20px_#0000000b] py-0 relative before:block before:w-px before:h-8 before:bg-slate-200 before:absolute before:left-0 before:inset-y-0 before:my-auto before:dark:bg-darkmode-400"
+                  :style="table_setting.편집.style"
+                >
+                  <div
+                    v-if="todo.결과 == '미검사'"
+                    class="flex items-center justify-center text-danger"
+                  >
+                    <a
+                      class="flex items-center mr-3"
+                      href="#"
+                      @click="
+                        () => {
+                          editModalData = todo;
+                          deliveryData.NO = todo.납품NO;
+                          setEditModal(true);
+                        }
+                      "
+                    >
+                      <Lucide icon="Edit" class="w-4 h-4 mr-1" />
+                      검사
+                    </a>
+                  </div>
+                  <div
+                    v-else
+                    class="flex items-center justify-center text-success"
+                  >
+                    <Lucide icon="CheckCircle" class="w-4 h-4 mr-1" />
+                    검사완료
+                  </div>
+                </Table.Td>
+              </Table.Tr>
+            </Table.Tbody>
+          </Table>
+          <div
+            class="text-center mt-20"
+            v-if="dataManager.dataCount.value == 0"
+          >
+            저장된 데이터가 없습니다.
+          </div>
+        </div>
+      </div>
+      <!-- END: Data List -->
     </div>
-    <!-- END: Data List -->
   </div>
+  <!-- BEGIN : 권한 경고 -->
+  <div class="intro-y" v-if="user_level < 2">
+    <div class="mt-20 items-center text-center">
+      <div>
+        <Lucide icon="AlertTriangle" class="w-20 h-20 mx-auto text-warning" />
+      </div>
+      <div class="mt-3 text-2xl">ACCESS DENIED</div>
+    </div>
+    <div class="mt-5 text-center">액세스 권한이 없습니다.</div>
+    <div class="mt-2 text-center">
+      IT 관리자에게 연락하여 액세스 권한을 요청하세요.
+    </div>
+  </div>
+  <!-- END : 권한 없을 때 -->
   <!-- BEGIN: FOOTER(COPYRIGHT) -->
   <div class="intro-y mt-5 mr-5" style="text-align: right">
     <footer>&copy;2023 QInnotek. All rights reserved.</footer>

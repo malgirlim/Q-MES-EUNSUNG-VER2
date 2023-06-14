@@ -298,6 +298,7 @@ const table_width = [
 </script>
 
 <template>
+<div v-if="user_level >= 2">
   <!-- style="height: calc(100vh - 250px)" : 브라우저 화면 창크기에 맞게 변경됨 : 100vh - 브라우저 창 크기 -->
   <div class="grid grid-cols-12 gap-1 mt-1">
     <div
@@ -677,9 +678,23 @@ const table_width = [
     </div>
     <!-- END: Data List -->
   </div>
-  <!-- BEGIN: Insert Modal Content -->
+</div>
+  <!-- BEGIN : 권한 경고 -->
+  <div class="intro-y" v-if="user_level < 2">
+    <div class="mt-20 items-center text-center">
+      <div>
+        <Lucide icon="AlertTriangle" class="w-20 h-20 mx-auto text-warning" />
+      </div>
+      <div class="mt-3 text-2xl">ACCESS DENIED</div>
+    </div>
+    <div class="mt-5 text-center">액세스 권한이 없습니다.</div>
+    <div class="mt-2 text-center">
+      IT 관리자에게 연락하여 액세스 권한을 요청하세요.
+    </div>
+  </div>
+  <!-- END : 권한 없을 때 -->
   <!-- BEGIN: FOOTER(COPYRIGHT) -->
-  <div class="intro-y mt-5 mr-5" style="text-align: right">
+  <!-- BEGIN: Insert Modal Content -->  <div class="intro-y mt-5 mr-5" style="text-align: right">
     <footer>&copy;2023 QInnotek. All rights reserved.</footer>
   </div>
   <!-- END: FOOTER(COPYRIGHT) -->
