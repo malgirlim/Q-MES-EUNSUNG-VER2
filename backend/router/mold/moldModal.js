@@ -33,6 +33,8 @@ router.get("/user", async (req, res) => {
         [USER_REGIST_NM] AS 등록자,
         [USER_REGIST_DT] AS 등록일시
       FROM [QMES2022].[dbo].[MASTER_USER_TB]
+      WHERE [USER_ID] != 'admin'
+      AND [USER_ID] != 'kiosk'
       ORDER BY [USER_RANK] DESC
     `);
 
@@ -66,6 +68,8 @@ router.post("/user", async (req, res) => {
           [USER_REGIST_NM] AS 등록자,
           [USER_REGIST_DT] AS 등록일시
         FROM [QMES2022].[dbo].[MASTER_USER_TB]
+        WHERE [USER_ID] != 'admin'
+        AND [USER_ID] != 'kiosk'
         ) AS RESULT
         WHERE (1=1)
         AND ( 아이디 like concat('%',@input,'%')
@@ -103,6 +107,8 @@ router.post("/user", async (req, res) => {
           [USER_REGIST_NM] AS 등록자,
           [USER_REGIST_DT] AS 등록일시
         FROM [QMES2022].[dbo].[MASTER_USER_TB]
+        WHERE [USER_ID] != 'admin'
+        AND [USER_ID] != 'kiosk'
         ) AS RESULT
         WHERE (1=1)
         AND ` +

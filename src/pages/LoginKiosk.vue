@@ -19,7 +19,7 @@ const state = reactive({
     name: "",
   },
   form: {
-    loginId: "kiosk01",
+    loginId: "kiosk",
     loginPw: "",
   },
 });
