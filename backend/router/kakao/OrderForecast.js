@@ -126,8 +126,6 @@ async function getSendUser(알림설정NO) {
           [USER_POSITION] AS 직책,
           [USER_RANK] AS 직급
         FROM [QMES2022].[dbo].[MASTER_USER_TB]
-        WHERE [USER_ID] != 'admin'
-        AND [USER_ID] != 'kiosk'
       ) AS MASTER_USER ON MASTER_USER.아이디 = [ALUS_USER_ID]
       WHERE [ALUS_ALST_PK] = ` +
         알림설정NO +
