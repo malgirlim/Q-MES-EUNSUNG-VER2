@@ -51,6 +51,8 @@ import {
 
 const { proxy }: any = getCurrentInstance();
 
+const show_debug_button = ref(false);
+
 const logout = () => {
   axios
     .delete("/api/auth", { params: { user: proxy.gstate.account.id } })
@@ -77,6 +79,7 @@ axios
     if (res.data.auth == "생산관리자") proxy.gstate.level = 생산_관리자;
     if (res.data.auth == "품질일반") proxy.gstate.level = 품질_일반;
     if (res.data.auth == "품질관리자") proxy.gstate.level = 품질_관리자;
+    if (res.data.auth == "시스템개발자") show_debug_button.value = true;
   })
   .catch(() => {
     if (proxy.gstate.account.id == null) {
@@ -404,7 +407,11 @@ const setDebugMode = () => {
           >
             <Lucide icon="BellPlus" class="w-4 h-4 mr-2" /> 모바일 알림설정
           </Menu.Item>
-          <Menu.Item class="hover:bg-white/5" @click="setDebugMode()">
+          <Menu.Item
+            v-if="show_debug_button == true"
+            class="hover:bg-white/5"
+            @click="setDebugMode()"
+          >
             <div class="flex" v-if="proxy.gstate.debug.active != 'on'">
               <Lucide icon="ToggleLeft" class="w-4 h-4 mr-2" /> 디버그모드(OFF)
             </div>

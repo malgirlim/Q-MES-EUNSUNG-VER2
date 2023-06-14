@@ -51,6 +51,8 @@ import {
 
 const { proxy }: any = getCurrentInstance();
 
+const user_level = proxy.gstate.level.TopBar;
+
 const logout = () => {
   axios
     .delete("/api/auth", { params: { user: proxy.gstate.account.id } })
@@ -391,7 +393,11 @@ const setDebugMode = () => {
             프로그램 정보
           </Menu.Item>
           <Menu.Devider class="bg-white/[0.08]" />
-          <Menu.Item class="hover:bg-white/5" @click="setDebugMode()">
+          <Menu.Item
+            v-if="user_level == 6"
+            class="hover:bg-white/5"
+            @click="setDebugMode()"
+          >
             <div class="flex" v-if="proxy.gstate.debug.active != 'on'">
               <Lucide icon="ToggleLeft" class="w-4 h-4 mr-2" /> 디버그모드(OFF)
             </div>
