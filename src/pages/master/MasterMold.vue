@@ -25,7 +25,7 @@ import {
   MasterProduct,
   MasterProcess,
   MasterUser,
-} from "../../interfaces/menu/MasterInterface";
+} from "../../interfaces/menu/masterInterface";
 
 // 컴포넌트 로드
 import MoldDetail from "../../components/Common/Detail/MasterMoldDetail.vue";

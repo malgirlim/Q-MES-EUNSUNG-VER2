@@ -21,7 +21,7 @@ import { useSendApi } from "../../../composables/useSendApi";
 import {
   MasterClient,
   MasterProduct,
-} from "../../../interfaces/menu/MasterInterface";
+} from "../../../interfaces/menu/masterInterface";
 import { OrderAccept } from "../../../interfaces/menu/orderInterface";
 import PaginationComponent from "../../../components/Pagination/PaginationComponent.vue"; // 페이징설정
 

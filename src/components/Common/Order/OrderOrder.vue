@@ -20,7 +20,7 @@ import { useSendApi } from "../../../composables/useSendApi";
 import {
   MasterClient,
   MasterProduct,
-} from "../../../interfaces/menu/MasterInterface";
+} from "../../../interfaces/menu/masterInterface";
 import {
   OrderAccept,
   OrderOrder,

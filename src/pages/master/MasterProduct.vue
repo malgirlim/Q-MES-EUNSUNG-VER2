@@ -20,7 +20,7 @@ import { useSendApi } from "../../composables/useSendApi";
 import {
   MasterProduct,
   MasterClient,
-} from "../../interfaces/menu/MasterInterface";
+} from "../../interfaces/menu/masterInterface";
 
 // 컴포넌트 로드
 import ProductDetail from "../../components/Common/Detail/MasterProductDetail.vue";

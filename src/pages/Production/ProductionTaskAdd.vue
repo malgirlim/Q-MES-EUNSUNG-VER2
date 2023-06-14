@@ -24,7 +24,7 @@ import {
   MasterProcess,
   MasterFacility,
   MasterUser,
-} from "../../interfaces/menu/MasterInterface";
+} from "../../interfaces/menu/masterInterface";
 import {
   StockItemReceive,
   StockStockLOT,

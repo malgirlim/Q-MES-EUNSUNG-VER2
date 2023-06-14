@@ -20,7 +20,7 @@ import { useSendApi } from "../../composables/useSendApi";
 import {
   MasterStockStand,
   MasterProduct,
-} from "../../interfaces/menu/MasterInterface";
+} from "../../interfaces/menu/masterInterface";
 
 // 컴포넌트 로드
 import MasterDetail from "../../components/Common/Detail/MasterStockStdDetail.vue";

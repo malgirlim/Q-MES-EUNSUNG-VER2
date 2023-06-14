@@ -16,7 +16,7 @@ import PaginationComponent from "../../components/Pagination/PaginationComponent
 
 // API 보내는 함수 및 인터페이스 불러오기
 import { useSendApi } from "../../composables/useSendApi";
-import { MasterDefect } from "../../interfaces/menu/MasterInterface";
+import { MasterDefect } from "../../interfaces/menu/masterInterface";
 
 // 컴포넌트 로드
 import MasterDetail from "../../components/Common/Detail/MasterCodeBadDetail.vue";

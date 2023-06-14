@@ -20,7 +20,7 @@ import { useSendApi } from "../../composables/useSendApi";
 import {
   MasterRecipe,
   MasterProduct,
-} from "../../interfaces/menu/MasterInterface";
+} from "../../interfaces/menu/masterInterface";
 
 import MasterDetail from "../../components/Common/Detail/MasterRecipeDetail.vue";
 

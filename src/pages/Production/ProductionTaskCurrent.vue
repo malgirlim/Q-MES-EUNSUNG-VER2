@@ -22,7 +22,7 @@ import {
   MasterFacility,
   MasterDefect,
   MasterNonWork,
-} from "../../interfaces/menu/MasterInterface";
+} from "../../interfaces/menu/masterInterface";
 import {
   ProductionTaskProcess,
   ProductionTaskProcessItem,

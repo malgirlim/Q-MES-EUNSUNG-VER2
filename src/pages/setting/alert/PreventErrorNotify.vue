@@ -17,7 +17,7 @@ import {
 import {
   MasterFacility,
   MasterUser,
-} from "../../../interfaces/menu/MasterInterface";
+} from "../../../interfaces/menu/masterInterface";
 
 // 페이지 로딩 시 시작
 onMounted(async () => {

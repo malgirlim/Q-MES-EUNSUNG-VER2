@@ -18,7 +18,7 @@ import { toast } from "vue3-toastify";
 
 // API 보내는 함수 및 인터페이스 불러오기
 import { useSendApi } from "../../composables/useSendApi";
-import { MasterQualityStand } from "../../interfaces/menu/MasterInterface";
+import { MasterQualityStand } from "../../interfaces/menu/masterInterface";
 import { OrderOrder } from "../../interfaces/menu/orderInterface";
 import { QualityProcess } from "../../interfaces/menu/qualityInterface";
 import { StockItemReceive } from "../../interfaces/menu/stockInterface";

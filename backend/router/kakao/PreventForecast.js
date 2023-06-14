@@ -39,8 +39,8 @@ async function request_post() {
 
       // 보낼 데이터가 여러개인 경우가 있으므로 for문 실행
       for (let data of send_data) {
-        // 발송시점의 기준을 판단
-        if (data.잔여일 == judge.발송시점) {
+        // 설비NO과 발송시점의 기준을 판단
+        if (data.설비NO == judge.설비NO && data.잔여일 == judge.발송시점) {
           kakaoSendData.잔여일 = data.잔여일 ?? "";
           kakaoSendData.계획일 = data.계획일 ?? "";
           kakaoSendData.설비명 = data.설비명 ?? "";
@@ -92,7 +92,7 @@ async function getJudgeStand() {
         ,[ALST_REGIST_NM] AS 등록자
         ,[ALST_REGIST_DT] AS 등록일시
       FROM [QMES2022].[dbo].[MANAGE_ALERT_SETTING_TB]
-      WHERE [ALST_DIV] = 'OrderForecast'
+      WHERE [ALST_DIV] = 'PreventForecast'
     `);
 
     return result.recordset;
@@ -196,7 +196,7 @@ async function insertAlertLog(user, data, res) {
     const Pool = await pool;
     await Pool.request()
       .input("발송대상ID", user.사용자ID ?? "")
-      .input("구분", "수주대비납품예보" ?? "")
+      .input("구분", "예방보전예보" ?? "")
       .input(
         "제목",
         dayjs().format("YYYY-MM-DD HH:mm:ss") + " : " + res.body.result
@@ -241,34 +241,36 @@ async function insertForecastNotify(data) {
     const Pool = await pool;
     await Pool.request()
       .input("참조NO", data.수주NO ?? null)
-      .input("구분", "수주대비납품예보")
+      .input("구분", "예방보전예보")
       .input(
         "내용",
-        "납기잔여일:" +
-          (data.납기잔여일 ?? "") +
-          ", 수주코드:" +
-          (data.수주코드 ?? "") +
-          ", 거래처명:" +
-          (data.거래처명 ?? "") +
-          ", 품명:" +
-          (data.품명 ?? "") +
-          ", 수량:" +
-          (data.수량 ?? "") +
-          ", 납기일:" +
-          (data.납기일 ?? "")
+        "잔여일:" +
+          (data.잔여일 ?? "") +
+          ", 계획일:" +
+          (data.계획일 ?? "") +
+          ", 설비명:" +
+          (data.설비명 ?? "") +
+          ", 구분:" +
+          (data.구분 ?? "") +
+          ", 내용:" +
+          (data.내용 ?? "") +
+          ", 담당자:" +
+          (data.담당자 ?? "") +
+          ", 직급:" +
+          (data.직급 ?? "")
       )
       .input("비고", "" ?? "")
       .input("등록자", "시스템" ?? "")
       .input("등록일시", dayjs().format("YYYY-MM-DD HH:mm:ss"))
-      .query(`INSERT INTO [QMES2022].[dbo].[MANAGE_WARNING_DELIVERY_TB]
-                ([WNDL_ACCEPT_PK]
-                ,[WNDL_DIV]
-                ,[WNDL_CONTENT]
-                ,[WNDL_NOTE]
-                ,[WNDL_REGIST_NM]
-                ,[WNDL_REGIST_DT])
-              VALUES
-                (@참조NO,@구분,@내용,@비고,@등록자,@등록일시)
+      .query(`INSERT INTO [QMES2022].[dbo].[MANAGE_WARNING_PREVENT_TB]
+          ([WNPV_PREVENT_PLAN_PK]
+          ,[WNPV_DIV]
+          ,[WNPV_CONTENT]
+          ,[WNPV_NOTE]
+          ,[WNPV_REGIST_NM]
+          ,[WNPV_REGIST_DT])
+        VALUES
+          (@참조NO,@구분,@내용,@비고,@등록자,@등록일시)
       `);
   } catch (err) {
     console.log(err.message);

@@ -25,7 +25,7 @@ import {
   MasterUser,
   MasterDefect,
   MasterNonWork,
-} from "../../interfaces/menu/MasterInterface";
+} from "../../interfaces/menu/masterInterface";
 import {
   StockItemReceive,
   StockProcess,
