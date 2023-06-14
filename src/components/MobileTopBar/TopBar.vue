@@ -305,7 +305,7 @@ const setDebugMode = () => {
       </div>
       END: Search -->
       <!-- BEGIN: Notifications -->
-      <Popover class="mr-4 intro-x sm:mr-6">
+      <!-- <Popover class="mr-4 intro-x sm:mr-6">
         <Popover.Button
           class="relative text-white/70 outline-none block before:content-[''] before:w-[8px] before:h-[8px] before:rounded-full before:absolute before:top-[-2px] before:right-0 before:bg-danger"
         >
@@ -351,7 +351,7 @@ const setDebugMode = () => {
             </div>
           </div>
         </Popover.Panel>
-      </Popover>
+      </Popover> -->
       <!-- END: Notifications -->
       <!-- BEGIN: Account Menu -->
 
@@ -383,9 +383,9 @@ const setDebugMode = () => {
             <Lucide icon="Lock" class="w-4 h-4 mr-2" /> 비밀번호 변경
           </Menu.Item>
 
-          <Menu.Item class="hover:bg-white/5">
+          <!-- <Menu.Item class="hover:bg-white/5">
             <Lucide icon="HelpCircle" class="w-4 h-4 mr-2" /> 도움말
-          </Menu.Item>
+          </Menu.Item> -->
           <Menu.Item class="hover:bg-white/5" @click="setInfoModal(true)">
             <Lucide icon="Info" class="w-4 h-4 mr-2" />
             프로그램 정보

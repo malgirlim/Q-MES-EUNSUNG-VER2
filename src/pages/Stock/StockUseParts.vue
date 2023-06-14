@@ -178,9 +178,9 @@ const insert_check = () => {
   //   pass_flag = false;
   // }
 
-  if (pass_flag == false) {
-    return;
-  }
+  // if (pass_flag == false) {
+  //   return;
+  //  }
 };
 
 // ########################## 등록, 수정, 삭제, 상세 Modal ##########################

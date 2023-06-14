@@ -198,6 +198,12 @@ const setDetailModal = (value: boolean) => {
   detailModal.value = value;
 };
 
+// ##### 사진열기 Modal #####
+const photoModal = ref(false);
+const setPhotoModal = (value: boolean) => {
+  photoModal.value = value;
+};
+
 // ########################## 체크박스 설정 ##########################
 const checkDebug: any = ref([]); // 체크박스 선택 데이터 저장변수
 const mainCheckBox = ref(true); // 메인 체크박스 상태
@@ -800,7 +806,7 @@ const checkDataFunction = async () => {
                     @click="
                       () => {
                         editModalData = todo;
-                        setDetailModal(true);
+                        setPhotoModal(true);
                       }
                     "
                   >
@@ -1574,4 +1580,54 @@ const checkDataFunction = async () => {
     </Dialog.Panel>
   </Dialog>
   <!-- END: Delete Confirmation Modal -->
+  <!-- BEGIN: 사진열기 Modal Content -->
+  <Dialog
+    size="xl"
+    :open="photoModal"
+    @close="
+      () => {
+        setPhotoModal(false);
+      }
+    "
+  >
+    <Dialog.Panel>
+      <div class="p-5 text-center">
+        <div class="text-2xl font-bold">품질기준서</div>
+        <div class="mt-5 mb-5">
+          <img
+            class="mx-auto"
+            src="../../../backend/uploads/hwp_logo1686549034501.png"
+          />
+        </div>
+        <a
+          href="../../../backend/uploads/hwp_logo1686549034501.png"
+          download
+          style="outline: none"
+        >
+          <Button
+            variant="outline-primary"
+            as="a"
+            type="button"
+            class="w-24 mr-5"
+          >
+            다운로드
+          </Button>
+        </a>
+        <Button
+          variant="outline-primary"
+          as="a"
+          type="button"
+          @click="
+            () => {
+              setPhotoModal(false);
+            }
+          "
+          class="w-24 mr-1"
+        >
+          닫기
+        </Button>
+      </div>
+    </Dialog.Panel>
+  </Dialog>
+  <!-- END: 사진열기 Modal Content -->
 </template>

@@ -2003,8 +2003,8 @@ const shipmentDataFunction = async () => {
           icon="CheckCircle"
           class="w-16 h-16 mx-auto mt-3 text-success"
         />
-        <div class="mt-5 text-3xl">출하검사요청</div>
-        <div class="mt-2 text-slate-500">출하요청하시겠습니까?</div>
+        <div class="mt-5 text-3xl">출하검사 요청</div>
+        <div class="mt-2 text-slate-500">요청하시겠습니까?</div>
 
         <!-- <div style="text-align: left">
           <div class="mt-3">
@@ -2027,7 +2027,7 @@ const shipmentDataFunction = async () => {
               setShipmentModal(false);
             }
           "
-          class="w-24 mr-1"
+          class="w-24 mr-5"
         >
           취소
         </Button>

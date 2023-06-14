@@ -176,10 +176,9 @@ import MobileOrderTaskReportFacility8 from "../pages/mobile/order/report/Facilit
 import MobileOrderTaskReportFacility9 from "../pages/mobile/order/report/Facility9.vue";
 import MobileOrderTaskReportFacility10 from "../pages/mobile/order/report/Facility10.vue";
 
-import testpage from "../test/kakaotalkTest.vue";
+import testpage from "../test/Main.vue";
 
 const routes = [
-  { path: "/test", component: testpage },
   {
     path: "/login",
     component: Login,
@@ -237,6 +236,7 @@ const routes = [
     component: TopMenu,
 
     children: [
+      { path: "/test", component: testpage },
       {
         path: "/",
         name: "top-menu-main",

@@ -171,9 +171,9 @@ const insert_check = () => {
   //   pass_flag = false;
   // }
 
-  if (pass_flag == false) {
-    return;
-  }
+  // if (pass_flag == false) {
+  //   return;
+  //  }
 };
 
 // ########################## 등록, 수정, 삭제, 상세 Modal ##########################
@@ -380,7 +380,7 @@ const onFileImport = (event: any) => {
         class="flex flex-wrap items-center col-span-12 mt-3 mb-2 intro-y sm:flex-nowrap"
       >
         <div class="ml-3">
-          <Button
+          <!-- <Button
             class="mr-2 shadow-md"
             style="height: 30px"
             as="a"
@@ -393,7 +393,7 @@ const onFileImport = (event: any) => {
           >
             <Lucide icon="FilePlus" class="w-4 h-4 mr-2" />
             등록
-          </Button>
+          </Button> -->
           <Button
             class="mr-2 shadow-md"
             style="height: 30px"
