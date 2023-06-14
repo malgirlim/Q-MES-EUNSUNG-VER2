@@ -18,7 +18,7 @@ import { toast } from "vue3-toastify";
 
 // API 보내는 함수 및 인터페이스 불러오기
 import { useSendApi } from "../../composables/useSendApi";
-import { MasterQualityStand } from "../../interfaces/menu/MasterInterface";
+import { MasterQualityStand } from "../../interfaces/menu/masterInterface";
 import { QualityShipment } from "../../interfaces/menu/qualityInterface";
 import { OrderDelivery } from "../../interfaces/menu/orderInterface";
 
@@ -148,7 +148,7 @@ const insertDataFunction = async () => {
 // ##### 수정 Modal #####
 const editModal = ref(false);
 const setEditModal = (value: boolean) => {
-  if (user_level >= 3) {
+  if (user_level >= 4) {
     editModal.value = value;
     search();
   } else {

@@ -16,7 +16,7 @@ import printJS from "print-js";
 // API 보내는 함수 및 인터페이스 불러오기
 import { useSendApi } from "../../composables/useSendApi";
 import { StockUse } from "../../interfaces/menu/stockInterface";
-import { MasterProduct } from "../../interfaces/menu/MasterInterface";
+import { MasterProduct } from "../../interfaces/menu/masterInterface";
 
 // 페이징기능
 import { onMounted, watch } from "vue";

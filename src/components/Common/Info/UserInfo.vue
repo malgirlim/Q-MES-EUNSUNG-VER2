@@ -5,7 +5,7 @@ import Table from "../../../base-components/Table";
 
 // API 보내는 함수 및 인터페이스 불러오기
 import { useSendApi } from "../../../composables/useSendApi";
-import { MasterUser } from "../../../interfaces/menu/MasterInterface";
+import { MasterUser } from "../../../interfaces/menu/masterInterface";
 
 const props = defineProps<{
   data?: any;

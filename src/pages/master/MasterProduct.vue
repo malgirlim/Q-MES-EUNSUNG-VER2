@@ -20,7 +20,7 @@ import { useSendApi } from "../../composables/useSendApi";
 import {
   MasterProduct,
   MasterClient,
-} from "../../interfaces/menu/MasterInterface";
+} from "../../interfaces/menu/masterInterface";
 
 // 컴포넌트 로드
 import ProductDetail from "../../components/Common/Detail/MasterProductDetail.vue";
@@ -217,7 +217,7 @@ const insertDataFunction = async () => {
 // ##### 수정 Modal #####
 const editModal = ref(false);
 const setEditModal = (value: boolean) => {
-  if (user_level >= 3) {
+  if (user_level >= 4) {
     editModal.value = value;
     search();
   } else {
@@ -234,7 +234,7 @@ const editDataFunction = async () => {
 // ##### 삭제 Modal #####
 const deleteModal = ref(false);
 const setDeleteModal = (value: boolean) => {
-  if (user_level >= 4) {
+  if (user_level >= 5) {
     deleteModal.value = value;
   } else {
     toast.warning("액세스 권한이 없습니다.\n관리자에게 문의하세요.");

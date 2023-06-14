@@ -19,7 +19,7 @@ import { toast } from "vue3-toastify";
 // API 보내는 함수 및 인터페이스 불러오기
 import { useSendApi } from "../../composables/useSendApi";
 import { OrderAccept } from "../../interfaces/menu/orderInterface";
-import { MasterClient } from "../../interfaces/menu/MasterInterface";
+import { MasterClient } from "../../interfaces/menu/masterInterface";
 
 // 컴포넌트 로드
 import Detail from "../../components/Common/Detail/OrderCurrentDetail.vue";
@@ -152,7 +152,7 @@ const insertDataFunction = async () => {
 // ##### 수정 Modal #####
 const editModal = ref(false);
 const setEditModal = (value: boolean) => {
-  if (user_level >= 3) {
+  if (user_level >= 4) {
     editModal.value = value;
     search();
   } else {
@@ -169,7 +169,7 @@ const editDataFunction = async () => {
 // ##### 삭제 Modal #####
 const deleteModal = ref(false);
 const setDeleteModal = (value: boolean) => {
-  if (user_level >= 4) {
+  if (user_level >= 5) {
     deleteModal.value = value;
   } else {
     toast.warning("액세스 권한이 없습니다.\n관리자에게 문의하세요.");

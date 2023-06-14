@@ -22,7 +22,7 @@ import { onMounted, watch } from "vue";
 import PaginationComponent from "../../components/Pagination/PaginationComponent.vue"; // 페이징설정
 
 const { proxy }: any = getCurrentInstance();
-const user_level = proxy.gstate.level.MonitoringMTBF; //권한레벨
+const user_level = proxy.gstate.level.MonitoringKPI2; //권한레벨
 
 const currentPage = ref(1); // 현재페이지
 const rowsPerPage = ref(10); // 한 페이지에 보여질 데이터 갯수

@@ -18,7 +18,7 @@ import { toast } from "vue3-toastify";
 
 // API 보내는 함수 및 인터페이스 불러오기
 import { useSendApi } from "../../composables/useSendApi";
-import { MasterQualityStand } from "../../interfaces/menu/MasterInterface";
+import { MasterQualityStand } from "../../interfaces/menu/masterInterface";
 import { OrderOrder } from "../../interfaces/menu/orderInterface";
 import { QualityIncoming } from "../../interfaces/menu/qualityInterface";
 import { StockItemReceive } from "../../interfaces/menu/stockInterface";
@@ -164,7 +164,7 @@ const editDataFunction = async () => {
 // ##### 삭제 Modal #####
 const deleteModal = ref(false);
 const setDeleteModal = (value: boolean) => {
-  if (user_level >= 4) {
+  if (user_level >= 5) {
     deleteModal.value = value;
   } else {
     toast.warning("액세스 권한이 없습니다.\n관리자에게 문의하세요.");
