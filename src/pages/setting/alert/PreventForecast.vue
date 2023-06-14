@@ -281,7 +281,7 @@ const importUser = (no: any) => {
               {{ alertSettingData?.발송시간 }}
             </div>
           </div>
-          <div class="flex items-center">
+          <!-- <div class="flex items-center">
             <div class="w-[30%] mx-2 text-center">
               <div>발송시점</div>
             </div>
@@ -295,7 +295,7 @@ const importUser = (no: any) => {
             >
               {{ alertSettingData?.발송시점 }}일전
             </div>
-          </div>
+          </div> -->
         </div>
       </div>
     </div>
@@ -400,12 +400,12 @@ const importUser = (no: any) => {
           <FormInput type="time" v-model="alertRuleModalData.발송시간" />
         </div>
       </div>
-      <div class="mb-3">
+      <!-- <div class="mb-3">
         <div class="text-left mb-1">발송시점</div>
         <div>
           <FormInput type="number" v-model="alertRuleModalData.발송시점" />
         </div>
-      </div>
+      </div> -->
 
       <div>
         <div class="mt-5 text-center">
@@ -451,12 +451,12 @@ const importUser = (no: any) => {
           <FormInput type="time" v-model="alertRuleModalData.발송시간" />
         </div>
       </div>
-      <div class="mb-3">
+      <!-- <div class="mb-3">
         <div class="text-left mb-1">발송시점</div>
         <div>
           <FormInput type="number" v-model="alertRuleModalData.발송시점" />
         </div>
-      </div>
+      </div> -->
 
       <div>
         <div class="mt-5 text-center">
