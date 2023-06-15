@@ -1064,7 +1064,7 @@ const onFileImport = (event: any) => {
   </Dialog>
   <!-- END: Insert Modal Content -->
   <!-- BEGIN: Edit Modal Content -->
-  <Dialog size="md" :open="editModal" :key="editModalData?.생산실적NO">
+  <Dialog size="md" :open="editModal" @close="setEditModal(false)">
     <Dialog.Panel class="p-10 text-center">
       <div class="mb-5" style="font-weight: bold">수정</div>
       <Tab.Group>

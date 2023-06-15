@@ -365,7 +365,7 @@ router.post("/", async (req, res) => {
           WHERE ITEM.품목구분 = '원부자재'
         ) AS RESULT
         WHERE (1=1)
-        AND 재공수량 != 0
+        AND 재공수 != 0
         AND ( 작업코드 like concat('%',@input,'%')
         OR 공정 like concat('%',@input,'%')
         OR LOT코드 like concat('%',@input,'%')
@@ -375,7 +375,7 @@ router.post("/", async (req, res) => {
         OR 규격 like concat('%',@input,'%')
         OR 단위 like concat('%',@input,'%'))
         ORDER BY ` +
-        req.body.sortKey +
+        (req.body.sortKey == "NO" ? "작업코드" : req.body.sortKey) +
         ` ` +
         req.body.sortOrder +
         `
@@ -541,12 +541,12 @@ router.post("/", async (req, res) => {
           WHERE ITEM.품목구분 = '원부자재'
         ) AS RESULT
         WHERE (1=1)
-        AND 재공수량 != 0
+        AND 재공수 != 0
         AND ` +
         req.body.searchKey +
         ` like concat('%',@input,'%')
         ORDER BY ` +
-        req.body.sortKey +
+        (req.body.sortKey == "NO" ? "작업코드" : req.body.sortKey) +
         ` ` +
         req.body.sortOrder +
         `
@@ -575,6 +575,62 @@ router.post("/", async (req, res) => {
     );
 
     res.send(JSON.stringify(result.recordset));
+  } catch (err) {
+    // 로그기록 저장
+    await logSend(
+      (type = "에러"),
+      (ct = err.message ?? ""),
+      (amount = 0),
+      (user = req.body.user ?? "")
+    );
+    res.status(500);
+    res.send(err.message);
+  }
+});
+
+// 등록
+router.post("/insert", async (req, res) => {
+  try {
+    const Pool = await pool;
+    await Pool.request()
+      .input("작업지시공정NO", req.body.data.작업지시공정NO ?? null)
+      .input("품목NO", req.body.data.품목NO ?? null)
+      .input("LOT코드", req.body.data.LOT코드 ?? "")
+      .input("수량", req.body.data.수량 ?? "")
+      .input(
+        "일시",
+        moment(req.body.data.일시).format("YYYY-MM-DD HH:mm:ss") ??
+          moment().tz("Asia/Seoul").format("YYYY-MM-DD HH:mm:ss")
+      )
+      .input("비고", req.body.data.비고 ?? "")
+      .input("등록자", req.body.user ?? "")
+      .input(
+        "등록일시",
+        moment().tz("Asia/Seoul").format("YYYY-MM-DD HH:mm:ss")
+      ).query(`
+        INSERT INTO [QMES2022].[dbo].[MANAGE_INSTRUCT_PROCESS_ITEM_TB]
+          ([ISPCI_DIV]
+          ,[ISPCI_INSTRUCT_PROCESS_PK]
+          ,[ISPCI_ITEM_PK]
+          ,[ISPCI_LOTCODE]
+          ,[ISPCI_AMOUNT]
+          ,[ISPCI_DT]
+          ,[ISPCI_NOTE]
+          ,[ISPCI_REGIST_NM]
+          ,[ISPCI_REGIST_DT])
+        VALUES
+          ('재공자재반납',@작업지시공정NO,@품목NO,@LOT코드,@수량,@일시,@비고,@등록자,@등록일시)
+      `);
+
+    // 로그기록 저장
+    await logSend(
+      (type = "등록"),
+      (ct = JSON.stringify(req.body.data) + " 을 등록."),
+      (amount = 1),
+      (user = req.body.user ?? "")
+    );
+
+    res.send("등록완료");
   } catch (err) {
     // 로그기록 저장
     await logSend(

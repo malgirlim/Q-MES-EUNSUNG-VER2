@@ -149,13 +149,20 @@ const insertDataFunction = async () => {
 // ##### 수정 Modal #####
 const editModal = ref(false);
 const setEditModal = (value: boolean) => {
-  editModal.value = value;
-  search();
+  if (user_level >= 3) {
+    editModal.value = value;
+    search();
+  } else {
+    toast.warning("액세스 권한이 없습니다.\n관리자에게 문의하세요.");
+  }
 };
 let editModalData: StockProcess; // 수정할 변수
 // 수정버튼 누르면 실행되는 함수
 const editDataFunction = async () => {
-  await dataManager.editData(editModalData); // await : 이 함수가 끝나야 다음으로 넘어간다
+  // await dataManager.editData(editModalData); // await : 이 함수가 끝나야 다음으로 넘어간다
+  editModalData.수량 = editModalData.수량 * -1;
+  await dataManager.insertData(editModalData); // await : 이 함수가 끝나야 다음으로 넘어간다
+  toast.success("재공자재 반납 등록되었습니다.");
   search();
 };
 
@@ -761,6 +768,10 @@ const onFileImport = (event: any) => {
                       @click="
                         () => {
                           editModalData = todo;
+                          editModalData.수량 = todo.재공수;
+                          editModalData.일시 = dayjs().format(
+                            'YYYY-MM-DD HH:mm:ss'
+                          );
                           setEditModal(true);
                         }
                       "
@@ -803,6 +814,164 @@ const onFileImport = (event: any) => {
     <footer>&copy;2023 QInnotek. All rights reserved.</footer>
   </div>
   <!-- END: FOOTER(COPYRIGHT) -->
+
+  <!-- #############################################################################################################################
+#############################################################################################################################
+############################################################################################################################# -->
+
+  <!-- BEGIN: Edit Modal Content -->
+  <Dialog size="md" :open="editModal" @close="setEditModal(false)">
+    <Dialog.Panel class="p-10 text-center">
+      <div class="mb-5" style="font-weight: bold">수정</div>
+      <Tab.Group>
+        <Tab.List variant="boxed-tabs">
+          <Tab>
+            <Tab.Button class="w-full py-2" as="button"> 기본 내용 </Tab.Button>
+          </Tab>
+          <Tab>
+            <Tab.Button class="w-full py-2" as="button"> 추가 내용 </Tab.Button>
+          </Tab>
+        </Tab.List>
+        <Tab.Panels class="mt-5">
+          <Tab.Panel class="leading-relaxed">
+            <div
+              style="
+                text-align: left;
+                overflow-y: scroll;
+                overflow-x: hidden;
+                height: 500px;
+              "
+            >
+              <div class="mt-3">
+                <FormLabel htmlFor="vertical-form-1">LOT코드</FormLabel>
+                <FormInput
+                  id="vertical-form-1"
+                  type="text"
+                  v-model="editModalData.LOT코드"
+                  placeholder=""
+                  readonly
+                />
+              </div>
+              <div class="mt-3">
+                <FormLabel htmlFor="vertical-form-1">품번</FormLabel>
+                <FormInput
+                  id="vertical-form-1"
+                  type="text"
+                  v-model="editModalData.품번"
+                  placeholder=""
+                  readonly
+                />
+              </div>
+              <div class="mt-3">
+                <FormLabel htmlFor="vertical-form-1">품목구분</FormLabel>
+                <FormInput
+                  id="vertical-form-1"
+                  type="text"
+                  v-model="editModalData.품목구분"
+                  placeholder=""
+                  readonly
+                />
+              </div>
+              <div class="mt-3">
+                <FormLabel htmlFor="vertical-form-1">품명</FormLabel>
+                <FormInput
+                  id="vertical-form-1"
+                  type="text"
+                  v-model="editModalData.품명"
+                  placeholder=""
+                  readonly
+                />
+              </div>
+              <div class="mt-3">
+                <FormLabel htmlFor="vertical-form-1">규격</FormLabel>
+                <FormInput
+                  id="vertical-form-1"
+                  type="text"
+                  v-model="editModalData.규격"
+                  placeholder=""
+                  readonly
+                />
+              </div>
+              <div class="mt-3">
+                <FormLabel htmlFor="vertical-form-1">단위</FormLabel>
+                <FormInput
+                  id="vertical-form-1"
+                  type="text"
+                  v-model="editModalData.단위"
+                  placeholder=""
+                  readonly
+                />
+              </div>
+              <div class="mt-3">
+                <FormLabel htmlFor="vertical-form-2">수량</FormLabel>
+                <FormInput
+                  id="vertical-form-2"
+                  type="number"
+                  v-model="editModalData.수량"
+                  placeholder=""
+                />
+              </div>
+              <div class="mt-3">
+                <FormLabel htmlFor="vertical-form-5">일시</FormLabel>
+                <FormInput
+                  type="datetime-local"
+                  step="10"
+                  v-model="editModalData.일시"
+                  placeholder=""
+                />
+              </div>
+            </div>
+          </Tab.Panel>
+          <Tab.Panel class="leading-relaxed">
+            <div
+              style="
+                text-align: left;
+                overflow-y: scroll;
+                overflow-x: hidden;
+                height: 500px;
+              "
+            >
+              <div class="mt-3">
+                <FormLabel htmlFor="vertical-form-11">비고</FormLabel>
+                <FormInput
+                  id="vertical-form-11"
+                  type="text"
+                  v-model="editModalData.비고"
+                  placeholder=""
+                />
+              </div>
+            </div>
+          </Tab.Panel>
+        </Tab.Panels>
+      </Tab.Group>
+      <div style="text-align: left">
+        <div class="mt-5 text-right">
+          <Button
+            class="mr-2 shadow-md"
+            variant="primary"
+            @click="
+              () => {
+                editDataFunction();
+                setEditModal(false);
+              }
+            "
+            >확인</Button
+          >
+          <Button
+            class="mr-2 shadow-md"
+            variant="outline-primary"
+            @click="
+              () => {
+                setEditModal(false);
+              }
+            "
+            >취소</Button
+          >
+        </div>
+      </div>
+    </Dialog.Panel>
+  </Dialog>
+  <!-- END: Edit Modal Content -->
 
   <!-- BEGIN: Detail Modal Content -->
   <Dialog

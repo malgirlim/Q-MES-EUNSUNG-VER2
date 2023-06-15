@@ -360,13 +360,39 @@ const onFileImport = (event: any) => {
           variant="linkedin"
           @click="
             () => {
+              router.push('/order/delivery');
+            }
+          "
+        >
+          <Lucide icon="ExternalLink" class="w-4 h-4 mr-2" />
+          납품
+        </Button>
+        <Button
+          class="mr-3 shadow-md"
+          as="a"
+          variant="linkedin"
+          @click="
+            () => {
+              router.push('/stock/monitor-finish');
+            }
+          "
+        >
+          <Lucide icon="ExternalLink" class="w-4 h-4 mr-2" />
+          재고현황
+        </Button>
+        <!-- <Button
+          class="mr-3 shadow-md"
+          as="a"
+          variant="linkedin"
+          @click="
+            () => {
               router.push('/quality/process');
             }
           "
         >
           <Lucide icon="ExternalLink" class="w-4 h-4 mr-2" />
           재고조정
-        </Button>
+        </Button> -->
         <div class="hidden mx-auto md:block text-slate-500"></div>
         <div class="mr-5">
           <a href="" class="flex items-center ml-auto text-primary">

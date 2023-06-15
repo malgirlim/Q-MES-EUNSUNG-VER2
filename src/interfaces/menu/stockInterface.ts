@@ -70,7 +70,7 @@ export interface StockItemRelease {
 // 재고 관리 - 품목 재공현황
 export interface StockProcess {
   [attribute: string]: any | undefined;
-  NO?: number;
+  // NO?: number;
   작업지시공정NO?: number;
   작업코드?: string;
   공정?: string;
