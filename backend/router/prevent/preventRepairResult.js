@@ -275,20 +275,16 @@ router.post("/insert", async (req, res) => {
         "등록일시",
         moment().tz("Asia/Seoul").format("YYYY-MM-DD HH:mm:ss")
       ).query(`
-        INSERT INTO [QMES2022].[dbo].[MANAGE_FACILITY_FIX_PLAN_TB]
-          ([FCFPL_FACILITY_PK]
-          ,[FCFPL_DIV]
-          ,[FCFPL_CONTENT]
-          ,[FCFPL_HOW]
-          ,[FCFPL_STAND]
-          ,[FCFPL_DATE]
-          ,[FCFPL_WARN_DATE]
-          ,[FCFPL_USER_ID]
-          ,[FCFPL_NOTE]
-          ,[FCFPL_REGIST_NM]
-          ,[FCFPL_REGIST_DT])
+        INSERT INTO [QMES2022].[dbo].[MANAGE_FACILITY_FIX_TB]
+          ([FCFIX_FACILITY_FIX_PLAN_PK]
+          ,[FCFIX_CONTENT]
+          ,[FCFIX_RESULT]
+          ,[FCFIX_COST]
+          ,[FCFIX_NOTE]
+          ,[FCFIX_REGIST_NM]
+          ,[FCFIX_REGIST_DT])
         VALUES
-          (@설비NO,@구분,@내용,@수리방법,@기준,@계획일,@예보일,@담당자ID,@비고,@등록자,@등록일시)
+          (@설비수리계획NO,@결과내용,@결과,@금액,@비고,@등록자,@등록일시)
       `);
 
     // 로그기록 저장
@@ -319,34 +315,26 @@ router.post("/insertAll", async (req, res) => {
     const Pool = await pool;
     for (var i = 0; i < req.body.data.length; i++) {
       await Pool.request()
-        .input("설비NO", req.body.data[i].설비NO ?? null)
-        .input("구분", req.body.data[i].구분 ?? "")
-        .input("내용", req.body.data[i].내용 ?? "")
-        .input("수리방법", req.body.data[i].수리방법 ?? "")
-        .input("기준", req.body.data[i].기준 ?? "")
-        .input("계획일", req.body.data[i].계획일 ?? "")
-        .input("예보일", req.body.data[i].예보일 ?? "")
-        .input("담당자ID", req.body.data[i].담당자ID ?? null)
+        .input("설비수리계획NO", req.body.data[i].설비수리계획NO ?? null)
+        .input("결과내용", req.body.data[i].결과내용 ?? "")
+        .input("결과", req.body.data[i].결과 ?? "")
+        .input("금액", req.body.data[i].금액 ?? "")
         .input("비고", req.body.data[i].비고 ?? "")
         .input("등록자", req.body.user ?? "")
         .input(
           "등록일시",
           moment().tz("Asia/Seoul").format("YYYY-MM-DD HH:mm:ss")
         ).query(`
-        INSERT INTO [QMES2022].[dbo].[MANAGE_FACILITY_FIX_PLAN_TB]
-          ([FCFPL_FACILITY_PK]
-          ,[FCFPL_DIV]
-          ,[FCFPL_CONTENT]
-          ,[FCFPL_HOW]
-          ,[FCFPL_STAND]
-          ,[FCFPL_DATE]
-          ,[FCFPL_WARN_DATE]
-          ,[FCFPL_USER_ID]
-          ,[FCFPL_NOTE]
-          ,[FCFPL_REGIST_NM]
-          ,[FCFPL_REGIST_DT])
+        INSERT INTO [QMES2022].[dbo].[MANAGE_FACILITY_FIX_TB]
+          ([FCFIX_FACILITY_FIX_PLAN_PK]
+          ,[FCFIX_CONTENT]
+          ,[FCFIX_RESULT]
+          ,[FCFIX_COST]
+          ,[FCFIX_NOTE]
+          ,[FCFIX_REGIST_NM]
+          ,[FCFIX_REGIST_DT])
         VALUES
-          (@설비NO,@구분,@내용,@수리방법,@기준,@계획일,@예보일,@담당자ID,@비고,@등록자,@등록일시)
+          (@설비수리계획NO,@결과내용,@결과,@금액,@비고,@등록자,@등록일시)
       `);
 
       // 로그기록 저장
@@ -377,34 +365,26 @@ router.post("/edit", async (req, res) => {
     const Pool = await pool;
     await Pool.request()
       .input("NO", req.body.data.NO ?? 0)
-      .input("설비NO", req.body.data.설비NO ?? null)
-      .input("구분", req.body.data.구분 ?? "")
-      .input("내용", req.body.data.내용 ?? "")
-      .input("수리방법", req.body.data.수리방법 ?? "")
-      .input("기준", req.body.data.기준 ?? "")
-      .input("계획일", req.body.data.계획일 ?? "")
-      .input("예보일", req.body.data.예보일 ?? "")
-      .input("담당자ID", req.body.data.담당자ID ?? null)
+      .input("설비수리계획NO", req.body.data.설비수리계획NO ?? null)
+      .input("결과내용", req.body.data.결과내용 ?? "")
+      .input("결과", req.body.data.결과 ?? "")
+      .input("금액", req.body.data.금액 ?? "")
       .input("비고", req.body.data.비고 ?? "")
       .input("등록자", req.body.user ?? "")
       .input(
         "등록일시",
         moment().tz("Asia/Seoul").format("YYYY-MM-DD HH:mm:ss")
       ).query(`
-        UPDATE [QMES2022].[dbo].[MANAGE_FACILITY_FIX_PLAN_TB]
+        UPDATE [QMES2022].[dbo].[MANAGE_FACILITY_FIX_TB]
           SET 
-            [FCFPL_FACILITY_PK] = @설비NO
-            ,[FCFPL_DIV] = @구분
-            ,[FCFPL_CONTENT] = @내용
-            ,[FCFPL_HOW] = @수리방법
-            ,[FCFPL_STAND] = @기준
-            ,[FCFPL_DATE] = @계획일
-            ,[FCFPL_WARN_DATE] = @예보일
-            ,[FCFPL_USER_ID] = @담당자ID
-            ,[FCFPL_NOTE] = @비고
-            ,[FCFPL_REGIST_NM] = @등록자
-            ,[FCFPL_REGIST_DT] = @등록일시
-          WHERE [FCFPL_PK] = @NO
+            [FCFIX_FACILITY_FIX_PLAN_PK] = @설비수리계획NO
+            ,[FCFIX_CONTENT] = @결과내용
+            ,[FCFIX_RESULT] = @결과
+            ,[FCFIX_COST] = @금액
+            ,[FCFIX_NOTE] = @비고
+            ,[FCFIX_REGIST_NM] = @등록자
+            ,[FCFIX_REGIST_DT] = @등록일시
+          WHERE [FCFIX_PK] = @NO
     `);
 
     // 로그기록 저장
@@ -436,28 +416,50 @@ router.post("/delete", async (req, res) => {
     for (var i = 0; i < req.body.data.length; i++) {
       const result = await Pool.request().input("key", req.body.data[i]).query(`
         SELECT
-          [FCFPL_PK] AS NO
-          ,[FCFPL_FACILITY_PK] AS 설비NO
-          ,(SELECT [FCLT_NAME] FROM [QMES2022].[dbo].[MASTER_FACILITY_TB] WHERE [FCLT_PK] = [FCFPL_FACILITY_PK]) AS 설비명
-          ,[FCFPL_DIV] AS 구분
-          ,[FCFPL_CONTENT] AS 내용
-          ,[FCFPL_HOW] AS 수리방법
-          ,[FCFPL_STAND] AS 기준
-          ,CONVERT(varchar, [FCFPL_DATE], 23) AS 계획일
-          ,CONVERT(varchar, [FCFPL_WARN_DATE], 23) AS 예보일
-          ,[FCFPL_USER_ID] AS 담당자ID
-          ,(SELECT [USER_NAME] FROM [QMES2022].[dbo].[MASTER_USER_TB] WHERE [USER_ID] = [FCFPL_USER_ID]) AS 담당자
-          ,[FCFPL_NOTE] AS 비고
-          ,[FCFPL_REGIST_NM] AS 등록자
-          ,[FCFPL_REGIST_DT] AS 등록일시
-        FROM [QMES2022].[dbo].[MANAGE_FACILITY_FIX_PLAN_TB]
-        WHERE [FCFPL_PK] = @key
+          [FCFIX_PK] AS NO
+          ,[FCFIX_FACILITY_FIX_PLAN_PK] AS 설비수리계획NO
+          ,FACILITY_FIX_PLAN.설비NO AS 설비NO
+          ,FACILITY_FIX_PLAN.설비명 AS 설비명
+          ,FACILITY_FIX_PLAN.구분 AS 구분
+          ,FACILITY_FIX_PLAN.내용 AS 내용
+          ,FACILITY_FIX_PLAN.수리방법 AS 수리방법
+          ,FACILITY_FIX_PLAN.기준 AS 기준
+          ,FACILITY_FIX_PLAN.계획일 AS 계획일
+          ,FACILITY_FIX_PLAN.예보일 AS 예보일
+          ,FACILITY_FIX_PLAN.담당자ID AS 담당자ID
+          ,FACILITY_FIX_PLAN.담당자 AS 담당자
+          ,[FCFIX_CONTENT] AS 결과내용
+          ,[FCFIX_RESULT] AS 결과
+          ,[FCFIX_COST] AS 금액
+          ,[FCFIX_NOTE] AS 비고
+          ,[FCFIX_REGIST_NM] AS 등록자
+          ,[FCFIX_REGIST_DT] AS 등록일시
+        FROM [QMES2022].[dbo].[MANAGE_FACILITY_FIX_TB]
+        (
+          SELECT
+            [FCFPL_PK] AS NO
+            ,[FCFPL_FACILITY_PK] AS 설비NO
+            ,(SELECT [FCLT_NAME] FROM [QMES2022].[dbo].[MASTER_FACILITY_TB] WHERE [FCLT_PK] = [FCFPL_FACILITY_PK]) AS 설비명
+            ,[FCFPL_DIV] AS 구분
+            ,[FCFPL_CONTENT] AS 내용
+            ,[FCFPL_HOW] AS 수리방법
+            ,[FCFPL_STAND] AS 기준
+            ,CONVERT(varchar, [FCFPL_DATE], 23) AS 계획일
+            ,CONVERT(varchar, [FCFPL_WARN_DATE], 23) AS 예보일
+            ,[FCFPL_USER_ID] AS 담당자ID
+            ,(SELECT [USER_NAME] FROM [QMES2022].[dbo].[MASTER_USER_TB] WHERE [USER_ID] = [FCFPL_USER_ID]) AS 담당자
+            ,[FCFPL_NOTE] AS 비고
+            ,[FCFPL_REGIST_NM] AS 등록자
+            ,[FCFPL_REGIST_DT] AS 등록일시
+          FROM [QMES2022].[dbo].[MANAGE_FACILITY_FIX_PLAN_TB]
+        ) AS FACILITY_FIX_PLAN ON FACILITY_FIX_PLAN.NO = [FCFIX_FACILITY_FIX_PLAN_PK]
+        WHERE [FCFIX_PK] = @key
       `);
 
       await Pool.request()
         .input("key", req.body.data[i])
         .query(
-          `DELETE FROM [QMES2022].[dbo].[MANAGE_FACILITY_FIX_PLAN_TB] WHERE [FCFPL_PK] = @key`
+          `DELETE FROM [QMES2022].[dbo].[MANAGE_FACILITY_FIX_TB] WHERE [FCFIX_PK] = @key`
         );
 
       // 로그기록 저장

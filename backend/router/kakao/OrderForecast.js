@@ -4,7 +4,7 @@ const request = require("request");
 const { sql, pool } = require("../../mssql");
 const router = express.Router();
 
-let kakaoSendData = {
+const kakaoSendData = {
   수신번호: "010-3258-2466",
   납기잔여일: "3",
   수주코드: "RES111003323",
