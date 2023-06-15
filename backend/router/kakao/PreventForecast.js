@@ -40,7 +40,11 @@ async function request_post() {
       // 보낼 데이터가 여러개인 경우가 있으므로 for문 실행
       for (let data of send_data) {
         // 설비NO과 발송시점의 기준을 판단
-        if (data.설비NO == judge.설비NO && data.잔여일 == judge.발송시점) {
+        if (
+          data.설비NO == judge.설비NO &&
+          0 <= data.잔여일 &&
+          data.예보잔여일 <= 0
+        ) {
           kakaoSendData.잔여일 = data.잔여일 ?? "";
           kakaoSendData.계획일 = data.계획일 ?? "";
           kakaoSendData.설비명 = data.설비명 ?? "";
@@ -147,41 +151,45 @@ async function getSendData() {
     const Pool = await pool;
     const result = await Pool.request().query(`
       SELECT
-        수주NO AS 수주NO
-        ,CAST(납기잔여일 AS VARCHAR) AS 납기잔여일
-        ,CAST(수주코드 AS VARCHAR) AS 수주코드
-        ,CAST(거래처명 AS VARCHAR) AS 거래처명
-        ,CAST(품명 AS VARCHAR) AS 품명
-        ,CAST(수량 AS VARCHAR) AS 수량
-        ,CAST(납기일 AS VARCHAR) AS 납기일
-        ,수량 - 납품수 AS 남은수량
+        NO AS 예방보전계획NO
+        ,설비NO AS 설비NO
+        ,잔여일 AS 잔여일
+        ,예보잔여일 AS 예보잔여일
+        ,계획일 AS 계획일
+        ,설비명 AS 설비명
+        ,구분 AS 구분
+        ,내용 AS 내용
+        ,담당자 AS 담당자
+        ,직급 AS 직급
+        ,계획완료수 AS 계획완료수
       FROM
       (
         SELECT
-          [ACPT_PK] AS 수주NO
-          ,DATEDIFF(dd,CONVERT(varchar, GETDATE(), 23),CONVERT(varchar, [ACPT_DELIVERY_DATE], 23)) AS 납기잔여일
-          ,[ACPT_CODE] AS 수주코드
-          ,(SELECT [CLNT_NAME] FROM [QMES2022].[dbo].[MASTER_CLIENT_TB] WHERE [CLNT_PK] = [ACPT_CLIENT_PK]) AS 거래처명
-          ,[ACPT_ITEM_PK] AS 품목NO
-          ,ITEM.품목구분 AS 품목구분
-          ,ITEM.품번 AS 품번
-          ,ITEM.품명 AS 품명
-          ,COALESCE(CONVERT(numeric,COALESCE([ACPT_AMOUNT],0)),0) AS 수량
-          ,CONVERT(varchar, [ACPT_DELIVERY_DATE], 23) AS 납기일
-          ,(SELECT COALESCE(SUM(CONVERT(numeric,[DLVR_AMOUNT])),0) FROM [QMES2022].[dbo].[MANAGE_DELIVERY_TB] WHERE [DLVR_ACCEPT_PK] = [ACPT_PK]) AS 납품수
-        FROM [QMES2022].[dbo].[MANAGE_ACCEPT_TB]
-        LEFT JOIN
-        (
-          SELECT
-            [ITEM_PK] AS NO
-            ,[ITEM_DIV] AS 품목구분
-            ,[ITEM_PRODUCT_NUM] AS 품번
-            ,[ITEM_NAME] AS 품명
-          FROM [QMES2022].[dbo].[MASTER_ITEM_TB]
-        ) AS ITEM ON ITEM.NO = [ACPT_ITEM_PK]
+          [PVPL_PK] AS NO
+          ,[PVPL_FACILITY_PK] AS 설비NO
+          ,(SELECT [FCLT_NAME] FROM [QMES2022].[dbo].[MASTER_FACILITY_TB] WHERE [FCLT_PK] = [PVPL_FACILITY_PK]) AS 설비명
+          ,[PVPL_DIV] AS 구분
+          ,[PVPL_CONTENT] AS 내용
+          ,[PVPL_HOW] AS 검사방법
+          ,[PVPL_STAND] AS 기준
+          ,[PVPL_UNIT] AS 단위
+          ,[PVPL_MIN] AS 최소
+          ,[PVPL_MAX] AS 최대
+          ,CONVERT(varchar, [PVPL_DATE], 23) AS 계획일
+          ,CONVERT(varchar, [PVPL_WARN_DATE], 23) AS 예보일
+          ,DATEDIFF(dd,CONVERT(varchar, GETDATE(), 23),CONVERT(varchar, [PVPL_DATE], 23)) AS 잔여일
+          ,DATEDIFF(dd,CONVERT(varchar, GETDATE(), 23),CONVERT(varchar, [PVPL_WARN_DATE], 23)) AS 예보잔여일
+          ,[PVPL_USER_ID] AS 담당자ID
+          ,(SELECT [USER_NAME] FROM [QMES2022].[dbo].[MASTER_USER_TB] WHERE [USER_ID] = [PVPL_USER_ID]) AS 담당자
+          ,(SELECT [USER_RANK] FROM [QMES2022].[dbo].[MASTER_USER_TB] WHERE [USER_ID] = [PVPL_USER_ID]) AS 직급
+          ,(SELECT COUNT(*) FROM [QMES2022].[dbo].[MANAGE_PREVENT_TB] WHERE [PRVNT_PREVENT_PLAN_PK] = [PVPL_PK]) AS 계획완료수
+          ,[PVPL_NOTE] AS 비고
+          ,[PVPL_REGIST_NM] AS 등록자
+          ,[PVPL_REGIST_DT] AS 등록일시
+        FROM [QMES2022].[dbo].[MANAGE_PREVENT_PLAN_TB]
       ) AS RESULT
-      WHERE (수량 - 납품수) > 0
-      ORDER BY 납기일 ASC
+      WHERE 계획완료수 < 1
+      ORDER BY 계획일 ASC
     `);
 
     return result.recordset;
@@ -203,18 +211,20 @@ async function insertAlertLog(user, data, res) {
       )
       .input(
         "내용",
-        "납기잔여일:" +
-          (data.납기잔여일 ?? "") +
-          ", 수주코드:" +
-          (data.수주코드 ?? "") +
-          ", 거래처명:" +
-          (data.거래처명 ?? "") +
-          ", 품명:" +
-          (data.품명 ?? "") +
-          ", 수량:" +
-          (data.수량 ?? "") +
-          ", 납기일:" +
-          (data.납기일 ?? "")
+        "잔여일:" +
+          (data.잔여일 ?? "") +
+          ", 계획일:" +
+          (data.계획일 ?? "") +
+          ", 설비명:" +
+          (data.설비명 ?? "") +
+          ", 구분:" +
+          (data.구분 ?? "") +
+          ", 내용:" +
+          (data.내용 ?? "") +
+          ", 담당자:" +
+          (data.담당자 ?? "") +
+          ", 직급:" +
+          (data.직급 ?? "")
       )
       .input("확인", "NO" ?? "")
       .input("등록자", "시스템" ?? "")
@@ -240,7 +250,7 @@ async function insertForecastNotify(data) {
   try {
     const Pool = await pool;
     await Pool.request()
-      .input("참조NO", data.수주NO ?? null)
+      .input("참조NO", data.예방보전계획NO ?? null)
       .input("구분", "예방보전예보")
       .input(
         "내용",

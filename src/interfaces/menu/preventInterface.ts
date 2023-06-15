@@ -61,6 +61,7 @@ export interface PreventDailyCheck {
 export interface PreventRepair {
   [attribute: string]: any | undefined;
   NO?: number;
+  설비수리계획NO?: number;
   설비NO?: number;
   설비명?: string;
   구분?: string;
