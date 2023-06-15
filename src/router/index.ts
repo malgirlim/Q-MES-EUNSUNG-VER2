@@ -169,17 +169,6 @@ import MobilePreventRepairNotify from "../pages/mobile/prevent/PreventRepairNoti
 import MobilePreventChangeNotify from "../pages/mobile/prevent/PreventChangeNotify.vue";
 import MobilePreventErrorNotify from "../pages/mobile/prevent/PreventErrorNotify.vue";
 
-import MobileOrderTaskReportFacility1 from "../pages/mobile/order/report/Facility1.vue";
-import MobileOrderTaskReportFacility2 from "../pages/mobile/order/report/Facility2.vue";
-import MobileOrderTaskReportFacility3 from "../pages/mobile/order/report/Facility3.vue";
-import MobileOrderTaskReportFacility4 from "../pages/mobile/order/report/Facility4.vue";
-import MobileOrderTaskReportFacility5 from "../pages/mobile/order/report/Facility5.vue";
-import MobileOrderTaskReportFacility6 from "../pages/mobile/order/report/Facility6.vue";
-import MobileOrderTaskReportFacility7 from "../pages/mobile/order/report/Facility7.vue";
-import MobileOrderTaskReportFacility8 from "../pages/mobile/order/report/Facility8.vue";
-import MobileOrderTaskReportFacility9 from "../pages/mobile/order/report/Facility9.vue";
-import MobileOrderTaskReportFacility10 from "../pages/mobile/order/report/Facility10.vue";
-
 import testpage from "../test/Main.vue";
 
 const routes = [
@@ -1305,105 +1294,6 @@ const routes = [
           category: "예방보전",
         },
         component: MobilePreventErrorNotify,
-      },
-      {
-        path: "/mobile/order/task-report/facility1",
-        name: "side-menu-mobile-order-task-report-facility1",
-        meta: {
-          pagename: "인쇄기1 생산실적 집계",
-          category: "주문/생산관리",
-        },
-        component: MobileOrderTaskReportFacility1,
-      },
-      {
-        path: "/mobile/order/task-report/facility2",
-        name: "side-menu-mobile-order-task-report-facility2",
-        meta: {
-          pagename: "인쇄기2 생산실적 집계",
-          category: "주문/생산관리",
-        },
-        component: MobileOrderTaskReportFacility2,
-      },
-      {
-        path: "/mobile/order/task-report/facility3",
-        name: "side-menu-mobile-order-task-report-facility3",
-        meta: {
-          pagename: "인쇄기3 생산실적 집계",
-          category: "주문/생산관리",
-        },
-        component: MobileOrderTaskReportFacility3,
-      },
-      {
-        path: "/mobile/order/task-report/facility4",
-        name: "side-menu-mobile-order-task-report-facility4",
-        meta: {
-          pagename: "인쇄기4 생산실적 집계",
-          category: "주문/생산관리",
-        },
-        component: MobileOrderTaskReportFacility4,
-      },
-      {
-        path: "/mobile/order/task-report/facility5",
-        name: "side-menu-mobile-order-task-report-facility5",
-        meta: {
-          pagename: "인쇄기5 생산실적 집계",
-          category: "주문/생산관리",
-        },
-        component: MobileOrderTaskReportFacility5,
-      },
-      {
-        path: "/mobile/order/task-report/facility6",
-        name: "side-menu-mobile-order-task-report-facility6",
-        meta: {
-          pagename: "인쇄기6 생산실적 집계",
-          category: "주문/생산관리",
-        },
-        component: MobileOrderTaskReportFacility6,
-      },
-      {
-        path: "/mobile/order/task-report/facility7",
-        name: "side-menu-mobile-order-task-report-facility7",
-        meta: {
-          pagename: "인쇄기7 생산실적 집계",
-          category: "주문/생산관리",
-        },
-        component: MobileOrderTaskReportFacility7,
-      },
-      {
-        path: "/mobile/order/task-report/facility8",
-        name: "side-menu-mobile-order-task-report-facility8",
-        meta: {
-          pagename: "인쇄기8 생산실적 집계",
-          category: "주문/생산관리",
-        },
-        component: MobileOrderTaskReportFacility8,
-      },
-      {
-        path: "/mobile/order/task-report/facility8",
-        name: "side-menu-mobile-order-task-report-facility8",
-        meta: {
-          pagename: "인쇄기8 생산실적 집계",
-          category: "주문/생산관리",
-        },
-        component: MobileOrderTaskReportFacility1,
-      },
-      {
-        path: "/mobile/order/task-report/facility9",
-        name: "side-menu-mobile-order-task-report-facility9",
-        meta: {
-          pagename: "검사기 생산실적 집계",
-          category: "주문/생산관리",
-        },
-        component: MobileOrderTaskReportFacility9,
-      },
-      {
-        path: "/mobile/order/task-report/facility10",
-        name: "side-menu-mobile-order-task-report-facility10",
-        meta: {
-          pagename: "제판기 생산실적 집계",
-          category: "주문/생산관리",
-        },
-        component: MobileOrderTaskReportFacility10,
       },
     ],
   },

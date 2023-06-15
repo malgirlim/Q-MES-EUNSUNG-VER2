@@ -534,14 +534,8 @@ const onFileImport = (event: any) => {
                     <td class="border-2 border-gray-500 font-bold bg-slate-200">
                       내용
                     </td>
-                    <td class="border-2 border-gray-500">
+                    <td colspan="3" class="border-2 border-gray-500">
                       {{ todo[table_setting.항목2.name] }}
-                    </td>
-                    <td class="border-2 border-gray-500 font-bold bg-slate-200">
-                      비고
-                    </td>
-                    <td class="border-2 border-gray-500">
-                      {{ todo[table_setting.항목3.name] }}
                     </td>
                   </tr>
                   <tr class="h-7">
