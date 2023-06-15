@@ -10,7 +10,7 @@ const monitorKpiManHourRouter = require("./monitor/monitorKpiManHour");
 
 const monitorPreventRouter = require("./monitor/monitorPrevent");
 const monitorDailyRouter = require("./monitor/monitorDaily");
-const monitorFixRouter = require("./monitor/monitorFix");
+const monitorRepairRouter = require("./monitor/monitorRepair");
 
 router.use((req, res, next) => {
   // console.log("middleware for test!");
@@ -34,7 +34,7 @@ router.use("/kpi/manhour", monitorKpiManHourRouter);
 router.use("/prevent", monitorPreventRouter);
 // 모니터링 / 일상점검 - router/monitor/monitorDaily.js
 router.use("/daily", monitorDailyRouter);
-// 모니터링 / 설비수리 - router/monitor/monitorFix.js
-router.use("/fix", monitorFixRouter);
+// 모니터링 / 설비수리 - router/monitor/monitorRepair.js
+router.use("/repair", monitorRepairRouter);
 
 module.exports = router;

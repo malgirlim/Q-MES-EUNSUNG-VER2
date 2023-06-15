@@ -17,7 +17,7 @@ const logSend = async (type, ct, amount, user) => {
   const Pool = await pool;
   await Pool.request() // 로그기록 저장
     .input("type", type)
-    .input("menu", "예방보전_일상점검계획") // ############ *중요* 이거 메뉴 이름 바꿔야함 !! #########
+    .input("menu", "모니터링_설비일상점검현황") // ############ *중요* 이거 메뉴 이름 바꿔야함 !! #########
     .input("content", ct.substr(0, 500))
     .input("amount", amount)
     .input("user", user)
@@ -51,7 +51,7 @@ router.get("/", async (req, res) => {
         ,[DISPT_RESULT] AS 결과
         ,[DISPT_NOTE] AS 비고
         ,[DISPT_REGIST_NM] AS 등록자
-        ,[DISPT_REGIST_DT] AS 등록일시
+        ,CONVERT(VARCHAR, [DISPT_REGIST_DT], 20) AS 등록일시
       FROM [QMES2022].[dbo].[MANAGE_DAILY_INSPECT_TB]
       LEFT JOIN
       (
@@ -123,7 +123,7 @@ router.post("/", async (req, res) => {
             ,[DISPT_RESULT] AS 결과
             ,[DISPT_NOTE] AS 비고
             ,[DISPT_REGIST_NM] AS 등록자
-            ,[DISPT_REGIST_DT] AS 등록일시
+            ,CONVERT(VARCHAR, [DISPT_REGIST_DT], 20) AS 등록일시
           FROM [QMES2022].[dbo].[MANAGE_DAILY_INSPECT_TB]
           LEFT JOIN
           (
@@ -193,7 +193,7 @@ router.post("/", async (req, res) => {
             ,[DISPT_RESULT] AS 결과
             ,[DISPT_NOTE] AS 비고
             ,[DISPT_REGIST_NM] AS 등록자
-            ,[DISPT_REGIST_DT] AS 등록일시
+            ,CONVERT(VARCHAR, [DISPT_REGIST_DT], 20) AS 등록일시
           FROM [QMES2022].[dbo].[MANAGE_DAILY_INSPECT_TB]
           LEFT JOIN
           (
@@ -252,7 +252,7 @@ router.post("/", async (req, res) => {
             ,[DISPT_RESULT] AS 결과
             ,[DISPT_NOTE] AS 비고
             ,[DISPT_REGIST_NM] AS 등록자
-            ,[DISPT_REGIST_DT] AS 등록일시
+            ,CONVERT(VARCHAR, [DISPT_REGIST_DT], 20) AS 등록일시
           FROM [QMES2022].[dbo].[MANAGE_DAILY_INSPECT_TB]
           LEFT JOIN
           (
@@ -491,7 +491,7 @@ router.post("/delete", async (req, res) => {
           ,[DISPT_RESULT] AS 결과
           ,[DISPT_NOTE] AS 비고
           ,[DISPT_REGIST_NM] AS 등록자
-          ,[DISPT_REGIST_DT] AS 등록일시
+          ,CONVERT(VARCHAR, [DISPT_REGIST_DT], 20) AS 등록일시
         FROM [QMES2022].[dbo].[MANAGE_DAILY_INSPECT_TB]
         LEFT JOIN
         (
