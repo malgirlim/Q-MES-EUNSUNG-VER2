@@ -411,13 +411,33 @@ export const useTopMenuStore = defineStore("topMenu", {
         subMenu: [
           {
             icon: "FileText",
-            pageName: "top-menu-monitoring-kpi1",
-            title: "설비 가동률 현황(KPI)",
+            pageName: "top-menu-monitoring-kpi-stock-cost",
+            title: "재고비용 현황(KPI)",
           },
           {
             icon: "FileText",
-            pageName: "top-menu-monitoring-kpi2",
-            title: "재고비용 현황(KPI)",
+            pageName: "top-menu-monitoring-kpi-return-cost",
+            title: "반품금액 절감 현황(KPI)",
+          },
+          {
+            icon: "FileText",
+            pageName: "top-menu-monitoring-kpi-oee",
+            title: "설비종합효율 현황(KPI)",
+          },
+          {
+            icon: "FileText",
+            pageName: "top-menu-monitoring-kpi-facility-rate",
+            title: "설비가동률 현황(KPI)",
+          },
+          {
+            icon: "FileText",
+            pageName: "top-menu-monitoring-kpi-bad-rate",
+            title: "공정불량률 현황(KPI)",
+          },
+          {
+            icon: "FileText",
+            pageName: "top-menu-monitoring-kpi-man-hour",
+            title: "작업공수 현황(KPI)",
           },
           {
             icon: "FileText",
@@ -428,6 +448,11 @@ export const useTopMenuStore = defineStore("topMenu", {
             icon: "FileText",
             pageName: "top-menu-monitoring-prevent",
             title: "설비 예방보전 현황",
+          },
+          {
+            icon: "FileText",
+            pageName: "top-menu-monitoring-facility-repair",
+            title: "설비 수리 현황",
           },
           {
             icon: "FileText",

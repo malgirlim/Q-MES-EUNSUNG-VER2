@@ -12,10 +12,7 @@ import TomSelect from "tom-select";
 import * as XLSX from "xlsx";
 import { read, utils, writeFileXLSX } from "xlsx";
 import printJS from "print-js";
-import KPIChart_line from "../../components/Common/Main/KPIChart_line.vue";
-import KPIChart_bar_line from "../../components/Common/Main/KPIChart_bar_line.vue";
-import KPIChart_line_filled from "../../components/Common/Main/KPIChart_line_filled.vue";
-import KPIChart_bar_bar from "../../components/Common/Main/KPIChart_bar_bar.vue";
+import KPI_OEE_Chart_bar_line from "../../components/Common/Monitoring/KPI_OEE_Chart_bar_line.vue";
 
 // API 보내는 함수 및 인터페이스 불러오기
 import { useSendApi } from "../../composables/useSendApi";
@@ -25,7 +22,7 @@ import { onMounted, watch } from "vue";
 import PaginationComponent from "../../components/Pagination/PaginationComponent.vue"; // 페이징설정
 
 const { proxy }: any = getCurrentInstance();
-const user_level = proxy.gstate.level.MonitoringKPI1; //권한레벨
+const user_level = proxy.gstate.level.MonitoringKPIOEE; //권한레벨
 
 const currentPage = ref(1); // 현재페이지
 const rowsPerPage = ref(10); // 한 페이지에 보여질 데이터 갯수
@@ -113,8 +110,12 @@ function exportFile(data: any) {
 // 날짜 구하기
 const now = dayjs().format("YYYY-MM-DD");
 const nowPlus = dayjs().add(7, "days").format("YYYY-MM-DD");
-const max_year = dayjs().format("YYYY");
-const min_year = dayjs().add(-3, "years").format("YYYY");
+const now_year = dayjs().format("YYYY");
+const ago_1year = dayjs().add(-1, "years").format("YYYY");
+const ago_2year = dayjs().add(-2, "years").format("YYYY");
+const ago_3year = dayjs().add(-3, "years").format("YYYY");
+const ago_4year = dayjs().add(-4, "years").format("YYYY");
+const ago_5year = dayjs().add(-5, "years").format("YYYY");
 const now2 = ref("전체기간");
 // now2가 변경되면 실행
 watch([now2], (newValue, oldValue) => {
@@ -153,8 +154,27 @@ const table_width = [
       <div class="col-span-1 p-5 bg-white rounded rounded-md">
         <div class="text-center font-bold text-xl">
           <div class="text-center">
-            <div class="mt-3">
+            <div class="mt-1">
               <div class="px-3">
+                <div
+                  class="text-lg mx-1 py-0.5 w-full border-l-2 border-r-2 border-t-2 border-success bg-success text-white rounded-t-md"
+                >
+                  <div class="flex">
+                    <div class="flex m-auto items-center">
+                      <div>
+                        <Lucide class="w-5 h-5 text-white mr-1" icon="Flag" />
+                      </div>
+                      <div>목표</div>
+                    </div>
+                  </div>
+                </div>
+                <div
+                  class="mx-1 p-2 w-full h-12 text-2xl border-l-2 border-r-2 border-b-2 border-success rounded-b-md bg-green-200"
+                >
+                  <div class="text-2xl">54%</div>
+                </div>
+              </div>
+              <div class="px-3 mt-5">
                 <div
                   class="text-lg mx-1 py-0.5 w-full border-l-2 border-r-2 border-t-2 border-success bg-success text-white rounded-t-md"
                 >
@@ -166,14 +186,36 @@ const table_width = [
                           icon="LineChart"
                         />
                       </div>
-                      <div>평균가동율</div>
+                      <div>평균효율</div>
                     </div>
                   </div>
                 </div>
                 <div
-                  class="mx-1 p-2 w-full h-24 text-2xl border-l-2 border-r-2 border-b-2 border-success rounded-b-md bg-green-200"
+                  class="mx-1 p-2 w-full h-12 text-2xl border-l-2 border-r-2 border-b-2 border-success rounded-b-md bg-green-200"
                 >
-                  <div class="mt-5 text-4xl">54%</div>
+                  <div class="text-2xl">54%</div>
+                </div>
+              </div>
+              <div class="px-3 mt-5">
+                <div
+                  class="text-lg mx-1 py-0.5 w-full border-l-2 border-r-2 border-t-2 border-success bg-success text-white rounded-t-md"
+                >
+                  <div class="flex">
+                    <div class="flex m-auto items-center">
+                      <div>
+                        <Lucide
+                          class="w-5 h-5 text-white mr-1"
+                          icon="TrendingUp"
+                        />
+                      </div>
+                      <div>목표대비달성률</div>
+                    </div>
+                  </div>
+                </div>
+                <div
+                  class="mx-1 p-2 w-full h-12 text-2xl border-l-2 border-r-2 border-b-2 border-success rounded-b-md bg-green-200"
+                >
+                  <div class="text-2xl">54%</div>
                 </div>
               </div>
             </div>
@@ -181,9 +223,9 @@ const table_width = [
         </div>
       </div>
       <div class="col-span-3 p-5 bg-white rounded rounded-md">
-        <div class="text-center font-bold text-xl">KPI 설비 가동율</div>
+        <div class="text-center font-bold text-xl">KPI 설비종합효율</div>
         <div style="height: 270px">
-          <KPIChart_bar_bar
+          <KPI_OEE_Chart_bar_line
             :x_label="[
               '1월',
               '2월',
@@ -211,106 +253,27 @@ const table_width = [
         class="flex flex-wrap items-center col-span-12 mt-2 mb-2 intro-y sm:flex-nowrap"
       >
         <div class="hidden mx-auto md:block text-slate-500"></div>
-        <div class="mr-5">
+        <div class="">
           <a href="" class="flex items-center ml-auto text-primary">
-            <Lucide icon="RefreshCcw" class="w-4 h-4 mr-3" /> 새로고침
+            <Lucide icon="RefreshCcw" class="w-4 h-4 mr-2" /> 새로고침
           </a>
         </div>
-        <div>
-          <Button
-            class="mr-2 shadow-md"
-            as="a"
-            size="sm"
-            variant="outline-primary"
-            @click="reset_date"
-            title="기간 초기화"
-            ><Lucide icon="CalendarX" class="w-5 h-5"
-          /></Button>
-        </div>
-        <div class="text-center">
-          <div>
-            <Litepicker
-              v-model="now2"
-              :options="{
-                autoApply: false,
-                singleMode: false,
-                numberOfColumns: 1,
-                numberOfMonths: 1,
-                showWeekNumbers: true,
-                dropdowns: {
-                  minYear: Number(min_year),
-                  maxYear: Number(max_year),
-                  months: true,
-                  years: true,
-                },
-                lang: 'ko',
-                format: 'YY/MM/DD',
-                delimiter: ' - ',
-                buttonText: {
-                  reset: '새로고침',
-                  apply: '적용',
-                  cancel: '취소',
-                },
-              }"
-              class="block w-40 mx-auto !box"
-              placeholder="전체기간"
-            />
-          </div>
-        </div>
-        <div class="ml-2">
-          <FormSelect modelValue="전체" class="w-30 mt-3 !box sm:mt-0">
-            <option>전체</option>
-            <option>품목코드</option>
-            <option>거래처명</option>
-            <option>품명</option>
-            <option>규격</option>
-            <option>비고</option>
-          </FormSelect>
-        </div>
-        <div class="w-full mt-3 sm:w-auto sm:mt-0 sm:ml-auto md:ml-2">
-          <div class="relative w-56 text-slate-500">
-            <FormInput
-              type="text"
-              class="w-56 pr-10 !box"
-              v-model="searchInput"
-              @keyup.enter="
-                () => {
-                  search();
-                  pageChange();
-                }
-              "
-              placeholder="검색어를 입력해주세요"
-            />
-            <button
-              @click="
-                {
-                  search();
-                  pageChange();
-                }
-              "
-            >
-              <Lucide
-                icon="Search"
-                class="absolute inset-y-0 right-0 w-4 h-4 my-auto mr-3"
-              />
-            </button>
-          </div>
-        </div>
-        <div class="ml-2">
-          <!-- BEGIN: Pagination Pages-->
+
+        <div class="ml-5">
           <FormSelect
-            class="w-20 mt-3 !box sm:mt-0"
-            v-model="rowsPerPage"
-            @change="pageChange"
+            :modelValue="now_year + '년'"
+            class="w-30 mt-3 !box sm:mt-0"
           >
-            <option>10</option>
-            <option>25</option>
-            <option>35</option>
-            <option>50</option>
+            <option>{{ now_year }}년</option>
+            <option>{{ ago_1year }}년</option>
+            <option>{{ ago_2year }}년</option>
+            <option>{{ ago_3year }}년</option>
+            <option>{{ ago_4year }}년</option>
+            <option>{{ ago_5year }}년</option>
           </FormSelect>
-          <!-- END: Pagination Pages-->
         </div>
-        <div class="ml-2">
+
+        <div class="ml-3">
           <Menu>
             <Menu.Button :as="Button" class="px-2 !box">
               <span class="flex items-center justify-center w-5 h-5">

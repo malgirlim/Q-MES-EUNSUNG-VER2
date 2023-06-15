@@ -106,10 +106,15 @@ import MoldRepair from "../pages/mold/MoldRepair.vue";
 import MoldCheck from "../pages/mold/MoldCheck.vue";
 
 /* 모니터링 */
-import MonitoringKPI1 from "../pages/monitoring/MonitoringKPI1.vue";
-import MonitoringKPI2 from "../pages/monitoring/MonitoringKPI2.vue";
+import MonitoringKPIStockCost from "../pages/monitoring/MonitoringKPIStockCost.vue";
+import MonitoringKPIReturnCost from "../pages/monitoring/MonitoringKPIReturnCost.vue";
+import MonitoringKPIOEE from "../pages/monitoring/MonitoringKPIOEE.vue";
+import MonitoringKPIFacilityRate from "../pages/monitoring/MonitoringKPIFacilityRate.vue";
+import MonitoringKPIBadRate from "../pages/monitoring/MonitoringKPIBadRate.vue";
+import MonitoringKPIManHour from "../pages/monitoring/MonitoringKPIManHour.vue";
 import MonitoringDaily from "../pages/monitoring/MonitoringDaily.vue";
 import MonitoringPrevent from "../pages/monitoring/MonitoringPrevent.vue";
+import MonitoringFacilityRepair from "../pages/monitoring/MonitoringFacilityRepair.vue";
 import MonitoringMTBF from "../pages/monitoring/MonitoringMTBF.vue";
 import MonitoringMTTR from "../pages/monitoring/MonitoringMTTR.vue";
 import MonitoringOEE from "../pages/monitoring/MonitoringOEE.vue";
@@ -839,22 +844,58 @@ const routes = [
         component: MoldCheck,
       },
       {
-        path: "monitoring/kpi1",
-        name: "top-menu-monitoring-kpi1",
+        path: "monitoring/kpi-stock-cost",
+        name: "top-menu-monitoring-kpi-stock-cost",
         meta: {
-          pagename: "설비 가동률 현황(KPI)",
+          pagename: "재고비용 현황(KPI)",
           category: "모니터링",
         },
-        component: MonitoringKPI1,
+        component: MonitoringKPIStockCost,
       },
       {
-        path: "monitoring/kpi2",
-        name: "top-menu-monitoring-kpi2",
+        path: "monitoring/kpi-return-cost",
+        name: "top-menu-monitoring-kpi-return-cost",
         meta: {
-          pagename: "재고 비용 현황(KPI)",
+          pagename: "반품금액 절감 현황(KPI)",
           category: "모니터링",
         },
-        component: MonitoringKPI2,
+        component: MonitoringKPIReturnCost,
+      },
+      {
+        path: "monitoring/kpi-oee",
+        name: "top-menu-monitoring-kpi-oee",
+        meta: {
+          pagename: "설비종합효율 현황(KPI)",
+          category: "모니터링",
+        },
+        component: MonitoringKPIOEE,
+      },
+      {
+        path: "monitoring/kpi-facility-rate",
+        name: "top-menu-monitoring-kpi-facility-rate",
+        meta: {
+          pagename: "설비가동률 현황(KPI)",
+          category: "모니터링",
+        },
+        component: MonitoringKPIFacilityRate,
+      },
+      {
+        path: "monitoring/kpi-bad-rate",
+        name: "top-menu-monitoring-kpi-bad-rate",
+        meta: {
+          pagename: "공정불량률 현황(KPI)",
+          category: "모니터링",
+        },
+        component: MonitoringKPIBadRate,
+      },
+      {
+        path: "monitoring/kpi-man-hour",
+        name: "top-menu-monitoring-kpi-man-hour",
+        meta: {
+          pagename: "작업공수 현황(KPI)",
+          category: "모니터링",
+        },
+        component: MonitoringKPIManHour,
       },
       {
         path: "monitoring/daily",
@@ -873,6 +914,15 @@ const routes = [
           category: "모니터링",
         },
         component: MonitoringPrevent,
+      },
+      {
+        path: "monitoring/facility-repair",
+        name: "top-menu-monitoring-facility-repair",
+        meta: {
+          pagename: "설비 수리 현황",
+          category: "모니터링",
+        },
+        component: MonitoringFacilityRepair,
       },
       {
         path: "monitoring/mtbf",

@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, onMounted, watch } from "vue";
+import { ref, onMounted, watch, getCurrentInstance } from "vue";
 import { Dialog } from "../../../base-components/Headless";
 import { FormInput, FormSelect } from "../../../base-components/Form";
 import Table from "../../../base-components/Table";
@@ -18,6 +18,9 @@ import {
   MasterFacility,
   MasterUser,
 } from "../../../interfaces/menu/masterInterface";
+
+const { proxy }: any = getCurrentInstance();
+const user_level = proxy.gstate.level.AlertPreventForecast; //권한레벨
 
 // 페이지 로딩 시 시작
 onMounted(async () => {
@@ -193,95 +196,97 @@ const importUser = (no: any) => {
 ############################################################################################################################
 
 <template>
-  <div class="mt-5 mb-3 text-xl font-bold">
-    <div class="flex items-center">
-      <Lucide class="mb-0.5 mr-1" icon="BellPlus" /> 알림설정
-    </div>
-  </div>
-  <!--BEGIN: 설정 항목들 -->
-  <div class="mt-5 grid grid-cols-12 gap-1">
-    <div class="col-span-2 border-r-2 border-slate-200" style="height: 640px">
-      <div><AlertSelect 예방보전예보_variant="primary" /></div>
-    </div>
-    <div class="intro-y col-span-3 border-r-2 border-slate-200">
-      <div class="flex items-center text-xl font-bold ml-5">
-        <div><Lucide class="mb-0.5 mr-1" icon="Settings2" /></div>
-        <div>발송조건</div>
-        <div class="ml-5">
-          <FormSelect class="w-32" v-model="alertSettingFacilityNO">
-            <option
-              v-for="facility in alert_modal_facility.dataAll.value"
-              :key="facility.NO"
-              :value="facility.NO"
-            >
-              {{ facility.설비명 }}
-            </option>
-          </FormSelect>
-        </div>
-        <div class="ml-5">
-          <Button
-            class="mb-1 w-20 h-6 text-base"
-            variant="primary"
-            v-if="
-              alertSettingData?.NO != null || alertSettingData?.NO != undefined
-            "
-            @click="
-              () => {
-                alertRuleModalData = alertSettingData;
-                setEditRuleModal(true);
-              }
-            "
-            >수정</Button
-          >
-        </div>
+  <div v-if="user_level >= 2">
+    <div class="mt-5 mb-3 text-xl font-bold">
+      <div class="flex items-center">
+        <Lucide class="mb-0.5 mr-1" icon="BellPlus" /> 알림설정
       </div>
-
-      <div class="p-8 text-lg">
-        <div
-          class="bg-white p-3 border-2 border-gray-400"
-          style="overflow-y: scroll; overflow-x: hidden; height: 540px"
-        >
-          <div class="flex items-center mb-5">
-            <div class="w-[30%] mx-2 text-center">
-              <div>기능사용</div>
-            </div>
-            <div class="mr-3"><Lucide icon="ChevronRight" /></div>
-            <div class="w-[50%]">
-              <div v-if="alertSettingData?.기능사용 == 'ON'">
-                <div class="flex items-center">
-                  <div class="text-green-400 mr-1">●</div>
-                  <div>ON</div>
-                </div>
-              </div>
-              <div v-if="alertSettingData?.기능사용 == 'OFF'">
-                <div class="flex items-center">
-                  <div class="text-danger mr-1">●</div>
-                  <div>OFF</div>
-                </div>
-              </div>
-              <div
-                v-if="
-                  alertSettingData?.기능사용 != 'OFF' &&
-                  alertSettingData?.기능사용 != 'ON' &&
-                  alertSettingFacilityNO != null
-                "
+    </div>
+    <!--BEGIN: 설정 항목들 -->
+    <div class="mt-5 grid grid-cols-12 gap-1">
+      <div class="col-span-2 border-r-2 border-slate-200" style="height: 640px">
+        <div><AlertSelect 예방보전예보_variant="primary" /></div>
+      </div>
+      <div class="intro-y col-span-3 border-r-2 border-slate-200">
+        <div class="flex items-center text-xl font-bold ml-5">
+          <div><Lucide class="mb-0.5 mr-1" icon="Settings2" /></div>
+          <div>발송조건</div>
+          <div class="ml-5">
+            <FormSelect class="w-32" v-model="alertSettingFacilityNO">
+              <option
+                v-for="facility in alert_modal_facility.dataAll.value"
+                :key="facility.NO"
+                :value="facility.NO"
               >
-                <Button variant="facebook" @click="setInsertRuleModal(true)">
-                  기능사용 등록
-                </Button>
+                {{ facility.설비명 }}
+              </option>
+            </FormSelect>
+          </div>
+          <div class="ml-5">
+            <Button
+              class="mb-1 w-20 h-6 text-base"
+              variant="primary"
+              v-if="
+                alertSettingData?.NO != null ||
+                alertSettingData?.NO != undefined
+              "
+              @click="
+                () => {
+                  alertRuleModalData = alertSettingData;
+                  setEditRuleModal(true);
+                }
+              "
+              >수정</Button
+            >
+          </div>
+        </div>
+
+        <div class="p-8 text-lg">
+          <div
+            class="bg-white p-3 border-2 border-gray-400"
+            style="overflow-y: scroll; overflow-x: hidden; height: 540px"
+          >
+            <div class="flex items-center mb-5">
+              <div class="w-[30%] mx-2 text-center">
+                <div>기능사용</div>
+              </div>
+              <div class="mr-3"><Lucide icon="ChevronRight" /></div>
+              <div class="w-[50%]">
+                <div v-if="alertSettingData?.기능사용 == 'ON'">
+                  <div class="flex items-center">
+                    <div class="text-green-400 mr-1">●</div>
+                    <div>ON</div>
+                  </div>
+                </div>
+                <div v-if="alertSettingData?.기능사용 == 'OFF'">
+                  <div class="flex items-center">
+                    <div class="text-danger mr-1">●</div>
+                    <div>OFF</div>
+                  </div>
+                </div>
+                <div
+                  v-if="
+                    alertSettingData?.기능사용 != 'OFF' &&
+                    alertSettingData?.기능사용 != 'ON' &&
+                    alertSettingFacilityNO != null
+                  "
+                >
+                  <Button variant="facebook" @click="setInsertRuleModal(true)">
+                    기능사용 등록
+                  </Button>
+                </div>
               </div>
             </div>
-          </div>
-          <div class="flex items-center mb-5">
-            <div class="w-[30%] mx-2 text-center">
-              <div>발송시간</div>
+            <div class="flex items-center mb-5">
+              <div class="w-[30%] mx-2 text-center">
+                <div>발송시간</div>
+              </div>
+              <div class="mr-3"><Lucide icon="ChevronRight" /></div>
+              <div class="w-[50%]">
+                {{ alertSettingData?.발송시간 }}
+              </div>
             </div>
-            <div class="mr-3"><Lucide icon="ChevronRight" /></div>
-            <div class="w-[50%]">
-              {{ alertSettingData?.발송시간 }}
-            </div>
-          </div>
-          <!-- <div class="flex items-center">
+            <!-- <div class="flex items-center">
             <div class="w-[30%] mx-2 text-center">
               <div>발송시점</div>
             </div>
@@ -296,80 +301,96 @@ const importUser = (no: any) => {
               {{ alertSettingData?.발송시점 }}일전
             </div>
           </div> -->
+          </div>
         </div>
       </div>
-    </div>
-    <div class="intro-y col-span-3 border-r-2 border-slate-200">
-      <div class="flex items-center text-xl font-bold ml-5">
-        <div><Lucide class="mb-0.5 mr-1" icon="Users" /></div>
-        <div>알림발송대상</div>
-        <div class="ml-5">
-          <Button
-            class="mb-1 w-20 h-6 text-base"
-            variant="primary"
-            v-if="
-              alertSettingData?.NO != null || alertSettingData?.NO != undefined
-            "
-            @click="setAddUserModal(true)"
-            >추가</Button
-          >
+      <div class="intro-y col-span-3 border-r-2 border-slate-200">
+        <div class="flex items-center text-xl font-bold ml-5">
+          <div><Lucide class="mb-0.5 mr-1" icon="Users" /></div>
+          <div>알림발송대상</div>
+          <div class="ml-5">
+            <Button
+              class="mb-1 w-20 h-6 text-base"
+              variant="primary"
+              v-if="
+                alertSettingData?.NO != null ||
+                alertSettingData?.NO != undefined
+              "
+              @click="setAddUserModal(true)"
+              >추가</Button
+            >
+          </div>
         </div>
-      </div>
 
-      <div class="p-8 text-lg">
-        <div
-          class="bg-white p-3 border-2 border-gray-400"
-          style="overflow-y: scroll; overflow-x: hidden; height: 540px"
-        >
-          <div v-for="user in alertUser.dataSearchAll.value" :key="user.NO">
-            <div class="flex items-center mt-5">
-              <div class="w-[40%] mx-2 text-center">
-                <div>{{ user.부서명 }}</div>
-                <div>{{ user.이름 }} {{ user.직급 }}</div>
+        <div class="p-8 text-lg">
+          <div
+            class="bg-white p-3 border-2 border-gray-400"
+            style="overflow-y: scroll; overflow-x: hidden; height: 540px"
+          >
+            <div v-for="user in alertUser.dataSearchAll.value" :key="user.NO">
+              <div class="flex items-center mt-5">
+                <div class="w-[40%] mx-2 text-center">
+                  <div>{{ user.부서명 }}</div>
+                  <div>{{ user.이름 }} {{ user.직급 }}</div>
+                </div>
+                <div class="mr-3"><Lucide icon="ChevronRight" /></div>
+                <div class="w-[50%]">{{ user.연락처 }}</div>
+                <div
+                  class="ml-2 cursor-pointer"
+                  @click="
+                    () => {
+                      alertUserModalData = user;
+                      setDeleteUserModal(true);
+                    }
+                  "
+                >
+                  <Lucide class="w-5 h-5 text-danger" icon="X" />
+                </div>
               </div>
-              <div class="mr-3"><Lucide icon="ChevronRight" /></div>
-              <div class="w-[50%]">{{ user.연락처 }}</div>
-              <div
-                class="ml-2 cursor-pointer"
-                @click="
-                  () => {
-                    alertUserModalData = user;
-                    setDeleteUserModal(true);
-                  }
-                "
-              >
-                <Lucide class="w-5 h-5 text-danger" icon="X" />
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="intro-y col-span-4">
+        <div class="flex items-center text-xl font-bold ml-5">
+          <div><Lucide class="mb-0.5 mr-1" icon="MessageCircle" /></div>
+          <div>템플릿 미리보기</div>
+        </div>
+        <div class="p-8 text-lg">
+          <div
+            class="bg-white mt-1 p-3 border-2 border-gray-400"
+            style="overflow-y: scroll; overflow-x: hidden; height: 540px"
+          >
+            <div class="flex items-center">
+              <div class="flex m-auto mt-5">
+                <img
+                  src="../../../assets/images/kakao_template/PreventForecast.png"
+                />
               </div>
+            </div>
+            <div class="text-center mt-5 text-md">
+              카카오톡 메세지로 발송되며 전송 실패시 SMS로 발송됩니다.
             </div>
           </div>
         </div>
       </div>
     </div>
-    <div class="intro-y col-span-4">
-      <div class="flex items-center text-xl font-bold ml-5">
-        <div><Lucide class="mb-0.5 mr-1" icon="MessageCircle" /></div>
-        <div>템플릿 미리보기</div>
+    <!--END: 설정 항목들 -->
+  </div>
+  <!-- BEGIN : 권한 경고 -->
+  <div class="intro-y" v-if="user_level < 2">
+    <div class="mt-20 items-center text-center">
+      <div>
+        <Lucide icon="AlertTriangle" class="w-20 h-20 mx-auto text-warning" />
       </div>
-      <div class="p-8 text-lg">
-        <div
-          class="bg-white mt-1 p-3 border-2 border-gray-400"
-          style="overflow-y: scroll; overflow-x: hidden; height: 540px"
-        >
-          <div class="flex items-center">
-            <div class="flex m-auto mt-5">
-              <img
-                src="../../../assets/images/kakao_template/PreventForecast.png"
-              />
-            </div>
-          </div>
-          <div class="text-center mt-5 text-md">
-            카카오톡 메세지로 발송되며 전송 실패시 SMS로 발송됩니다.
-          </div>
-        </div>
-      </div>
+      <div class="mt-3 text-2xl">ACCESS DENIED</div>
+    </div>
+    <div class="mt-5 text-center">액세스 권한이 없습니다.</div>
+    <div class="mt-2 text-center">
+      IT 관리자에게 연락하여 액세스 권한을 요청하세요.
     </div>
   </div>
-  <!--END: 설정 항목들 -->
+  <!-- END : 권한 없을 때 -->
   <!-- BEGIN: FOOTER(COPYRIGHT) -->
   <div class="mt-3 mr-5" style="text-align: right">
     <footer>&copy;2023 QInnotek. All rights reserved.</footer>
