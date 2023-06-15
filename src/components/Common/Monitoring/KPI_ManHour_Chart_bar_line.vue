@@ -39,7 +39,7 @@ const chartData = computed<ChartData>(() => {
     labels: props.x_label,
     datasets: [
       {
-        label: "재고비용",
+        label: "공수",
         maxBarThickness: 60,
         data: [20, 30, 55, 40, 60, 47, 46, 40, 75, 65],
         type: "bar",
@@ -54,7 +54,7 @@ const chartData = computed<ChartData>(() => {
         order: 0,
       },
       {
-        label: "목표비용",
+        label: "목표공수",
         data: [50, 50, 50, 50, 50, 50, 50, 50, 50, 50],
         datalabels: { display: false },
         type: "line",
@@ -87,7 +87,7 @@ const chartOptions = computed<ChartOptions>(() => {
             size: 15,
           },
           callback: function (value: any) {
-            return value + "백만원";
+            return value + "hr";
           },
         },
       },

@@ -174,26 +174,50 @@ const table_width = [
                   <div class="text-2xl">54%</div>
                 </div>
               </div>
-              <div class="px-3 mt-5">
-                <div
-                  class="text-lg mx-1 py-0.5 w-full border-l-2 border-r-2 border-t-2 border-success bg-success text-white rounded-t-md"
-                >
-                  <div class="flex">
-                    <div class="flex m-auto items-center">
-                      <div>
-                        <Lucide
-                          class="w-5 h-5 text-white mr-1"
-                          icon="LineChart"
-                        />
+              <div class="grid grid-cols-2">
+                <div class="px-3 mt-5 col-span-1">
+                  <div
+                    class="text-lg mx-1 py-0.5 w-full border-l-2 border-r-2 border-t-2 border-success bg-success text-white rounded-t-md"
+                  >
+                    <div class="flex">
+                      <div class="flex m-auto items-center">
+                        <div>
+                          <Lucide
+                            class="w-5 h-5 text-white mr-1"
+                            icon="LineChart"
+                          />
+                        </div>
+                        <div>연간평균시간</div>
                       </div>
-                      <div>연간평균시간 + 합산</div>
                     </div>
                   </div>
+                  <div
+                    class="mx-1 p-2 w-full h-12 text-2xl border-l-2 border-r-2 border-b-2 border-success rounded-b-md bg-green-200"
+                  >
+                    <div class="text-2xl">54%</div>
+                  </div>
                 </div>
-                <div
-                  class="mx-1 p-2 w-full h-12 text-2xl border-l-2 border-r-2 border-b-2 border-success rounded-b-md bg-green-200"
-                >
-                  <div class="text-2xl">54%</div>
+                <div class="px-3 mt-5 col-span-1">
+                  <div
+                    class="text-lg mx-1 py-0.5 w-full border-l-2 border-r-2 border-t-2 border-success bg-success text-white rounded-t-md"
+                  >
+                    <div class="flex">
+                      <div class="flex m-auto items-center">
+                        <div>
+                          <Lucide
+                            class="w-5 h-5 text-white mr-1"
+                            icon="Sigma"
+                          />
+                        </div>
+                        <div>합산</div>
+                      </div>
+                    </div>
+                  </div>
+                  <div
+                    class="mx-1 p-2 w-full h-12 text-2xl border-l-2 border-r-2 border-b-2 border-success rounded-b-md bg-green-200"
+                  >
+                    <div class="text-2xl">54%</div>
+                  </div>
                 </div>
               </div>
               <div class="px-3 mt-5">

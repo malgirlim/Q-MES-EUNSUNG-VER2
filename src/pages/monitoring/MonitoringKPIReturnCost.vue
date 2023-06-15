@@ -174,26 +174,50 @@ const table_width = [
                   <div class="text-2xl">54%</div>
                 </div>
               </div>
-              <div class="px-3 mt-5">
-                <div
-                  class="text-lg mx-1 py-0.5 w-full border-l-2 border-r-2 border-t-2 border-success bg-success text-white rounded-t-md"
-                >
-                  <div class="flex">
-                    <div class="flex m-auto items-center">
-                      <div>
-                        <Lucide
-                          class="w-5 h-5 text-white mr-1"
-                          icon="LineChart"
-                        />
+              <div class="grid grid-cols-2">
+                <div class="px-3 mt-5 col-span-1">
+                  <div
+                    class="text-lg mx-1 py-0.5 w-full border-l-2 border-r-2 border-t-2 border-success bg-success text-white rounded-t-md"
+                  >
+                    <div class="flex">
+                      <div class="flex m-auto items-center">
+                        <div>
+                          <Lucide
+                            class="w-5 h-5 text-white mr-1"
+                            icon="LineChart"
+                          />
+                        </div>
+                        <div>연간평균금액</div>
                       </div>
-                      <div>연간평균금액 + 합산</div>
                     </div>
                   </div>
+                  <div
+                    class="mx-1 p-2 w-full h-12 text-2xl border-l-2 border-r-2 border-b-2 border-success rounded-b-md bg-green-200"
+                  >
+                    <div class="text-2xl">54%</div>
+                  </div>
                 </div>
-                <div
-                  class="mx-1 p-2 w-full h-12 text-2xl border-l-2 border-r-2 border-b-2 border-success rounded-b-md bg-green-200"
-                >
-                  <div class="text-2xl">54%</div>
+                <div class="px-3 mt-5 col-span-1">
+                  <div
+                    class="text-lg mx-1 py-0.5 w-full border-l-2 border-r-2 border-t-2 border-success bg-success text-white rounded-t-md"
+                  >
+                    <div class="flex">
+                      <div class="flex m-auto items-center">
+                        <div>
+                          <Lucide
+                            class="w-5 h-5 text-white mr-1"
+                            icon="Sigma"
+                          />
+                        </div>
+                        <div>합산</div>
+                      </div>
+                    </div>
+                  </div>
+                  <div
+                    class="mx-1 p-2 w-full h-12 text-2xl border-l-2 border-r-2 border-b-2 border-success rounded-b-md bg-green-200"
+                  >
+                    <div class="text-2xl">54%</div>
+                  </div>
                 </div>
               </div>
               <div class="px-3 mt-5">
@@ -252,7 +276,33 @@ const table_width = [
       <div
         class="flex flex-wrap items-center col-span-12 mt-2 mb-2 intro-y sm:flex-nowrap"
       >
-        <div class="hidden mx-auto md:block text-slate-500"></div>
+        <div class="mr-auto">
+          <Button
+            class="mr-2 shadow-md"
+            as="a"
+            variant="primary"
+            @click="
+              () => {
+                setInsertModal(true);
+              }
+            "
+          >
+            <Lucide icon="FilePlus" class="w-4 h-4 mr-2" />
+            등록
+          </Button>
+          <Button
+            class="mr-2 shadow-md"
+            as="a"
+            variant="danger"
+            @click="
+              () => {
+                setDeleteModal(true);
+              }
+            "
+          >
+            <Lucide icon="Trash2" class="w-4 h-4 mr-2" /> 삭제</Button
+          >
+        </div>
         <div class="">
           <a href="" class="flex items-center ml-auto text-primary">
             <Lucide icon="RefreshCcw" class="w-4 h-4 mr-2" /> 새로고침
@@ -467,6 +517,234 @@ const table_width = [
     <footer>&copy;2023 QInnotek. All rights reserved.</footer>
   </div>
   <!-- END: FOOTER(COPYRIGHT) -->
+
+  <!-- BEGIN: Insert Modal Content -->
+  <Dialog size="md" :open="insertModal" :key="insertModalData?.생산실적NO">
+    <Dialog.Panel class="p-10 text-center">
+      <!--추가 Modal 내용 시작-->
+      <div class="mb-5" style="font-weight: bold">등록</div>
+      <Tab.Group>
+        <Tab.List variant="boxed-tabs">
+          <Tab>
+            <Tab.Button class="w-full py-2" as="button"> 기본 내용 </Tab.Button>
+          </Tab>
+          <Tab>
+            <Tab.Button class="w-full py-2" as="button"> 추가 내용 </Tab.Button>
+          </Tab>
+        </Tab.List>
+        <Tab.Panels class="mt-5">
+          <Tab.Panel class="leading-relaxed">
+            <div
+              style="
+                text-align: left;
+                overflow-y: scroll;
+                overflow-x: hidden;
+                height: 500px;
+              "
+            >
+              <div class="mt-3">
+                <FormLabel htmlFor="vertical-form-1">사용일자</FormLabel>
+                <FormInput
+                  id="vertical-form-1"
+                  type="date"
+                  v-model="insertModalData.사용일자"
+                  placeholder=""
+                />
+              </div>
+              <div class="mt-3">
+                <FormLabel htmlFor="vertical-form-2">사용횟수</FormLabel>
+                <FormInput
+                  id="vertical-form-2"
+                  type="number"
+                  v-model="insertModalData.사용횟수"
+                  placeholder=""
+                />
+              </div>
+              <div class="mt-3">
+                <FormLabel htmlFor="vertical-form-3">금형</FormLabel>
+                <select v-tom v-model="insertModalData.금형NO">
+                  <option value="" selected>=== 필수 선택 ===</option>
+                  <option
+                    :value="p.NO"
+                    v-for="p in molduse_modal_mold.dataAll.value"
+                    :key="p.NO"
+                  >
+                    {{ p.코드 }} # 금형명:{{ p.금형명 }} # 규격:{{ p.규격 }}
+                  </option>
+                </select>
+              </div>
+              <div class="mt-3">
+                <FormLabel htmlFor="vertical-form-4">작업코드</FormLabel>
+                <FormInput
+                  type="text"
+                  v-model="insertModalData.작업코드"
+                  @click="setProduceResultModal(true)"
+                  placeholder="여기를 클릭하여 생산실적을 등록해주세요."
+                />
+              </div>
+              <div class="mt-3">
+                <FormLabel htmlFor="vertical-form-5">품번</FormLabel>
+                <FormInput
+                  type="text"
+                  v-model="insertModalData.품번"
+                  placeholder=""
+                  readonly
+                />
+              </div>
+              <div class="mt-3">
+                <FormLabel htmlFor="vertical-form-6">품목구분</FormLabel>
+                <FormInput
+                  type="text"
+                  v-model="insertModalData.품목구분"
+                  placeholder=""
+                  readonly
+                />
+              </div>
+              <div class="mt-3">
+                <FormLabel htmlFor="vertical-form-6">품명</FormLabel>
+                <FormInput
+                  type="text"
+                  v-model="insertModalData.품명"
+                  placeholder=""
+                  readonly
+                />
+              </div>
+              <div class="mt-3">
+                <FormLabel htmlFor="vertical-form-6">규격</FormLabel>
+                <FormInput
+                  type="text"
+                  v-model="insertModalData.규격"
+                  placeholder=""
+                  readonly
+                />
+              </div>
+              <div class="mt-3">
+                <FormLabel htmlFor="vertical-form-6">단위</FormLabel>
+                <FormInput
+                  type="text"
+                  v-model="insertModalData.단위"
+                  placeholder=""
+                  readonly
+                />
+              </div>
+              <div class="mt-3">
+                <FormLabel htmlFor="vertical-form-6">생산수</FormLabel>
+                <FormInput
+                  type="text"
+                  v-model="insertModalData.생산수"
+                  placeholder=""
+                  readonly
+                />
+              </div>
+              <div class="mt-3">
+                <FormLabel htmlFor="vertical-form-6">불량수</FormLabel>
+                <FormInput
+                  type="text"
+                  v-model="insertModalData.불량수"
+                  placeholder=""
+                  readonly
+                />
+              </div>
+            </div>
+          </Tab.Panel>
+          <Tab.Panel class="leading-relaxed">
+            <div
+              style="
+                text-align: left;
+                overflow-y: scroll;
+                overflow-x: hidden;
+                height: 500px;
+              "
+            >
+              <div class="mt-3">
+                <FormLabel htmlFor="vertical-form-11">비고</FormLabel>
+                <FormInput
+                  id="vertical-form-11"
+                  type="text"
+                  v-model="insertModalData.비고"
+                  placeholder=""
+                />
+              </div>
+            </div>
+          </Tab.Panel>
+        </Tab.Panels>
+      </Tab.Group>
+      <div style="text-align: left">
+        <div class="mt-5 text-right">
+          <Button
+            class="mr-2 shadow-md"
+            variant="primary"
+            @click="
+              async () => {
+                insertDataFunction();
+              }
+            "
+            >확인</Button
+          >
+          <Button
+            class="mr-2 shadow-md"
+            variant="outline-primary"
+            @click="
+              () => {
+                setInsertModal(false);
+              }
+            "
+            >취소</Button
+          >
+        </div>
+      </div>
+      <!--Modal 내용 끝-->
+    </Dialog.Panel>
+  </Dialog>
+  <!-- END: Insert Modal Content -->
+
+  <!-- BEGIN: Delete Confirmation Modal -->
+  <Dialog
+    :open="deleteModal"
+    @close="
+      () => {
+        setDeleteModal(false);
+      }
+    "
+    :initialFocus="deleteButtonRef"
+  >
+    <Dialog.Panel>
+      <div class="p-5 text-center">
+        <Lucide icon="XCircle" class="w-16 h-16 mx-auto mt-3 text-danger" />
+        <div class="mt-5 text-3xl">삭제</div>
+        <div class="mt-2 text-slate-500">정말 삭제하시겠습니까?</div>
+      </div>
+      <div class="px-5 pb-8 text-center">
+        <Button
+          variant="outline-secondary"
+          type="button"
+          @click="
+            () => {
+              setDeleteModal(false);
+            }
+          "
+          class="w-24 mr-1"
+        >
+          취소
+        </Button>
+        <Button
+          variant="danger"
+          type="button"
+          class="w-24"
+          ref="deleteButtonRef"
+          @click="
+            () => {
+              deleteDataFunction();
+              setDeleteModal(false);
+            }
+          "
+        >
+          삭제
+        </Button>
+      </div>
+    </Dialog.Panel>
+  </Dialog>
+  <!-- END: Delete Confirmation Modal -->
 
   <!-- BEGIN: 엑셀 다운로드 Modal -->
   <Dialog :open="excelExportModal" @close="setExcelExportModal(false)">
