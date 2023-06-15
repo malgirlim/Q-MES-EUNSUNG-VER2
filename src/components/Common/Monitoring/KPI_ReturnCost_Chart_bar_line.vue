@@ -39,9 +39,9 @@ const chartData = computed<ChartData>(() => {
     labels: props.x_label,
     datasets: [
       {
-        label: "재고비용",
+        label: "반품비용",
         maxBarThickness: 60,
-        data: [20, 30, 55, 40, 60, 47, 46, 40, 75, 65],
+        data: [20, 30, 55, 40, 60, 47, 46, 40, 75, 65, 35, 75],
         type: "bar",
         datalabels: {
           color: "black",
@@ -55,7 +55,7 @@ const chartData = computed<ChartData>(() => {
       },
       {
         label: "목표비용",
-        data: [50, 50, 50, 50, 50, 50, 50, 50, 50, 50],
+        data: [50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50],
         datalabels: { display: false },
         type: "line",
         pointStyle: false,

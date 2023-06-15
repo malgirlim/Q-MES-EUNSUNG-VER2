@@ -227,18 +227,14 @@ const table_width = [
         <div style="height: 270px">
           <KPI_BadRate_Chart_bar_line
             :x_label="[
-              '1월',
-              '2월',
-              '3월',
-              '4월',
-              '5월',
-              '6월',
-              '7월',
-              '8월',
-              '9월',
-              '10월',
-              '11월',
-              '12월',
+              '공정1',
+              '공정2',
+              '공정3',
+              '공정4',
+              '공정5',
+              '공정6',
+              '공정7',
+              '공정8',
             ]"
           />
         </div>
@@ -260,17 +256,45 @@ const table_width = [
         </div>
 
         <div class="ml-5">
-          <FormSelect
-            :modelValue="now_year + '년'"
-            class="w-30 mt-3 !box sm:mt-0"
-          >
-            <option>{{ now_year }}년</option>
-            <option>{{ ago_1year }}년</option>
-            <option>{{ ago_2year }}년</option>
-            <option>{{ ago_3year }}년</option>
-            <option>{{ ago_4year }}년</option>
-            <option>{{ ago_5year }}년</option>
-          </FormSelect>
+          <Button
+            class="mr-2 shadow-md"
+            as="a"
+            size="sm"
+            variant="outline-primary"
+            @click="reset_date"
+            title="기간 초기화"
+            ><Lucide icon="CalendarX" class="w-5 h-5"
+          /></Button>
+        </div>
+        <div class="text-center">
+          <div>
+            <Litepicker
+              v-model="now2"
+              :options="{
+                autoApply: false,
+                singleMode: false,
+                numberOfColumns: 1,
+                numberOfMonths: 1,
+                showWeekNumbers: true,
+                dropdowns: {
+                  minYear: Number(min_year),
+                  maxYear: Number(max_year),
+                  months: true,
+                  years: true,
+                },
+                lang: 'ko',
+                format: 'YY/MM/DD',
+                delimiter: ' - ',
+                buttonText: {
+                  reset: '새로고침',
+                  apply: '적용',
+                  cancel: '취소',
+                },
+              }"
+              class="block w-40 mx-auto !box"
+              placeholder="전체기간"
+            />
+          </div>
         </div>
 
         <div class="ml-3">
