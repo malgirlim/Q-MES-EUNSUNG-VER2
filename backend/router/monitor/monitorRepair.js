@@ -17,7 +17,7 @@ const logSend = async (type, ct, amount, user) => {
   const Pool = await pool;
   await Pool.request() // 로그기록 저장
     .input("type", type)
-    .input("menu", "예방보전_설비수리결과") // ############ *중요* 이거 메뉴 이름 바꿔야함 !! #########
+    .input("menu", "모니터링_설비수리현황") // ############ *중요* 이거 메뉴 이름 바꿔야함 !! #########
     .input("content", ct.substr(0, 500))
     .input("amount", amount)
     .input("user", user)
@@ -52,8 +52,9 @@ router.get("/", async (req, res) => {
         ,[FCFIX_COST] AS 금액
         ,[FCFIX_NOTE] AS 비고
         ,[FCFIX_REGIST_NM] AS 등록자
-        ,[FCFIX_REGIST_DT] AS 등록일시
+        ,CONVERT(VARCHAR, [FCFIX_REGIST_DT], 20) AS 등록일시
       FROM [QMES2022].[dbo].[MANAGE_FACILITY_FIX_TB]
+      LEFT JOIN
       (
         SELECT
           [FCFPL_PK] AS NO
@@ -126,8 +127,9 @@ router.post("/", async (req, res) => {
             ,[FCFIX_COST] AS 금액
             ,[FCFIX_NOTE] AS 비고
             ,[FCFIX_REGIST_NM] AS 등록자
-            ,[FCFIX_REGIST_DT] AS 등록일시
+            ,CONVERT(VARCHAR, [FCFIX_REGIST_DT], 20) AS 등록일시
           FROM [QMES2022].[dbo].[MANAGE_FACILITY_FIX_TB]
+          LEFT JOIN
           (
             SELECT
               [FCFPL_PK] AS NO
@@ -148,6 +150,12 @@ router.post("/", async (req, res) => {
           ) AS FACILITY_FIX_PLAN ON FACILITY_FIX_PLAN.NO = [FCFIX_FACILITY_FIX_PLAN_PK]
         ) AS RESULT
         WHERE (1=1)
+        AND CONVERT(varchar, CONVERT(datetime, 등록일시), 12) >= ` +
+        req.body.startDate +
+        `
+        AND CONVERT(varchar, CONVERT(datetime, 등록일시), 12) <= ` +
+        req.body.endDate +
+        `
         AND ( 설비명 like concat('%',@input,'%')
         OR 구분 like concat('%',@input,'%')
         OR 내용 like concat('%',@input,'%')
@@ -192,8 +200,9 @@ router.post("/", async (req, res) => {
             ,[FCFIX_COST] AS 금액
             ,[FCFIX_NOTE] AS 비고
             ,[FCFIX_REGIST_NM] AS 등록자
-            ,[FCFIX_REGIST_DT] AS 등록일시
+            ,CONVERT(VARCHAR, [FCFIX_REGIST_DT], 20) AS 등록일시
           FROM [QMES2022].[dbo].[MANAGE_FACILITY_FIX_TB]
+          LEFT JOIN
           (
             SELECT
               [FCFPL_PK] AS NO
@@ -214,6 +223,12 @@ router.post("/", async (req, res) => {
           ) AS FACILITY_FIX_PLAN ON FACILITY_FIX_PLAN.NO = [FCFIX_FACILITY_FIX_PLAN_PK]
         ) AS RESULT
         WHERE (1=1)
+        AND CONVERT(varchar, CONVERT(datetime, 등록일시), 12) >= ` +
+        req.body.startDate +
+        `
+        AND CONVERT(varchar, CONVERT(datetime, 등록일시), 12) <= ` +
+        req.body.endDate +
+        `
         AND ` +
         req.body.searchKey +
         ` like concat('%',@input,'%')
@@ -433,8 +448,9 @@ router.post("/delete", async (req, res) => {
           ,[FCFIX_COST] AS 금액
           ,[FCFIX_NOTE] AS 비고
           ,[FCFIX_REGIST_NM] AS 등록자
-          ,[FCFIX_REGIST_DT] AS 등록일시
+          ,CONVERT(VARCHAR, [FCFIX_REGIST_DT], 20) AS 등록일시
         FROM [QMES2022].[dbo].[MANAGE_FACILITY_FIX_TB]
+        LEFT JOIN
         (
           SELECT
             [FCFPL_PK] AS NO

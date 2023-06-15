@@ -18,6 +18,10 @@ import { toast } from "vue3-toastify";
 // API 보내는 함수 및 인터페이스 불러오기
 import { useSendApi } from "../../composables/useSendApi";
 import { PreventPrevent } from "../../interfaces/menu/preventInterface";
+import {
+  MasterUser,
+  MasterFacility,
+} from "../../interfaces/menu/masterInterface";
 
 // 컴포넌트 로드
 import ProductDetail from "../../components/Common/Detail/MasterProductDetail.vue";
@@ -390,9 +394,10 @@ const setPreventResultInsertModal = (value: boolean) => {
     toast.warning("액세스 권한이 없습니다.\n관리자에게 문의하세요.");
   }
 };
-// 수정버튼 누르면 실행되는 함수
+// 등록버튼 누르면 실행되는 함수
 const preventResultInsertFunction = async () => {
   await preventresult.insertData(editModalData); // await : 이 함수가 끝나야 다음으로 넘어간다
+  toast.success("예방보전 검사결과가 등록되었습니다.");
   search();
 };
 </script>
@@ -844,6 +849,7 @@ const preventResultInsertFunction = async () => {
                       @click="
                         () => {
                           editModalData = todo;
+                          editModalData.예방보전계획NO = todo.NO;
                           setPreventResultInsertModal(true);
                         }
                       "
@@ -1554,6 +1560,7 @@ const preventResultInsertFunction = async () => {
     </Dialog.Panel>
   </Dialog>
   <!-- END: 프린트 출력 Modal -->
+
   <!-- 
   ##########################################################################################################################
   ##########################################################################################################################
