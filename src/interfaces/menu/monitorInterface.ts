@@ -63,6 +63,7 @@ export interface MonitorRepair {
   담당자?: string;
   결과내용?: string;
   결과?: string;
+  수리시간?: string;
   금액?: string;
   비고?: string;
   등록자?: string;

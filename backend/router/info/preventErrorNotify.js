@@ -36,7 +36,7 @@ router.get("/", async (req, res) => {
     const result = await Pool.request().query(`
       SELECT
         [NTERR_PK] AS NO
-        ,[NTERR_NONWORK_PK] AS 참조NO
+        ,[NTERR_FACILITY_PK] AS 참조NO
         ,[NTERR_DIV] AS 구분
         ,[NTERR_CONTENT] AS 내용
         ,[NTERR_NOTE] AS 비고
@@ -79,7 +79,7 @@ router.post("/", async (req, res) => {
         FROM(
           SELECT
             [NTERR_PK] AS NO
-            ,[NTERR_NONWORK_PK] AS 참조NO
+            ,[NTERR_FACILITY_PK] AS 참조NO
             ,[NTERR_DIV] AS 구분
             ,[NTERR_CONTENT] AS 내용
             ,[NTERR_NOTE] AS 비고
@@ -107,7 +107,7 @@ router.post("/", async (req, res) => {
         FROM(
           SELECT
             [NTERR_PK] AS NO
-            ,[NTERR_NONWORK_PK] AS 참조NO
+            ,[NTERR_FACILITY_PK] AS 참조NO
             ,[NTERR_DIV] AS 구분
             ,[NTERR_CONTENT] AS 내용
             ,[NTERR_NOTE] AS 비고
@@ -177,7 +177,7 @@ router.post("/insert", async (req, res) => {
         moment().tz("Asia/Seoul").format("YYYY-MM-DD HH:mm:ss")
       ).query(`
         INSERT INTO [QMES2022].[dbo].[MANAGE_NOTICE_ERROR_TB]
-          ([NTERR_NONWORK_PK]
+          ([NTERR_FACILITY_PK]
           ,[NTERR_DIV]
           ,[NTERR_CONTENT]
           ,[NTERR_NOTE]
@@ -225,7 +225,7 @@ router.post("/insertAll", async (req, res) => {
           moment().tz("Asia/Seoul").format("YYYY-MM-DD HH:mm:ss")
         ).query(`
         INSERT INTO [QMES2022].[dbo].[MANAGE_NOTICE_ERROR_TB]
-          ([NTERR_NONWORK_PK]
+          ([NTERR_FACILITY_PK]
           ,[NTERR_DIV]
           ,[NTERR_CONTENT]
           ,[NTERR_NOTE]
@@ -274,7 +274,7 @@ router.post("/edit", async (req, res) => {
       ).query(`
         UPDATE [QMES2022].[dbo].[MANAGE_NOTICE_ERROR_TB]
           SET 
-            [NTERR_NONWORK_PK] = @참조NO
+            [NTERR_FACILITY_PK] = @참조NO
             ,[NTERR_DIV] = @구분
             ,[NTERR_CONTENT] = @내용
             ,[NTERR_NOTE] = @비고
@@ -313,7 +313,7 @@ router.post("/delete", async (req, res) => {
       const result = await Pool.request().input("key", req.body.data[i]).query(`
         SELECT
           [NTERR_PK] AS NO
-          ,[NTERR_NONWORK_PK] AS 참조NO
+          ,[NTERR_FACILITY_PK] AS 참조NO
           ,[NTERR_DIV] AS 구분
           ,[NTERR_CONTENT] AS 내용
           ,[NTERR_NOTE] AS 비고

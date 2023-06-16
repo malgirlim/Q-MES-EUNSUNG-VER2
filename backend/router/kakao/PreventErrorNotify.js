@@ -311,7 +311,7 @@ async function insertForecastNotify(data) {
       .input("등록자", "시스템" ?? "")
       .input("등록일시", dayjs().format("YYYY-MM-DD HH:mm:ss"))
       .query(`INSERT INTO [QMES2022].[dbo].[MANAGE_NOTICE_ERROR_TB]
-          ([NTERR_NONWORK_PK]
+          ([NTERR_FACILITY_PK]
           ,[NTERR_DIV]
           ,[NTERR_CONTENT]
           ,[NTERR_NOTE]
