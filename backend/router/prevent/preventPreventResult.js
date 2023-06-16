@@ -45,11 +45,12 @@ router.get("/", async (req, res) => {
         ,PREVENT_PLAN.단위 AS 단위
         ,PREVENT_PLAN.최소 AS 최소
         ,PREVENT_PLAN.최대 AS 최대
+        ,PREVENT_PLAN.담당자 AS 담당자
         ,[PRVNT_CONTENT] AS 결과내용
         ,[PRVNT_RESULT] AS 결과
         ,[PRVNT_NOTE] AS 비고
         ,[PRVNT_REGIST_NM] AS 등록자
-        ,[PRVNT_REGIST_DT] AS 등록일시
+        ,CONVERT(VARCHAR, [PRVNT_REGIST_DT], 20) AS 등록일시
       FROM [QMES2022].[dbo].[MANAGE_PREVENT_TB]
       LEFT JOIN
       (
@@ -103,7 +104,8 @@ router.post("/", async (req, res) => {
         `
         SELECT
           NO AS NO, 예방보전계획NO AS 예방보전계획NO, 설비명 AS 설비명, 구분 AS 구분, 내용 AS 내용, 검사방법 AS 검사방법,
-          기준 AS 기준, 단위 AS 단위, 최소 AS 최소, 최대 AS 최대, 비고 AS 비고, 등록자 AS 등록자, 등록일시 AS 등록일시
+          기준 AS 기준, 단위 AS 단위, 최소 AS 최소, 최대 AS 최대, 담당자 AS 담당자, 결과내용 AS 결과내용, 결과 AS 결과,
+          비고 AS 비고, 등록자 AS 등록자, 등록일시 AS 등록일시
         FROM(
           SELECT
             [PRVNT_PK] AS NO
@@ -116,11 +118,12 @@ router.post("/", async (req, res) => {
             ,PREVENT_PLAN.단위 AS 단위
             ,PREVENT_PLAN.최소 AS 최소
             ,PREVENT_PLAN.최대 AS 최대
+            ,PREVENT_PLAN.담당자 AS 담당자
             ,[PRVNT_CONTENT] AS 결과내용
             ,[PRVNT_RESULT] AS 결과
             ,[PRVNT_NOTE] AS 비고
             ,[PRVNT_REGIST_NM] AS 등록자
-            ,[PRVNT_REGIST_DT] AS 등록일시
+            ,CONVERT(VARCHAR, [PRVNT_REGIST_DT], 20) AS 등록일시
           FROM [QMES2022].[dbo].[MANAGE_PREVENT_TB]
           LEFT JOIN
           (
@@ -143,6 +146,12 @@ router.post("/", async (req, res) => {
           ) AS PREVENT_PLAN ON PREVENT_PLAN.NO = [PRVNT_PREVENT_PLAN_PK]
         ) AS RESULT
         WHERE (1=1)
+        AND CONVERT(varchar, CONVERT(datetime, 등록일시), 12) >= ` +
+        req.body.startDate +
+        `
+        AND CONVERT(varchar, CONVERT(datetime, 등록일시), 12) <= ` +
+        req.body.endDate +
+        `
         AND ( 설비명 like concat('%',@input,'%')
         OR 구분 like concat('%',@input,'%')
         OR 내용 like concat('%',@input,'%')
@@ -165,7 +174,8 @@ router.post("/", async (req, res) => {
         `
         SELECT
           NO AS NO, 예방보전계획NO AS 예방보전계획NO, 설비명 AS 설비명, 구분 AS 구분, 내용 AS 내용, 검사방법 AS 검사방법,
-          기준 AS 기준, 단위 AS 단위, 최소 AS 최소, 최대 AS 최대, 비고 AS 비고, 등록자 AS 등록자, 등록일시 AS 등록일시
+          기준 AS 기준, 단위 AS 단위, 최소 AS 최소, 최대 AS 최대, 담당자 AS 담당자, 결과내용 AS 결과내용, 결과 AS 결과,
+          비고 AS 비고, 등록자 AS 등록자, 등록일시 AS 등록일시
         FROM(
           SELECT
             [PRVNT_PK] AS NO
@@ -178,11 +188,12 @@ router.post("/", async (req, res) => {
             ,PREVENT_PLAN.단위 AS 단위
             ,PREVENT_PLAN.최소 AS 최소
             ,PREVENT_PLAN.최대 AS 최대
+            ,PREVENT_PLAN.담당자 AS 담당자
             ,[PRVNT_CONTENT] AS 결과내용
             ,[PRVNT_RESULT] AS 결과
             ,[PRVNT_NOTE] AS 비고
             ,[PRVNT_REGIST_NM] AS 등록자
-            ,[PRVNT_REGIST_DT] AS 등록일시
+            ,CONVERT(VARCHAR, [PRVNT_REGIST_DT], 20) AS 등록일시
           FROM [QMES2022].[dbo].[MANAGE_PREVENT_TB]
           LEFT JOIN
           (
@@ -205,6 +216,12 @@ router.post("/", async (req, res) => {
           ) AS PREVENT_PLAN ON PREVENT_PLAN.NO = [PRVNT_PREVENT_PLAN_PK]
         ) AS RESULT
         WHERE (1=1)
+        AND CONVERT(varchar, CONVERT(datetime, 등록일시), 12) >= ` +
+        req.body.startDate +
+        `
+        AND CONVERT(varchar, CONVERT(datetime, 등록일시), 12) <= ` +
+        req.body.endDate +
+        `
         AND ` +
         req.body.searchKey +
         ` like concat('%',@input,'%')
@@ -411,11 +428,12 @@ router.post("/delete", async (req, res) => {
           ,PREVENT_PLAN.단위 AS 단위
           ,PREVENT_PLAN.최소 AS 최소
           ,PREVENT_PLAN.최대 AS 최대
+          ,PREVENT_PLAN.담당자 AS 담당자
           ,[PRVNT_CONTENT] AS 결과내용
           ,[PRVNT_RESULT] AS 결과
           ,[PRVNT_NOTE] AS 비고
           ,[PRVNT_REGIST_NM] AS 등록자
-          ,[PRVNT_REGIST_DT] AS 등록일시
+          ,CONVERT(VARCHAR, [PRVNT_REGIST_DT], 20) AS 등록일시
         FROM [QMES2022].[dbo].[MANAGE_PREVENT_TB]
         LEFT JOIN
         (

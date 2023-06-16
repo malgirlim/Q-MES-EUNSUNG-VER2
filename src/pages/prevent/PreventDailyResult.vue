@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { ref, Ref, onMounted, watch, getCurrentInstance } from "vue";
+import router from "../../router";
 import Button from "../../base-components/Button";
 import {
   FormInput,
@@ -22,12 +23,7 @@ import { toast } from "vue3-toastify";
 
 // API 보내는 함수 및 인터페이스 불러오기
 import { useSendApi } from "../../composables/useSendApi";
-import {
-  MonitorPrevent,
-  MonitorDaily,
-  MonitorRepair,
-} from "../../interfaces/menu/monitorInterface";
-import { ProductionResult } from "../../interfaces/menu/productionInterface";
+import { PreventDaily } from "../../interfaces/menu/preventInterface";
 
 // 컴포넌트 로드
 import MasterDetail from "../../components/Common/Detail/MasterClientDetail.vue";
@@ -48,8 +44,8 @@ const pageChangeFirst = () => {
 };
 
 // dataManager 만들기
-const url = "/api/monitor/daily";
-const dataManager = useSendApi<MonitorDaily>(url, currentPage, rowsPerPage);
+const url = "/api/prevent/dailyresult";
+const dataManager = useSendApi<PreventDaily>(url, currentPage, rowsPerPage);
 
 // 테이블항목 설정 및 가로크기 조정
 const table_setting = {
@@ -184,7 +180,7 @@ const insert_check = () => {
 
 // ########################## 등록, 수정, 삭제, 상세 Modal ##########################
 // ##### 등록 Modal #####
-let insertModalData: MonitorDaily;
+let insertModalData: PreventDaily;
 const insertModal = ref(false);
 const setInsertModal = (value: boolean) => {
   if (user_level >= 3) {
@@ -224,7 +220,7 @@ const setEditModal = (value: boolean) => {
     toast.warning("액세스 권한이 없습니다.\n관리자에게 문의하세요.");
   }
 };
-let editModalData: MonitorDaily; // 수정할 변수
+let editModalData: PreventDaily; // 수정할 변수
 // 수정버튼 누르면 실행되는 함수
 const editDataFunction = async () => {
   await dataManager.editData(editModalData); // await : 이 함수가 끝나야 다음으로 넘어간다
@@ -412,6 +408,19 @@ const onFileImport = (event: any) => {
         >
           <Lucide icon="Trash2" class="w-4 h-4 mr-2" /> 삭제</Button
         > -->
+        <Button
+          class="mr-3 shadow-md"
+          as="a"
+          variant="linkedin"
+          @click="
+            () => {
+              router.push('/prevent/daily-plan');
+            }
+          "
+        >
+          <Lucide icon="ExternalLink" class="w-4 h-4 mr-2" />
+          일상점검계획
+        </Button>
         <div class="hidden mx-auto md:block text-slate-500"></div>
         <div class="mr-5">
           <a href="" class="flex items-center ml-auto text-primary">
