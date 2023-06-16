@@ -113,6 +113,8 @@ import MonitoringKPIFacilityRate from "../pages/monitoring/MonitoringKPIFacility
 import MonitoringKPIBadRate from "../pages/monitoring/MonitoringKPIBadRate.vue";
 import MonitoringKPIManHour from "../pages/monitoring/MonitoringKPIManHour.vue";
 import MonitoringKPIProductHour from "../pages/monitoring/MonitoringKPIProductHour.vue";
+import MonitoringDaily from "../pages/monitoring/MonitoringDaily.vue";
+import MonitoringPrevent from "../pages/monitoring/MonitoringPrevent.vue";
 import MonitoringMTBF from "../pages/monitoring/MonitoringMTBF.vue";
 import MonitoringMTTR from "../pages/monitoring/MonitoringMTTR.vue";
 import MonitoringOEE from "../pages/monitoring/MonitoringOEE.vue";
@@ -916,6 +918,24 @@ const routes = [
           category: "모니터링",
         },
         component: MonitoringKPIProductHour,
+      },
+      {
+        path: "monitoring/daily",
+        name: "top-menu-monitoring-daily",
+        meta: {
+          pagename: "설비 일상점검 현황",
+          category: "모니터링",
+        },
+        component: MonitoringDaily,
+      },
+      {
+        path: "monitoring/prevent",
+        name: "top-menu-monitoring-prevent",
+        meta: {
+          pagename: "설비 예방보전 현황",
+          category: "모니터링",
+        },
+        component: MonitoringPrevent,
       },
       {
         path: "monitoring/mtbf",
