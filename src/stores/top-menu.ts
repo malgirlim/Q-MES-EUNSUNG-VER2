@@ -268,79 +268,107 @@ export const useTopMenuStore = defineStore("topMenu", {
         title: "재고관리",
         subMenu: [
           {
-            icon: "FileText",
-            pageName: "top-menu-stock-receive-raw",
-            title: "원부자재 입고",
+            icon: "Folder",
+            pageName: "",
+            title: "원부자재",
+            subMenu: [
+              {
+                icon: "FileText",
+                pageName: "top-menu-stock-receive-raw",
+                title: "원부자재 입고",
+              },
+              {
+                icon: "FileText",
+                pageName: "top-menu-stock-wip-raw",
+                title: "원부자재 불출",
+              },
+              {
+                icon: "FileText",
+                pageName: "top-menu-stock-wip-monitor-raw",
+                title: "원부자재 재공현황",
+              },
+              {
+                icon: "FileText",
+                pageName: "top-menu-stock-use-raw",
+                title: "원부자재 사용",
+              },
+              {
+                icon: "FileText",
+                pageName: "top-menu-stock-monitor-raw",
+                title: "원부자재 재고현황",
+              },
+            ],
           },
           {
-            icon: "FileText",
-            pageName: "top-menu-stock-wip-raw",
-            title: "원부자재 불출",
+            icon: "Folder",
+            pageName: "",
+            title: "반제품",
+            subMenu: [
+              {
+                icon: "FileText",
+                pageName: "top-menu-stock-receive-half",
+                title: "반제품 입고",
+              },
+              {
+                icon: "FileText",
+                pageName: "top-menu-stock-wip-half",
+                title: "반제품 불출",
+              },
+              {
+                icon: "FileText",
+                pageName: "top-menu-stock-wip-monitor-half",
+                title: "반제품 재공현황",
+              },
+              {
+                icon: "FileText",
+                pageName: "top-menu-stock-use-half",
+                title: "반제품 사용",
+              },
+              {
+                icon: "FileText",
+                pageName: "top-menu-stock-monitor-half",
+                title: "반제품 재고현황",
+              },
+            ],
           },
           {
-            icon: "FileText",
-            pageName: "top-menu-stock-wip-monitor-raw",
-            title: "원부자재 재공현황",
+            icon: "Folder",
+            pageName: "",
+            title: "완제품",
+            subMenu: [
+              {
+                icon: "FileText",
+                pageName: "top-menu-stock-receive-finish",
+                title: "완제품 입고",
+              },
+              {
+                icon: "FileText",
+                pageName: "top-menu-stock-monitor-finish",
+                title: "완제품 재고현황",
+              },
+            ],
           },
           {
-            icon: "FileText",
-            pageName: "top-menu-stock-use-raw",
-            title: "원부자재 사용",
-          },
-          {
-            icon: "FileText",
-            pageName: "top-menu-stock-monitor-raw",
-            title: "원부자재 재고현황",
-          },
-          {
-            icon: "FileText",
-            pageName: "top-menu-stock-receive-half",
-            title: "반제품 입고",
-          },
-          {
-            icon: "FileText",
-            pageName: "top-menu-stock-wip-half",
-            title: "반제품 불출",
-          },
-          {
-            icon: "FileText",
-            pageName: "top-menu-stock-wip-monitor-half",
-            title: "반제품 재공현황",
-          },
-          {
-            icon: "FileText",
-            pageName: "top-menu-stock-use-half",
-            title: "반제품 사용",
-          },
-          {
-            icon: "FileText",
-            pageName: "top-menu-stock-monitor-half",
-            title: "반제품 재고현황",
-          },
-          {
-            icon: "FileText",
-            pageName: "top-menu-stock-receive-finish",
-            title: "완제품 입고",
-          },
-          {
-            icon: "FileText",
-            pageName: "top-menu-stock-monitor-finish",
-            title: "완제품 재고현황",
-          },
-          {
-            icon: "FileText",
-            pageName: "top-menu-stock-receive-parts",
-            title: "설비부품 입고등록",
-          },
-          {
-            icon: "FileText",
-            pageName: "top-menu-stock-use-parts",
-            title: "설비부품 출고등록",
-          },
-          {
-            icon: "FileText",
-            pageName: "top-menu-stock-monitor-parts",
-            title: "설비부품 재고현황",
+            icon: "Folder",
+            pageName: "",
+            title: "설비부품",
+            subMenu: [
+              {
+                icon: "FileText",
+                pageName: "top-menu-stock-receive-parts",
+                title: "설비부품 입고등록",
+              },
+              {
+                icon: "FileText",
+                pageName: "top-menu-stock-use-parts",
+                title: "설비부품 출고등록",
+              },
+              {
+                icon: "FileText",
+                pageName: "top-menu-stock-monitor-parts",
+                title: "설비부품 재고현황",
+              },
+            ],
           },
         ],
       },
@@ -404,6 +432,124 @@ export const useTopMenuStore = defineStore("topMenu", {
           },
         ],
       },
+
+      {
+        icon: "Folders",
+        pageName: "",
+        title: "예방보전",
+        subMenu: [
+          {
+            icon: "Folder",
+            pageName: "",
+            title: "예방보전",
+            subMenu: [
+              {
+                icon: "FileText",
+                pageName: "top-menu-prevent-plan",
+                title: "예방보전 계획",
+              },
+              {
+                icon: "FileText",
+                pageName: "top-menu-prevent-result",
+                title: "예방보전 결과",
+              },
+              {
+                icon: "FileText",
+                pageName: "top-menu-prevent-forecast",
+                title: "예방보전 예보",
+              },
+              {
+                icon: "FileText",
+                pageName: "top-menu-prevent-notice",
+                title: "예방보전 통보",
+              },
+            ],
+          },
+          {
+            icon: "Folder",
+            pageName: "",
+            title: "일상점검",
+            subMenu: [
+              {
+                icon: "FileText",
+                pageName: "top-menu-prevent-daily-plan",
+                title: "일상점검 계획",
+              },
+              {
+                icon: "FileText",
+                pageName: "top-menu-prevent-daily-result",
+                title: "일상점검 결과",
+              },
+              {
+                icon: "FileText",
+                pageName: "top-menu-prevent-daily-notify",
+                title: "일상점검 확인통보",
+              },
+            ],
+          },
+          {
+            icon: "Folder",
+            pageName: "",
+            title: "설비수리",
+            subMenu: [
+              {
+                icon: "FileText",
+                pageName: "top-menu-prevent-repair-plan",
+                title: "설비수리 계획",
+              },
+              {
+                icon: "FileText",
+                pageName: "top-menu-prevent-repair-result",
+                title: "설비수리 결과",
+              },
+              {
+                icon: "FileText",
+                pageName: "top-menu-prevent-repair-forecast",
+                title: "설비수리 예보",
+              },
+              {
+                icon: "FileText",
+                pageName: "top-menu-prevent-repair-notify",
+                title: "설비수리 통보",
+              },
+            ],
+          },
+          {
+            icon: "Folder",
+            pageName: "",
+            title: "설비부품",
+            subMenu: [
+              {
+                icon: "FileText",
+                pageName: "top-menu-prevent-life-plan",
+                title: "설비부품 수명계획",
+              },
+              {
+                icon: "FileText",
+                pageName: "top-menu-prevent-change-notify",
+                title: "설비부품 교체시기 통보",
+              },
+            ],
+          },
+          {
+            icon: "Folder",
+            pageName: "",
+            title: "설비고장",
+            subMenu: [
+              {
+                icon: "FileText",
+                pageName: "top-menu-prevent-error-list",
+                title: "설비고장 내역",
+              },
+              {
+                icon: "FileText",
+                pageName: "top-menu-prevent-error-notify",
+                title: "설비고장발생 통보",
+              },
+            ],
+          },
+        ],
+      },
       {
         icon: "Folders",
         pageName: "",
@@ -441,21 +587,6 @@ export const useTopMenuStore = defineStore("topMenu", {
           },
           {
             icon: "FileText",
-            pageName: "top-menu-monitoring-daily",
-            title: "설비 일상점검 현황",
-          },
-          {
-            icon: "FileText",
-            pageName: "top-menu-monitoring-prevent",
-            title: "설비 예방보전 현황",
-          },
-          {
-            icon: "FileText",
-            pageName: "top-menu-monitoring-facility-repair",
-            title: "설비 수리 현황",
-          },
-          {
-            icon: "FileText",
             pageName: "top-menu-monitoring-mtbf",
             title: "MTBF 현황",
           },
@@ -468,68 +599,6 @@ export const useTopMenuStore = defineStore("topMenu", {
             icon: "FileText",
             pageName: "top-menu-monitoring-oee",
             title: "OEE현황",
-          },
-        ],
-      },
-      {
-        icon: "Folders",
-        pageName: "",
-        title: "예방보전",
-        subMenu: [
-          {
-            icon: "FileText",
-            pageName: "top-menu-prevent-plan",
-            title: "예방보전계획",
-          },
-          {
-            icon: "FileText",
-            pageName: "top-menu-prevent-daily-plan",
-            title: "일상점검계획",
-          },
-          {
-            icon: "FileText",
-            pageName: "top-menu-prevent-repair-plan",
-            title: "설비수리계획",
-          },
-          {
-            icon: "FileText",
-            pageName: "top-menu-prevent-life-plan",
-            title: "설비부품수명계획",
-          },
-          {
-            icon: "FileText",
-            pageName: "top-menu-prevent-forecast",
-            title: "예방보전 예보",
-          },
-          {
-            icon: "FileText",
-            pageName: "top-menu-prevent-notice",
-            title: "예방보전 통보",
-          },
-          {
-            icon: "FileText",
-            pageName: "top-menu-prevent-error-notify",
-            title: "설비고장발생 통보",
-          },
-          {
-            icon: "FileText",
-            pageName: "top-menu-prevent-daily-notify",
-            title: "일상점검 확인통보",
-          },
-          {
-            icon: "FileText",
-            pageName: "top-menu-prevent-repair-forecast",
-            title: "설비수리 예보",
-          },
-          {
-            icon: "FileText",
-            pageName: "top-menu-prevent-repair-notify",
-            title: "설비수리 통보",
-          },
-          {
-            icon: "FileText",
-            pageName: "top-menu-prevent-change-notify",
-            title: "설비부품 교체시기 통보",
           },
         ],
       },

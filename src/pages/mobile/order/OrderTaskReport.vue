@@ -1830,7 +1830,7 @@ const importNonwork = (no: any) => {
 
   <!-- BEGIN: 실적입력 Modal Content -->
   <Dialog size="xl" :open="resultModal">
-    <Dialog.Panel>
+    <Dialog.Panel style="top: -8%">
       <div class="text-center text-xl p-5">
         <strong>공정별 작업실적 입력</strong>
       </div>
@@ -1988,17 +1988,17 @@ const importNonwork = (no: any) => {
         <Tab.Group class="px-5">
           <Tab.List variant="boxed-tabs">
             <Tab>
-              <Tab.Button class="w-full py-1 text-md" as="button">
+              <Tab.Button class="w-full p-1 text-md" as="button">
                 <strong>소요 자재</strong>
               </Tab.Button>
             </Tab>
             <Tab>
-              <Tab.Button class="w-full py-1 text-md" as="button">
+              <Tab.Button class="w-full p-1 text-md" as="button">
                 <strong>불량 사유</strong>
               </Tab.Button>
             </Tab>
             <Tab>
-              <Tab.Button class="w-full px-1 py-1 text-md" as="button">
+              <Tab.Button class="w-full p-1 text-md" as="button">
                 <strong>비가동 사유</strong>
               </Tab.Button>
             </Tab>
@@ -2299,7 +2299,7 @@ const importNonwork = (no: any) => {
               setResultStopCheckModal(true);
             }
           "
-          class="w-24 mr-5"
+          class="w-24 mr-3"
         >
           작업중지
         </Button>
@@ -2312,7 +2312,7 @@ const importNonwork = (no: any) => {
               setResultCheckModal(true);
             }
           "
-          class="w-24 mr-5"
+          class="w-24 mr-3"
         >
           작업완료
         </Button>
@@ -2403,7 +2403,7 @@ const importNonwork = (no: any) => {
           class="w-16 h-16 mx-auto mt-3 text-primary"
         />
         <!-- <div class="mt-5 text-3xl">작업 완료</div> -->
-        <div class="mt-5 text-2xl">작업을 완료하시겠습니까?</div>
+        <div class="mt-5 text-xl">작업을 완료하시겠습니까?</div>
         <div
           class="mt-5 text-xl text-danger border-2 border-danger p-2"
           v-if="
@@ -2419,7 +2419,10 @@ const importNonwork = (no: any) => {
               />경고
             </div>
           </div>
-          <div class="mt-1">생산 양품수량이 지시수량보다 적습니다.</div>
+          <div class="mt-1">
+            생산 양품수량이<br />
+            지시수량보다 적습니다.
+          </div>
           <div class="mt-1">
             <input
               class="mr-2 transition-all duration-100 ease-in-out shadow-sm border-slate-200 cursor-pointer rounded focus:ring-4 focus:ring-offset-0 focus:ring-primary focus:ring-opacity-20 [&[type='checkbox']]:checked:bg-primary [&[type='checkbox']]:checked:border-primary [&[type='checkbox']]:checked:border-opacity-10 [&:disabled:not(:checked)]:bg-slate-100 [&:disabled:not(:checked)]:cursor-not-allowed [&:disabled:checked]:opacity-70 [&:disabled:checked]:cursor-not-allowed"
@@ -2477,30 +2480,30 @@ const importNonwork = (no: any) => {
 
   <!-- BEGIN: Facility Modal Content -->
   <Dialog size="xxl" :open="facilityModal" @close="setFacilityModal(false)">
-    <Dialog.Panel class="p-10 text-center">
+    <Dialog.Panel class="p-5 text-center" style="top: -5%">
       <!--Facility Modal 내용 시작-->
-      <div class="mb-3" style="font-weight: bold; font-size: x-large">
-        설비 리스트
-      </div>
+      <div class="mb-3 font-bold text-xl">설비 리스트</div>
       <div class="grid grid-cols-12 gap-1 mt-1">
         <div
           class="flex flex-wrap itemlist-center col-span-12 mt-2 mb-2 intro-y sm:flex-nowrap"
         >
-          <div class="hidden mx-auto md:block text-slate-500"></div>
-          <div class="ml-2">
-            <FormSelect
-              v-model="searchKey_facility"
-              class="w-30 mt-3 !box sm:mt-0"
-            >
-              <option>전체</option>
-              <option>거래처명</option>
-              <option>사업자번호</option>
-              <option>주소</option>
-              <option>비고</option>
-            </FormSelect>
-          </div>
-          <div class="w-full mt-3 sm:w-auto sm:mt-0 sm:ml-auto md:ml-2">
-            <div class="relative w-56 text-slate-500">
+          <div class="w-full sm:w-auto sm:mt-0 sm:ml-auto md:ml-2">
+            <div class="flex relative w-56 text-slate-500">
+              <div class="mr-3">
+                <FormSelect
+                  class="w-20 !box sm:mt-0"
+                  v-model="rowsPerPage_facility"
+                  @change="pageChangeFirst_facility"
+                >
+                  <option>10</option>
+                  <option>25</option>
+                  <option>50</option>
+                  <option>100</option>
+                  <option :value="task_modal_facility.dataCount.value">
+                    전체
+                  </option>
+                </FormSelect>
+              </div>
               <FormInput
                 type="text"
                 class="w-56 pr-10 !box"
@@ -2523,7 +2526,7 @@ const importNonwork = (no: any) => {
               >
                 <Lucide
                   icon="Search"
-                  class="absolute inset-y-0 right-0 w-4 h-4 my-auto mr-3"
+                  class="absolute inset-y-0 -right-20 w-4 h-4 my-auto mr-3"
                 />
               </button>
             </div>
@@ -2534,54 +2537,6 @@ const importNonwork = (no: any) => {
           class="flex flex-wrap itemlist-center col-span-12 mt-0 intro-y sm:flex-nowrap"
         >
           <div>
-            <FormSelect
-              v-model="sortKey_facility"
-              class="w-30 mt-3 !box sm:mt-0"
-            >
-              <option>등록일</option>
-              <option>거래처명</option>
-              <option>사업자번호</option>
-              <option>주소</option>
-            </FormSelect>
-          </div>
-          <div class="ml-3">
-            <Button
-              class="shadow-md"
-              as="a"
-              variant="outline-primary"
-              v-if="sortOrder_facility == '오름차순'"
-              @click="sortOrderToggle_facility"
-            >
-              <Lucide icon="SortAsc" class="w-4 h-4 mr-1" />
-
-              {{ sortOrder_facility }}</Button
-            >
-            <Button
-              class="shadow-md"
-              as="a"
-              variant="outline-danger"
-              v-if="sortOrder_facility == '내림차순'"
-              @click="sortOrderToggle_facility"
-            >
-              <Lucide icon="SortDesc" class="w-4 h-4 mr-1" />
-
-              {{ sortOrder_facility }}</Button
-            >
-          </div>
-          <div class="ml-5">
-            <FormSelect
-              class="w-20 mt-3 !box sm:mt-0"
-              v-model="rowsPerPage_facility"
-              @change="pageChangeFirst_facility"
-            >
-              <option>10</option>
-              <option>25</option>
-              <option>50</option>
-              <option>100</option>
-              <option :value="task_modal_facility.dataCount.value">전체</option>
-            </FormSelect>
-          </div>
-          <div>
             <PaginationComponent
               class="pagination-component"
               v-model="currentPage_facility"
@@ -2589,7 +2544,7 @@ const importNonwork = (no: any) => {
             />
           </div>
           <div class="hidden mx-auto md:block text-slate-500"></div>
-          <div>
+          <div class="mx-auto">
             <span class="mr-3"
               >[ {{ task_modal_facility.dataCount }}개 데이터 조회됨 ]
             </span>
@@ -2604,110 +2559,48 @@ const importNonwork = (no: any) => {
         <!-- style="height: calc(100vh - 350px)" : 브라우저 화면 창크기에 맞게 변경됨 -->
         <div class="col-span-12 overflow-auto intro-y lg:overflow-visible">
           <div
-            class="mr-3"
-            style="overflow-y: scroll; overflow-x: hidden; height: 580px"
+            class=""
+            style="overflow-y: scroll; overflow-x: hidden; height: 395px"
           >
-            <Table class="border-spacing-y-[6px] border-separate -mt-2">
-              <Table.Thead
-                class="bg-slate-100"
-                style="position: sticky; top: 0px; z-index: 2"
-              >
-                <Table.Tr>
-                  <Table.Th
-                    class="text-center border-b-0 whitespace-nowrap"
-                    :style="table_setting_facility.순번.style"
-                  >
-                    {{ table_setting_facility.순번.name }}
-                  </Table.Th>
-                  <Table.Th
-                    class="text-center border-b-0 whitespace-nowrap"
-                    :style="table_setting_facility.항목1.style"
-                  >
-                    {{ table_setting_facility.항목1.name }}
-                  </Table.Th>
-                  <Table.Th
-                    class="text-center border-b-0 whitespace-nowrap"
-                    :style="table_setting_facility.항목2.style"
-                  >
-                    {{ table_setting_facility.항목2.name }}
-                  </Table.Th>
-                  <Table.Th
-                    class="text-center border-b-0 whitespace-nowrap"
-                    :style="table_setting_facility.항목3.style"
-                  >
-                    {{ table_setting_facility.항목3.name }}
-                  </Table.Th>
-                  <Table.Th
-                    class="text-center border-b-0 whitespace-nowrap"
-                    :style="table_setting_facility.항목4.style"
-                  >
-                    {{ table_setting_facility.항목4.name }}
-                  </Table.Th>
-                  <Table.Th
-                    class="text-center border-b-0 whitespace-nowrap"
-                    :style="table_setting_facility.항목5.style"
-                  >
-                    {{ table_setting_facility.항목5.name }}
-                  </Table.Th>
-                </Table.Tr>
-              </Table.Thead>
-              <Table.Tbody style="position: relative; z-index: 1">
-                <Table.Tr
-                  v-for="(todo, index) in task_modal_facility.datas.value"
-                  :key="todo.NO"
-                  class="intro-x hover:bg-gray-200 active:bg-gray-300 cursor-pointer"
-                >
-                  <Table.Td
-                    class="first:rounded-l-md last:rounded-r-md text-center border-b-2 dark:bg-darkmode-600"
-                    :style="table_setting_facility.순번.style"
-                    @click="importFacility(todo.NO)"
-                  >
-                    <div>
+            <div
+              v-for="(todo, index) in task_modal_facility.datas.value"
+              :key="todo.NO"
+              class="mb-5 cursor-pointer"
+              @click="importFacility(todo.NO)"
+            >
+              <table class="border-2 border-gray-500 w-full">
+                <tbody class="text-center">
+                  <tr class="h-7 font-bold bg-slate-200">
+                    <td class="w-1/2 border-2 border-gray-500">순번</td>
+                    <td class="w-1/2 border-2 border-gray-500">라인</td>
+                  </tr>
+                  <tr class="h-7">
+                    <td class="border-2 border-gray-500">
                       {{
                         index +
                         1 +
                         (currentPage_facility - 1) * rowsPerPage_facility
                       }}
-                    </div>
-                  </Table.Td>
-                  <Table.Td
-                    class="first:rounded-l-md last:rounded-r-md text-center border-b-2 dark:bg-darkmode-600"
-                    :style="table_setting_facility.항목1.style"
-                    @click="importFacility(todo.NO)"
-                  >
-                    <div>{{ todo[table_setting_facility.항목1.name] }}</div>
-                  </Table.Td>
-                  <Table.Td
-                    class="first:rounded-l-md last:rounded-r-md text-center border-b-2 dark:bg-darkmode-600"
-                    :style="table_setting_facility.항목2.style"
-                    @click="importFacility(todo.NO)"
-                  >
-                    <div>{{ todo[table_setting_facility.항목2.name] }}</div>
-                  </Table.Td>
-                  <Table.Td
-                    class="first:rounded-l-md last:rounded-r-md text-center border-b-2 dark:bg-darkmode-600"
-                    :style="table_setting_facility.항목3.style"
-                    @click="importFacility(todo.NO)"
-                  >
-                    <div>{{ todo[table_setting_facility.항목3.name] }}</div>
-                  </Table.Td>
-                  <Table.Td
-                    class="first:rounded-l-md last:rounded-r-md text-center border-b-2 dark:bg-darkmode-600"
-                    :style="table_setting_facility.항목4.style"
-                    @click="importFacility(todo.NO)"
-                  >
-                    <div>{{ todo[table_setting_facility.항목4.name] }}</div>
-                  </Table.Td>
-                  <Table.Td
-                    class="first:rounded-l-md last:rounded-r-md text-center border-b-2 dark:bg-darkmode-600"
-                    :style="table_setting_facility.항목5.style"
-                    @click="importFacility(todo.NO)"
-                  >
-                    <div>{{ todo[table_setting_facility.항목5.name] }}</div>
-                  </Table.Td>
-                </Table.Tr>
-              </Table.Tbody>
-            </Table>
+                    </td>
+                    <td class="border-2 border-gray-500">
+                      {{ todo[table_setting_facility.항목1.name] }}
+                    </td>
+                  </tr>
+                  <tr class="h-7 font-bold bg-slate-200">
+                    <td class="border-2 border-gray-500">설비명</td>
+                    <td class="border-2 border-gray-500">규격</td>
+                  </tr>
+                  <tr class="h-7">
+                    <td class="border-2 border-gray-500">
+                      {{ todo[table_setting_facility.항목2.name] }}
+                    </td>
+                    <td class="border-2 border-gray-500">
+                      {{ todo[table_setting_facility.항목3.name] }}
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
             <div
               class="text-center mt-20"
               v-if="task_modal_facility.dataCount.value == 0"
@@ -2739,27 +2632,28 @@ const importNonwork = (no: any) => {
 
   <!-- BEGIN: User Modal Content -->
   <Dialog size="xxl" :open="userModal" @close="setUserModal(false)">
-    <Dialog.Panel class="p-10 text-center">
+    <Dialog.Panel class="p-5 text-center" style="top: -5%">
       <!--User Modal 내용 시작-->
-      <div class="mb-3" style="font-weight: bold; font-size: x-large">
-        작업자 리스트
-      </div>
+      <div class="mb-3 text-xl font-bold">작업자 리스트</div>
       <div class="grid grid-cols-12 gap-1 mt-1">
         <div
           class="flex flex-wrap itemlist-center col-span-12 mt-2 mb-2 intro-y sm:flex-nowrap"
         >
-          <div class="hidden mx-auto md:block text-slate-500"></div>
-          <div class="ml-2">
-            <FormSelect v-model="searchKey_user" class="w-30 mt-3 !box sm:mt-0">
-              <option>전체</option>
-              <option>거래처명</option>
-              <option>사업자번호</option>
-              <option>주소</option>
-              <option>비고</option>
-            </FormSelect>
-          </div>
-          <div class="w-full mt-3 sm:w-auto sm:mt-0 sm:ml-auto md:ml-2">
-            <div class="relative w-56 text-slate-500">
+          <div class="w-full sm:w-auto sm:mt-0 sm:ml-auto md:ml-2">
+            <div class="flex relative w-56 text-slate-500">
+              <div class="mr-3">
+                <FormSelect
+                  class="w-20 !box sm:mt-0"
+                  v-model="rowsPerPage_user"
+                  @change="pageChangeFirst_user"
+                >
+                  <option>10</option>
+                  <option>25</option>
+                  <option>50</option>
+                  <option>100</option>
+                  <option :value="task_modal_user.dataCount.value">전체</option>
+                </FormSelect>
+              </div>
               <FormInput
                 type="text"
                 class="w-56 pr-10 !box"
@@ -2782,7 +2676,7 @@ const importNonwork = (no: any) => {
               >
                 <Lucide
                   icon="Search"
-                  class="absolute inset-y-0 right-0 w-4 h-4 my-auto mr-3"
+                  class="absolute inset-y-0 -right-20 w-4 h-4 my-auto mr-3"
                 />
               </button>
             </div>
@@ -2793,51 +2687,6 @@ const importNonwork = (no: any) => {
           class="flex flex-wrap itemlist-center col-span-12 mt-0 intro-y sm:flex-nowrap"
         >
           <div>
-            <FormSelect v-model="sortKey_user" class="w-30 mt-3 !box sm:mt-0">
-              <option>등록일</option>
-              <option>거래처명</option>
-              <option>사업자번호</option>
-              <option>주소</option>
-            </FormSelect>
-          </div>
-          <div class="ml-3">
-            <Button
-              class="shadow-md"
-              as="a"
-              variant="outline-primary"
-              v-if="sortOrder_user == '오름차순'"
-              @click="sortOrderToggle_user"
-            >
-              <Lucide icon="SortAsc" class="w-4 h-4 mr-1" />
-
-              {{ sortOrder_user }}</Button
-            >
-            <Button
-              class="shadow-md"
-              as="a"
-              variant="outline-danger"
-              v-if="sortOrder_user == '내림차순'"
-              @click="sortOrderToggle_user"
-            >
-              <Lucide icon="SortDesc" class="w-4 h-4 mr-1" />
-
-              {{ sortOrder_user }}</Button
-            >
-          </div>
-          <div class="ml-5">
-            <FormSelect
-              class="w-20 mt-3 !box sm:mt-0"
-              v-model="rowsPerPage_user"
-              @change="pageChangeFirst_user"
-            >
-              <option>10</option>
-              <option>25</option>
-              <option>50</option>
-              <option>100</option>
-              <option :value="task_modal_user.dataCount.value">전체</option>
-            </FormSelect>
-          </div>
-          <div>
             <PaginationComponent
               class="pagination-component"
               v-model="currentPage_user"
@@ -2845,7 +2694,7 @@ const importNonwork = (no: any) => {
             />
           </div>
           <div class="hidden mx-auto md:block text-slate-500"></div>
-          <div>
+          <div class="mx-auto">
             <span class="mr-3"
               >[ {{ task_modal_user.dataCount }}개 데이터 조회됨 ]
             </span>
@@ -2860,108 +2709,55 @@ const importNonwork = (no: any) => {
         <!-- style="height: calc(100vh - 350px)" : 브라우저 화면 창크기에 맞게 변경됨 -->
         <div class="col-span-12 overflow-auto intro-y lg:overflow-visible">
           <div
-            class="mr-3"
-            style="overflow-y: scroll; overflow-x: hidden; height: 580px"
+            class=""
+            style="overflow-y: scroll; overflow-x: hidden; height: 395px"
           >
-            <Table class="border-spacing-y-[6px] border-separate -mt-2">
-              <Table.Thead
-                class="bg-slate-100"
-                style="position: sticky; top: 0px; z-index: 2"
-              >
-                <Table.Tr>
-                  <Table.Th
-                    class="text-center border-b-0 whitespace-nowrap"
-                    :style="table_setting_user.순번.style"
-                  >
-                    {{ table_setting_user.순번.name }}
-                  </Table.Th>
-                  <Table.Th
-                    class="text-center border-b-0 whitespace-nowrap"
-                    :style="table_setting_user.항목1.style"
-                  >
-                    {{ table_setting_user.항목1.name }}
-                  </Table.Th>
-                  <Table.Th
-                    class="text-center border-b-0 whitespace-nowrap"
-                    :style="table_setting_user.항목2.style"
-                  >
-                    {{ table_setting_user.항목2.name }}
-                  </Table.Th>
-                  <Table.Th
-                    class="text-center border-b-0 whitespace-nowrap"
-                    :style="table_setting_user.항목3.style"
-                  >
-                    {{ table_setting_user.항목3.name }}
-                  </Table.Th>
-                  <Table.Th
-                    class="text-center border-b-0 whitespace-nowrap"
-                    :style="table_setting_user.항목4.style"
-                  >
-                    {{ table_setting_user.항목4.name }}
-                  </Table.Th>
-                  <Table.Th
-                    class="text-center border-b-0 whitespace-nowrap"
-                    :style="table_setting_user.항목5.style"
-                  >
-                    {{ table_setting_user.항목5.name }}
-                  </Table.Th>
-                </Table.Tr>
-              </Table.Thead>
-              <Table.Tbody style="position: relative; z-index: 1">
-                <Table.Tr
-                  v-for="(todo, index) in task_modal_user.datas.value"
-                  :key="todo.아이디"
-                  class="intro-x hover:bg-gray-200 active:bg-gray-300 cursor-pointer"
-                >
-                  <Table.Td
-                    class="first:rounded-l-md last:rounded-r-md text-center border-b-2 dark:bg-darkmode-600"
-                    :style="table_setting_user.순번.style"
-                    @click="importUser(todo.아이디)"
-                  >
-                    <div>
+            <div
+              v-for="(todo, index) in task_modal_user.datas.value"
+              :key="todo.아이디"
+              class="mb-5 cursor-pointer"
+              @click="importUser(todo.아이디)"
+            >
+              <table class="border-2 border-gray-500 w-full">
+                <tbody class="text-center">
+                  <tr class="h-7 font-bold bg-slate-200">
+                    <td class="w-1/3 border-2 border-gray-500">순번</td>
+                    <td class="w-1/3 border-2 border-gray-500">아이디</td>
+                    <td class="w-1/3 border-2 border-gray-500">이름</td>
+                  </tr>
+                  <tr class="h-7">
+                    <td class="border-2 border-gray-500">
                       {{
                         index + 1 + (currentPage_user - 1) * rowsPerPage_user
                       }}
-                    </div>
-                  </Table.Td>
-                  <Table.Td
-                    class="first:rounded-l-md last:rounded-r-md text-center border-b-2 dark:bg-darkmode-600"
-                    :style="table_setting_user.항목1.style"
-                    @click="importUser(todo.아이디)"
-                  >
-                    <div>{{ todo[table_setting_user.항목1.name] }}</div>
-                  </Table.Td>
-                  <Table.Td
-                    class="first:rounded-l-md last:rounded-r-md text-center border-b-2 dark:bg-darkmode-600"
-                    :style="table_setting_user.항목2.style"
-                    @click="importUser(todo.아이디)"
-                  >
-                    <div>{{ todo[table_setting_user.항목2.name] }}</div>
-                  </Table.Td>
-                  <Table.Td
-                    class="first:rounded-l-md last:rounded-r-md text-center border-b-2 dark:bg-darkmode-600"
-                    :style="table_setting_user.항목3.style"
-                    @click="importUser(todo.아이디)"
-                  >
-                    <div>{{ todo[table_setting_user.항목3.name] }}</div>
-                  </Table.Td>
-                  <Table.Td
-                    class="first:rounded-l-md last:rounded-r-md text-center border-b-2 dark:bg-darkmode-600"
-                    :style="table_setting_user.항목4.style"
-                    @click="importUser(todo.아이디)"
-                  >
-                    <div>{{ todo[table_setting_user.항목4.name] }}</div>
-                  </Table.Td>
-                  <Table.Td
-                    class="first:rounded-l-md last:rounded-r-md text-center border-b-2 dark:bg-darkmode-600"
-                    :style="table_setting_user.항목5.style"
-                    @click="importUser(todo.아이디)"
-                  >
-                    <div>{{ todo[table_setting_user.항목5.name] }}</div>
-                  </Table.Td>
-                </Table.Tr>
-              </Table.Tbody>
-            </Table>
+                    </td>
+                    <td class="border-2 border-gray-500">
+                      {{ todo[table_setting_user.항목1.name] }}
+                    </td>
+                    <td class="border-2 border-gray-500">
+                      {{ todo[table_setting_user.항목2.name] }}
+                    </td>
+                  </tr>
+                  <tr class="h-7 font-bold bg-slate-200">
+                    <td class="border-2 border-gray-500">부서명</td>
+                    <td class="border-2 border-gray-500">직책</td>
+                    <td class="border-2 border-gray-500">직급</td>
+                  </tr>
+                  <tr class="h-7">
+                    <td class="border-2 border-gray-500">
+                      {{ todo[table_setting_user.항목3.name] }}
+                    </td>
+                    <td class="border-2 border-gray-500">
+                      {{ todo[table_setting_user.항목4.name] }}
+                    </td>
+                    <td class="border-2 border-gray-500">
+                      {{ todo[table_setting_user.항목5.name] }}
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+
             <div
               class="text-center mt-20"
               v-if="task_modal_user.dataCount.value == 0"
@@ -2997,30 +2793,30 @@ const importNonwork = (no: any) => {
     :open="itemProcessModal"
     @close="setItemProcessModal(false, 0)"
   >
-    <Dialog.Panel class="p-10 text-center">
+    <Dialog.Panel class="p-5 text-center" style="top: -5%">
       <!--ItemProcess Modal 내용 시작-->
-      <div class="mb-3" style="font-weight: bold; font-size: x-large">
-        품목재공현황 리스트
-      </div>
+      <div class="mb-3 font-bold text-xl">품목재공현황 리스트</div>
       <div class="grid grid-cols-12 gap-1 mt-1">
         <div
           class="flex flex-wrap itemlist-center col-span-12 mt-2 mb-2 intro-y sm:flex-nowrap"
         >
-          <div class="hidden mx-auto md:block text-slate-500"></div>
-          <div class="ml-2">
-            <FormSelect
-              v-model="searchKey_itemProcess"
-              class="w-30 mt-3 !box sm:mt-0"
-            >
-              <option>전체</option>
-              <option>거래처명</option>
-              <option>사업자번호</option>
-              <option>주소</option>
-              <option>비고</option>
-            </FormSelect>
-          </div>
-          <div class="w-full mt-3 sm:w-auto sm:mt-0 sm:ml-auto md:ml-2">
-            <div class="relative w-56 text-slate-500">
+          <div class="w-full sm:w-auto sm:mt-0 sm:ml-auto md:ml-2">
+            <div class="flex relative w-56 text-slate-500">
+              <div class="mr-3">
+                <FormSelect
+                  class="w-20 !box sm:mt-0"
+                  v-model="rowsPerPage_itemProcess"
+                  @change="pageChangeFirst_itemProcess"
+                >
+                  <option>10</option>
+                  <option>25</option>
+                  <option>50</option>
+                  <option>100</option>
+                  <option :value="task_modal_itemProcess.dataCount.value">
+                    전체
+                  </option>
+                </FormSelect>
+              </div>
               <FormInput
                 type="text"
                 class="w-56 pr-10 !box"
@@ -3043,7 +2839,7 @@ const importNonwork = (no: any) => {
               >
                 <Lucide
                   icon="Search"
-                  class="absolute inset-y-0 right-0 w-4 h-4 my-auto mr-3"
+                  class="absolute inset-y-0 -right-20 w-4 h-4 my-auto mr-3"
                 />
               </button>
             </div>
@@ -3053,65 +2849,7 @@ const importNonwork = (no: any) => {
         <div
           class="flex flex-wrap itemlist-center col-span-12 mt-0 intro-y sm:flex-nowrap"
         >
-          <div>
-            <FormSelect
-              v-model="sortKey_itemProcess"
-              class="w-30 mt-3 !box sm:mt-0"
-            >
-              <option>등록일</option>
-              <option>거래처명</option>
-              <option>사업자번호</option>
-              <option>주소</option>
-            </FormSelect>
-          </div>
-          <div class="ml-3">
-            <Button
-              class="shadow-md"
-              as="a"
-              variant="outline-primary"
-              v-if="sortOrder_itemProcess == '오름차순'"
-              @click="sortOrderToggle_itemProcess"
-            >
-              <Lucide icon="SortAsc" class="w-4 h-4 mr-1" />
-
-              {{ sortOrder_itemProcess }}</Button
-            >
-            <Button
-              class="shadow-md"
-              as="a"
-              variant="outline-danger"
-              v-if="sortOrder_itemProcess == '내림차순'"
-              @click="sortOrderToggle_itemProcess"
-            >
-              <Lucide icon="SortDesc" class="w-4 h-4 mr-1" />
-
-              {{ sortOrder_itemProcess }}</Button
-            >
-          </div>
-          <div class="ml-5">
-            <FormSelect
-              class="w-20 mt-3 !box sm:mt-0"
-              v-model="rowsPerPage_itemProcess"
-              @change="pageChangeFirst_itemProcess"
-            >
-              <option>10</option>
-              <option>25</option>
-              <option>50</option>
-              <option>100</option>
-              <option :value="task_modal_itemProcess.dataCount.value">
-                전체
-              </option>
-            </FormSelect>
-          </div>
-          <div>
-            <PaginationComponent
-              class="pagination-component"
-              v-model="currentPage_itemProcess"
-              :numberOfPages="task_modal_itemProcess.numberOfPages.value"
-            />
-          </div>
-          <div class="hidden mx-auto md:block text-slate-500"></div>
-          <div>
+          <div class="mx-auto">
             <span class="mr-3"
               >[ {{ task_modal_itemProcess.dataCount }}개 데이터 조회됨 ]
             </span>
@@ -3121,202 +2859,104 @@ const importNonwork = (no: any) => {
             >
           </div>
         </div>
+        <div>
+          <PaginationComponent
+            class="pagination-component"
+            v-model="currentPage_itemProcess"
+            :numberOfPages="task_modal_itemProcess.numberOfPages.value"
+          />
+        </div>
         <!-- END: Pagination-->
         <!-- BEGIN: Data List -->
         <!-- style="height: calc(100vh - 350px)" : 브라우저 화면 창크기에 맞게 변경됨 -->
         <div class="col-span-12 overflow-auto intro-y lg:overflow-visible">
           <div
-            class="mr-3"
-            style="overflow-y: scroll; overflow-x: hidden; height: 580px"
+            class=""
+            style="overflow-y: scroll; overflow-x: hidden; height: 395px"
           >
-            <Table class="border-spacing-y-[6px] border-separate -mt-2">
-              <Table.Thead
-                class="bg-slate-100"
-                style="position: sticky; top: 0px; z-index: 2"
-              >
-                <Table.Tr>
-                  <Table.Th
-                    class="text-center border-b-0 whitespace-nowrap"
-                    :style="table_setting_itemProcess.순번.style"
-                  >
-                    {{ table_setting_itemProcess.순번.name }}
-                  </Table.Th>
-                  <Table.Th
-                    class="text-center border-b-0 whitespace-nowrap"
-                    :style="table_setting_itemProcess.항목1.style"
-                  >
-                    {{ table_setting_itemProcess.항목1.name }}
-                  </Table.Th>
-                  <Table.Th
-                    class="text-center border-b-0 whitespace-nowrap"
-                    :style="table_setting_itemProcess.항목2.style"
-                  >
-                    {{ table_setting_itemProcess.항목2.name }}
-                  </Table.Th>
-                  <Table.Th
-                    class="text-center border-b-0 whitespace-nowrap"
-                    :style="table_setting_itemProcess.항목3.style"
-                  >
-                    {{ table_setting_itemProcess.항목3.name }}
-                  </Table.Th>
-                  <Table.Th
-                    class="text-center border-b-0 whitespace-nowrap"
-                    :style="table_setting_itemProcess.항목4.style"
-                  >
-                    {{ table_setting_itemProcess.항목4.name }}
-                  </Table.Th>
-                  <Table.Th
-                    class="text-center border-b-0 whitespace-nowrap"
-                    :style="table_setting_itemProcess.항목5.style"
-                  >
-                    {{ table_setting_itemProcess.항목5.name }}
-                  </Table.Th>
-                  <Table.Th
-                    class="text-center border-b-0 whitespace-nowrap"
-                    :style="table_setting_itemProcess.항목6.style"
-                  >
-                    {{ table_setting_itemProcess.항목6.name }}
-                  </Table.Th>
-                  <Table.Th
-                    class="text-center border-b-0 whitespace-nowrap"
-                    :style="table_setting_itemProcess.항목7.style"
-                  >
-                    {{ table_setting_itemProcess.항목7.name }}
-                  </Table.Th>
-                  <Table.Th
-                    class="text-center border-b-0 whitespace-nowrap"
-                    :style="table_setting_itemProcess.항목8.style"
-                  >
-                    {{ table_setting_itemProcess.항목8.name }}
-                  </Table.Th>
-                  <Table.Th
-                    class="text-center border-b-0 whitespace-nowrap"
-                    :style="table_setting_itemProcess.항목9.style"
-                  >
-                    {{ table_setting_itemProcess.항목9.name }}
-                  </Table.Th>
-                  <Table.Th
-                    class="text-center border-b-0 whitespace-nowrap"
-                    :style="table_setting_itemProcess.항목10.style"
-                  >
-                    {{ table_setting_itemProcess.항목10.name }}
-                  </Table.Th>
-                </Table.Tr>
-              </Table.Thead>
-              <Table.Tbody style="position: relative; z-index: 1">
-                <Table.Tr
-                  v-for="(todo, index) in task_modal_itemProcess.datas.value"
-                  :key="todo.NO"
-                  class="intro-x hover:bg-gray-200 active:bg-gray-300 cursor-pointer"
-                >
-                  <Table.Td
-                    class="first:rounded-l-md last:rounded-r-md text-center border-b-2 dark:bg-darkmode-600"
-                    :style="table_setting_itemProcess.순번.style"
-                    @click="
-                      importItemProcess(todo.작업지시공정NO, todo.LOT코드)
-                    "
-                  >
-                    <div>
+            <div
+              v-for="(todo, index) in task_modal_itemProcess.datas.value"
+              :key="todo.NO"
+              class="mb-5 cursor-pointer"
+              @click="importItemProcess(todo.작업지시공정NO, todo.LOT코드)"
+            >
+              <table class="border-2 border-gray-500 w-full">
+                <tbody class="text-center">
+                  <tr class="h-7 font-bold bg-slate-200">
+                    <td class="w-1/3 border-2 border-gray-500">순번</td>
+                    <td colspan="2" class="w-2/3 border-2 border-gray-500">
+                      작업코드
+                    </td>
+                  </tr>
+                  <tr class="h-7">
+                    <td class="border-2 border-gray-500">
                       {{
                         index +
                         1 +
                         (currentPage_itemProcess - 1) * rowsPerPage_itemProcess
                       }}
-                    </div>
-                  </Table.Td>
-                  <Table.Td
-                    class="first:rounded-l-md last:rounded-r-md text-center border-b-2 dark:bg-darkmode-600"
-                    :style="table_setting_itemProcess.항목1.style"
-                    @click="
-                      importItemProcess(todo.작업지시공정NO, todo.LOT코드)
-                    "
-                  >
-                    <div>{{ todo[table_setting_itemProcess.항목1.name] }}</div>
-                  </Table.Td>
-                  <Table.Td
-                    class="first:rounded-l-md last:rounded-r-md text-center border-b-2 dark:bg-darkmode-600"
-                    :style="table_setting_itemProcess.항목2.style"
-                    @click="
-                      importItemProcess(todo.작업지시공정NO, todo.LOT코드)
-                    "
-                  >
-                    <div>{{ todo[table_setting_itemProcess.항목2.name] }}</div>
-                  </Table.Td>
-                  <Table.Td
-                    class="first:rounded-l-md last:rounded-r-md text-center border-b-2 dark:bg-darkmode-600"
-                    :style="table_setting_itemProcess.항목3.style"
-                    @click="
-                      importItemProcess(todo.작업지시공정NO, todo.LOT코드)
-                    "
-                  >
-                    <div>{{ todo[table_setting_itemProcess.항목3.name] }}</div>
-                  </Table.Td>
-                  <Table.Td
-                    class="first:rounded-l-md last:rounded-r-md text-center border-b-2 dark:bg-darkmode-600"
-                    :style="table_setting_itemProcess.항목4.style"
-                    @click="
-                      importItemProcess(todo.작업지시공정NO, todo.LOT코드)
-                    "
-                  >
-                    <div>{{ todo[table_setting_itemProcess.항목4.name] }}</div>
-                  </Table.Td>
-                  <Table.Td
-                    class="first:rounded-l-md last:rounded-r-md text-center border-b-2 dark:bg-darkmode-600"
-                    :style="table_setting_itemProcess.항목5.style"
-                    @click="
-                      importItemProcess(todo.작업지시공정NO, todo.LOT코드)
-                    "
-                  >
-                    <div>{{ todo[table_setting_itemProcess.항목5.name] }}</div>
-                  </Table.Td>
-                  <Table.Td
-                    class="first:rounded-l-md last:rounded-r-md text-center border-b-2 dark:bg-darkmode-600"
-                    :style="table_setting_itemProcess.항목6.style"
-                    @click="
-                      importItemProcess(todo.작업지시공정NO, todo.LOT코드)
-                    "
-                  >
-                    <div>{{ todo[table_setting_itemProcess.항목6.name] }}</div>
-                  </Table.Td>
-                  <Table.Td
-                    class="first:rounded-l-md last:rounded-r-md text-center border-b-2 dark:bg-darkmode-600"
-                    :style="table_setting_itemProcess.항목7.style"
-                    @click="
-                      importItemProcess(todo.작업지시공정NO, todo.LOT코드)
-                    "
-                  >
-                    <div>{{ todo[table_setting_itemProcess.항목7.name] }}</div>
-                  </Table.Td>
-                  <Table.Td
-                    class="first:rounded-l-md last:rounded-r-md text-center border-b-2 dark:bg-darkmode-600"
-                    :style="table_setting_itemProcess.항목8.style"
-                    @click="
-                      importItemProcess(todo.작업지시공정NO, todo.LOT코드)
-                    "
-                  >
-                    <div>{{ todo[table_setting_itemProcess.항목8.name] }}</div>
-                  </Table.Td>
-                  <Table.Td
-                    class="first:rounded-l-md last:rounded-r-md text-center border-b-2 dark:bg-darkmode-600"
-                    :style="table_setting_itemProcess.항목9.style"
-                    @click="
-                      importItemProcess(todo.작업지시공정NO, todo.LOT코드)
-                    "
-                  >
-                    <div>{{ todo[table_setting_itemProcess.항목9.name] }}</div>
-                  </Table.Td>
-                  <Table.Td
-                    class="first:rounded-l-md last:rounded-r-md text-center border-b-2 dark:bg-darkmode-600"
-                    :style="table_setting_itemProcess.항목10.style"
-                    @click="
-                      importItemProcess(todo.작업지시공정NO, todo.LOT코드)
-                    "
-                  >
-                    <div>{{ todo[table_setting_itemProcess.항목10.name] }}</div>
-                  </Table.Td>
-                </Table.Tr>
-              </Table.Tbody>
-            </Table>
+                    </td>
+                    <td colspan="2" class="border-2 border-gray-500">
+                      {{ todo[table_setting_itemProcess.항목1.name] }}
+                    </td>
+                  </tr>
+                  <tr class="h-7 font-bold bg-slate-200">
+                    <td class="border-2 border-gray-500">공정</td>
+                    <td colspan="2" class="border-2 border-gray-500">
+                      LOT코드
+                    </td>
+                  </tr>
+                  <tr class="h-7">
+                    <td class="border-2 border-gray-500">
+                      {{ todo[table_setting_itemProcess.항목2.name] }}
+                    </td>
+                    <td colspan="2" class="border-2 border-gray-500">
+                      {{ todo[table_setting_itemProcess.항목3.name] }}
+                    </td>
+                  </tr>
+                  <tr class="h-7 font-bold bg-slate-200">
+                    <td class="border-2 border-gray-500">품목구분</td>
+                    <td colspan="2" class="border-2 border-gray-500">품명</td>
+                  </tr>
+                  <tr class="h-7">
+                    <td class="border-2 border-gray-500">
+                      {{ todo[table_setting_itemProcess.항목4.name] }}
+                    </td>
+                    <td colspan="2" class="border-2 border-gray-500">
+                      {{ todo[table_setting_itemProcess.항목5.name] }}
+                    </td>
+                  </tr>
+                  <tr class="h-7 font-bold bg-slate-200">
+                    <td class="border-2 border-gray-500">단위</td>
+                    <td colspan="2" class="border-2 border-gray-500">규격</td>
+                  </tr>
+                  <tr class="h-7">
+                    <td class="border-2 border-gray-500">
+                      {{ todo[table_setting_itemProcess.항목7.name] }}
+                    </td>
+                    <td colspan="2" class="border-2 border-gray-500">
+                      {{ todo[table_setting_itemProcess.항목6.name] }}
+                    </td>
+                  </tr>
+                  <tr class="h-7 font-bold bg-slate-200">
+                    <td class="border-2 border-gray-500">불출수</td>
+                    <td class="border-2 border-gray-500">사용수</td>
+                    <td class="border-2 border-gray-500">재공수</td>
+                  </tr>
+                  <tr class="h-7">
+                    <td class="border-2 border-gray-500">
+                      {{ todo[table_setting_itemProcess.항목8.name] }}
+                    </td>
+                    <td class="border-2 border-gray-500">
+                      {{ todo[table_setting_itemProcess.항목9.name] }}
+                    </td>
+                    <td class="border-2 border-gray-500">
+                      {{ todo[table_setting_itemProcess.항목10.name] }}
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
             <div
               class="text-center mt-20"
               v-if="task_modal_itemProcess.dataCount.value == 0"
@@ -3348,30 +2988,30 @@ const importNonwork = (no: any) => {
 
   <!-- BEGIN: Defect Modal Content -->
   <Dialog size="xxl" :open="defectModal" @close="setDefectModal(false, 0)">
-    <Dialog.Panel class="p-10 text-center">
+    <Dialog.Panel class="p-5 text-center" style="top: -5%">
       <!--ItemProcess Modal 내용 시작-->
-      <div class="mb-3" style="font-weight: bold; font-size: x-large">
-        불량 리스트
-      </div>
+      <div class="mb-3 font-bold text-xl">불량 리스트</div>
       <div class="grid grid-cols-12 gap-1 mt-1">
         <div
           class="flex flex-wrap itemlist-center col-span-12 mt-2 mb-2 intro-y sm:flex-nowrap"
         >
-          <div class="hidden mx-auto md:block text-slate-500"></div>
-          <div class="ml-2">
-            <FormSelect
-              v-model="searchKey_defect"
-              class="w-30 mt-3 !box sm:mt-0"
-            >
-              <option>전체</option>
-              <option>거래처명</option>
-              <option>사업자번호</option>
-              <option>주소</option>
-              <option>비고</option>
-            </FormSelect>
-          </div>
-          <div class="w-full mt-3 sm:w-auto sm:mt-0 sm:ml-auto md:ml-2">
-            <div class="relative w-56 text-slate-500">
+          <div class="w-full sm:w-auto sm:mt-0 sm:ml-auto md:ml-2">
+            <div class="flex relative w-56 text-slate-500">
+              <div class="mr-3">
+                <FormSelect
+                  class="w-20 !box sm:mt-0"
+                  v-model="rowsPerPage_defect"
+                  @change="pageChangeFirst_defect"
+                >
+                  <option>10</option>
+                  <option>25</option>
+                  <option>50</option>
+                  <option>100</option>
+                  <option :value="task_modal_defect.dataCount.value">
+                    전체
+                  </option>
+                </FormSelect>
+              </div>
               <FormInput
                 type="text"
                 class="w-56 pr-10 !box"
@@ -3394,7 +3034,7 @@ const importNonwork = (no: any) => {
               >
                 <Lucide
                   icon="Search"
-                  class="absolute inset-y-0 right-0 w-4 h-4 my-auto mr-3"
+                  class="absolute inset-y-0 -right-20 w-4 h-4 my-auto mr-3"
                 />
               </button>
             </div>
@@ -3405,51 +3045,6 @@ const importNonwork = (no: any) => {
           class="flex flex-wrap itemlist-center col-span-12 mt-0 intro-y sm:flex-nowrap"
         >
           <div>
-            <FormSelect v-model="sortKey_defect" class="w-30 mt-3 !box sm:mt-0">
-              <option>등록일</option>
-              <option>거래처명</option>
-              <option>사업자번호</option>
-              <option>주소</option>
-            </FormSelect>
-          </div>
-          <div class="ml-3">
-            <Button
-              class="shadow-md"
-              as="a"
-              variant="outline-primary"
-              v-if="sortOrder_defect == '오름차순'"
-              @click="sortOrderToggle_defect"
-            >
-              <Lucide icon="SortAsc" class="w-4 h-4 mr-1" />
-
-              {{ sortOrder_defect }}</Button
-            >
-            <Button
-              class="shadow-md"
-              as="a"
-              variant="outline-danger"
-              v-if="sortOrder_defect == '내림차순'"
-              @click="sortOrderToggle_defect"
-            >
-              <Lucide icon="SortDesc" class="w-4 h-4 mr-1" />
-
-              {{ sortOrder_defect }}</Button
-            >
-          </div>
-          <div class="ml-5">
-            <FormSelect
-              class="w-20 mt-3 !box sm:mt-0"
-              v-model="rowsPerPage_defect"
-              @change="pageChangeFirst_defect"
-            >
-              <option>10</option>
-              <option>25</option>
-              <option>50</option>
-              <option>100</option>
-              <option :value="task_modal_defect.dataCount.value">전체</option>
-            </FormSelect>
-          </div>
-          <div>
             <PaginationComponent
               class="pagination-component"
               v-model="currentPage_defect"
@@ -3457,7 +3052,7 @@ const importNonwork = (no: any) => {
             />
           </div>
           <div class="hidden mx-auto md:block text-slate-500"></div>
-          <div>
+          <div class="mx-auto">
             <span class="mr-3"
               >[ {{ task_modal_defect.dataCount }}개 데이터 조회됨 ]
             </span>
@@ -3472,110 +3067,52 @@ const importNonwork = (no: any) => {
         <!-- style="height: calc(100vh - 350px)" : 브라우저 화면 창크기에 맞게 변경됨 -->
         <div class="col-span-12 overflow-auto intro-y lg:overflow-visible">
           <div
-            class="mr-3"
-            style="overflow-y: scroll; overflow-x: hidden; height: 580px"
+            class=""
+            style="overflow-y: scroll; overflow-x: hidden; height: 395px"
           >
-            <Table class="border-spacing-y-[6px] border-separate -mt-2">
-              <Table.Thead
-                class="bg-slate-100"
-                style="position: sticky; top: 0px; z-index: 2"
-              >
-                <Table.Tr>
-                  <Table.Th
-                    class="text-center border-b-0 whitespace-nowrap"
-                    :style="table_setting_defect.순번.style"
-                  >
-                    {{ table_setting_defect.순번.name }}
-                  </Table.Th>
-                  <Table.Th
-                    class="text-center border-b-0 whitespace-nowrap"
-                    :style="table_setting_defect.항목1.style"
-                  >
-                    {{ table_setting_defect.항목1.name }}
-                  </Table.Th>
-                  <Table.Th
-                    class="text-center border-b-0 whitespace-nowrap"
-                    :style="table_setting_defect.항목2.style"
-                  >
-                    {{ table_setting_defect.항목2.name }}
-                  </Table.Th>
-                  <Table.Th
-                    class="text-center border-b-0 whitespace-nowrap"
-                    :style="table_setting_defect.항목3.style"
-                  >
-                    {{ table_setting_defect.항목3.name }}
-                  </Table.Th>
-                  <Table.Th
-                    class="text-center border-b-0 whitespace-nowrap"
-                    :style="table_setting_defect.항목4.style"
-                  >
-                    {{ table_setting_defect.항목4.name }}
-                  </Table.Th>
-                  <Table.Th
-                    class="text-center border-b-0 whitespace-nowrap"
-                    :style="table_setting_defect.항목5.style"
-                  >
-                    {{ table_setting_defect.항목5.name }}
-                  </Table.Th>
-                </Table.Tr>
-              </Table.Thead>
-              <Table.Tbody style="position: relative; z-index: 1">
-                <Table.Tr
-                  v-for="(todo, index) in task_modal_defect.datas.value"
-                  :key="todo.NO"
-                  class="intro-x hover:bg-gray-200 active:bg-gray-300 cursor-pointer"
-                >
-                  <Table.Td
-                    class="first:rounded-l-md last:rounded-r-md text-center border-b-2 dark:bg-darkmode-600"
-                    :style="table_setting_defect.순번.style"
-                    @click="importDefect(todo.NO)"
-                  >
-                    <div>
+            <div
+              v-for="(todo, index) in task_modal_defect.datas.value"
+              :key="todo.NO"
+              class="mb-5 cursor-pointer"
+              @click="importDefect(todo.NO)"
+            >
+              <table class="border-2 border-gray-500 w-full">
+                <tbody class="text-center">
+                  <tr class="h-7 font-bold bg-slate-200">
+                    <td class="border-2 border-gray-500">순번</td>
+                    <td class="border-2 border-gray-500">코드</td>
+                    <td class="border-2 border-gray-500">구분</td>
+                  </tr>
+                  <tr class="h-7">
+                    <td class="border-2 border-gray-500">
                       {{
                         index +
                         1 +
                         (currentPage_defect - 1) * rowsPerPage_defect
                       }}
-                    </div>
-                  </Table.Td>
-                  <Table.Td
-                    class="first:rounded-l-md last:rounded-r-md text-center border-b-2 dark:bg-darkmode-600"
-                    :style="table_setting_defect.항목1.style"
-                    @click="importDefect(todo.NO)"
-                  >
-                    <div>{{ todo[table_setting_defect.항목1.name] }}</div>
-                  </Table.Td>
-                  <Table.Td
-                    class="first:rounded-l-md last:rounded-r-md text-center border-b-2 dark:bg-darkmode-600"
-                    :style="table_setting_defect.항목2.style"
-                    @click="importDefect(todo.NO)"
-                  >
-                    <div>{{ todo[table_setting_defect.항목2.name] }}</div>
-                  </Table.Td>
-                  <Table.Td
-                    class="first:rounded-l-md last:rounded-r-md text-center border-b-2 dark:bg-darkmode-600"
-                    :style="table_setting_defect.항목3.style"
-                    @click="importDefect(todo.NO)"
-                  >
-                    <div>{{ todo[table_setting_defect.항목3.name] }}</div>
-                  </Table.Td>
-                  <Table.Td
-                    class="first:rounded-l-md last:rounded-r-md text-center border-b-2 dark:bg-darkmode-600"
-                    :style="table_setting_defect.항목4.style"
-                    @click="importDefect(todo.NO)"
-                  >
-                    <div>{{ todo[table_setting_defect.항목4.name] }}</div>
-                  </Table.Td>
-                  <Table.Td
-                    class="first:rounded-l-md last:rounded-r-md text-center border-b-2 dark:bg-darkmode-600"
-                    :style="table_setting_defect.항목5.style"
-                    @click="importDefect(todo.NO)"
-                  >
-                    <div>{{ todo[table_setting_defect.항목5.name] }}</div>
-                  </Table.Td>
-                </Table.Tr>
-              </Table.Tbody>
-            </Table>
+                    </td>
+                    <td class="border-2 border-gray-500">
+                      {{ todo[table_setting_defect.항목1.name] }}
+                    </td>
+                    <td class="border-2 border-gray-500">
+                      {{ todo[table_setting_defect.항목2.name] }}
+                    </td>
+                  </tr>
+                  <tr class="h-7 font-bold bg-slate-200">
+                    <td class="border-2 border-gray-500">불량명</td>
+                    <td colspan="2" class="border-2 border-gray-500">내용</td>
+                  </tr>
+                  <tr class="h-7">
+                    <td class="w-1/3 border-2 border-gray-500">
+                      {{ todo[table_setting_defect.항목3.name] }}
+                    </td>
+                    <td colspan="2" class="w-2/3 border-2 border-gray-500">
+                      {{ todo[table_setting_defect.항목4.name] }}
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
             <div
               class="text-center mt-20"
               v-if="task_modal_defect.dataCount.value == 0"
@@ -3607,30 +3144,30 @@ const importNonwork = (no: any) => {
 
   <!-- BEGIN: NonWork Modal Content -->
   <Dialog size="xxl" :open="nonworkModal" @close="setNonworkModal(false, 0)">
-    <Dialog.Panel class="p-10 text-center">
+    <Dialog.Panel class="p-5 text-center" style="top: -5%">
       <!--ItemProcess Modal 내용 시작-->
-      <div class="mb-3" style="font-weight: bold; font-size: x-large">
-        비가동 리스트
-      </div>
-      <div class="grid grid-cols-12 gap-1 mt-1">
+      <div class="mb-3 font-bold text-xl">비가동 리스트</div>
+      <div class="grid grid-cols-12 gap-1">
         <div
-          class="flex flex-wrap itemlist-center col-span-12 mt-2 mb-2 intro-y sm:flex-nowrap"
+          class="flex flex-wrap itemlist-center col-span-12 mb-2 intro-y sm:flex-nowrap"
         >
-          <div class="hidden mx-auto md:block text-slate-500"></div>
-          <div class="ml-2">
-            <FormSelect
-              v-model="searchKey_nonwork"
-              class="w-30 mt-3 !box sm:mt-0"
-            >
-              <option>전체</option>
-              <option>거래처명</option>
-              <option>사업자번호</option>
-              <option>주소</option>
-              <option>비고</option>
-            </FormSelect>
-          </div>
           <div class="w-full mt-3 sm:w-auto sm:mt-0 sm:ml-auto md:ml-2">
-            <div class="relative w-56 text-slate-500">
+            <div class="flex relative w-56 text-slate-500">
+              <div class="mr-3">
+                <FormSelect
+                  class="w-20 !box sm:mt-0"
+                  v-model="rowsPerPage_nonwork"
+                  @change="pageChangeFirst_nonwork"
+                >
+                  <option>10</option>
+                  <option>25</option>
+                  <option>50</option>
+                  <option>100</option>
+                  <option :value="task_modal_nonwork.dataCount.value">
+                    전체
+                  </option>
+                </FormSelect>
+              </div>
               <FormInput
                 type="text"
                 class="w-56 pr-10 !box"
@@ -3653,7 +3190,7 @@ const importNonwork = (no: any) => {
               >
                 <Lucide
                   icon="Search"
-                  class="absolute inset-y-0 right-0 w-4 h-4 my-auto mr-3"
+                  class="absolute inset-y-0 -right-20 w-4 h-4 my-auto mr-3"
                 />
               </button>
             </div>
@@ -3664,54 +3201,6 @@ const importNonwork = (no: any) => {
           class="flex flex-wrap itemlist-center col-span-12 mt-0 intro-y sm:flex-nowrap"
         >
           <div>
-            <FormSelect
-              v-model="sortKey_nonwork"
-              class="w-30 mt-3 !box sm:mt-0"
-            >
-              <option>등록일</option>
-              <option>거래처명</option>
-              <option>사업자번호</option>
-              <option>주소</option>
-            </FormSelect>
-          </div>
-          <div class="ml-3">
-            <Button
-              class="shadow-md"
-              as="a"
-              variant="outline-primary"
-              v-if="sortOrder_nonwork == '오름차순'"
-              @click="sortOrderToggle_nonwork"
-            >
-              <Lucide icon="SortAsc" class="w-4 h-4 mr-1" />
-
-              {{ sortOrder_nonwork }}</Button
-            >
-            <Button
-              class="shadow-md"
-              as="a"
-              variant="outline-danger"
-              v-if="sortOrder_nonwork == '내림차순'"
-              @click="sortOrderToggle_nonwork"
-            >
-              <Lucide icon="SortDesc" class="w-4 h-4 mr-1" />
-
-              {{ sortOrder_nonwork }}</Button
-            >
-          </div>
-          <div class="ml-5">
-            <FormSelect
-              class="w-20 mt-3 !box sm:mt-0"
-              v-model="rowsPerPage_nonwork"
-              @change="pageChangeFirst_nonwork"
-            >
-              <option>10</option>
-              <option>25</option>
-              <option>50</option>
-              <option>100</option>
-              <option :value="task_modal_nonwork.dataCount.value">전체</option>
-            </FormSelect>
-          </div>
-          <div>
             <PaginationComponent
               class="pagination-component"
               v-model="currentPage_nonwork"
@@ -3719,7 +3208,7 @@ const importNonwork = (no: any) => {
             />
           </div>
           <div class="hidden mx-auto md:block text-slate-500"></div>
-          <div>
+          <div class="mx-auto">
             <span class="mr-3"
               >[ {{ task_modal_nonwork.dataCount }}개 데이터 조회됨 ]
             </span>
@@ -3734,110 +3223,48 @@ const importNonwork = (no: any) => {
         <!-- style="height: calc(100vh - 350px)" : 브라우저 화면 창크기에 맞게 변경됨 -->
         <div class="col-span-12 overflow-auto intro-y lg:overflow-visible">
           <div
-            class="mr-3"
-            style="overflow-y: scroll; overflow-x: hidden; height: 580px"
+            class=""
+            style="overflow-y: scroll; overflow-x: hidden; height: 395px"
           >
-            <Table class="border-spacing-y-[6px] border-separate -mt-2">
-              <Table.Thead
-                class="bg-slate-100"
-                style="position: sticky; top: 0px; z-index: 2"
-              >
-                <Table.Tr>
-                  <Table.Th
-                    class="text-center border-b-0 whitespace-nowrap"
-                    :style="table_setting_nonwork.순번.style"
-                  >
-                    {{ table_setting_nonwork.순번.name }}
-                  </Table.Th>
-                  <Table.Th
-                    class="text-center border-b-0 whitespace-nowrap"
-                    :style="table_setting_nonwork.항목1.style"
-                  >
-                    {{ table_setting_nonwork.항목1.name }}
-                  </Table.Th>
-                  <Table.Th
-                    class="text-center border-b-0 whitespace-nowrap"
-                    :style="table_setting_nonwork.항목2.style"
-                  >
-                    {{ table_setting_nonwork.항목2.name }}
-                  </Table.Th>
-                  <Table.Th
-                    class="text-center border-b-0 whitespace-nowrap"
-                    :style="table_setting_nonwork.항목3.style"
-                  >
-                    {{ table_setting_nonwork.항목3.name }}
-                  </Table.Th>
-                  <Table.Th
-                    class="text-center border-b-0 whitespace-nowrap"
-                    :style="table_setting_nonwork.항목4.style"
-                  >
-                    {{ table_setting_nonwork.항목4.name }}
-                  </Table.Th>
-                  <Table.Th
-                    class="text-center border-b-0 whitespace-nowrap"
-                    :style="table_setting_nonwork.항목5.style"
-                  >
-                    {{ table_setting_nonwork.항목5.name }}
-                  </Table.Th>
-                </Table.Tr>
-              </Table.Thead>
-              <Table.Tbody style="position: relative; z-index: 1">
-                <Table.Tr
-                  v-for="(todo, index) in task_modal_nonwork.datas.value"
-                  :key="todo.NO"
-                  class="intro-x hover:bg-gray-200 active:bg-gray-300 cursor-pointer"
-                >
-                  <Table.Td
-                    class="first:rounded-l-md last:rounded-r-md text-center border-b-2 dark:bg-darkmode-600"
-                    :style="table_setting_nonwork.순번.style"
-                    @click="importNonwork(todo.NO)"
-                  >
-                    <div>
-                      {{
-                        index +
-                        1 +
-                        (currentPage_nonwork - 1) * rowsPerPage_nonwork
-                      }}
-                    </div>
-                  </Table.Td>
-                  <Table.Td
-                    class="first:rounded-l-md last:rounded-r-md text-center border-b-2 dark:bg-darkmode-600"
-                    :style="table_setting_nonwork.항목1.style"
-                    @click="importNonwork(todo.NO)"
-                  >
-                    <div>{{ todo[table_setting_nonwork.항목1.name] }}</div>
-                  </Table.Td>
-                  <Table.Td
-                    class="first:rounded-l-md last:rounded-r-md text-center border-b-2 dark:bg-darkmode-600"
-                    :style="table_setting_nonwork.항목2.style"
-                    @click="importNonwork(todo.NO)"
-                  >
-                    <div>{{ todo[table_setting_nonwork.항목2.name] }}</div>
-                  </Table.Td>
-                  <Table.Td
-                    class="first:rounded-l-md last:rounded-r-md text-center border-b-2 dark:bg-darkmode-600"
-                    :style="table_setting_nonwork.항목3.style"
-                    @click="importNonwork(todo.NO)"
-                  >
-                    <div>{{ todo[table_setting_nonwork.항목3.name] }}</div>
-                  </Table.Td>
-                  <Table.Td
-                    class="first:rounded-l-md last:rounded-r-md text-center border-b-2 dark:bg-darkmode-600"
-                    :style="table_setting_nonwork.항목4.style"
-                    @click="importNonwork(todo.NO)"
-                  >
-                    <div>{{ todo[table_setting_nonwork.항목4.name] }}</div>
-                  </Table.Td>
-                  <Table.Td
-                    class="first:rounded-l-md last:rounded-r-md text-center border-b-2 dark:bg-darkmode-600"
-                    :style="table_setting_nonwork.항목5.style"
-                    @click="importNonwork(todo.NO)"
-                  >
-                    <div>{{ todo[table_setting_nonwork.항목5.name] }}</div>
-                  </Table.Td>
-                </Table.Tr>
-              </Table.Tbody>
-            </Table>
+            <div
+              v-for="(todo, index) in task_modal_nonwork.datas.value"
+              :key="todo.NO"
+              class="mb-5 cursor-pointer"
+              @click="importNonwork(todo.NO)"
+            >
+              <table class="border-2 border-gray-500 w-full">
+                <tbody class="text-center">
+                  <tr class="h-7 font-bold bg-slate-200">
+                    <td class="border-2 border-gray-500">순번</td>
+                    <td class="border-2 border-gray-500">코드</td>
+                    <td class="border-2 border-gray-500">구분</td>
+                  </tr>
+                  <tr class="h-7">
+                    <td class="border-2 border-gray-500">
+                      {{ index + 1 + (currentPage - 1) * rowsPerPage }}
+                    </td>
+                    <td class="border-2 border-gray-500">
+                      {{ todo[table_setting_nonwork.항목1.name] }}
+                    </td>
+                    <td class="border-2 border-gray-500">
+                      {{ todo[table_setting_nonwork.항목2.name] }}
+                    </td>
+                  </tr>
+                  <tr class="h-7 font-bold bg-slate-200">
+                    <td class="border-2 border-gray-500">비가동명</td>
+                    <td colspan="2" class="border-2 border-gray-500">내용</td>
+                  </tr>
+                  <tr class="h-7">
+                    <td class="w-1/3 border-2 border-gray-500">
+                      {{ todo[table_setting_nonwork.항목3.name] }}
+                    </td>
+                    <td colspan="2" class="w-2/3 border-2 border-gray-500">
+                      {{ todo[table_setting_nonwork.항목4.name] }}
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
             <div
               class="text-center mt-20"
               v-if="task_modal_nonwork.dataCount.value == 0"

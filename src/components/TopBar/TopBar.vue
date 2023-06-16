@@ -191,6 +191,9 @@ const setDebugMode = () => {
         <Breadcrumb.Link v-if="$route.meta.category != undefined">
           {{ $route.meta.category }}
         </Breadcrumb.Link>
+        <Breadcrumb.Link v-if="$route.meta.category_sub != undefined">
+          {{ $route.meta.category_sub }}
+        </Breadcrumb.Link>
         <Breadcrumb.Link>
           {{ $route.meta.pagename }}
         </Breadcrumb.Link>

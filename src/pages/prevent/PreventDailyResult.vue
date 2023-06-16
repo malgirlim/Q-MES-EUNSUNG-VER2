@@ -1,6 +1,5 @@
 <script setup lang="ts">
 import { ref, Ref, onMounted, watch, getCurrentInstance } from "vue";
-import router from "../../router";
 import Button from "../../base-components/Button";
 import {
   FormInput,
@@ -34,7 +33,7 @@ import { ProductionResult } from "../../interfaces/menu/productionInterface";
 import MasterDetail from "../../components/Common/Detail/MasterClientDetail.vue";
 
 const { proxy }: any = getCurrentInstance();
-const user_level = proxy.gstate.level.MonitoringFacilityRepair; //권한레벨
+const user_level = proxy.gstate.level.PreventDailyResult; //권한레벨
 
 // 페이지 로딩 시 시작
 onMounted(async () => {
@@ -49,8 +48,8 @@ const pageChangeFirst = () => {
 };
 
 // dataManager 만들기
-const url = "/api/monitor/repair";
-const dataManager = useSendApi<MonitorRepair>(url, currentPage, rowsPerPage);
+const url = "/api/monitor/daily";
+const dataManager = useSendApi<MonitorDaily>(url, currentPage, rowsPerPage);
 
 // 테이블항목 설정 및 가로크기 조정
 const table_setting = {
@@ -60,12 +59,14 @@ const table_setting = {
   항목2: { name: "설비명", style: "width: 50px; text-align: center;" },
   항목3: { name: "구분", style: "width: 50px; text-align: center;" },
   항목4: { name: "내용", style: "width: 50px; text-align: center;" },
-  항목5: { name: "수리방법", style: "width: 50px; text-align: center;" },
+  항목5: { name: "검사방법", style: "width: 50px; text-align: center;" },
   항목6: { name: "기준", style: "width: 50px; text-align: center;" },
-  항목7: { name: "담당자", style: "width: 50px; text-align: center;" },
-  항목8: { name: "결과내용", style: "width: 50px; text-align: center;" },
-  항목9: { name: "결과", style: "width: 50px; text-align: center;" },
-  항목10: { name: "금액", style: "width: 50px; text-align: center;" },
+  항목7: { name: "단위", style: "width: 50px; text-align: center;" },
+  항목8: { name: "최소", style: "width: 50px; text-align: center;" },
+  항목9: { name: "최대", style: "width: 50px; text-align: center;" },
+  항목10: { name: "담당자", style: "width: 50px; text-align: center;" },
+  항목11: { name: "결과내용", style: "width: 50px; text-align: center;" },
+  항목12: { name: "결과", style: "width: 50px; text-align: center;" },
   상세보기: { name: "정보", style: "width: 50px; text-align: center;" },
   편집: { name: "편집", style: "width: 50px; text-align: center;" },
 };
@@ -183,7 +184,7 @@ const insert_check = () => {
 
 // ########################## 등록, 수정, 삭제, 상세 Modal ##########################
 // ##### 등록 Modal #####
-let insertModalData: MonitorRepair;
+let insertModalData: MonitorDaily;
 const insertModal = ref(false);
 const setInsertModal = (value: boolean) => {
   if (user_level >= 3) {
@@ -223,7 +224,7 @@ const setEditModal = (value: boolean) => {
     toast.warning("액세스 권한이 없습니다.\n관리자에게 문의하세요.");
   }
 };
-let editModalData: MonitorRepair; // 수정할 변수
+let editModalData: MonitorDaily; // 수정할 변수
 // 수정버튼 누르면 실행되는 함수
 const editDataFunction = async () => {
   await dataManager.editData(editModalData); // await : 이 함수가 끝나야 다음으로 넘어간다
@@ -398,19 +399,6 @@ const onFileImport = (event: any) => {
         >
           <Lucide icon="FilePlus" class="w-4 h-4 mr-2" />
           등록
-        </Button> -->
-        <Button
-          class="mr-3 shadow-md"
-          as="a"
-          variant="linkedin"
-          @click="
-            () => {
-              router.push('/prevent/repair-plan');
-            }
-          "
-        >
-          <Lucide icon="ExternalLink" class="w-4 h-4 mr-2" />
-          설비수리등록
         </Button>
         <Button
           class="mr-2 shadow-md"
@@ -423,7 +411,7 @@ const onFileImport = (event: any) => {
           "
         >
           <Lucide icon="Trash2" class="w-4 h-4 mr-2" /> 삭제</Button
-        >
+        > -->
         <div class="hidden mx-auto md:block text-slate-500"></div>
         <div class="mr-5">
           <a href="" class="flex items-center ml-auto text-primary">
@@ -473,13 +461,15 @@ const onFileImport = (event: any) => {
             <option>설비명</option>
             <option>구분</option>
             <option>내용</option>
-            <option>수리방법</option>
+            <option>검사방법</option>
             <option>기준</option>
+            <option>단위</option>
+            <option>최소</option>
+            <option>최대</option>
             <option>담당자</option>
             <option>결과내용</option>
             <option>결과</option>
-            <option>금액</option>
-            <option>비고</option>
+            <option>등록일시</option>
           </FormSelect>
         </div>
         <div class="w-full mt-3 sm:w-auto sm:mt-0 sm:ml-auto md:ml-2">
@@ -545,13 +535,15 @@ const onFileImport = (event: any) => {
             <option>설비명</option>
             <option>구분</option>
             <option>내용</option>
-            <option>수리방법</option>
+            <option>검사방법</option>
             <option>기준</option>
+            <option>단위</option>
+            <option>최소</option>
+            <option>최대</option>
             <option>담당자</option>
             <option>결과내용</option>
             <option>결과</option>
-            <option>금액</option>
-            <option>비고</option>
+            <option>등록일시</option>
           </FormSelect>
         </div>
         <div class="ml-3">
@@ -623,7 +615,7 @@ const onFileImport = (event: any) => {
               style="position: sticky; top: 0px; z-index: 2"
             >
               <Table.Tr>
-                <Table.Th
+                <!-- <Table.Th
                   class="text-center border-b-0 whitespace-nowrap"
                   id="checkbox"
                   :style="table_setting.체크박스.style"
@@ -640,7 +632,7 @@ const onFileImport = (event: any) => {
                       }
                     "
                   />
-                </Table.Th>
+                </Table.Th> -->
                 <Table.Th
                   class="text-center border-b-0 whitespace-nowrap font-bold"
                   :style="table_setting.순번.style"
@@ -707,6 +699,18 @@ const onFileImport = (event: any) => {
                 >
                   {{ table_setting.항목10.name }}
                 </Table.Th>
+                <Table.Th
+                  class="text-center border-b-0 whitespace-nowrap font-bold"
+                  :style="table_setting.항목11.style"
+                >
+                  {{ table_setting.항목11.name }}
+                </Table.Th>
+                <Table.Th
+                  class="text-center border-b-0 whitespace-nowrap font-bold"
+                  :style="table_setting.항목12.style"
+                >
+                  {{ table_setting.항목12.name }}
+                </Table.Th>
                 <!-- <Table.Th
                   class="text-center border-b-0 whitespace-nowrap font-bold"
                   :style="table_setting.상세보기.style"
@@ -727,7 +731,7 @@ const onFileImport = (event: any) => {
                 :key="todo.NO"
                 class="intro-x"
               >
-                <Table.Td
+                <!-- <Table.Td
                   class="first:rounded-l-md last:rounded-r-md text-center bg-white border-b-0 dark:bg-darkmode-600 shadow-[20px_3px_20px_#0000000b]"
                   id="checkbox"
                   :style="table_setting.체크박스.style"
@@ -739,7 +743,7 @@ const onFileImport = (event: any) => {
                     :value="todo.NO"
                     v-model="checkDebug"
                   />
-                </Table.Td>
+                </Table.Td> -->
                 <Table.Td
                   class="first:rounded-l-md last:rounded-r-md text-center bg-white border-b-0 dark:bg-darkmode-600 shadow-[20px_3px_20px_#0000000b]"
                   :style="table_setting.순번.style"
@@ -806,6 +810,20 @@ const onFileImport = (event: any) => {
                 >
                   <div>{{ todo[table_setting.항목10.name] }}</div>
                 </Table.Td>
+                <Table.Td
+                  class="first:rounded-l-md last:rounded-r-md text-center bg-white border-b-0 dark:bg-darkmode-600 shadow-[20px_3px_20px_#0000000b]"
+                  :style="table_setting.항목11.style"
+                >
+                  <div>{{ todo[table_setting.항목11.name] }}</div>
+                </Table.Td>
+                <Table.Td
+                  class="first:rounded-l-md last:rounded-r-md text-center bg-white border-b-0 dark:bg-darkmode-600 shadow-[20px_3px_20px_#0000000b]"
+                  :style="table_setting.항목12.style"
+                >
+                  <div>
+                    {{ todo[table_setting.항목12.name] }}
+                  </div>
+                </Table.Td>
                 <!-- <Table.Td
                   class="first:rounded-l-md last:rounded-r-md text-center bg-white border-b-0 dark:bg-darkmode-600 shadow-[20px_3px_20px_#0000000b] py-0 relative before:block before:w-px before:h-8 before:bg-slate-200 before:absolute before:left-0 before:inset-y-0 before:my-auto before:dark:bg-darkmode-400"
                   :style="table_setting.상세보기.style"
@@ -830,7 +848,13 @@ const onFileImport = (event: any) => {
                   class="first:rounded-l-md last:rounded-r-md text-center bg-white border-b-0 dark:bg-darkmode-600 shadow-[20px_3px_20px_#0000000b] py-0 relative before:block before:w-px before:h-8 before:bg-slate-200 before:absolute before:left-0 before:inset-y-0 before:my-auto before:dark:bg-darkmode-400"
                   :style="table_setting.편집.style"
                 >
-                  <div class="flex items-center justify-center text-danger">
+                  <div
+                    v-if="
+                      dayjs(todo.등록일시).format('YYYY-MM-DD') ==
+                      dayjs().format('YYYY-MM-DD')
+                    "
+                    class="flex items-center justify-center text-danger"
+                  >
                     <a
                       class="flex items-center mr-3"
                       href="#"
@@ -1117,11 +1141,11 @@ const onFileImport = (event: any) => {
                 />
               </div>
               <div class="mt-3">
-                <FormLabel htmlFor="vertical-form-1">수리방법</FormLabel>
+                <FormLabel htmlFor="vertical-form-1">검사방법</FormLabel>
                 <FormInput
                   id="vertical-form-1"
                   type="text"
-                  v-model="editModalData.수리방법"
+                  v-model="editModalData.검사방법"
                   placeholder=""
                   readonly
                 />
@@ -1137,11 +1161,30 @@ const onFileImport = (event: any) => {
                 />
               </div>
               <div class="mt-3">
-                <FormLabel htmlFor="vertical-form-1">담당자</FormLabel>
+                <FormLabel htmlFor="vertical-form-1">단위</FormLabel>
                 <FormInput
                   id="vertical-form-1"
                   type="text"
-                  v-model="editModalData.담당자"
+                  v-model="editModalData.단위"
+                  placeholder=""
+                  readonly
+                />
+              </div>
+              <div class="mt-3">
+                <FormLabel htmlFor="vertical-form-2">최소</FormLabel>
+                <FormInput
+                  id="vertical-form-2"
+                  type="text"
+                  v-model="editModalData.최소"
+                  placeholder=""
+                  readonly
+                />
+              </div>
+              <div class="mt-3">
+                <FormLabel htmlFor="vertical-form-5">최대</FormLabel>
+                <FormInput
+                  type="text"
+                  v-model="editModalData.최대"
                   placeholder=""
                   readonly
                 />
@@ -1154,20 +1197,20 @@ const onFileImport = (event: any) => {
                   placeholder=""
                 />
               </div>
-              <div class="mt-3">
+              <div v-if="editModalData.검사방법 == '육안검사'" class="mt-3">
+                <FormLabel htmlFor="vertical-form-11">결과</FormLabel>
+                <FormSelect v-model="editModalData.결과" class="">
+                  <option selected>양호</option>
+                  <option>점검필요</option>
+                  <option>불량</option>
+                </FormSelect>
+              </div>
+              <div v-if="editModalData.검사방법 == '치수검사'" class="mt-3">
                 <FormLabel htmlFor="vertical-form-11">결과</FormLabel>
                 <FormSelect v-model="editModalData.결과" class="">
                   <option selected>적합</option>
                   <option>부적합</option>
                 </FormSelect>
-              </div>
-              <div class="mt-3">
-                <FormLabel htmlFor="vertical-form-6">금액</FormLabel>
-                <FormInput
-                  type="number"
-                  v-model="editModalData.금액"
-                  placeholder=""
-                />
               </div>
             </div>
           </Tab.Panel>

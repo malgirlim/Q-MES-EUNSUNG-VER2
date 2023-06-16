@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { ref, Ref, onMounted, watch, getCurrentInstance } from "vue";
+import router from "../../router";
 import Button from "../../base-components/Button";
 import {
   FormInput,
@@ -33,7 +34,7 @@ import { ProductionResult } from "../../interfaces/menu/productionInterface";
 import MasterDetail from "../../components/Common/Detail/MasterClientDetail.vue";
 
 const { proxy }: any = getCurrentInstance();
-const user_level = proxy.gstate.level.MonitoringDaily; //권한레벨
+const user_level = proxy.gstate.level.PreventResult; //권한레벨
 
 // 페이지 로딩 시 시작
 onMounted(async () => {
@@ -48,8 +49,8 @@ const pageChangeFirst = () => {
 };
 
 // dataManager 만들기
-const url = "/api/monitor/daily";
-const dataManager = useSendApi<MonitorDaily>(url, currentPage, rowsPerPage);
+const url = "/api/monitor/prevent";
+const dataManager = useSendApi<MonitorPrevent>(url, currentPage, rowsPerPage);
 
 // 테이블항목 설정 및 가로크기 조정
 const table_setting = {
@@ -184,7 +185,7 @@ const insert_check = () => {
 
 // ########################## 등록, 수정, 삭제, 상세 Modal ##########################
 // ##### 등록 Modal #####
-let insertModalData: MonitorDaily;
+let insertModalData: MonitorPrevent;
 const insertModal = ref(false);
 const setInsertModal = (value: boolean) => {
   if (user_level >= 3) {
@@ -224,7 +225,7 @@ const setEditModal = (value: boolean) => {
     toast.warning("액세스 권한이 없습니다.\n관리자에게 문의하세요.");
   }
 };
-let editModalData: MonitorDaily; // 수정할 변수
+let editModalData: MonitorPrevent; // 수정할 변수
 // 수정버튼 누르면 실행되는 함수
 const editDataFunction = async () => {
   await dataManager.editData(editModalData); // await : 이 함수가 끝나야 다음으로 넘어간다
@@ -399,6 +400,19 @@ const onFileImport = (event: any) => {
         >
           <Lucide icon="FilePlus" class="w-4 h-4 mr-2" />
           등록
+        </Button> -->
+        <Button
+          class="mr-3 shadow-md"
+          as="a"
+          variant="linkedin"
+          @click="
+            () => {
+              router.push('/prevent/plan');
+            }
+          "
+        >
+          <Lucide icon="ExternalLink" class="w-4 h-4 mr-2" />
+          예방보전등록
         </Button>
         <Button
           class="mr-2 shadow-md"
@@ -411,7 +425,7 @@ const onFileImport = (event: any) => {
           "
         >
           <Lucide icon="Trash2" class="w-4 h-4 mr-2" /> 삭제</Button
-        > -->
+        >
         <div class="hidden mx-auto md:block text-slate-500"></div>
         <div class="mr-5">
           <a href="" class="flex items-center ml-auto text-primary">
@@ -615,7 +629,7 @@ const onFileImport = (event: any) => {
               style="position: sticky; top: 0px; z-index: 2"
             >
               <Table.Tr>
-                <!-- <Table.Th
+                <Table.Th
                   class="text-center border-b-0 whitespace-nowrap"
                   id="checkbox"
                   :style="table_setting.체크박스.style"
@@ -632,7 +646,7 @@ const onFileImport = (event: any) => {
                       }
                     "
                   />
-                </Table.Th> -->
+                </Table.Th>
                 <Table.Th
                   class="text-center border-b-0 whitespace-nowrap font-bold"
                   :style="table_setting.순번.style"
@@ -728,10 +742,10 @@ const onFileImport = (event: any) => {
             <Table.Tbody style="position: relative; z-index: 1">
               <Table.Tr
                 v-for="(todo, index) in dataManager.datas.value"
-                :key="todo.NO"
+                :key="todo.LOT코드"
                 class="intro-x"
               >
-                <!-- <Table.Td
+                <Table.Td
                   class="first:rounded-l-md last:rounded-r-md text-center bg-white border-b-0 dark:bg-darkmode-600 shadow-[20px_3px_20px_#0000000b]"
                   id="checkbox"
                   :style="table_setting.체크박스.style"
@@ -743,7 +757,7 @@ const onFileImport = (event: any) => {
                     :value="todo.NO"
                     v-model="checkDebug"
                   />
-                </Table.Td> -->
+                </Table.Td>
                 <Table.Td
                   class="first:rounded-l-md last:rounded-r-md text-center bg-white border-b-0 dark:bg-darkmode-600 shadow-[20px_3px_20px_#0000000b]"
                   :style="table_setting.순번.style"
@@ -820,9 +834,7 @@ const onFileImport = (event: any) => {
                   class="first:rounded-l-md last:rounded-r-md text-center bg-white border-b-0 dark:bg-darkmode-600 shadow-[20px_3px_20px_#0000000b]"
                   :style="table_setting.항목12.style"
                 >
-                  <div>
-                    {{ todo[table_setting.항목12.name] }}
-                  </div>
+                  <div>{{ todo[table_setting.항목12.name] }}</div>
                 </Table.Td>
                 <!-- <Table.Td
                   class="first:rounded-l-md last:rounded-r-md text-center bg-white border-b-0 dark:bg-darkmode-600 shadow-[20px_3px_20px_#0000000b] py-0 relative before:block before:w-px before:h-8 before:bg-slate-200 before:absolute before:left-0 before:inset-y-0 before:my-auto before:dark:bg-darkmode-400"
@@ -848,13 +860,7 @@ const onFileImport = (event: any) => {
                   class="first:rounded-l-md last:rounded-r-md text-center bg-white border-b-0 dark:bg-darkmode-600 shadow-[20px_3px_20px_#0000000b] py-0 relative before:block before:w-px before:h-8 before:bg-slate-200 before:absolute before:left-0 before:inset-y-0 before:my-auto before:dark:bg-darkmode-400"
                   :style="table_setting.편집.style"
                 >
-                  <div
-                    v-if="
-                      dayjs(todo.등록일시).format('YYYY-MM-DD') ==
-                      dayjs().format('YYYY-MM-DD')
-                    "
-                    class="flex items-center justify-center text-danger"
-                  >
+                  <div class="flex items-center justify-center text-danger">
                     <a
                       class="flex items-center mr-3"
                       href="#"

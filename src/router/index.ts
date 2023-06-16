@@ -112,25 +112,31 @@ import MonitoringKPIOEE from "../pages/monitoring/MonitoringKPIOEE.vue";
 import MonitoringKPIFacilityRate from "../pages/monitoring/MonitoringKPIFacilityRate.vue";
 import MonitoringKPIBadRate from "../pages/monitoring/MonitoringKPIBadRate.vue";
 import MonitoringKPIManHour from "../pages/monitoring/MonitoringKPIManHour.vue";
-import MonitoringDaily from "../pages/monitoring/MonitoringDaily.vue";
-import MonitoringPrevent from "../pages/monitoring/MonitoringPrevent.vue";
-import MonitoringFacilityRepair from "../pages/monitoring/MonitoringFacilityRepair.vue";
 import MonitoringMTBF from "../pages/monitoring/MonitoringMTBF.vue";
 import MonitoringMTTR from "../pages/monitoring/MonitoringMTTR.vue";
 import MonitoringOEE from "../pages/monitoring/MonitoringOEE.vue";
 
 /* 예방보전 */
+/* - 예방보전 */
 import PreventPlan from "../pages/prevent/PreventPlan.vue";
-import PreventDailyPlan from "../pages/prevent/PreventDailyPlan.vue";
-import PreventRepairPlan from "../pages/prevent/PreventRepairPlan.vue";
-import PreventLifePlan from "../pages/prevent/PreventLifePlan.vue";
+import PreventResult from "../pages/prevent/PreventResult.vue";
 import PreventForecast from "../pages/prevent/PreventForecast.vue";
 import PreventNotice from "../pages/prevent/PreventNotice.vue";
-import PreventErrorNotify from "../pages/prevent/PreventErrorNotify.vue";
+/* - 일상점검 */
+import PreventDailyPlan from "../pages/prevent/PreventDailyPlan.vue";
+import PreventDailyResult from "../pages/prevent/PreventDailyResult.vue";
 import PreventDailyNotify from "../pages/prevent/PreventDailyNotify.vue";
+/* - 설비수리 */
+import PreventRepairPlan from "../pages/prevent/PreventRepairPlan.vue";
+import PreventRepairResult from "../pages/prevent/PreventRepairResult.vue";
 import PreventRepairForecast from "../pages/prevent/PreventRepairForecast.vue";
 import PreventRepairNotify from "../pages/prevent/PreventRepairNotify.vue";
+/* - 설비부품 */
+import PreventLifePlan from "../pages/prevent/PreventLifePlan.vue";
 import PreventChangeNotify from "../pages/prevent/PreventChangeNotify.vue";
+/* - 설비고장 */
+import PreventErrorNotify from "../pages/prevent/PreventErrorNotify.vue";
+import PreventErrorList from "../pages/prevent/PreventErrorList.vue";
 
 /* 관리자메뉴 */
 import AdminLog from "../pages/admin/AdminLog.vue";
@@ -622,6 +628,7 @@ const routes = [
         meta: {
           pagename: "원부자재 입고",
           category: "재고관리",
+          category_sub: "원부자재",
         },
         component: StockReceiveRaw,
       },
@@ -631,6 +638,7 @@ const routes = [
         meta: {
           pagename: "원부자재 불출",
           category: "재고관리",
+          category_sub: "원부자재",
         },
         component: StockWIPRaw,
       },
@@ -640,6 +648,7 @@ const routes = [
         meta: {
           pagename: "원부자재 재공현황",
           category: "재고관리",
+          category_sub: "원부자재",
         },
         component: StockWIPMonitorRaw,
       },
@@ -649,6 +658,7 @@ const routes = [
         meta: {
           pagename: "원부자재 사용",
           category: "재고관리",
+          category_sub: "원부자재",
         },
         component: StockUseRaw,
       },
@@ -658,6 +668,7 @@ const routes = [
         meta: {
           pagename: "원부자재 재고현황",
           category: "재고관리",
+          category_sub: "원부자재",
         },
         component: StockMonitorRaw,
       },
@@ -667,6 +678,7 @@ const routes = [
         meta: {
           pagename: "반제품 입고",
           category: "재고관리",
+          category_sub: "반제품",
         },
         component: StockReceiveHalf,
       },
@@ -676,6 +688,7 @@ const routes = [
         meta: {
           pagename: "반제품 불출",
           category: "재고관리",
+          category_sub: "반제품",
         },
         component: StockWIPHalf,
       },
@@ -685,6 +698,7 @@ const routes = [
         meta: {
           pagename: "반제품 재공현황",
           category: "재고관리",
+          category_sub: "반제품",
         },
         component: StockWIPMonitorHalf,
       },
@@ -694,6 +708,7 @@ const routes = [
         meta: {
           pagename: "반제품 사용",
           category: "재고관리",
+          category_sub: "반제품",
         },
         component: StockUseHalf,
       },
@@ -703,6 +718,7 @@ const routes = [
         meta: {
           pagename: "반제품 재고현황",
           category: "재고관리",
+          category_sub: "반제품",
         },
         component: StockMonitorHalf,
       },
@@ -712,6 +728,7 @@ const routes = [
         meta: {
           pagename: "완제품 입고",
           category: "재고관리",
+          category_sub: "완제품",
         },
         component: StockReceiveFinish,
       },
@@ -721,6 +738,7 @@ const routes = [
         meta: {
           pagename: "완제품 재고현황",
           category: "재고관리",
+          category_sub: "완제품",
         },
         component: StockMonitorFinish,
       },
@@ -730,6 +748,7 @@ const routes = [
         meta: {
           pagename: "설비부품 입고등록",
           category: "재고관리",
+          category_sub: "설비부품",
         },
         component: StockReceiveParts,
       },
@@ -739,6 +758,7 @@ const routes = [
         meta: {
           pagename: "설비부품 출고등록",
           category: "재고관리",
+          category_sub: "설비부품",
         },
         component: StockUseParts,
       },
@@ -748,6 +768,7 @@ const routes = [
         meta: {
           pagename: "설비부품 재고현황",
           category: "재고관리",
+          category_sub: "설비부품",
         },
         component: StockMonitorParts,
       },
@@ -887,33 +908,6 @@ const routes = [
         component: MonitoringKPIManHour,
       },
       {
-        path: "monitoring/daily",
-        name: "top-menu-monitoring-daily",
-        meta: {
-          pagename: "설비 일상점검 현황",
-          category: "모니터링",
-        },
-        component: MonitoringDaily,
-      },
-      {
-        path: "monitoring/prevent",
-        name: "top-menu-monitoring-prevent",
-        meta: {
-          pagename: "설비 예방보전 현황",
-          category: "모니터링",
-        },
-        component: MonitoringPrevent,
-      },
-      {
-        path: "monitoring/facility-repair",
-        name: "top-menu-monitoring-facility-repair",
-        meta: {
-          pagename: "설비 수리 현황",
-          category: "모니터링",
-        },
-        component: MonitoringFacilityRepair,
-      },
-      {
         path: "monitoring/mtbf",
         name: "top-menu-monitoring-mtbf",
         meta: {
@@ -944,37 +938,21 @@ const routes = [
         path: "prevent/plan",
         name: "top-menu-prevent-plan",
         meta: {
-          pagename: "예방보전계획",
+          pagename: "예방보전 계획",
           category: "예방보전",
+          category_sub: "예방보전",
         },
         component: PreventPlan,
       },
       {
-        path: "prevent/daily-plan",
-        name: "top-menu-prevent-daily-plan",
+        path: "prevent/result",
+        name: "top-menu-prevent-result",
         meta: {
-          pagename: "일상점검계획",
+          pagename: "예방보전 결과",
           category: "예방보전",
+          category_sub: "예방보전",
         },
-        component: PreventDailyPlan,
-      },
-      {
-        path: "prevent/repair-plan",
-        name: "top-menu-prevent-repair-plan",
-        meta: {
-          pagename: "설비수리계획",
-          category: "예방보전",
-        },
-        component: PreventRepairPlan,
-      },
-      {
-        path: "prevent/life-plan",
-        name: "top-menu-prevent-life-plan",
-        meta: {
-          pagename: "설비부품수명계획",
-          category: "예방보전",
-        },
-        component: PreventLifePlan,
+        component: PreventResult,
       },
       {
         path: "prevent/forecast",
@@ -982,6 +960,7 @@ const routes = [
         meta: {
           pagename: "예방보전 예보",
           category: "예방보전",
+          category_sub: "예방보전",
         },
         component: PreventForecast,
       },
@@ -991,17 +970,29 @@ const routes = [
         meta: {
           pagename: "예방보전 통보",
           category: "예방보전",
+          category_sub: "예방보전",
         },
         component: PreventNotice,
       },
       {
-        path: "prevent/error-notify",
-        name: "top-menu-prevent-error-notify",
+        path: "prevent/daily-plan",
+        name: "top-menu-prevent-daily-plan",
         meta: {
-          pagename: "설비고장발생 통보",
+          pagename: "일상점검 계획",
           category: "예방보전",
+          category_sub: "일상점검",
         },
-        component: PreventErrorNotify,
+        component: PreventDailyPlan,
+      },
+      {
+        path: "prevent/daily-result",
+        name: "top-menu-prevent-daily-result",
+        meta: {
+          pagename: "일상점검 결과",
+          category: "예방보전",
+          category_sub: "일상점검",
+        },
+        component: PreventDailyResult,
       },
       {
         path: "prevent/daily-notify",
@@ -1009,8 +1000,29 @@ const routes = [
         meta: {
           pagename: "일상점검 확인통보",
           category: "예방보전",
+          category_sub: "일상점검",
         },
         component: PreventDailyNotify,
+      },
+      {
+        path: "prevent/repair-plan",
+        name: "top-menu-prevent-repair-plan",
+        meta: {
+          pagename: "설비수리 계획",
+          category: "예방보전",
+          category_sub: "설비수리",
+        },
+        component: PreventRepairPlan,
+      },
+      {
+        path: "prevent/repair-result",
+        name: "top-menu-prevent-repair-result",
+        meta: {
+          pagename: "설비수리 결과",
+          category: "예방보전",
+          category_sub: "설비수리",
+        },
+        component: PreventRepairResult,
       },
       {
         path: "prevent/repair-forecast",
@@ -1018,6 +1030,7 @@ const routes = [
         meta: {
           pagename: "설비수리 예보",
           category: "예방보전",
+          category_sub: "설비수리",
         },
         component: PreventRepairForecast,
       },
@@ -1027,8 +1040,19 @@ const routes = [
         meta: {
           pagename: "설비수리 통보",
           category: "예방보전",
+          category_sub: "설비수리",
         },
         component: PreventRepairNotify,
+      },
+      {
+        path: "prevent/life-plan",
+        name: "top-menu-prevent-life-plan",
+        meta: {
+          pagename: "설비부품 수명계획",
+          category: "예방보전",
+          category_sub: "설비부품",
+        },
+        component: PreventLifePlan,
       },
       {
         path: "prevent/change-notify",
@@ -1036,8 +1060,29 @@ const routes = [
         meta: {
           pagename: "설비부품 교체시기 통보",
           category: "예방보전",
+          category_sub: "설비부품",
         },
         component: PreventChangeNotify,
+      },
+      {
+        path: "prevent/error-list",
+        name: "top-menu-prevent-error-list",
+        meta: {
+          pagename: "설비고장 내역",
+          category: "예방보전",
+          category_sub: "설비고장",
+        },
+        component: PreventErrorList,
+      },
+      {
+        path: "prevent/error-notify",
+        name: "top-menu-prevent-error-notify",
+        meta: {
+          pagename: "설비고장발생 통보",
+          category: "예방보전",
+          category_sub: "설비고장",
+        },
+        component: PreventErrorNotify,
       },
       {
         path: "admin/log",
