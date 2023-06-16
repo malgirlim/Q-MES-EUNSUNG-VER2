@@ -112,6 +112,7 @@ import MonitoringKPIOEE from "../pages/monitoring/MonitoringKPIOEE.vue";
 import MonitoringKPIFacilityRate from "../pages/monitoring/MonitoringKPIFacilityRate.vue";
 import MonitoringKPIBadRate from "../pages/monitoring/MonitoringKPIBadRate.vue";
 import MonitoringKPIManHour from "../pages/monitoring/MonitoringKPIManHour.vue";
+import MonitoringKPIProductHour from "../pages/monitoring/MonitoringKPIProductHour.vue";
 import MonitoringMTBF from "../pages/monitoring/MonitoringMTBF.vue";
 import MonitoringMTTR from "../pages/monitoring/MonitoringMTTR.vue";
 import MonitoringOEE from "../pages/monitoring/MonitoringOEE.vue";
@@ -906,6 +907,15 @@ const routes = [
           category: "모니터링",
         },
         component: MonitoringKPIManHour,
+      },
+      {
+        path: "monitoring/kpi-product-hour",
+        name: "top-menu-monitoring-kpi-product-hour",
+        meta: {
+          pagename: "시간당 생산량 현황(KPI)",
+          category: "모니터링",
+        },
+        component: MonitoringKPIProductHour,
       },
       {
         path: "monitoring/mtbf",

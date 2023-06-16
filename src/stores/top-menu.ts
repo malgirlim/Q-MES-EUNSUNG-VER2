@@ -587,6 +587,11 @@ export const useTopMenuStore = defineStore("topMenu", {
           },
           {
             icon: "FileText",
+            pageName: "top-menu-monitoring-kpi-product-hour",
+            title: "시간당 생산량 현황(KPI)",
+          },
+          {
+            icon: "FileText",
             pageName: "top-menu-monitoring-mtbf",
             title: "MTBF 현황",
           },

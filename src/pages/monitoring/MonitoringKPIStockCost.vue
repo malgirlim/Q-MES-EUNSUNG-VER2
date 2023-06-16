@@ -110,6 +110,8 @@ function exportFile(data: any) {
 // 날짜 구하기
 const now = dayjs().format("YYYY-MM-DD");
 const nowPlus = dayjs().add(7, "days").format("YYYY-MM-DD");
+const max_year = dayjs().format("YYYY");
+const min_year = dayjs().add(-3, "years").format("YYYY");
 const now_year = dayjs().format("YYYY");
 const ago_1year = dayjs().add(-1, "years").format("YYYY");
 const ago_2year = dayjs().add(-2, "years").format("YYYY");
