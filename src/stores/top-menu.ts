@@ -592,6 +592,16 @@ export const useTopMenuStore = defineStore("topMenu", {
           },
           {
             icon: "FileText",
+            pageName: "top-menu-monitoring-daily",
+            title: "설비 일상점검 현황",
+          },
+          {
+            icon: "FileText",
+            pageName: "top-menu-monitoring-prevent",
+            title: "설비 예방보전 현황",
+          },
+          {
+            icon: "FileText",
             pageName: "top-menu-monitoring-mtbf",
             title: "MTBF 현황",
           },
