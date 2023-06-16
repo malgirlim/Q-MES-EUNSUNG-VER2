@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { ref, Ref, onMounted, watch, getCurrentInstance } from "vue";
+import router from "../../router";
 import Button from "../../base-components/Button";
 import {
   FormInput,
@@ -25,7 +26,6 @@ import { useSendApi } from "../../composables/useSendApi";
 import {
   MonitorPrevent,
   MonitorDaily,
-  MonitorRepair,
 } from "../../interfaces/menu/monitorInterface";
 import { ProductionResult } from "../../interfaces/menu/productionInterface";
 
@@ -412,6 +412,19 @@ const onFileImport = (event: any) => {
         >
           <Lucide icon="Trash2" class="w-4 h-4 mr-2" /> 삭제</Button
         > -->
+        <Button
+          class="mr-3 shadow-md"
+          as="a"
+          variant="linkedin"
+          @click="
+            () => {
+              router.push('/prevent/daily-plan');
+            }
+          "
+        >
+          <Lucide icon="ExternalLink" class="w-4 h-4 mr-2" />
+          일상점검계획
+        </Button>
         <div class="hidden mx-auto md:block text-slate-500"></div>
         <div class="mr-5">
           <a href="" class="flex items-center ml-auto text-primary">
@@ -717,12 +730,12 @@ const onFileImport = (event: any) => {
                 >
                   {{ table_setting.상세보기.name }}
                 </Table.Th> -->
-                <Table.Th
+                <!-- <Table.Th
                   class="text-center border-b-0 whitespace-nowrap font-bold"
                   :style="table_setting.편집.style"
                 >
                   {{ table_setting.편집.name }}
-                </Table.Th>
+                </Table.Th> -->
               </Table.Tr>
             </Table.Thead>
             <Table.Tbody style="position: relative; z-index: 1">
@@ -844,7 +857,7 @@ const onFileImport = (event: any) => {
                     </a>
                   </div>
                 </Table.Td> -->
-                <Table.Td
+                <!-- <Table.Td
                   class="first:rounded-l-md last:rounded-r-md text-center bg-white border-b-0 dark:bg-darkmode-600 shadow-[20px_3px_20px_#0000000b] py-0 relative before:block before:w-px before:h-8 before:bg-slate-200 before:absolute before:left-0 before:inset-y-0 before:my-auto before:dark:bg-darkmode-400"
                   :style="table_setting.편집.style"
                 >
@@ -869,7 +882,7 @@ const onFileImport = (event: any) => {
                       수정
                     </a>
                   </div>
-                </Table.Td>
+                </Table.Td> -->
               </Table.Tr>
             </Table.Tbody>
           </Table>

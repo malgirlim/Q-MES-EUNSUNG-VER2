@@ -23,6 +23,8 @@ const kioskRouter = require("./router/kioskRouter");
 const uploadRouter = require("./router/uploadRouter");
 const kakaoRouter = require("./router/kakaoRouter");
 
+const scheduleRouter = require("./router/scheduleRouter");
+
 app.use(
   express.json({
     limit: "10mb",
@@ -73,6 +75,9 @@ app.use("/api/upload", uploadRouter);
 
 // 카카오알림톡 전송 - kakaoRouter.js
 app.use("/api/kakao", kakaoRouter);
+
+// 예약 작업 - scheduleRouter.js
+app.use("/api/schedule", scheduleRouter);
 
 app.listen(port, () => {
   console.log(`Q-MES app listening on port ${port}`);

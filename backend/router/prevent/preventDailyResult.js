@@ -51,7 +51,7 @@ router.get("/", async (req, res) => {
         ,[DISPT_RESULT] AS 결과
         ,[DISPT_NOTE] AS 비고
         ,[DISPT_REGIST_NM] AS 등록자
-        ,[DISPT_REGIST_DT] AS 등록일시
+        ,CONVERT(VARCHAR, [DISPT_REGIST_DT], 20) AS 등록일시
       FROM [QMES2022].[dbo].[MANAGE_DAILY_INSPECT_TB]
       LEFT JOIN
       (
@@ -123,7 +123,7 @@ router.post("/", async (req, res) => {
             ,[DISPT_RESULT] AS 결과
             ,[DISPT_NOTE] AS 비고
             ,[DISPT_REGIST_NM] AS 등록자
-            ,[DISPT_REGIST_DT] AS 등록일시
+            ,CONVERT(VARCHAR, [DISPT_REGIST_DT], 20) AS 등록일시
           FROM [QMES2022].[dbo].[MANAGE_DAILY_INSPECT_TB]
           LEFT JOIN
           (
@@ -193,7 +193,7 @@ router.post("/", async (req, res) => {
             ,[DISPT_RESULT] AS 결과
             ,[DISPT_NOTE] AS 비고
             ,[DISPT_REGIST_NM] AS 등록자
-            ,[DISPT_REGIST_DT] AS 등록일시
+            ,CONVERT(VARCHAR, [DISPT_REGIST_DT], 20) AS 등록일시
           FROM [QMES2022].[dbo].[MANAGE_DAILY_INSPECT_TB]
           LEFT JOIN
           (
@@ -252,7 +252,7 @@ router.post("/", async (req, res) => {
             ,[DISPT_RESULT] AS 결과
             ,[DISPT_NOTE] AS 비고
             ,[DISPT_REGIST_NM] AS 등록자
-            ,[DISPT_REGIST_DT] AS 등록일시
+            ,CONVERT(VARCHAR, [DISPT_REGIST_DT], 20) AS 등록일시
           FROM [QMES2022].[dbo].[MANAGE_DAILY_INSPECT_TB]
           LEFT JOIN
           (
@@ -491,7 +491,7 @@ router.post("/delete", async (req, res) => {
           ,[DISPT_RESULT] AS 결과
           ,[DISPT_NOTE] AS 비고
           ,[DISPT_REGIST_NM] AS 등록자
-          ,[DISPT_REGIST_DT] AS 등록일시
+          ,CONVERT(VARCHAR, [DISPT_REGIST_DT], 20) AS 등록일시
         FROM [QMES2022].[dbo].[MANAGE_DAILY_INSPECT_TB]
         LEFT JOIN
         (

@@ -10,7 +10,6 @@ const monitorKpiManHourRouter = require("./monitor/monitorKpiManHour");
 
 const monitorPreventRouter = require("./monitor/monitorPrevent");
 const monitorDailyRouter = require("./monitor/monitorDaily");
-const monitorRepairRouter = require("./monitor/monitorRepair");
 
 router.use((req, res, next) => {
   // console.log("middleware for test!");

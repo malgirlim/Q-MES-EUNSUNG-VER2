@@ -18,6 +18,10 @@ import { toast } from "vue3-toastify";
 // API 보내는 함수 및 인터페이스 불러오기
 import { useSendApi } from "../../composables/useSendApi";
 import { PreventDaily } from "../../interfaces/menu/preventInterface";
+import {
+  MasterFacility,
+  MasterUser,
+} from "../../interfaces/menu/masterInterface";
 
 // 컴포넌트 로드
 import ProductDetail from "../../components/Common/Detail/MasterProductDetail.vue";

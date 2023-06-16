@@ -24,6 +24,10 @@ import { toast } from "vue3-toastify";
 // API 보내는 함수 및 인터페이스 불러오기
 import { useSendApi } from "../../composables/useSendApi";
 import { PreventError } from "../../interfaces/menu/preventInterface";
+import {
+  MasterFacility,
+  MasterNonWork,
+} from "../../interfaces/menu/masterInterface";
 
 // 컴포넌트 로드
 import MasterDetail from "../../components/Common/Detail/MasterClientDetail.vue";
@@ -34,6 +38,8 @@ const user_level = proxy.gstate.level.PreventErrorList; //권한레벨
 // 페이지 로딩 시 시작
 onMounted(async () => {
   dataManager.loadDatas(); // 메인으로 쓸 데이터 불러오기
+  prevent_modal_facility.loadDatas(); // 설비 데이터 불러오기
+  prevent_modal_nonwork.loadDatas(); // 비가동 데이터 불러오기
 });
 
 // 페이징기능
@@ -44,23 +50,36 @@ const pageChangeFirst = () => {
 };
 
 // dataManager 만들기
-const url = "/api/prevent/repairresult";
+const url = "/api/prevent/errorresult";
 const dataManager = useSendApi<PreventError>(url, currentPage, rowsPerPage);
+
+// 설비 데이터
+const url_prevent_modal_facility = "/api/prevent/modal/facility";
+const prevent_modal_facility = useSendApi<MasterFacility>(
+  url_prevent_modal_facility,
+  currentPage,
+  rowsPerPage
+);
+
+// 비가동 데이터
+const url_prevent_modal_nonwork = "/api/prevent/modal/nonwork";
+const prevent_modal_nonwork = useSendApi<MasterNonWork>(
+  url_prevent_modal_nonwork,
+  currentPage,
+  rowsPerPage
+);
 
 // 테이블항목 설정 및 가로크기 조정
 const table_setting = {
   체크박스: { name: "체크박스", style: "width: 5px" },
   순번: { name: "순번", style: "width: 5px; text-align: center;" },
-  항목1: { name: "등록일시", style: "width: 50px; text-align: center;" },
-  항목2: { name: "설비명", style: "width: 50px; text-align: center;" },
-  항목3: { name: "구분", style: "width: 50px; text-align: center;" },
-  항목4: { name: "내용", style: "width: 50px; text-align: center;" },
-  항목5: { name: "수리방법", style: "width: 50px; text-align: center;" },
-  항목6: { name: "기준", style: "width: 50px; text-align: center;" },
-  항목7: { name: "담당자", style: "width: 50px; text-align: center;" },
-  항목8: { name: "결과내용", style: "width: 50px; text-align: center;" },
-  항목9: { name: "결과", style: "width: 50px; text-align: center;" },
-  항목10: { name: "금액", style: "width: 50px; text-align: center;" },
+  항목1: { name: "설비명", style: "width: 50px; text-align: center;" },
+  항목2: { name: "비가동구분", style: "width: 50px; text-align: center;" },
+  항목3: { name: "비가동명", style: "width: 50px; text-align: center;" },
+  항목4: { name: "구분", style: "width: 50px; text-align: center;" },
+  항목5: { name: "시작일시", style: "width: 50px; text-align: center;" },
+  항목6: { name: "종료일시", style: "width: 50px; text-align: center;" },
+  항목7: { name: "조치내용", style: "width: 50px; text-align: center;" },
   상세보기: { name: "정보", style: "width: 50px; text-align: center;" },
   편집: { name: "편집", style: "width: 50px; text-align: center;" },
 };
@@ -381,7 +400,7 @@ const onFileImport = (event: any) => {
       <div
         class="flex flex-wrap items-center col-span-12 mt-2 mb-2 intro-y sm:flex-nowrap"
       >
-        <!-- <Button
+        <Button
           class="mr-2 shadow-md"
           as="a"
           variant="primary"
@@ -393,19 +412,6 @@ const onFileImport = (event: any) => {
         >
           <Lucide icon="FilePlus" class="w-4 h-4 mr-2" />
           등록
-        </Button> -->
-        <Button
-          class="mr-3 shadow-md"
-          as="a"
-          variant="linkedin"
-          @click="
-            () => {
-              router.push('/prevent/repair-plan');
-            }
-          "
-        >
-          <Lucide icon="ExternalLink" class="w-4 h-4 mr-2" />
-          설비수리등록
         </Button>
         <Button
           class="mr-2 shadow-md"
@@ -466,14 +472,12 @@ const onFileImport = (event: any) => {
           <FormSelect v-model="searchKey" class="w-30 mt-3 !box sm:mt-0">
             <option>전체</option>
             <option>설비명</option>
+            <option>비가동구분</option>
+            <option>비가동명</option>
             <option>구분</option>
-            <option>내용</option>
-            <option>수리방법</option>
-            <option>기준</option>
-            <option>담당자</option>
-            <option>결과내용</option>
-            <option>결과</option>
-            <option>금액</option>
+            <option>시작일시</option>
+            <option>종료일시</option>
+            <option>조치내용</option>
             <option>비고</option>
           </FormSelect>
         </div>
@@ -538,14 +542,12 @@ const onFileImport = (event: any) => {
           <FormSelect v-model="sortKey" class="w-30 mt-3 !box sm:mt-0">
             <option>등록일</option>
             <option>설비명</option>
+            <option>비가동구분</option>
+            <option>비가동명</option>
             <option>구분</option>
-            <option>내용</option>
-            <option>수리방법</option>
-            <option>기준</option>
-            <option>담당자</option>
-            <option>결과내용</option>
-            <option>결과</option>
-            <option>금액</option>
+            <option>시작일시</option>
+            <option>종료일시</option>
+            <option>조치내용</option>
             <option>비고</option>
           </FormSelect>
         </div>
@@ -684,24 +686,6 @@ const onFileImport = (event: any) => {
                 >
                   {{ table_setting.항목7.name }}
                 </Table.Th>
-                <Table.Th
-                  class="text-center border-b-0 whitespace-nowrap font-bold"
-                  :style="table_setting.항목8.style"
-                >
-                  {{ table_setting.항목8.name }}
-                </Table.Th>
-                <Table.Th
-                  class="text-center border-b-0 whitespace-nowrap font-bold"
-                  :style="table_setting.항목9.style"
-                >
-                  {{ table_setting.항목9.name }}
-                </Table.Th>
-                <Table.Th
-                  class="text-center border-b-0 whitespace-nowrap font-bold"
-                  :style="table_setting.항목10.style"
-                >
-                  {{ table_setting.항목10.name }}
-                </Table.Th>
                 <!-- <Table.Th
                   class="text-center border-b-0 whitespace-nowrap font-bold"
                   :style="table_setting.상세보기.style"
@@ -783,24 +767,6 @@ const onFileImport = (event: any) => {
                 >
                   <div>{{ todo[table_setting.항목7.name] }}</div>
                 </Table.Td>
-                <Table.Td
-                  class="first:rounded-l-md last:rounded-r-md text-center bg-white border-b-0 dark:bg-darkmode-600 shadow-[20px_3px_20px_#0000000b]"
-                  :style="table_setting.항목8.style"
-                >
-                  <div>{{ todo[table_setting.항목8.name] }}</div>
-                </Table.Td>
-                <Table.Td
-                  class="first:rounded-l-md last:rounded-r-md text-center bg-white border-b-0 dark:bg-darkmode-600 shadow-[20px_3px_20px_#0000000b]"
-                  :style="table_setting.항목9.style"
-                >
-                  <div>{{ todo[table_setting.항목9.name] }}</div>
-                </Table.Td>
-                <Table.Td
-                  class="first:rounded-l-md last:rounded-r-md text-center bg-white border-b-0 dark:bg-darkmode-600 shadow-[20px_3px_20px_#0000000b]"
-                  :style="table_setting.항목10.style"
-                >
-                  <div>{{ todo[table_setting.항목10.name] }}</div>
-                </Table.Td>
                 <!-- <Table.Td
                   class="first:rounded-l-md last:rounded-r-md text-center bg-white border-b-0 dark:bg-darkmode-600 shadow-[20px_3px_20px_#0000000b] py-0 relative before:block before:w-px before:h-8 before:bg-slate-200 before:absolute before:left-0 before:inset-y-0 before:my-auto before:dark:bg-darkmode-400"
                   :style="table_setting.상세보기.style"
@@ -880,7 +846,7 @@ const onFileImport = (event: any) => {
 ############################################################################################################################# -->
 
   <!-- BEGIN: Insert Modal Content -->
-  <Dialog size="md" :open="insertModal" :key="insertModalData?.생산실적NO">
+  <Dialog size="md" :open="insertModal" @close="setInsertModal(false)">
     <Dialog.Panel class="p-10 text-center">
       <!--추가 Modal 내용 시작-->
       <div class="mb-5" style="font-weight: bold">등록</div>
@@ -904,106 +870,66 @@ const onFileImport = (event: any) => {
               "
             >
               <div class="mt-3">
-                <FormLabel htmlFor="vertical-form-1">사용일자</FormLabel>
-                <FormInput
-                  id="vertical-form-1"
-                  type="date"
-                  v-model="insertModalData.사용일자"
-                  placeholder=""
-                />
-              </div>
-              <div class="mt-3">
-                <FormLabel htmlFor="vertical-form-2">사용횟수</FormLabel>
-                <FormInput
-                  id="vertical-form-2"
-                  type="number"
-                  v-model="insertModalData.사용횟수"
-                  placeholder=""
-                />
-              </div>
-              <!-- <div class="mt-3">
-                <FormLabel htmlFor="vertical-form-3">금형</FormLabel>
-                <select v-tom v-model="insertModalData.금형NO">
+                <FormLabel htmlFor="vertical-form-3">설비</FormLabel>
+                <select v-tom v-model="insertModalData.설비NO">
                   <option value="" selected>=== 필수 선택 ===</option>
                   <option
                     :value="p.NO"
-                    v-for="p in molduse_modal_mold.dataAll.value"
+                    v-for="p in prevent_modal_facility.dataAll.value"
                     :key="p.NO"
                   >
-                    {{ p.코드 }} # 금형명:{{ p.금형명 }} # 규격:{{ p.규격 }}
+                    {{ p.설비명 }} # 라인:{{ p.라인 }} # 규격:{{ p.규격 }}
                   </option>
                 </select>
               </div>
               <div class="mt-3">
-                <FormLabel htmlFor="vertical-form-4">작업코드</FormLabel>
-                <FormInput
-                  type="text"
-                  v-model="insertModalData.작업코드"
-                  @click="setProduceResultModal(true)"
-                  placeholder="여기를 클릭하여 생산실적을 등록해주세요."
-                />
-              </div> -->
+                <FormLabel htmlFor="vertical-form-3">비가동</FormLabel>
+                <select v-tom v-model="insertModalData.비가동NO">
+                  <option value="" selected>=== 필수 선택 ===</option>
+                  <option
+                    :value="p.NO"
+                    v-for="p in prevent_modal_nonwork.dataAll.value"
+                    :key="p.NO"
+                  >
+                    {{ p.코드 }} # 구분:{{ p.구분 }} # 비가동명:{{
+                      p.비가동명
+                    }}
+                    # 내용:{{ p.내용 }}
+                  </option>
+                </select>
+              </div>
               <div class="mt-3">
-                <FormLabel htmlFor="vertical-form-5">품번</FormLabel>
+                <FormLabel htmlFor="vertical-form-5">구분</FormLabel>
                 <FormInput
                   type="text"
-                  v-model="insertModalData.품번"
+                  v-model="insertModalData.구분"
                   placeholder=""
-                  readonly
                 />
               </div>
               <div class="mt-3">
-                <FormLabel htmlFor="vertical-form-6">품목구분</FormLabel>
+                <FormLabel htmlFor="vertical-form-6">시작일시</FormLabel>
                 <FormInput
-                  type="text"
-                  v-model="insertModalData.품목구분"
+                  type="datetime-local"
+                  step="10"
+                  v-model="insertModalData.시작일시"
                   placeholder=""
-                  readonly
                 />
               </div>
               <div class="mt-3">
-                <FormLabel htmlFor="vertical-form-6">품명</FormLabel>
+                <FormLabel htmlFor="vertical-form-6">종료일시</FormLabel>
                 <FormInput
-                  type="text"
-                  v-model="insertModalData.품명"
+                  type="datetime-local"
+                  step="10"
+                  v-model="insertModalData.종료일시"
                   placeholder=""
-                  readonly
                 />
               </div>
               <div class="mt-3">
-                <FormLabel htmlFor="vertical-form-6">규격</FormLabel>
+                <FormLabel htmlFor="vertical-form-6">조치내용</FormLabel>
                 <FormInput
                   type="text"
-                  v-model="insertModalData.규격"
+                  v-model="insertModalData.조치내용"
                   placeholder=""
-                  readonly
-                />
-              </div>
-              <div class="mt-3">
-                <FormLabel htmlFor="vertical-form-6">단위</FormLabel>
-                <FormInput
-                  type="text"
-                  v-model="insertModalData.단위"
-                  placeholder=""
-                  readonly
-                />
-              </div>
-              <div class="mt-3">
-                <FormLabel htmlFor="vertical-form-6">생산수</FormLabel>
-                <FormInput
-                  type="text"
-                  v-model="insertModalData.생산수"
-                  placeholder=""
-                  readonly
-                />
-              </div>
-              <div class="mt-3">
-                <FormLabel htmlFor="vertical-form-6">불량수</FormLabel>
-                <FormInput
-                  type="text"
-                  v-model="insertModalData.불량수"
-                  placeholder=""
-                  readonly
                 />
               </div>
             </div>
@@ -1082,85 +1008,116 @@ const onFileImport = (event: any) => {
               "
             >
               <div class="mt-3">
-                <FormLabel htmlFor="vertical-form-1">설비명</FormLabel>
-                <FormInput
-                  id="vertical-form-1"
-                  type="text"
-                  v-model="editModalData.설비명"
-                  placeholder=""
-                  readonly
-                />
+                <FormLabel htmlFor="vertical-form-3">설비</FormLabel>
+                <select v-tom v-model="editModalData.설비NO">
+                  <option
+                    v-if="editModalData.설비NO"
+                    :value="editModalData.설비NO"
+                    selected
+                  >
+                    {{
+                      prevent_modal_facility.dataAll.value.filter(
+                        (c) => c.NO == editModalData.설비NO
+                      )[0].설비명
+                    }}
+                    # 라인:{{
+                      prevent_modal_facility.dataAll.value.filter(
+                        (c) => c.NO == editModalData.설비NO
+                      )[0].라인
+                    }}
+                    # 규격:{{
+                      prevent_modal_facility.dataAll.value.filter(
+                        (c) => c.NO == editModalData.설비NO
+                      )[0].규격
+                    }}
+                  </option>
+                  <option v-if="!editModalData.설비NO" value="" selected>
+                    === 필수 선택 ===
+                  </option>
+                  <option
+                    :value="p.NO"
+                    v-for="p in prevent_modal_facility.dataAll.value"
+                    :key="p.NO"
+                  >
+                    {{ p.설비명 }} # 라인:{{ p.라인 }} # 규격:{{ p.규격 }}
+                  </option>
+                </select>
               </div>
               <div class="mt-3">
-                <FormLabel htmlFor="vertical-form-1">구분</FormLabel>
+                <FormLabel htmlFor="vertical-form-3">비가동</FormLabel>
+                <select v-tom v-model="editModalData.비가동NO">
+                  <option
+                    v-if="editModalData.비가동NO"
+                    :value="editModalData.비가동NO"
+                    selected
+                  >
+                    {{
+                      prevent_modal_nonwork.dataAll.value.filter(
+                        (c) => c.NO == editModalData.비가동NO
+                      )[0].코드
+                    }}
+                    # 구분:{{
+                      prevent_modal_nonwork.dataAll.value.filter(
+                        (c) => c.NO == editModalData.비가동NO
+                      )[0].구분
+                    }}
+                    # 비가동명:{{
+                      prevent_modal_nonwork.dataAll.value.filter(
+                        (c) => c.NO == editModalData.비가동NO
+                      )[0].비가동명
+                    }}
+                    # 내용:{{
+                      prevent_modal_nonwork.dataAll.value.filter(
+                        (c) => c.NO == editModalData.비가동NO
+                      )[0].내용
+                    }}
+                  </option>
+                  <option v-if="!editModalData.비가동NO" value="" selected>
+                    === 필수 선택 ===
+                  </option>
+                  <option
+                    :value="p.NO"
+                    v-for="p in prevent_modal_nonwork.dataAll.value"
+                    :key="p.NO"
+                  >
+                    {{ p.코드 }} # 구분:{{ p.구분 }} # 비가동명:{{
+                      p.비가동명
+                    }}
+                    # 내용:{{ p.내용 }}
+                  </option>
+                </select>
+              </div>
+              <div class="mt-3">
+                <FormLabel htmlFor="vertical-form-5">구분</FormLabel>
                 <FormInput
-                  id="vertical-form-1"
                   type="text"
                   v-model="editModalData.구분"
                   placeholder=""
-                  readonly
                 />
               </div>
               <div class="mt-3">
-                <FormLabel htmlFor="vertical-form-1">내용</FormLabel>
+                <FormLabel htmlFor="vertical-form-6">시작일시</FormLabel>
                 <FormInput
-                  id="vertical-form-1"
-                  type="text"
-                  v-model="editModalData.내용"
-                  placeholder=""
-                  readonly
-                />
-              </div>
-              <div class="mt-3">
-                <FormLabel htmlFor="vertical-form-1">수리방법</FormLabel>
-                <FormInput
-                  id="vertical-form-1"
-                  type="text"
-                  v-model="editModalData.수리방법"
-                  placeholder=""
-                  readonly
-                />
-              </div>
-              <div class="mt-3">
-                <FormLabel htmlFor="vertical-form-1">기준</FormLabel>
-                <FormInput
-                  id="vertical-form-1"
-                  type="text"
-                  v-model="editModalData.기준"
-                  placeholder=""
-                  readonly
-                />
-              </div>
-              <div class="mt-3">
-                <FormLabel htmlFor="vertical-form-1">담당자</FormLabel>
-                <FormInput
-                  id="vertical-form-1"
-                  type="text"
-                  v-model="editModalData.담당자"
-                  placeholder=""
-                  readonly
-                />
-              </div>
-              <div class="mt-3">
-                <FormLabel htmlFor="vertical-form-6">결과내용</FormLabel>
-                <FormInput
-                  type="text"
-                  v-model="editModalData.결과내용"
+                  type="datetime-local"
+                  step="10"
+                  v-model="editModalData.시작일시"
                   placeholder=""
                 />
               </div>
               <div class="mt-3">
-                <FormLabel htmlFor="vertical-form-11">결과</FormLabel>
-                <FormSelect v-model="editModalData.결과" class="">
-                  <option selected>적합</option>
-                  <option>부적합</option>
-                </FormSelect>
+                <FormLabel htmlFor="vertical-form-6">종료일시</FormLabel>
+                <FormInput
+                  type="datetime-local"
+                  step="10"
+                  v-model="editModalData.종료일시"
+                  placeholder=""
+                />
               </div>
               <div class="mt-3">
-                <FormLabel htmlFor="vertical-form-6">금액</FormLabel>
+                <FormLabel htmlFor="vertical-form-6">조치내용</FormLabel>
                 <FormInput
-                  type="number"
-                  v-model="editModalData.금액"
+                  type="text"
+                  v-model="editModalData.조치내용"
                   placeholder=""
                 />
               </div>

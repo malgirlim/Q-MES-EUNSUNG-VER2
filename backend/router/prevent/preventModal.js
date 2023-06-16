@@ -451,4 +451,107 @@ router.post("/user", async (req, res) => {
   }
 });
 
+// ###################################################################################################################
+// ###################################################   비가동   ###################################################
+// ###################################################################################################################
+
+router.get("/nonwork", async (req, res) => {
+  try {
+    const Pool = await pool;
+    const result = await Pool.request().query(`
+      SELECT
+        [NOWK_PK] AS NO
+        ,[NOWK_CODE] AS 코드
+        ,[NOWK_DIV] AS 구분
+        ,[NOWK_NAME] AS 비가동명
+        ,[NOWK_CONTENT] AS 내용
+        ,[NOWK_NOTE] AS 비고
+        ,[NOWK_REGIST_NM] AS 등록자
+        ,[NOWK_REGIST_DT] AS 등록일시
+      FROM [QMES2022].[dbo].[MASTER_NONWORK_TB]
+      ORDER BY [NOWK_PK] DESC
+    `);
+
+    res.send(JSON.stringify(result.recordset));
+  } catch (err) {
+    res.status(500);
+    res.send(err.message);
+  }
+});
+
+router.post("/nonwork", async (req, res) => {
+  try {
+    var sql = "";
+    if (req.body.searchKey == "전체") {
+      sql =
+        `
+        SELECT
+          NO AS NO, 코드 AS 코드, 구분 AS 구분, 비가동명 AS 비가동명, 내용 AS 내용,
+          비고 AS 비고, 등록자 AS 등록자, 등록일시 AS 등록일시
+        FROM(
+          SELECT
+            [NOWK_PK] AS NO
+            ,[NOWK_CODE] AS 코드
+            ,[NOWK_DIV] AS 구분
+            ,[NOWK_NAME] AS 비가동명
+            ,[NOWK_CONTENT] AS 내용
+            ,[NOWK_NOTE] AS 비고
+            ,[NOWK_REGIST_NM] AS 등록자
+            ,[NOWK_REGIST_DT] AS 등록일시
+          FROM [QMES2022].[dbo].[MASTER_NONWORK_TB]
+        ) AS RESULT
+        WHERE (1=1)
+        AND ( 코드 like concat('%',@input,'%')
+        OR 비가동명 like concat('%',@input,'%')
+        OR 구분 like concat('%',@input,'%')
+        OR 내용 like concat('%',@input,'%')
+        OR 비고 like concat('%',@input,'%'))
+        ORDER BY ` +
+        req.body.sortKey +
+        ` ` +
+        req.body.sortOrder +
+        `
+      `;
+    } else {
+      sql =
+        `
+        SELECT
+          NO AS NO, 코드 AS 코드, 구분 AS 구분, 비가동명 AS 비가동명, 내용 AS 내용,
+          비고 AS 비고, 등록자 AS 등록자, 등록일시 AS 등록일시
+        FROM(
+          SELECT
+            [NOWK_PK] AS NO
+            ,[NOWK_CODE] AS 코드
+            ,[NOWK_DIV] AS 구분
+            ,[NOWK_NAME] AS 비가동명
+            ,[NOWK_CONTENT] AS 내용
+            ,[NOWK_NOTE] AS 비고
+            ,[NOWK_REGIST_NM] AS 등록자
+            ,[NOWK_REGIST_DT] AS 등록일시
+          FROM [QMES2022].[dbo].[MASTER_NONWORK_TB]
+        ) AS RESULT
+        WHERE (1=1)
+        AND ` +
+        req.body.searchKey +
+        ` like concat('%',@input,'%')
+        ORDER BY ` +
+        req.body.sortKey +
+        ` ` +
+        req.body.sortOrder +
+        `
+      `;
+    }
+
+    const Pool = await pool;
+    const result = await Pool.request()
+      .input("input", req.body.searchInput)
+      .query(sql);
+
+    res.send(JSON.stringify(result.recordset));
+  } catch (err) {
+    res.status(500);
+    res.send(err.message);
+  }
+});
+
 module.exports = router;
