@@ -12,7 +12,7 @@ import TomSelect from "tom-select";
 import * as XLSX from "xlsx";
 import { read, utils, writeFileXLSX } from "xlsx";
 import printJS from "print-js";
-import KPI_OEE_Chart_bar_line from "../../components/Common/Monitoring/KPI_OEE_Chart_bar_line.vue";
+import KPI_ProductHour_Chart_bar_line from "../../components/Common/Monitoring/KPI_ProductHour_Chart_bar_line.vue";
 
 // API 보내는 함수 및 인터페이스 불러오기
 import { useSendApi } from "../../composables/useSendApi";
@@ -22,7 +22,7 @@ import { onMounted, watch } from "vue";
 import PaginationComponent from "../../components/Pagination/PaginationComponent.vue"; // 페이징설정
 
 const { proxy }: any = getCurrentInstance();
-const user_level = proxy.gstate.level.MonitoringKPIOEE; //권한레벨
+const user_level = proxy.gstate.level.MonitoringKPIProductHour; //권한레벨
 
 const currentPage = ref(1); // 현재페이지
 const rowsPerPage = ref(10); // 한 페이지에 보여질 데이터 갯수
@@ -188,7 +188,7 @@ const table_width = [
                           icon="LineChart"
                         />
                       </div>
-                      <div>평균효율</div>
+                      <div>평균생산수</div>
                     </div>
                   </div>
                 </div>
@@ -225,9 +225,9 @@ const table_width = [
         </div>
       </div>
       <div class="col-span-3 p-5 bg-white rounded rounded-md">
-        <div class="text-center font-bold text-xl">KPI 설비종합효율</div>
+        <div class="text-center font-bold text-xl">KPI 시간당생산량</div>
         <div style="height: 270px">
-          <KPI_OEE_Chart_bar_line
+          <KPI_ProductHour_Chart_bar_line
             :x_label="[
               '검사기',
               '제판기',
