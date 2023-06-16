@@ -104,7 +104,7 @@ router.post("/", async (req, res) => {
         `
         SELECT
           NO AS NO, 예방보전계획NO AS 예방보전계획NO, 설비명 AS 설비명, 구분 AS 구분, 내용 AS 내용, 검사방법 AS 검사방법,
-          기준 AS 기준, 단위 AS 단위, 최소 AS 최소, 최대 AS 최대, 담당자 AS 담당자,
+          기준 AS 기준, 단위 AS 단위, 최소 AS 최소, 최대 AS 최대, 담당자 AS 담당자, 결과내용 AS 결과내용, 결과 AS 결과,
           비고 AS 비고, 등록자 AS 등록자, 등록일시 AS 등록일시
         FROM(
           SELECT
@@ -174,7 +174,7 @@ router.post("/", async (req, res) => {
         `
         SELECT
           NO AS NO, 예방보전계획NO AS 예방보전계획NO, 설비명 AS 설비명, 구분 AS 구분, 내용 AS 내용, 검사방법 AS 검사방법,
-          기준 AS 기준, 단위 AS 단위, 최소 AS 최소, 최대 AS 최대, 담당자 AS 담당자,
+          기준 AS 기준, 단위 AS 단위, 최소 AS 최소, 최대 AS 최대, 담당자 AS 담당자, 결과내용 AS 결과내용, 결과 AS 결과,
           비고 AS 비고, 등록자 AS 등록자, 등록일시 AS 등록일시
         FROM(
           SELECT

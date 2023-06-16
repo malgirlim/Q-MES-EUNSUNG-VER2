@@ -30,11 +30,9 @@ router.use("/kpi/badrate", monitorKpiBadRateRouter);
 // 모니터링 / kpi / 작업공수 - router/monitor/monitorKpiManHour.js
 router.use("/kpi/manhour", monitorKpiManHourRouter);
 
-// 모니터링 / 예방보전 - router/monitor/monitorPrevent.js
+// 모니터링 / 예방보전 현황 - router/monitor/monitorPrevent.js
 router.use("/prevent", monitorPreventRouter);
-// 모니터링 / 일상점검 - router/monitor/monitorDaily.js
+// 모니터링 / 일상점검 현황 - router/monitor/monitorDaily.js
 router.use("/daily", monitorDailyRouter);
-// 모니터링 / 설비수리 - router/monitor/monitorRepair.js
-router.use("/repair", monitorRepairRouter);
 
 module.exports = router;

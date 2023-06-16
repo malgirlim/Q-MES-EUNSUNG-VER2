@@ -23,12 +23,7 @@ import { toast } from "vue3-toastify";
 
 // API 보내는 함수 및 인터페이스 불러오기
 import { useSendApi } from "../../composables/useSendApi";
-import {
-  MonitorPrevent,
-  MonitorDaily,
-  MonitorRepair,
-} from "../../interfaces/menu/monitorInterface";
-import { ProductionResult } from "../../interfaces/menu/productionInterface";
+import { PreventRepair } from "../../interfaces/menu/preventInterface";
 
 // 컴포넌트 로드
 import MasterDetail from "../../components/Common/Detail/MasterClientDetail.vue";
@@ -49,8 +44,8 @@ const pageChangeFirst = () => {
 };
 
 // dataManager 만들기
-const url = "/api/monitor/repair";
-const dataManager = useSendApi<MonitorRepair>(url, currentPage, rowsPerPage);
+const url = "/api/prevent/repairresult";
+const dataManager = useSendApi<PreventRepair>(url, currentPage, rowsPerPage);
 
 // 테이블항목 설정 및 가로크기 조정
 const table_setting = {
@@ -183,7 +178,7 @@ const insert_check = () => {
 
 // ########################## 등록, 수정, 삭제, 상세 Modal ##########################
 // ##### 등록 Modal #####
-let insertModalData: MonitorRepair;
+let insertModalData: PreventRepair;
 const insertModal = ref(false);
 const setInsertModal = (value: boolean) => {
   if (user_level >= 3) {
@@ -223,7 +218,7 @@ const setEditModal = (value: boolean) => {
     toast.warning("액세스 권한이 없습니다.\n관리자에게 문의하세요.");
   }
 };
-let editModalData: MonitorRepair; // 수정할 변수
+let editModalData: PreventRepair; // 수정할 변수
 // 수정버튼 누르면 실행되는 함수
 const editDataFunction = async () => {
   await dataManager.editData(editModalData); // await : 이 함수가 끝나야 다음으로 넘어간다

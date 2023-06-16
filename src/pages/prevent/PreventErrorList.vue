@@ -23,12 +23,7 @@ import { toast } from "vue3-toastify";
 
 // API 보내는 함수 및 인터페이스 불러오기
 import { useSendApi } from "../../composables/useSendApi";
-import {
-  MonitorPrevent,
-  MonitorDaily,
-  MonitorRepair,
-} from "../../interfaces/menu/monitorInterface";
-import { ProductionResult } from "../../interfaces/menu/productionInterface";
+import { PreventError } from "../../interfaces/menu/preventInterface";
 
 // 컴포넌트 로드
 import MasterDetail from "../../components/Common/Detail/MasterClientDetail.vue";
@@ -49,8 +44,8 @@ const pageChangeFirst = () => {
 };
 
 // dataManager 만들기
-const url = "/api/monitor/repair";
-const dataManager = useSendApi<MonitorRepair>(url, currentPage, rowsPerPage);
+const url = "/api/prevent/repairresult";
+const dataManager = useSendApi<PreventError>(url, currentPage, rowsPerPage);
 
 // 테이블항목 설정 및 가로크기 조정
 const table_setting = {
@@ -65,8 +60,7 @@ const table_setting = {
   항목7: { name: "담당자", style: "width: 50px; text-align: center;" },
   항목8: { name: "결과내용", style: "width: 50px; text-align: center;" },
   항목9: { name: "결과", style: "width: 50px; text-align: center;" },
-  항목10: { name: "수리시간", style: "width: 50px; text-align: center;" },
-  항목11: { name: "금액", style: "width: 50px; text-align: center;" },
+  항목10: { name: "금액", style: "width: 50px; text-align: center;" },
   상세보기: { name: "정보", style: "width: 50px; text-align: center;" },
   편집: { name: "편집", style: "width: 50px; text-align: center;" },
 };
@@ -184,7 +178,7 @@ const insert_check = () => {
 
 // ########################## 등록, 수정, 삭제, 상세 Modal ##########################
 // ##### 등록 Modal #####
-let insertModalData: MonitorRepair;
+let insertModalData: PreventError;
 const insertModal = ref(false);
 const setInsertModal = (value: boolean) => {
   if (user_level >= 3) {
@@ -224,7 +218,7 @@ const setEditModal = (value: boolean) => {
     toast.warning("액세스 권한이 없습니다.\n관리자에게 문의하세요.");
   }
 };
-let editModalData: MonitorRepair; // 수정할 변수
+let editModalData: PreventError; // 수정할 변수
 // 수정버튼 누르면 실행되는 함수
 const editDataFunction = async () => {
   await dataManager.editData(editModalData); // await : 이 함수가 끝나야 다음으로 넘어간다
@@ -706,13 +700,7 @@ const onFileImport = (event: any) => {
                   class="text-center border-b-0 whitespace-nowrap font-bold"
                   :style="table_setting.항목10.style"
                 >
-                  {{ table_setting.항목10.name }}(분)
-                </Table.Th>
-                <Table.Th
-                  class="text-center border-b-0 whitespace-nowrap font-bold"
-                  :style="table_setting.항목11.style"
-                >
-                  {{ table_setting.항목11.name }}
+                  {{ table_setting.항목10.name }}
                 </Table.Th>
                 <!-- <Table.Th
                   class="text-center border-b-0 whitespace-nowrap font-bold"
@@ -812,12 +800,6 @@ const onFileImport = (event: any) => {
                   :style="table_setting.항목10.style"
                 >
                   <div>{{ todo[table_setting.항목10.name] }}</div>
-                </Table.Td>
-                <Table.Td
-                  class="first:rounded-l-md last:rounded-r-md text-center bg-white border-b-0 dark:bg-darkmode-600 shadow-[20px_3px_20px_#0000000b]"
-                  :style="table_setting.항목11.style"
-                >
-                  <div>{{ todo[table_setting.항목11.name] }}</div>
                 </Table.Td>
                 <!-- <Table.Td
                   class="first:rounded-l-md last:rounded-r-md text-center bg-white border-b-0 dark:bg-darkmode-600 shadow-[20px_3px_20px_#0000000b] py-0 relative before:block before:w-px before:h-8 before:bg-slate-200 before:absolute before:left-0 before:inset-y-0 before:my-auto before:dark:bg-darkmode-400"
@@ -1173,14 +1155,6 @@ const onFileImport = (event: any) => {
                   <option selected>적합</option>
                   <option>부적합</option>
                 </FormSelect>
-              </div>
-              <div class="mt-3">
-                <FormLabel htmlFor="vertical-form-6">수리시간(분)</FormLabel>
-                <FormInput
-                  type="number"
-                  v-model="editModalData.수리시간"
-                  placeholder=""
-                />
               </div>
               <div class="mt-3">
                 <FormLabel htmlFor="vertical-form-6">금액</FormLabel>

@@ -15,6 +15,8 @@ const preventRepairResultRouter = require("./prevent/preventRepairResult");
 
 const preventLifePlanRouter = require("./prevent/preventLifePlan");
 
+const preventErrorResultRouter = require("./prevent/preventErrorResult");
+
 router.use((req, res, next) => {
   // console.log("middleware for test!");
   next();
@@ -32,7 +34,7 @@ router.use("/preventresult", preventPreventResultRouter);
 router.use("/dailyplan", preventDailyPlanRouter);
 // 예방보전 / 일상점검확인 - router/prevent/preventDailyCheck.js
 router.use("/dailycheck", preventDailyCheckRouter);
-// 예방보전 / 일상점검관리 - router/prevent/preventDailyResult.js
+// 예방보전 / 일상점검결과 - router/prevent/preventDailyResult.js
 router.use("/dailyresult", preventDailyResultRouter);
 
 // 예방보전 / 설비수리계획 - router/prevent/preventRepairPlan.js
@@ -42,5 +44,8 @@ router.use("/repairresult", preventRepairResultRouter);
 
 // 예방보전 / 설비부품수명계획 - router/prevent/preventLifePlan.js
 router.use("/lifeplan", preventLifePlanRouter);
+
+// 예방보전 / 설비고장내역 - router/prevent/preventErrorResult.js
+router.use("/errorresult", preventErrorResultRouter);
 
 module.exports = router;
