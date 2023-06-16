@@ -409,7 +409,7 @@ const setDebugMode = () => {
             class="hover:bg-white/5"
             @click="$router.push('/setting/alert/order-forecast')"
           >
-            <Lucide icon="BellPlus" class="w-4 h-4 mr-2" /> 모바일 알림설정
+            <Lucide icon="BellPlus" class="w-4 h-4 mr-2" /> 알림설정
           </Menu.Item>
           <Menu.Item
             v-if="show_debug_button == true"
