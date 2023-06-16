@@ -49,6 +49,7 @@ router.get("/", async (req, res) => {
         ,FACILITY_FIX_PLAN.담당자 AS 담당자
         ,[FCFIX_CONTENT] AS 결과내용
         ,[FCFIX_RESULT] AS 결과
+        ,[FCFIX_TIME] AS 수리시간
         ,[FCFIX_COST] AS 금액
         ,[FCFIX_NOTE] AS 비고
         ,[FCFIX_REGIST_NM] AS 등록자
@@ -107,7 +108,7 @@ router.post("/", async (req, res) => {
         SELECT
           NO AS NO, 설비수리계획NO AS 설비수리계획NO, 설비NO AS 설비NO, 설비명 AS 설비명, 구분 AS 구분, 내용 AS 내용,
           수리방법 AS 수리방법, 기준 AS 기준, 계획일 AS 계획일, 예보일 AS 예보일, 담당자ID AS 담당자ID, 담당자 AS 담당자,
-          결과내용 AS 결과내용, 결과 AS 결과, 금액 AS 금액, 비고 AS 비고, 등록자 AS 등록자, 등록일시 AS 등록일시
+          결과내용 AS 결과내용, 결과 AS 결과, 수리시간 AS 수리시간, 금액 AS 금액, 비고 AS 비고, 등록자 AS 등록자, 등록일시 AS 등록일시
         FROM(
           SELECT
             [FCFIX_PK] AS NO
@@ -124,6 +125,7 @@ router.post("/", async (req, res) => {
             ,FACILITY_FIX_PLAN.담당자 AS 담당자
             ,[FCFIX_CONTENT] AS 결과내용
             ,[FCFIX_RESULT] AS 결과
+            ,[FCFIX_TIME] AS 수리시간
             ,[FCFIX_COST] AS 금액
             ,[FCFIX_NOTE] AS 비고
             ,[FCFIX_REGIST_NM] AS 등록자
@@ -166,6 +168,7 @@ router.post("/", async (req, res) => {
         OR 담당자 like concat('%',@input,'%')
         OR 결과내용 like concat('%',@input,'%')
         OR 결과 like concat('%',@input,'%')
+        OR 수리시간 like concat('%',@input,'%')
         OR 금액 like concat('%',@input,'%')
         OR 비고 like concat('%',@input,'%'))
         ORDER BY ` +
@@ -180,7 +183,7 @@ router.post("/", async (req, res) => {
         SELECT
           NO AS NO, 설비수리계획NO AS 설비수리계획NO, 설비NO AS 설비NO, 설비명 AS 설비명, 구분 AS 구분, 내용 AS 내용,
           수리방법 AS 수리방법, 기준 AS 기준, 계획일 AS 계획일, 예보일 AS 예보일, 담당자ID AS 담당자ID, 담당자 AS 담당자,
-          결과내용 AS 결과내용, 결과 AS 결과, 금액 AS 금액, 비고 AS 비고, 등록자 AS 등록자, 등록일시 AS 등록일시
+          결과내용 AS 결과내용, 결과 AS 결과, 수리시간 AS 수리시간, 금액 AS 금액, 비고 AS 비고, 등록자 AS 등록자, 등록일시 AS 등록일시
         FROM(
           SELECT
             [FCFIX_PK] AS NO
@@ -197,6 +200,7 @@ router.post("/", async (req, res) => {
             ,FACILITY_FIX_PLAN.담당자 AS 담당자
             ,[FCFIX_CONTENT] AS 결과내용
             ,[FCFIX_RESULT] AS 결과
+            ,[FCFIX_TIME] AS 수리시간
             ,[FCFIX_COST] AS 금액
             ,[FCFIX_NOTE] AS 비고
             ,[FCFIX_REGIST_NM] AS 등록자
@@ -283,6 +287,7 @@ router.post("/insert", async (req, res) => {
       .input("설비수리계획NO", req.body.data.설비수리계획NO ?? null)
       .input("결과내용", req.body.data.결과내용 ?? "")
       .input("결과", req.body.data.결과 ?? "")
+      .input("수리시간", req.body.data.수리시간 ?? "")
       .input("금액", req.body.data.금액 ?? "")
       .input("비고", req.body.data.비고 ?? "")
       .input("등록자", req.body.user ?? "")
@@ -294,12 +299,13 @@ router.post("/insert", async (req, res) => {
           ([FCFIX_FACILITY_FIX_PLAN_PK]
           ,[FCFIX_CONTENT]
           ,[FCFIX_RESULT]
+          ,[FCFIX_TIME]
           ,[FCFIX_COST]
           ,[FCFIX_NOTE]
           ,[FCFIX_REGIST_NM]
           ,[FCFIX_REGIST_DT])
         VALUES
-          (@설비수리계획NO,@결과내용,@결과,@금액,@비고,@등록자,@등록일시)
+          (@설비수리계획NO,@결과내용,@결과,@수리시간,@금액,@비고,@등록자,@등록일시)
       `);
 
     // 로그기록 저장
@@ -333,6 +339,7 @@ router.post("/insertAll", async (req, res) => {
         .input("설비수리계획NO", req.body.data[i].설비수리계획NO ?? null)
         .input("결과내용", req.body.data[i].결과내용 ?? "")
         .input("결과", req.body.data[i].결과 ?? "")
+        .input("수리시간", req.body.data[i].수리시간 ?? "")
         .input("금액", req.body.data[i].금액 ?? "")
         .input("비고", req.body.data[i].비고 ?? "")
         .input("등록자", req.body.user ?? "")
@@ -344,12 +351,13 @@ router.post("/insertAll", async (req, res) => {
           ([FCFIX_FACILITY_FIX_PLAN_PK]
           ,[FCFIX_CONTENT]
           ,[FCFIX_RESULT]
+          ,[FCFIX_TIME]
           ,[FCFIX_COST]
           ,[FCFIX_NOTE]
           ,[FCFIX_REGIST_NM]
           ,[FCFIX_REGIST_DT])
         VALUES
-          (@설비수리계획NO,@결과내용,@결과,@금액,@비고,@등록자,@등록일시)
+          (@설비수리계획NO,@결과내용,@결과,@수리시간,@금액,@비고,@등록자,@등록일시)
       `);
 
       // 로그기록 저장
@@ -383,6 +391,7 @@ router.post("/edit", async (req, res) => {
       .input("설비수리계획NO", req.body.data.설비수리계획NO ?? null)
       .input("결과내용", req.body.data.결과내용 ?? "")
       .input("결과", req.body.data.결과 ?? "")
+      .input("수리시간", req.body.data.수리시간 ?? "")
       .input("금액", req.body.data.금액 ?? "")
       .input("비고", req.body.data.비고 ?? "")
       .input("등록자", req.body.user ?? "")
@@ -395,6 +404,7 @@ router.post("/edit", async (req, res) => {
             [FCFIX_FACILITY_FIX_PLAN_PK] = @설비수리계획NO
             ,[FCFIX_CONTENT] = @결과내용
             ,[FCFIX_RESULT] = @결과
+            ,[FCFIX_TIME] = @수리시간
             ,[FCFIX_COST] = @금액
             ,[FCFIX_NOTE] = @비고
             ,[FCFIX_REGIST_NM] = @등록자
@@ -445,6 +455,7 @@ router.post("/delete", async (req, res) => {
           ,FACILITY_FIX_PLAN.담당자 AS 담당자
           ,[FCFIX_CONTENT] AS 결과내용
           ,[FCFIX_RESULT] AS 결과
+          ,[FCFIX_TIME] AS 수리시간
           ,[FCFIX_COST] AS 금액
           ,[FCFIX_NOTE] AS 비고
           ,[FCFIX_REGIST_NM] AS 등록자

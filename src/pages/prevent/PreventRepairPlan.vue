@@ -1535,11 +1535,11 @@ const repairResultInsertFunction = async () => {
                 />
               </div>
               <div class="mt-3">
-                <FormLabel htmlFor="vertical-form-4">검사방법</FormLabel>
+                <FormLabel htmlFor="vertical-form-4">수리방법</FormLabel>
                 <FormInput
                   id="vertical-form-4"
                   type="text"
-                  v-model="editModalData.검사방법"
+                  v-model="editModalData.수리방법"
                   placeholder=""
                   readonly
                 />
@@ -1579,6 +1579,15 @@ const repairResultInsertFunction = async () => {
                   <option selected>적합</option>
                   <option>부적합</option>
                 </FormSelect>
+              </div>
+              <div class="mt-3">
+                <FormLabel htmlFor="vertical-form-10">수리시간(분)</FormLabel>
+                <FormInput
+                  id="vertical-form-10"
+                  type="number"
+                  v-model="editModalData.수리시간"
+                  placeholder=""
+                />
               </div>
               <div class="mt-3">
                 <FormLabel htmlFor="vertical-form-10">금액</FormLabel>

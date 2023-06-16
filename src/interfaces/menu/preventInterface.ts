@@ -74,6 +74,7 @@ export interface PreventRepair {
   담당자?: string;
   결과내용?: string;
   결과?: string;
+  수리시간?: string;
   금액?: string;
   비고?: string;
   등록자?: string;
@@ -97,6 +98,26 @@ export interface PreventLife {
   교체확인?: string;
   담당자ID?: string;
   담당자?: string;
+  비고?: string;
+  등록자?: string;
+  등록일시?: string;
+}
+
+// 예방보전 - 설비고장 관리
+export interface PreventError {
+  [attribute: string]: any | undefined;
+  NO?: number;
+  설비NO?: number;
+  설비명?: string;
+  비가동NO?: number;
+  비가동코드?: number;
+  비가동구분?: number;
+  비가동명?: number;
+  비가동내용?: number;
+  구분?: number;
+  시작일시?: string;
+  종료일시?: string;
+  조치내용?: string;
   비고?: string;
   등록자?: string;
   등록일시?: string;
