@@ -80,8 +80,8 @@ onMounted(async () => {
 });
 
 // 임시데이터
-const running = "미가동";
-const task_status = "작업미확인";
+const running = "가동중";
+const task_status = "작업중";
 const checked = false;
 const 지시수량 = ref("3000");
 const 완료수량 = ref("0");
@@ -132,7 +132,7 @@ const 생산수량_증가 = () => {
 };
 const 생산수량_차감 = () => {
   생산수량.value = String(Number(생산수량.value) - Number(입력수량.value));
-  if (생산수량.value < 0) 생산수량.value = "0";
+  if (Number(생산수량.value) < 0) 생산수량.value = "0";
   입력수량.value = "0";
   입력수량_show.value = "0";
 };
@@ -205,7 +205,7 @@ const finishCheckBox = ref(false);
 const taskFinishModal = ref(false);
 const setTaskFinishModal = (value: boolean) => {
   taskFinishModal.value = value;
-  if (지시수량 > Number(num_good.value.replace(/,/g, "")))
+  if (Number(지시수량) > Number(양품수량.value.replace(/,/g, "")))
     finishCheckBox.value = false;
   else finishCheckBox.value = true;
 };
@@ -248,17 +248,20 @@ const setWorkerChangeModal = (value: boolean) => {
 -->
 
 <template>
-  <div class="pl-8 pr-8 pt-8">
-    <div class="intro-y bg-[#3a437c] p-2 rounded-md">
-      <img class="m-auto w-32" src="../../assets/images/kiosk_logo.svg" />
+  <div class="pl-4 pr-4 pt-2">
+    <div class="intro-y bg-[#3a437c] p-1 rounded-md">
+      <img class="m-auto w-20" src="../../assets/images/kiosk_logo.svg" />
     </div>
 
-    <div class="flex mt-2 items-center h-10 intro-y">
+    <div class="flex items-center h-10 intro-y">
       <LoadingIcon icon="circles" class="w-5 h-5 mr-2" />
       <div>
-        <h2 class="mr-5 text-lg font-medium truncate" :key="now">
+        <h2 class="mr-5 text-base font-medium truncate" :key="now">
           {{ now }}
         </h2>
+      </div>
+      <div class="text-center text-sm">
+        <strong>인쇄기1 설비 작업현황</strong>
       </div>
       <div class="mx-auto">
         <div></div>
@@ -280,107 +283,17 @@ const setWorkerChangeModal = (value: boolean) => {
         <Lucide icon="RefreshCcw" class="w-4 h-4 mr-2" /> 새로고침
       </div>
     </div>
-    <div class="mt-3 flex intro-y">
-      <div class="flex m-auto">
-        <Button
-          class="mr-5 h-14 w-44 text-2xl"
-          as="a"
-          variant="dark"
-          @click="$router.push('/kiosk')"
-          ><Lucide icon="Home" class="w-7 h-7 mb-0.5 mr-1" /><strong
-            >설비선택</strong
-          ></Button
-        >
-        <Button
-          :class="[
-            'mr-5 h-14 w-44 text-2xl text-white',
-            { 'border-4 border-danger': checked == false },
-          ]"
-          as="a"
-          variant="success"
-          @click="setCheckListModal(true)"
-          ><strong>일상점검</strong></Button
-        >
-        <Button
-          class="mr-5 h-14 w-44 text-2xl text-white"
-          variant="success"
-          @click="setTaskListModal(true)"
-          :disabled="task_status == '작업중'"
-          ><strong>작업지시목록</strong></Button
-        >
-        <Button
-          v-if="task_status == '작업미확인' || task_status == ''"
-          class="mr-5 h-14 w-44 text-2xl text-white"
-          variant="success"
-          :disabled="task_status == ''"
-          @click="setTaskStartModal(true)"
-          ><strong>작업수락</strong></Button
-        >
-        <Button
-          v-if="task_status == '작업대기' || task_status == '작업중'"
-          class="mr-5 h-14 w-44 text-2xl text-white"
-          variant="success"
-          :disabled="task_status == '작업중'"
-          @click="setTaskStartModal(true)"
-          ><strong>작업시작</strong></Button
-        >
-        <Button
-          class="mr-5 h-14 w-44 text-2xl"
-          variant="pending"
-          @click="setNonOPModal(true)"
-          :disabled="task_status != '작업중'"
-          ><strong>비가동전환</strong></Button
-        ><Button
-          class="mr-5 h-14 w-44 text-2xl"
-          variant="pending"
-          @click="setBadAddModal(true)"
-          :disabled="task_status != '작업중'"
-          ><strong>불량변경</strong></Button
-        ><Button
-          class="mr-5 h-14 w-44 text-2xl"
-          variant="pending"
-          @click="setItemAddModal(true)"
-          :disabled="task_status != '작업중'"
-          ><strong>투입자재변경</strong></Button
-        ><Button
-          v-if="task_status == '작업중'"
-          class="mr-5 h-14 w-44 text-2xl"
-          variant="danger"
-          @click="setTaskFinishModal(true)"
-          ><strong>작업종료</strong></Button
-        >
-        <Button
-          v-if="
-            task_status == '작업미확인' ||
-            task_status == '작업대기' ||
-            task_status == ''
-          "
-          class="mr-5 h-14 w-48 text-2xl"
-          variant="danger"
-          @click="setTaskCancleModal(true)"
-          :disabled="task_status == ''"
-          ><strong>작업반려</strong></Button
-        >
-        <Button
-          class="h-14 w-44 text-2xl"
-          variant="danger"
-          @click="setAlertModal(true)"
-          ><Lucide icon="Siren" class="w-7 h-7 mb-0.5 mr-1" /><strong
-            >고장발생</strong
-          ></Button
-        >
-      </div>
-    </div>
-    <div class="grid grid-cols-3 p-1 mt-3 intro-y">
-      <div class="flex items-center cols-span-1 text-lg">
+
+    <div class="grid grid-cols-2 px-1 intro-y">
+      <div class="flex items-center col-span-1 text-sm">
         <div class="flex items-center mr-3">
           <Lucide class="w-5 h-5 mr-1" icon="CalendarClock" /><strong
-            >가동시작일시 : 2023-05-11 14:43</strong
+            >가동시작 : 2023-05-11 14:43</strong
           >
         </div>
         <div class="flex items-center">
           <Lucide class="w-5 h-5 mr-1" icon="Signal" /><strong
-            >설비운전상태 :
+            >운전상태 :
           </strong>
           <div class="flex ml-1 items-center">
             <div
@@ -414,10 +327,8 @@ const setWorkerChangeModal = (value: boolean) => {
           />
         </div>
       </div>
-      <div class="cols-span-1 text-center text-2xl">
-        <strong>인쇄기1 설비 작업현황</strong>
-      </div>
-      <div class="flex items-center cols-span-1 text-right text-lg">
+
+      <div class="flex items-center col-span-1 text-right text-sm">
         <div class="flex ml-auto items-center mr-3">
           <Lucide class="w-5 h-5 mr-1 mb-0.5" icon="ArrowUpCircle" /><strong
             >부하시간 : 14:43:00</strong
@@ -435,161 +346,134 @@ const setWorkerChangeModal = (value: boolean) => {
         </div>
       </div>
     </div>
-    <div
-      class="p-2 mt-3 border-2 border-[#3a437c] text-center text-xl rounded-md bg-white intro-y"
-      style="height: 650px"
-    >
-      <div class="grid grid-cols-4 gap-2">
-        <div class="col-span-1">
-          <div class="pl-1 pr-1 pt-1 bg-success text-white">
-            <strong>생산제품</strong>
-          </div>
-          <div class="border-2 border-success" style="height: 279px">
-            <table class="w-full">
-              <tbody>
-                <tr class="border-b-2 border-success h-9">
-                  <td
-                    class="border-r-2 border-success bg-slate-200 font-bold w-24"
-                  >
-                    품번
-                  </td>
-                  <td class="pl-2 text-left">2074-G901-1</td>
-                </tr>
-                <tr class="border-b-2 border-success h-9">
-                  <td class="border-r-2 border-success bg-slate-200 font-bold">
-                    구분
-                  </td>
-                  <td class="pl-2 text-left">반제품</td>
-                </tr>
-                <tr class="border-b-2 border-success h-9">
-                  <td class="border-r-2 border-success bg-slate-200 font-bold">
-                    품명
-                  </td>
-                  <td class="pl-2 text-left">POWER TERMINAL PRE-MOLD</td>
-                </tr>
-                <tr class="border-b-2 border-success h-9">
-                  <td class="border-r-2 border-success bg-slate-200 font-bold">
-                    규격
-                  </td>
-                  <td class="pl-2 text-left">A2 E-EGR</td>
-                </tr>
-                <tr class="border-b-2 border-success h-9">
-                  <td class="border-success bg-slate-200 font-bold" colspan="2">
-                    작업표준서
-                  </td>
-                </tr>
-                <tr class="border-b-2 border-success h-24">
-                  <td class="border-success" colspan="2">
-                    <Button
-                      class="mr-5 h-14 w-64 text-2xl text-white"
-                      as="a"
-                      variant="success"
-                      @click="setTaskStandardModal(true)"
-                      ><strong>작업표준서 열기</strong></Button
-                    >
-                  </td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
-        </div>
-        <div class="col-span-2">
-          <div class="pl-1 pr-1 pt-1 bg-[#D9821C] text-white">
-            <strong>투입자재</strong>
-          </div>
-          <div
-            class="border-2 border-[#D9821C]"
-            style="height: 279px; overflow-y: visible; overflow-x: hidden"
-          >
-            <table class="w-full">
-              <thead
-                class="border-b-2 border-[#D9821C] bg-slate-200 h-9"
-                style="position: sticky; top: 0px; z-index: 2"
-              >
-                <th class="border-r-2 border-[#D9821C] w-40">LOT코드</th>
-                <th class="border-r-2 border-[#D9821C] w-32">품목코드</th>
-                <th class="border-r-2 border-[#D9821C] w-32">품목구분</th>
-                <th class="border-r-2 border-[#D9821C] w-48">품명</th>
-                <th class="border-r-2 border-[#D9821C] w-32">단위</th>
-                <th class="w-24">수량</th>
-              </thead>
-              <tbody>
-                <tr v-for="i in Array(10).fill('10')">
-                  <td class="border-b-2 border-r-2 border-[#D9821C] h-9">
-                    FA00001230418
-                  </td>
-                  <td class="border-b-2 border-r-2 border-[#D9821C] h-9">
-                    AS00001
-                  </td>
-                  <td class="border-b-2 border-r-2 border-[#D9821C] h-9">
-                    반제품
-                  </td>
-                  <td class="border-b-2 border-r-2 border-[#D9821C] h-9">
-                    인쇄용지1
-                  </td>
-                  <td class="border-b-2 border-r-2 border-[#D9821C] h-9">롤</td>
-                  <td class="border-b-2 border-[#D9821C] h-9">2</td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
-        </div>
 
-        <div class="col-span-1">
-          <div class="pl-1 pr-1 pt-1 bg-primary text-white">
-            <strong>생산실적</strong>
+    <div class="grid grid-cols-12">
+      <div
+        class="col-span-10 p-2 border-2 border-[#3a437c] text-center text-base rounded-md bg-white intro-y"
+      >
+        <div class="grid grid-cols-12 gap-2">
+          <div class="col-span-7">
+            <div class="pl-1 pr-1 pt-1 bg-success text-white">
+              <strong>생산제품</strong>
+            </div>
+            <div class="border-2 border-success" style="height: 215px">
+              <table class="w-full">
+                <tbody>
+                  <tr class="border-b-2 border-success h-7">
+                    <td
+                      class="border-r-2 border-success bg-slate-200 font-bold w-24"
+                    >
+                      품번
+                    </td>
+                    <td class="pl-2 text-left">2074-G901-1</td>
+                  </tr>
+                  <tr class="border-b-2 border-success h-7">
+                    <td
+                      class="border-r-2 border-success bg-slate-200 font-bold"
+                    >
+                      구분
+                    </td>
+                    <td class="pl-2 text-left">반제품</td>
+                  </tr>
+                  <tr class="border-b-2 border-success h-7">
+                    <td
+                      class="border-r-2 border-success bg-slate-200 font-bold"
+                    >
+                      품명
+                    </td>
+                    <td class="pl-2 text-left">POWER TERMINAL PRE-MOLD</td>
+                  </tr>
+                  <tr class="border-b-2 border-success h-7">
+                    <td
+                      class="border-r-2 border-success bg-slate-200 font-bold"
+                    >
+                      규격
+                    </td>
+                    <td class="pl-2 text-left">A2 E-EGR</td>
+                  </tr>
+                  <tr class="border-b-2 border-success h-7">
+                    <td
+                      class="border-success bg-slate-200 font-bold"
+                      colspan="2"
+                    >
+                      작업표준서
+                    </td>
+                  </tr>
+                  <tr class="border-success h-14">
+                    <td class="border-success" colspan="2">
+                      <Button
+                        class="mt-2 h-12 w-64 text-xl text-white"
+                        as="a"
+                        variant="success"
+                        @click="setTaskStandardModal(true)"
+                        ><strong>작업표준서 열기</strong></Button
+                      >
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
           </div>
-          <div class="border-2 border-primary" style="height: 279px">
-            <table class="w-full">
-              <tbody>
-                <tr class="border-b-2 border-primary h-9">
-                  <td
-                    class="border-r-2 border-primary bg-slate-200 font-bold w-[30%]"
-                  >
-                    지시수량
-                  </td>
-                  <td colspan="3" class="pl-2 text-left w-[70%]">
-                    {{
-                      Number(지시수량).toLocaleString(undefined, {
-                        maximumFractionDigits: 11,
-                      })
-                    }}
-                  </td>
-                </tr>
-                <tr class="border-b-2 border-primary h-9">
-                  <td class="border-r-2 border-primary bg-slate-200 font-bold">
-                    완료수량
-                  </td>
-                  <td class="pl-2 text-left">
-                    {{
-                      Number(완료수량).toLocaleString(undefined, {
-                        maximumFractionDigits: 11,
-                      })
-                    }}
-                  </td>
-                </tr>
-                <tr class="border-b-2 border-primary h-9">
-                  <td class="border-r-2 border-primary bg-slate-200 font-bold">
-                    생산수량
-                  </td>
-                  <td class="pl-2 text-left">
-                    <div class="flex items-center">
-                      <div class="mr-auto" :key="생산수량">
-                        {{
-                          Number(생산수량).toLocaleString(undefined, {
-                            maximumFractionDigits: 11,
-                          })
-                        }}
-                      </div>
-                      <div class="ml-auto p-1">
-                        <Button
-                          class="h-7 mr-2"
-                          variant="primary"
-                          @click="생산수량_초기화()"
-                          >초기화</Button
-                        >
-                      </div>
-                      <!-- <div v-if="num_show != '0'" class="ml-auto">
+
+          <div class="col-span-5">
+            <div class="pl-1 pr-1 pt-1 bg-primary text-white">
+              <strong>생산실적</strong>
+            </div>
+            <div class="border-2 border-primary" style="height: 215px">
+              <table class="w-full">
+                <tbody>
+                  <tr class="border-b-2 border-primary h-7">
+                    <td
+                      class="border-r-2 border-primary bg-slate-200 font-bold w-[30%]"
+                    >
+                      지시수량
+                    </td>
+                    <td colspan="3" class="pl-2 text-left w-[70%]">
+                      {{
+                        Number(지시수량).toLocaleString(undefined, {
+                          maximumFractionDigits: 11,
+                        })
+                      }}
+                    </td>
+                  </tr>
+                  <tr class="border-b-2 border-primary h-7">
+                    <td
+                      class="border-r-2 border-primary bg-slate-200 font-bold"
+                    >
+                      완료수량
+                    </td>
+                    <td class="pl-2 text-left">
+                      {{
+                        Number(완료수량).toLocaleString(undefined, {
+                          maximumFractionDigits: 11,
+                        })
+                      }}
+                    </td>
+                  </tr>
+                  <tr class="border-b-2 border-primary h-7">
+                    <td
+                      class="border-r-2 border-primary bg-slate-200 font-bold"
+                    >
+                      생산수량
+                    </td>
+                    <td class="pl-2 text-left">
+                      <div class="flex items-center">
+                        <div class="mr-auto" :key="생산수량">
+                          {{
+                            Number(생산수량).toLocaleString(undefined, {
+                              maximumFractionDigits: 11,
+                            })
+                          }}
+                        </div>
+                        <div class="ml-auto px-1">
+                          <Button
+                            class="h-5 mr-2"
+                            variant="primary"
+                            @click="생산수량_초기화()"
+                            >초기화</Button
+                          >
+                        </div>
+                        <!-- <div v-if="num_show != '0'" class="ml-auto">
                         <Button
                           class="h-7 text-white mr-2"
                           variant="primary"
@@ -597,67 +481,74 @@ const setWorkerChangeModal = (value: boolean) => {
                           >임시저장</Button
                         >
                       </div> -->
-                    </div>
-                  </td>
-                </tr>
-                <tr class="border-b-2 border-primary h-9">
-                  <td class="border-r-2 border-primary bg-slate-200 font-bold">
-                    불량수량
-                  </td>
-                  <td class="pl-2 text-left">
-                    {{
-                      Number(불량수량).toLocaleString(undefined, {
-                        maximumFractionDigits: 11,
-                      })
-                    }}
-                  </td>
-                </tr>
-                <tr class="border-b-2 border-primary h-9">
-                  <td class="border-r-2 border-primary bg-slate-200 font-bold">
-                    양품수량
-                  </td>
-                  <td class="pl-2 text-left w-28">
-                    {{
-                      Number(양품수량).toLocaleString(undefined, {
-                        maximumFractionDigits: 11,
-                      })
-                    }}
-                  </td>
-                </tr>
+                      </div>
+                    </td>
+                  </tr>
+                  <tr class="border-b-2 border-primary h-7">
+                    <td
+                      class="border-r-2 border-primary bg-slate-200 font-bold"
+                    >
+                      불량수량
+                    </td>
+                    <td class="pl-2 text-left">
+                      {{
+                        Number(불량수량).toLocaleString(undefined, {
+                          maximumFractionDigits: 11,
+                        })
+                      }}
+                    </td>
+                  </tr>
+                  <tr class="border-b-2 border-primary h-7">
+                    <td
+                      class="border-r-2 border-primary bg-slate-200 font-bold"
+                    >
+                      양품수량
+                    </td>
+                    <td class="pl-2 text-left w-28">
+                      {{
+                        Number(양품수량).toLocaleString(undefined, {
+                          maximumFractionDigits: 11,
+                        })
+                      }}
+                    </td>
+                  </tr>
 
-                <tr class="border-b-2 border-primary h-9">
-                  <td class="border-primary bg-slate-200 font-bold" colspan="3">
-                    생산수 저장
-                  </td>
-                </tr>
-                <tr>
-                  <td colspan="2">
-                    <div class="flex">
-                      <div class="flex mx-auto">
-                        <div
-                          class="mt-1.5 mr-10 p-1.5 w-48 h-10 border-2 border-slate-200"
-                        >
-                          {{ 입력수량_show }}
-                        </div>
-                        <div class="mt-1.5">
-                          <Button
-                            class="mr-5 h-10"
-                            variant="primary"
-                            @click="생산수량_증가()"
-                            >증가</Button
-                          ><Button
-                            class="h-10"
-                            variant="danger"
-                            @click="생산수량_차감()"
-                            >차감</Button
+                  <tr class="border-b-2 border-primary h-7">
+                    <td
+                      class="border-primary bg-slate-200 font-bold"
+                      colspan="3"
+                    >
+                      생산수 저장
+                    </td>
+                  </tr>
+                  <tr>
+                    <td colspan="2">
+                      <div class="flex">
+                        <div class="flex mx-auto">
+                          <div
+                            class="mt-1.5 mr-5 w-40 h-7 border-2 border-slate-200"
                           >
+                            {{ 입력수량_show }}
+                          </div>
+                          <div class="mt-1.5">
+                            <Button
+                              class="mr-2 h-7"
+                              variant="primary"
+                              @click="생산수량_증가()"
+                              >증가</Button
+                            ><Button
+                              class="h-7"
+                              variant="danger"
+                              @click="생산수량_차감()"
+                              >차감</Button
+                            >
+                          </div>
                         </div>
                       </div>
-                    </div>
-                  </td>
-                </tr>
+                    </td>
+                  </tr>
 
-                <!-- <tr class="border-b-2 border-primary h-9">
+                  <!-- <tr class="border-b-2 border-primary h-7">
                   <td class="border-primary bg-slate-200 font-bold" colspan="4">
                     작업진행률
                   </td>
@@ -678,233 +569,270 @@ const setWorkerChangeModal = (value: boolean) => {
                     </div>
                   </td>
                 </tr> -->
-              </tbody>
-            </table>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+        <div class="grid grid-cols-12 gap-2 mt-2">
+          <div class="col-span-7">
+            <div class="pl-1 pr-1 pt-1 bg-success text-white">
+              <strong>작업지시정보</strong>
+            </div>
+            <div class="border-2 border-success" style="height: 215px">
+              <table class="w-full">
+                <tbody>
+                  <tr class="border-b-2 border-success h-7">
+                    <td
+                      class="border-r-2 border-success bg-slate-200 font-bold w-24"
+                    >
+                      작업코드
+                    </td>
+                    <td class="pl-2 text-left">TAS0022112202</td>
+                  </tr>
+                  <tr class="border-b-2 border-success h-7">
+                    <td
+                      class="border-r-2 border-success bg-slate-200 font-bold"
+                    >
+                      시작일
+                    </td>
+                    <td class="pl-2 text-left">2023-05-11</td>
+                  </tr>
+
+                  <tr class="border-b-2 border-success h-7">
+                    <td
+                      class="border-r-2 border-success bg-slate-200 font-bold"
+                    >
+                      공정명
+                    </td>
+                    <td class="pl-2 text-left">인쇄2공정</td>
+                  </tr>
+                  <tr class="border-b-2 border-success h-7">
+                    <td
+                      class="border-r-2 border-success bg-slate-200 font-bold"
+                    >
+                      설비명
+                    </td>
+                    <td class="pl-2 text-left">인쇄기1</td>
+                  </tr>
+                  <tr class="border-b-2 border-success h-7">
+                    <td
+                      class="border-r-2 border-success bg-slate-200 font-bold"
+                    >
+                      지시수량
+                    </td>
+                    <td class="pl-2 text-left">
+                      {{ 지시수량.toLocaleString() }}
+                    </td>
+                  </tr>
+                  <tr class="border-b-2 border-success h-7">
+                    <td
+                      class="border-r-2 border-success bg-slate-200 font-bold"
+                    >
+                      단위
+                    </td>
+                    <td class="pl-2 text-left">매</td>
+                  </tr>
+                  <tr class="border-b-2 border-success h-7">
+                    <td
+                      class="border-r-2 border-success bg-slate-200 font-bold"
+                    >
+                      작업자
+                    </td>
+                    <td class="pl-2 text-left">
+                      <div class="flex">
+                        <div class="mr-auto">박명한</div>
+                        <div class="ml-auto">
+                          <Button
+                            class="h-7 text-white mr-2"
+                            variant="success"
+                            @click="setWorkerChangeModal(true)"
+                            >작업자변경</Button
+                          >
+                        </div>
+                      </div>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <div class="col-span-5">
+            <div class="pl-1 pr-1 pt-1 bg-primary text-white">
+              <strong>생산수입력</strong>
+            </div>
+            <div class="border-2 border-primary" style="height: 215px">
+              <div class="grid grid-cols-3 mt-4">
+                <div class="cols-span-1">
+                  <Button class="py-1 w-24 text-2xl" @click="insert_num('1')"
+                    >1</Button
+                  >
+                </div>
+                <div class="cols-span-1">
+                  <Button class="py-1 w-24 text-2xl" @click="insert_num('2')"
+                    >2</Button
+                  >
+                </div>
+                <div class="cols-span-1">
+                  <Button class="py-1.5 w-24 text-2xl" @click="insert_num('3')"
+                    >3</Button
+                  >
+                </div>
+              </div>
+              <div class="grid grid-cols-3 mt-1">
+                <div class="cols-span-1">
+                  <Button class="py-1 w-24 text-2xl" @click="insert_num('4')"
+                    >4</Button
+                  >
+                </div>
+                <div class="cols-span-1">
+                  <Button class="py-1 w-24 text-2xl" @click="insert_num('5')"
+                    >5</Button
+                  >
+                </div>
+                <div class="cols-span-1">
+                  <Button class="py-1 w-24 text-2xl" @click="insert_num('6')"
+                    >6</Button
+                  >
+                </div>
+              </div>
+              <div class="grid grid-cols-3 mt-1">
+                <div class="cols-span-1">
+                  <Button class="py-1 w-24 text-2xl" @click="insert_num('7')"
+                    >7</Button
+                  >
+                </div>
+                <div class="cols-span-1">
+                  <Button class="py-1 w-24 text-2xl" @click="insert_num('8')"
+                    >8</Button
+                  >
+                </div>
+                <div class="cols-span-1">
+                  <Button class="py-1 w-24 text-2xl" @click="insert_num('9')"
+                    >9</Button
+                  >
+                </div>
+              </div>
+              <div class="grid grid-cols-3 mt-1">
+                <div class="cols-span-1">
+                  <Button class="py-1 w-24 text-2xl" @click="insert_dot()"
+                    >.</Button
+                  >
+                </div>
+                <div class="cols-span-1">
+                  <Button class="py-1 w-24 text-2xl" @click="insert_num('0')"
+                    >0</Button
+                  >
+                </div>
+                <div class="cols-span-1">
+                  <Button class="py-1 w-24 text-2xl" @click="delete_num()"
+                    ><Lucide icon="Delete" class="w-8 h-8 mx-auto text-info"
+                  /></Button>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
       </div>
-      <div class="grid grid-cols-4 gap-2 mt-2">
-        <div class="col-span-1">
-          <div class="pl-1 pr-1 pt-1 bg-success text-white">
-            <strong>작업지시정보</strong>
-          </div>
-          <div class="border-2 border-success" style="height: 279px">
-            <table class="w-full">
-              <tbody>
-                <tr class="border-b-2 border-success h-9">
-                  <td
-                    class="border-r-2 border-success bg-slate-200 font-bold w-24"
-                  >
-                    작업코드
-                  </td>
-                  <td class="pl-2 text-left">TAS0022112202</td>
-                </tr>
-                <tr class="border-b-2 border-success h-9">
-                  <td class="border-r-2 border-success bg-slate-200 font-bold">
-                    시작일
-                  </td>
-                  <td class="pl-2 text-left">2023-05-11</td>
-                </tr>
-
-                <tr class="border-b-2 border-success h-9">
-                  <td class="border-r-2 border-success bg-slate-200 font-bold">
-                    공정명
-                  </td>
-                  <td class="pl-2 text-left">인쇄2공정</td>
-                </tr>
-                <tr class="border-b-2 border-success h-9">
-                  <td class="border-r-2 border-success bg-slate-200 font-bold">
-                    설비명
-                  </td>
-                  <td class="pl-2 text-left">인쇄기1</td>
-                </tr>
-                <tr class="border-b-2 border-success h-9">
-                  <td class="border-r-2 border-success bg-slate-200 font-bold">
-                    지시수량
-                  </td>
-                  <td class="pl-2 text-left">
-                    {{ 지시수량.toLocaleString() }}
-                  </td>
-                </tr>
-                <tr class="border-b-2 border-success h-9">
-                  <td class="border-r-2 border-success bg-slate-200 font-bold">
-                    단위
-                  </td>
-                  <td class="pl-2 text-left">매</td>
-                </tr>
-                <tr class="border-b-2 border-success h-9">
-                  <td class="border-r-2 border-success bg-slate-200 font-bold">
-                    작업자
-                  </td>
-                  <td class="pl-2 text-left">
-                    <div class="flex">
-                      <div class="mr-auto">박명한</div>
-                      <div class="ml-auto">
-                        <Button
-                          class="h-7 text-white mr-2"
-                          variant="success"
-                          @click="setWorkerChangeModal(true)"
-                          >작업자변경</Button
-                        >
-                      </div>
-                    </div>
-                  </td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
-        </div>
-        <div class="col-span-1">
-          <div class="pl-1 pr-1 pt-1 bg-[#D9821C] text-white">
-            <strong>비가동</strong>
-          </div>
-
-          <div
-            class="border-2 border-[#D9821C]"
-            style="height: 279px; overflow-y: visible; overflow-x: hidden"
+      <div class="col-span-2">
+        <div class="">
+          <Button
+            class="mx-2 mb-3 h-10 w-full text-xl"
+            as="a"
+            variant="dark"
+            @click="$router.push('/kiosk')"
+            ><strong>설비선택</strong></Button
           >
-            <table class="w-full">
-              <thead
-                class="border-b-2 border-[#D9821C] bg-slate-200 h-9"
-                style="position: sticky; top: 0px; z-index: 2"
-              >
-                <th class="border-r-2 border-[#D9821C] w-24">코드</th>
-                <th class="border-r-2 border-[#D9821C] w-32">비가동명</th>
-                <th class="border-r-2 border-[#D9821C] w-32">시작일시</th>
-                <th class="w-32">종료일시</th>
-              </thead>
-              <tbody>
-                <tr v-for="i in Array(10).fill('10')">
-                  <td class="border-b-2 border-r-2 border-[#D9821C] h-9">
-                    0012
-                  </td>
-                  <td class="border-b-2 border-r-2 border-[#D9821C] h-9">
-                    계획정지
-                  </td>
-                  <td class="border-b-2 border-r-2 border-[#D9821C] h-9">
-                    2023-05-11 12:33:12
-                  </td>
-                  <td class="border-b-2 border-[#D9821C] h-9">
-                    2023-05-11 18:33:12
-                  </td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
-        </div>
-        <div class="col-span-1">
-          <div class="pl-1 pr-1 pt-1 bg-[#D9821C] text-white">
-            <strong>불량</strong>
-          </div>
-          <div
-            class="border-2 border-[#D9821C]"
-            style="height: 279px; overflow-y: visible; overflow-x: hidden"
+          <Button
+            :class="[
+              'mx-2 mb-3 h-10 w-full text-xl text-white',
+              { 'border-4 border-danger': checked == false },
+            ]"
+            as="a"
+            variant="success"
+            @click="setCheckListModal(true)"
+            ><strong>일상점검</strong></Button
           >
-            <table class="w-full">
-              <thead
-                class="border-b-2 border-[#D9821C] bg-slate-200 h-9"
-                style="position: sticky; top: 0px; z-index: 2"
-              >
-                <th class="border-r-2 border-[#D9821C] w-40">코드</th>
-                <th class="border-r-2 border-[#D9821C] w-32">구분</th>
-                <th class="border-r-2 border-[#D9821C] w-32">불량명</th>
-                <th class="w-24">수량</th>
-              </thead>
-              <tbody>
-                <tr v-for="i in Array(10).fill('10')">
-                  <td class="border-b-2 border-r-2 border-[#D9821C] h-9">
-                    001230418
-                  </td>
-                  <td class="border-b-2 border-r-2 border-[#D9821C] h-9">
-                    오염
-                  </td>
-                  <td class="border-b-2 border-r-2 border-[#D9821C] h-9">
-                    재질오염
-                  </td>
-                  <td class="border-b-2 border-[#D9821C] h-9">2</td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
-        </div>
-        <div class="col-span-1">
-          <div class="pl-1 pr-1 pt-1 bg-primary text-white">
-            <strong>생산수입력</strong>
-          </div>
-          <div class="border-2 border-primary" style="height: 279px">
-            <div class="grid grid-cols-3 mt-4">
-              <div class="cols-span-1">
-                <Button class="w-32 text-4xl" @click="insert_num('1')"
-                  >1</Button
-                >
-              </div>
-              <div class="cols-span-1">
-                <Button class="w-32 text-4xl" @click="insert_num('2')"
-                  >2</Button
-                >
-              </div>
-              <div class="cols-span-1">
-                <Button class="w-32 text-4xl" @click="insert_num('3')"
-                  >3</Button
-                >
-              </div>
-            </div>
-            <div class="grid grid-cols-3 mt-1">
-              <div class="cols-span-1">
-                <Button class="w-32 text-4xl" @click="insert_num('4')"
-                  >4</Button
-                >
-              </div>
-              <div class="cols-span-1">
-                <Button class="w-32 text-4xl" @click="insert_num('5')"
-                  >5</Button
-                >
-              </div>
-              <div class="cols-span-1">
-                <Button class="w-32 text-4xl" @click="insert_num('6')"
-                  >6</Button
-                >
-              </div>
-            </div>
-            <div class="grid grid-cols-3 mt-1">
-              <div class="cols-span-1">
-                <Button class="w-32 text-4xl" @click="insert_num('7')"
-                  >7</Button
-                >
-              </div>
-              <div class="cols-span-1">
-                <Button class="w-32 text-4xl" @click="insert_num('8')"
-                  >8</Button
-                >
-              </div>
-              <div class="cols-span-1">
-                <Button class="w-32 text-4xl" @click="insert_num('9')"
-                  >9</Button
-                >
-              </div>
-            </div>
-            <div class="grid grid-cols-3 mt-1">
-              <div class="cols-span-1">
-                <Button class="w-32 text-4xl" @click="insert_dot()">.</Button>
-              </div>
-              <div class="cols-span-1">
-                <Button class="w-32 text-4xl" @click="insert_num('0')"
-                  >0</Button
-                >
-              </div>
-              <div class="cols-span-1">
-                <Button class="w-32 text-4xl" @click="delete_num()"
-                  ><Lucide icon="Delete" class="w-10 h-10 mx-auto text-info"
-                /></Button>
-              </div>
-            </div>
-          </div>
+          <Button
+            class="mx-2 mb-3 h-10 w-full text-xl text-white"
+            variant="success"
+            @click="setTaskListModal(true)"
+            :disabled="task_status == '작업중'"
+            ><strong>작업지시목록</strong></Button
+          >
+          <Button
+            v-if="task_status == '작업미확인' || task_status == ''"
+            class="mx-2 mb-3 h-10 w-full text-xl text-white"
+            variant="success"
+            :disabled="task_status == ''"
+            @click="setTaskStartModal(true)"
+            ><strong>작업수락</strong></Button
+          >
+          <Button
+            v-if="task_status == '작업대기' || task_status == '작업중'"
+            class="mx-2 mb-3 h-10 w-full text-xl text-white"
+            variant="success"
+            :disabled="task_status == '작업중'"
+            @click="setTaskStartModal(true)"
+            ><strong>작업시작</strong></Button
+          >
+          <Button
+            class="mx-2 mb-3 h-10 w-full text-xl"
+            variant="pending"
+            @click="setNonOPModal(true)"
+            :disabled="task_status != '작업중'"
+            ><strong>비가동전환</strong></Button
+          >
+          <Button
+            class="mx-2 mb-3 h-10 w-full text-xl"
+            variant="pending"
+            @click="setNonOPModal(true)"
+            :disabled="task_status != '작업중'"
+            ><strong>비가동확인</strong></Button
+          ><Button
+            class="mx-2 mb-3 h-10 w-full text-xl"
+            variant="pending"
+            @click="setBadAddModal(true)"
+            :disabled="task_status != '작업중'"
+            ><strong>불량등록</strong></Button
+          ><Button
+            class="mx-2 mb-3 h-10 w-full text-xl"
+            variant="pending"
+            @click="setItemAddModal(true)"
+            :disabled="task_status != '작업중'"
+            ><strong>투입자재등록</strong></Button
+          ><Button
+            v-if="task_status == '작업중'"
+            class="mx-2 mb-3 h-10 w-full text-xl"
+            variant="danger"
+            @click="setTaskFinishModal(true)"
+            ><strong>작업종료</strong></Button
+          >
+          <Button
+            v-if="
+              task_status == '작업미확인' ||
+              task_status == '작업대기' ||
+              task_status == ''
+            "
+            class="mx-2 mb-3 h-10 w-full text-xl"
+            variant="danger"
+            @click="setTaskCancleModal(true)"
+            :disabled="task_status == ''"
+            ><strong>작업반려</strong></Button
+          >
+          <Button
+            class="mx-2 h-10 w-full text-xl"
+            variant="danger"
+            @click="setAlertModal(true)"
+            ><strong>고장발생</strong></Button
+          >
         </div>
       </div>
     </div>
   </div>
   <!-- BEGIN: FOOTER(COPYRIGHT) -->
-  <div class="intro-y mr-10 mt-2" style="text-align: right">
+  <div class="intro-y mt-0.5" style="text-align: center">
     <footer>&copy;2023 QInnotek. All rights reserved.</footer>
   </div>
   <!-- END: FOOTER(COPYRIGHT) -->
@@ -1251,7 +1179,9 @@ const setWorkerChangeModal = (value: boolean) => {
                     class="text-center border-l-2 border-r-2 border-danger font-bold"
                   >
                     <div
-                      v-if="지시수량 > Number(num_good.replace(/,/g, ''))"
+                      v-if="
+                        Number(지시수량) > Number(양품수량.replace(/,/g, ''))
+                      "
                       class="pl-7 pr-7 mt-5 text-lg"
                     >
                       <div class="flex">
