@@ -44,23 +44,20 @@ const pageChangeFirst = () => {
 };
 
 // dataManager 만들기
-const url = "/api/prevent/repairresult";
+const url = "/api/prevent/errorresult";
 const dataManager = useSendApi<PreventError>(url, currentPage, rowsPerPage);
 
 // 테이블항목 설정 및 가로크기 조정
 const table_setting = {
   체크박스: { name: "체크박스", style: "width: 5px" },
   순번: { name: "순번", style: "width: 5px; text-align: center;" },
-  항목1: { name: "등록일시", style: "width: 50px; text-align: center;" },
-  항목2: { name: "설비명", style: "width: 50px; text-align: center;" },
-  항목3: { name: "구분", style: "width: 50px; text-align: center;" },
-  항목4: { name: "내용", style: "width: 50px; text-align: center;" },
-  항목5: { name: "수리방법", style: "width: 50px; text-align: center;" },
-  항목6: { name: "기준", style: "width: 50px; text-align: center;" },
-  항목7: { name: "담당자", style: "width: 50px; text-align: center;" },
-  항목8: { name: "결과내용", style: "width: 50px; text-align: center;" },
-  항목9: { name: "결과", style: "width: 50px; text-align: center;" },
-  항목10: { name: "금액", style: "width: 50px; text-align: center;" },
+  항목1: { name: "설비명", style: "width: 50px; text-align: center;" },
+  항목2: { name: "비가동구분", style: "width: 50px; text-align: center;" },
+  항목3: { name: "비가동명", style: "width: 50px; text-align: center;" },
+  항목4: { name: "구분", style: "width: 50px; text-align: center;" },
+  항목5: { name: "시작일시", style: "width: 50px; text-align: center;" },
+  항목6: { name: "종료일시", style: "width: 50px; text-align: center;" },
+  항목7: { name: "조치내용", style: "width: 50px; text-align: center;" },
   상세보기: { name: "정보", style: "width: 50px; text-align: center;" },
   편집: { name: "편집", style: "width: 50px; text-align: center;" },
 };
@@ -381,7 +378,7 @@ const onFileImport = (event: any) => {
       <div
         class="flex flex-wrap items-center col-span-12 mt-2 mb-2 intro-y sm:flex-nowrap"
       >
-        <!-- <Button
+        <Button
           class="mr-2 shadow-md"
           as="a"
           variant="primary"
@@ -393,19 +390,6 @@ const onFileImport = (event: any) => {
         >
           <Lucide icon="FilePlus" class="w-4 h-4 mr-2" />
           등록
-        </Button> -->
-        <Button
-          class="mr-3 shadow-md"
-          as="a"
-          variant="linkedin"
-          @click="
-            () => {
-              router.push('/prevent/repair-plan');
-            }
-          "
-        >
-          <Lucide icon="ExternalLink" class="w-4 h-4 mr-2" />
-          설비수리등록
         </Button>
         <Button
           class="mr-2 shadow-md"
@@ -466,14 +450,12 @@ const onFileImport = (event: any) => {
           <FormSelect v-model="searchKey" class="w-30 mt-3 !box sm:mt-0">
             <option>전체</option>
             <option>설비명</option>
+            <option>비가동구분</option>
+            <option>비가동명</option>
             <option>구분</option>
-            <option>내용</option>
-            <option>수리방법</option>
-            <option>기준</option>
-            <option>담당자</option>
-            <option>결과내용</option>
-            <option>결과</option>
-            <option>금액</option>
+            <option>시작일시</option>
+            <option>종료일시</option>
+            <option>조치내용</option>
             <option>비고</option>
           </FormSelect>
         </div>
@@ -538,14 +520,12 @@ const onFileImport = (event: any) => {
           <FormSelect v-model="sortKey" class="w-30 mt-3 !box sm:mt-0">
             <option>등록일</option>
             <option>설비명</option>
+            <option>비가동구분</option>
+            <option>비가동명</option>
             <option>구분</option>
-            <option>내용</option>
-            <option>수리방법</option>
-            <option>기준</option>
-            <option>담당자</option>
-            <option>결과내용</option>
-            <option>결과</option>
-            <option>금액</option>
+            <option>시작일시</option>
+            <option>종료일시</option>
+            <option>조치내용</option>
             <option>비고</option>
           </FormSelect>
         </div>
@@ -684,24 +664,6 @@ const onFileImport = (event: any) => {
                 >
                   {{ table_setting.항목7.name }}
                 </Table.Th>
-                <Table.Th
-                  class="text-center border-b-0 whitespace-nowrap font-bold"
-                  :style="table_setting.항목8.style"
-                >
-                  {{ table_setting.항목8.name }}
-                </Table.Th>
-                <Table.Th
-                  class="text-center border-b-0 whitespace-nowrap font-bold"
-                  :style="table_setting.항목9.style"
-                >
-                  {{ table_setting.항목9.name }}
-                </Table.Th>
-                <Table.Th
-                  class="text-center border-b-0 whitespace-nowrap font-bold"
-                  :style="table_setting.항목10.style"
-                >
-                  {{ table_setting.항목10.name }}
-                </Table.Th>
                 <!-- <Table.Th
                   class="text-center border-b-0 whitespace-nowrap font-bold"
                   :style="table_setting.상세보기.style"
@@ -782,24 +744,6 @@ const onFileImport = (event: any) => {
                   :style="table_setting.항목7.style"
                 >
                   <div>{{ todo[table_setting.항목7.name] }}</div>
-                </Table.Td>
-                <Table.Td
-                  class="first:rounded-l-md last:rounded-r-md text-center bg-white border-b-0 dark:bg-darkmode-600 shadow-[20px_3px_20px_#0000000b]"
-                  :style="table_setting.항목8.style"
-                >
-                  <div>{{ todo[table_setting.항목8.name] }}</div>
-                </Table.Td>
-                <Table.Td
-                  class="first:rounded-l-md last:rounded-r-md text-center bg-white border-b-0 dark:bg-darkmode-600 shadow-[20px_3px_20px_#0000000b]"
-                  :style="table_setting.항목9.style"
-                >
-                  <div>{{ todo[table_setting.항목9.name] }}</div>
-                </Table.Td>
-                <Table.Td
-                  class="first:rounded-l-md last:rounded-r-md text-center bg-white border-b-0 dark:bg-darkmode-600 shadow-[20px_3px_20px_#0000000b]"
-                  :style="table_setting.항목10.style"
-                >
-                  <div>{{ todo[table_setting.항목10.name] }}</div>
                 </Table.Td>
                 <!-- <Table.Td
                   class="first:rounded-l-md last:rounded-r-md text-center bg-white border-b-0 dark:bg-darkmode-600 shadow-[20px_3px_20px_#0000000b] py-0 relative before:block before:w-px before:h-8 before:bg-slate-200 before:absolute before:left-0 before:inset-y-0 before:my-auto before:dark:bg-darkmode-400"
