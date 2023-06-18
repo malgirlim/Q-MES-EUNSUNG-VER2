@@ -32,10 +32,10 @@ const dataManager = useSendApi<ProductionTaskCurrent>(url, ref(1), ref(100));
 let kiosk_work: KioskWork;
 </script>
 <template>
-  <div class="px-7 py-3">
+  <div class="p-7">
     <div
-      class="text-base"
-      style="height: 450px; overflow-y: visible; overflow-x: hidden"
+      class="text-2xl"
+      style="height: 650px; overflow-y: visible; overflow-x: hidden"
     >
       <table class="w-full">
         <thead
@@ -43,13 +43,13 @@ let kiosk_work: KioskWork;
           style="position: sticky; top: 0px; z-index: 2"
         >
           <th class="border-t-2 border-l-2 border-r-2 border-success w-8">
-            <Lucide class="w-5 h-5 mx-auto" icon="Star" />
+            <Lucide class="w-8 h-8 mx-auto" icon="Star" />
           </th>
           <th class="border-t-2 border-r-2 border-success w-24">작업코드</th>
           <th class="border-t-2 border-r-2 border-success w-24">공정명</th>
-          <th class="border-t-2 border-r-2 border-success w-24">작업자</th>
+          <th class="border-t-2 border-r-2 border-success w-20">작업자</th>
           <th class="border-t-2 border-r-2 border-success w-28">품번</th>
-          <th class="border-t-2 border-r-2 border-success w-24">구분</th>
+          <th class="border-t-2 border-r-2 border-success w-16">구분</th>
           <th class="border-t-2 border-r-2 border-success w-64">품명</th>
           <th class="border-t-2 border-r-2 border-success w-32">규격</th>
           <th class="border-t-2 border-r-2 border-success w-36">작업상태</th>
@@ -102,7 +102,7 @@ let kiosk_work: KioskWork;
               >
                 {{ data.진행상황 }}
               </div>
-              <div class="text-base">
+              <div class="text-xl">
                 ({{ data.생산양품수량 }}/{{ data.지시수량 }}{{ data.단위 }})
               </div>
             </td>
@@ -127,7 +127,7 @@ let kiosk_work: KioskWork;
                       emit(`update:modalclose`, false);
                     }
                   "
-                  ><Lucide class="w-5 h-5 mx-auto" icon="CheckSquare" />
+                  ><Lucide class="w-8 h-8 mx-auto" icon="CheckSquare" />
                 </Button>
               </div>
             </td>

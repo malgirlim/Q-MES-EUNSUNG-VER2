@@ -10,14 +10,14 @@ const now = dayjs().format("YYYY-MM-DD HH:mm:ss");
 // 임시 데이터
 </script>
 <template>
-  <div class="pb-2">
+  <div class="pb-7">
     <div
-      class="pl-7 pr-3 text-base"
-      style="height: 150px; overflow-y: scroll; overflow-x: hidden"
+      class="pl-7 pr-3 text-xl"
+      style="height: 234px; overflow-y: scroll; overflow-x: hidden"
     >
       <table class="w-full">
         <thead
-          class="border-b-2 border-danger bg-slate-200 h-7"
+          class="border-b-2 border-danger bg-slate-200 h-10"
           style="position: sticky; top: 0px; z-index: 2"
         >
           <th class="border-l-2 border-t-2 border-r-2 border-danger w-24">
@@ -30,17 +30,17 @@ const now = dayjs().format("YYYY-MM-DD HH:mm:ss");
         </thead>
         <tbody>
           <tr class="text-center" v-for="i in Array(10).fill('10')">
-            <td class="border-l-2 border-b-2 border-r-2 border-danger h-9">
+            <td class="border-l-2 border-b-2 border-r-2 border-danger h-16">
               NOE0021
             </td>
-            <td class="border-b-2 border-r-2 border-danger h-7">설비고장</td>
-            <td class="border-b-2 border-r-2 border-danger h-7">고장수리</td>
-            <td class="border-b-2 border-r-2 border-danger h-7">
+            <td class="border-b-2 border-r-2 border-danger h-10">설비고장</td>
+            <td class="border-b-2 border-r-2 border-danger h-10">고장수리</td>
+            <td class="border-b-2 border-r-2 border-danger h-10">
               설비 고장 수리중
             </td>
 
-            <td class="border-b-2 border-r-2 border-danger h-7">
-              <Button class="h-7" variant="primary"
+            <td class="border-b-2 border-r-2 border-danger h-10">
+              <Button class="h-10" variant="primary"
                 ><Lucide class="w-6 h-6 mx-auto" icon="CheckSquare"
               /></Button>
             </td>
@@ -48,18 +48,22 @@ const now = dayjs().format("YYYY-MM-DD HH:mm:ss");
         </tbody>
       </table>
     </div>
-    <div class="pl-7 pr-7 mt-3 text-base">
+    <div class="pl-7 pr-7 mt-3 text-lg">
       <div>
         <table class="w-full">
           <tbody>
-            <tr class="border-t-2 border-l-2 border-b-2 border-danger h-7">
+            <tr class="border-t-2 border-l-2 border-b-2 border-danger h-9">
               <td
                 class="text-center border-r-2 border-danger bg-slate-200 font-bold w-40"
               >
                 조치내역
               </td>
               <td class="p-2 border-r-2 border-danger text-center">
-                <FormSelect class="w-full" model-value="미입력">
+                <FormSelect
+                  class="w-full"
+                  formSelectSize="lg"
+                  model-value="미입력"
+                >
                   <option>미입력</option>
                   <option>수리 접수</option>
                   <option>수리 진행중</option>
@@ -71,10 +75,10 @@ const now = dayjs().format("YYYY-MM-DD HH:mm:ss");
         </table>
       </div>
     </div>
-    <div class="pl-7 pr-7 mt-3 text-base">
+    <div class="pl-7 pr-7 mt-3 text-lg">
       <table class="w-full">
         <tbody>
-          <tr class="border-t-2 border-l-2 border-b-2 border-danger h-7">
+          <tr class="border-t-2 border-l-2 border-b-2 border-danger h-9">
             <td
               class="text-center border-r-2 border-danger bg-slate-200 font-bold w-40"
             >
@@ -82,7 +86,7 @@ const now = dayjs().format("YYYY-MM-DD HH:mm:ss");
             </td>
             <td class="pl-2 border-r-2 border-danger text-left">NOE0021</td>
           </tr>
-          <tr class="border-b-2 border-l-2 border-danger h-7">
+          <tr class="border-b-2 border-l-2 border-danger h-9">
             <td
               class="text-center border-r-2 border-danger bg-slate-200 font-bold"
             >
@@ -90,7 +94,7 @@ const now = dayjs().format("YYYY-MM-DD HH:mm:ss");
             </td>
             <td class="pl-2 border-r-2 border-danger text-left">설비고장</td>
           </tr>
-          <tr class="border-b-2 border-danger h-7">
+          <tr class="border-b-2 border-danger h-9">
             <td
               class="text-center border-l-2 border-r-2 border-danger bg-slate-200 font-bold"
             >
@@ -98,7 +102,7 @@ const now = dayjs().format("YYYY-MM-DD HH:mm:ss");
             </td>
             <td class="pl-2 border-r-2 border-danger text-left">고장수리</td>
           </tr>
-          <tr class="border-b-2 border-danger h-7">
+          <tr class="border-b-2 border-danger h-9">
             <td
               class="text-center border-l-2 border-r-2 border-danger bg-slate-200 font-bold"
             >
@@ -108,7 +112,7 @@ const now = dayjs().format("YYYY-MM-DD HH:mm:ss");
               설비 고장 수리중
             </td>
           </tr>
-          <tr class="border-b-2 border-danger h-7">
+          <tr class="border-b-2 border-danger h-9">
             <td
               class="text-center border-l-2 border-r-2 border-danger bg-slate-200 font-bold"
             >
@@ -118,7 +122,7 @@ const now = dayjs().format("YYYY-MM-DD HH:mm:ss");
               {{ now }}
             </td>
           </tr>
-          <tr class="border-b-2 border-danger h-7">
+          <tr class="border-b-2 border-danger h-9">
             <td
               class="text-center border-l-2 border-r-2 border-danger bg-slate-200 font-bold"
             >

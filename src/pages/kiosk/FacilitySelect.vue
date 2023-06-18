@@ -63,15 +63,15 @@ const year = ref(dayjs().format("YYYY"));
 </script>
 
 <template>
-  <div class="pl-8 pr-8 pt-8">
-    <div class="intro-y bg-[#3a437c] p-3 rounded-md">
-      <img class="m-auto w-64" src="../../assets/images/kiosk_logo.svg" />
+  <div class="pl-4 pr-4 pt-2">
+    <div class="intro-y bg-[#3a437c] p-2 rounded-md">
+      <img class="m-auto w-32" src="../../assets/images/kiosk_logo.svg" />
     </div>
 
     <div class="flex items-center h-10 intro-y">
       <LoadingIcon icon="circles" class="w-5 h-5 mr-2" />
       <div>
-        <h2 class="mr-5 text-lg font-medium truncate" :key="now">
+        <h2 class="mr-5 text-base font-medium truncate" :key="now">
           {{ now }}
         </h2>
       </div>
@@ -94,13 +94,13 @@ const year = ref(dayjs().format("YYYY"));
       </div>
     </div>
     <div
-      class="p-3 mt-5 mb-5 font-bold border-2 border-[#3a437c] text-center text-4xl rounded-md bg-white intro-y"
+      class="p-2 mt-3 mb-3 font-bold border-2 border-[#3a437c] text-center text-xl rounded-md bg-white intro-y"
     >
       설비 선택
     </div>
 
     <div class="p-3 mt-5 mb-5 text-center bg-slate-200 intro-y">
-      <div class="grid grid-cols-4 gap-6">
+      <div class="grid grid-cols-5 gap-3">
         <FacilityCard
           name="인쇄기1"
           running="가동중"
@@ -133,8 +133,6 @@ const year = ref(dayjs().format("YYYY"));
           time="2023-05-11 12:34"
           @click="$router.push('/kiosk/facility4/')"
         />
-      </div>
-      <div class="grid grid-cols-4 gap-6 mt-10">
         <FacilityCard
           name="인쇄기5"
           running="미가동"
@@ -143,6 +141,8 @@ const year = ref(dayjs().format("YYYY"));
           time="2023-05-11 12:34"
           @click="$router.push('/kiosk/facility5/')"
         />
+      </div>
+      <div class="grid grid-cols-5 gap-3 mt-10">
         <FacilityCard
           name="인쇄기6"
           running="가동중"
@@ -167,8 +167,6 @@ const year = ref(dayjs().format("YYYY"));
           time="2023-05-11 12:34"
           @click="$router.push('/kiosk/facility8/')"
         />
-      </div>
-      <div class="grid grid-cols-4 gap-6 mt-10">
         <FacilityCard
           name="검사기"
           running="가동중"

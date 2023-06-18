@@ -104,13 +104,13 @@ const insert_num = (numpad_value: any) => {
   // 만약 입력수량이 "0" 이라면 선택한 숫자로 덮어쓰기
   if (입력수량.value == "0") 입력수량.value = numpad_value;
   // 만약 입력수량이 "0"이 아니고 13글자를 넘지 않는다면 선택한 숫자를 추가하기
-  else if (입력수량.value.length < 13) 입력수량.value += numpad_value;
+  else if (입력수량.value.length < 12) 입력수량.value += numpad_value;
 };
 
 // [함수] 입력수량에 . (점) 집어넣기
 const insert_dot = () => {
   // 만약 입력수량에 . (점)이 없고, 13자리를 넘지 않는다면 .(점)을 추가하기
-  if (입력수량.value.indexOf(".") == -1 && 입력수량.value.length < 13)
+  if (입력수량.value.indexOf(".") == -1 && 입력수량.value.length < 12)
     입력수량.value += ".";
 };
 
@@ -735,7 +735,7 @@ const setWorkerChangeModal = (value: boolean) => {
           </div>
         </div>
       </div>
-      <div class="col-span-2">
+      <div class="col-span-2 intro-y">
         <div class="">
           <Button
             class="mx-2 mb-3 h-10 w-full text-xl"
@@ -839,9 +839,9 @@ const setWorkerChangeModal = (value: boolean) => {
 
   <!-- BEGIN: 작업지시목록 Modal -->
   <Dialog :open="taskListModal" size="xxl" @close="setTaskListModal(false)">
-    <Dialog.Panel>
+    <Dialog.Panel style="top: -8%">
       <div class="p-3 text-center">
-        <div class="mt-8 text-4xl"><strong>인쇄기1 작업지시목록</strong></div>
+        <div class="mt-3 text-lg"><strong>인쇄기1 작업지시목록</strong></div>
       </div>
       <div>
         <TaskList
@@ -855,7 +855,7 @@ const setWorkerChangeModal = (value: boolean) => {
         <Button
           variant="outline-primary"
           type="button"
-          class="w-48 text-2xl"
+          class="w-48 text-base"
           @click="setTaskListModal(false)"
         >
           닫기
@@ -867,17 +867,17 @@ const setWorkerChangeModal = (value: boolean) => {
 
   <!-- BEGIN: 일상점검 Modal -->
   <Dialog :open="checkListModal" size="xxl">
-    <Dialog.Panel>
+    <Dialog.Panel style="top: -8%">
       <div class="p-3 text-center">
-        <div class="mt-8 text-4xl"><strong>일상점검</strong></div>
+        <div class="text-xl"><strong>일상점검</strong></div>
       </div>
       <div><CheckList /></div>
       <label class="cursor-pointer"
-        ><div class="flex text-center text-2xl mb-5">
-          <div class="flex m-auto">
+        ><div class="flex text-center text-base mb-3">
+          <div class="flex m-auto mt-2">
             <div>
               <Input
-                class="w-6 h-6 mb-1 transition-all duration-100 ease-in-out shadow-sm border-slate-200 cursor-pointer rounded focus:ring-4 focus:ring-offset-0 focus:ring-primary focus:ring-opacity-20 [&[type='checkbox']]:checked:bg-primary [&[type='checkbox']]:checked:border-primary [&[type='checkbox']]:checked:border-opacity-10 [&:disabled:not(:checked)]:bg-slate-100 [&:disabled:not(:checked)]:cursor-not-allowed [&:disabled:checked]:opacity-70 [&:disabled:checked]:cursor-not-allowed"
+                class="w-4 h-4 mb-1 transition-all duration-100 ease-in-out shadow-sm border-slate-200 cursor-pointer rounded focus:ring-4 focus:ring-offset-0 focus:ring-primary focus:ring-opacity-20 [&[type='checkbox']]:checked:bg-primary [&[type='checkbox']]:checked:border-primary [&[type='checkbox']]:checked:border-opacity-10 [&:disabled:not(:checked)]:bg-slate-100 [&:disabled:not(:checked)]:cursor-not-allowed [&:disabled:checked]:opacity-70 [&:disabled:checked]:cursor-not-allowed"
                 id="checkListCheckBox"
                 type="checkbox"
                 :value="checkListCheckBox"
@@ -888,16 +888,12 @@ const setWorkerChangeModal = (value: boolean) => {
           </div>
         </div></label
       >
-      <div class="mt-1 mb-3 text-center text-2xl">
+      <div class="mt-1 mb-3 text-center text-base">
         <div class="flex">
           <div class="flex mx-auto">
             <div class="mr-3 mt-1.5">점검자 :</div>
             <div>
-              <FormSelect
-                class="w-48"
-                formSelectSize="xxl"
-                model-value="강민철"
-              >
+              <FormSelect class="w-32" model-value="강민철">
                 <option>강민철</option>
                 <option>고범석</option>
                 <option>김주현</option>
@@ -917,7 +913,7 @@ const setWorkerChangeModal = (value: boolean) => {
         <Button
           variant="primary"
           type="button"
-          class="w-48 mr-10 text-2xl"
+          class="w-32 mr-10 text-base"
           :disabled="!checkListCheckBox"
           @click="setCheckListModal(false)"
         >
@@ -927,7 +923,7 @@ const setWorkerChangeModal = (value: boolean) => {
         <Button
           variant="outline-primary"
           type="button"
-          class="w-48 text-2xl"
+          class="w-32 text-base"
           @click="setCheckListModal(false)"
         >
           취소
@@ -1010,21 +1006,21 @@ const setWorkerChangeModal = (value: boolean) => {
 
   <!-- BEGIN: 비가동중 Modal -->
   <Dialog :open="nonOPAddModal" size="lg">
-    <Dialog.Panel>
+    <Dialog.Panel style="top: -8%">
       <div class="p-3 text-center">
-        <Lucide icon="Pause" class="w-20 h-20 mx-auto mt-3 text-[#D9821C]" />
-        <div class="mt-5 text-3xl"><strong>설비가 비가동중입니다</strong></div>
-        <div class="mt-3 text-2xl">
+        <Lucide icon="Pause" class="w-16 h-16 mx-auto text-[#D9821C]" />
+        <div class="mt-4 text-xl"><strong>설비가 비가동중입니다</strong></div>
+        <div class="mt-2 text-lg">
           비가동 사유를 선택하고 작업을 재개해 주세요
         </div>
       </div>
       <div><NonOPAdd /></div>
 
-      <div class="px-5 pb-8 text-center">
+      <div class="px-5 pb-3 text-center">
         <Button
           variant="primary"
           type="button"
-          class="w-48 text-2xl"
+          class="w-48 text-base"
           @click="setNonOPAddModal(false)"
         >
           작업재개
@@ -1104,23 +1100,23 @@ const setWorkerChangeModal = (value: boolean) => {
 
   <!-- BEGIN: 작업종료 Modal -->
   <Dialog :open="taskFinishModal" size="lg" @close="setTaskFinishModal(false)">
-    <Dialog.Panel>
-      <div class="p-5 text-center">
-        <Lucide icon="CheckCircle" class="w-20 h-20 mx-auto mt-3 text-danger" />
-        <div class="mt-5 text-3xl"><strong>작업 종료</strong></div>
-        <div class="mt-3 text-2xl">종료 유형을 선택해주세요.</div>
-        <div class="mt-5">
-          <div class="pl-7 pr-7 mt-5 text-xl">
+    <Dialog.Panel style="top: -8%">
+      <div class="p-3 text-center">
+        <Lucide icon="CheckCircle" class="w-16 h-16 mx-auto text-danger" />
+        <div class="mt-3 text-xl"><strong>작업 종료</strong></div>
+        <div class="mt-2 text-lg">종료 유형을 선택해주세요.</div>
+        <div class="mt-3">
+          <div class="pl-7 pr-7 mt-3 text-base">
             <table class="w-full">
               <tbody>
-                <tr class="border-t-2 border-l-2 border-b-2 border-danger h-12">
+                <tr class="border-t-2 border-l-2 border-b-2 border-danger h-7">
                   <td
                     class="text-center border-r-2 border-danger bg-slate-200 font-bold w-32"
                   >
                     작업중단
                   </td>
                 </tr>
-                <tr class="border-b-2 border-danger h-12">
+                <tr class="border-b-2 border-danger h-7">
                   <td
                     class="text-center border-l-2 border-r-2 border-danger font-bold"
                   >
@@ -1131,7 +1127,7 @@ const setWorkerChangeModal = (value: boolean) => {
                     </div>
                   </td>
                 </tr>
-                <tr class="border-b-2 border-danger h-20">
+                <tr class="border-b-2 border-danger h-12">
                   <td
                     class="text-center border-l-2 border-r-2 border-danger font-bold"
                   >
@@ -1143,7 +1139,7 @@ const setWorkerChangeModal = (value: boolean) => {
                           setTaskFinishModal(false);
                         }
                       "
-                      class="w-40 text-2xl mb-5 mt-5"
+                      class="w-40 text-base mb-3 mt-3"
                     >
                       작업중단
                     </Button>
@@ -1152,17 +1148,17 @@ const setWorkerChangeModal = (value: boolean) => {
               </tbody>
             </table>
           </div>
-          <div class="pl-7 pr-7 mt-5 text-xl">
+          <div class="pl-7 pr-7 mt-5 text-base">
             <table class="w-full">
               <tbody>
-                <tr class="border-t-2 border-l-2 border-b-2 border-danger h-12">
+                <tr class="border-t-2 border-l-2 border-b-2 border-danger h-7">
                   <td
                     class="text-center border-r-2 border-danger bg-slate-200 font-bold w-32"
                   >
                     작업완료
                   </td>
                 </tr>
-                <tr class="border-b-2 border-danger h-12">
+                <tr class="border-b-2 border-danger h-7">
                   <td
                     class="text-center border-l-2 border-r-2 border-danger font-bold"
                   >
@@ -1174,7 +1170,7 @@ const setWorkerChangeModal = (value: boolean) => {
                   </td>
                 </tr>
 
-                <tr class="border-b-2 border-danger h-20">
+                <tr class="border-b-2 border-danger h-12">
                   <td
                     class="text-center border-l-2 border-r-2 border-danger font-bold"
                   >
@@ -1182,7 +1178,7 @@ const setWorkerChangeModal = (value: boolean) => {
                       v-if="
                         Number(지시수량) > Number(양품수량.replace(/,/g, ''))
                       "
-                      class="pl-7 pr-7 mt-5 text-lg"
+                      class="pl-7 pr-7 mt-3 text-base"
                     >
                       <div class="flex">
                         <div class="flex mx-auto items-center">
@@ -1195,13 +1191,13 @@ const setWorkerChangeModal = (value: boolean) => {
                           <div class="text-danger font-bold">경고</div>
                         </div>
                       </div>
-                      <div class="text-danger mt-2 font-bold">
+                      <div class="text-danger mt-1 font-bold">
                         현재 양품수량이 지시수량보다 적습니다.
                       </div>
-                      <div class="mt-2">
+                      <div class="mt-1">
                         <label class="cursor-pointer">
                           <input
-                            class="w-6 h-6 mb-1 mr-2 transition-all duration-100 ease-in-out shadow-sm border-slate-200 cursor-pointer rounded focus:ring-4 focus:ring-offset-0 focus:ring-primary focus:ring-opacity-20 [&[type='checkbox']]:checked:bg-primary [&[type='checkbox']]:checked:border-primary [&[type='checkbox']]:checked:border-opacity-10 [&:disabled:not(:checked)]:bg-slate-100 [&:disabled:not(:checked)]:cursor-not-allowed [&:disabled:checked]:opacity-70 [&:disabled:checked]:cursor-not-allowed"
+                            class="w-5 h-5 mb-1 mr-2 transition-all duration-100 ease-in-out shadow-sm border-slate-200 cursor-pointer rounded focus:ring-4 focus:ring-offset-0 focus:ring-primary focus:ring-opacity-20 [&[type='checkbox']]:checked:bg-primary [&[type='checkbox']]:checked:border-primary [&[type='checkbox']]:checked:border-opacity-10 [&:disabled:not(:checked)]:bg-slate-100 [&:disabled:not(:checked)]:cursor-not-allowed [&:disabled:checked]:opacity-70 [&:disabled:checked]:cursor-not-allowed"
                             id="finishcheckbox"
                             type="checkbox"
                             :value="finishCheckBox"
@@ -1219,7 +1215,7 @@ const setWorkerChangeModal = (value: boolean) => {
                           setTaskFinishModal(false);
                         }
                       "
-                      class="w-40 text-2xl mb-5 mt-5"
+                      class="w-40 text-base mb-3 mt-3"
                     >
                       작업완료
                     </Button>
@@ -1231,11 +1227,11 @@ const setWorkerChangeModal = (value: boolean) => {
         </div>
       </div>
 
-      <div class="mt-5 px-5 pb-8 text-center">
+      <div class="px-5 pb-3 text-center">
         <Button
           variant="outline-primary"
           type="button"
-          class="w-40 text-2xl"
+          class="w-40 text-base"
           @click="setTaskFinishModal(false)"
         >
           취소
@@ -1327,23 +1323,23 @@ const setWorkerChangeModal = (value: boolean) => {
 
   <!-- BEGIN: 고장발생 Modal -->
   <Dialog :open="alertAddModal" size="lg">
-    <Dialog.Panel>
+    <Dialog.Panel style="top: -8%">
       <div class="p-3 text-center">
-        <Lucide icon="Siren" class="w-20 h-20 mx-auto mt-3 text-danger" />
-        <div class="mt-5 text-3xl">
+        <Lucide icon="Siren" class="w-16 h-16 mx-auto text-danger" />
+        <div class="mt-4 text-xl">
           <strong>설비가 고장 발생중입니다</strong>
         </div>
-        <div class="mt-3 text-2xl">
+        <div class="mt-2 text-lg">
           고장 사유를 선택하고 설비를 재개해 주세요
         </div>
       </div>
       <div><AlertAdd /></div>
 
-      <div class="px-5 pb-8 text-center">
+      <div class="px-5 pb-2 text-center">
         <Button
           variant="primary"
           type="button"
-          class="w-48 text-2xl"
+          class="w-48 text-base"
           @click="setAlertAddModal(false)"
         >
           설비재개
@@ -1362,7 +1358,7 @@ const setWorkerChangeModal = (value: boolean) => {
     <Dialog.Panel style="top: -8%">
       <div
         class="mt-5"
-        style="height: 850px; overflow-y: scroll; overflow-x: hidden"
+        style="height: 540px; overflow-y: scroll; overflow-x: hidden"
       >
         <inner-image-zoom
           src="../../src/assets/images/task_standard/G5Z24.png"
@@ -1372,11 +1368,11 @@ const setWorkerChangeModal = (value: boolean) => {
         />
       </div>
 
-      <div class="px-5 pt-5 pb-5 text-center">
+      <div class="px-5 pt-2 pb-2 text-center">
         <Button
           variant="outline-primary"
           type="button"
-          class="w-48 text-2xl"
+          class="w-48 text-base"
           @click="setTaskStandardModal(false)"
         >
           닫기
