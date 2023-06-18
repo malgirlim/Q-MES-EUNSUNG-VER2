@@ -45,3 +45,27 @@ export interface MonitorDaily {
   등록자?: string;
   등록일시?: string;
 }
+
+// 모니터링 - KPI - 시간당생산량
+export interface MonitorKPIProductHour {
+  [attribute: string]: any | undefined;
+  NO?: number;
+  설비NO?: number;
+  설비명?: string;
+  총생산시간?: string;
+  총생산수?: string;
+  시간당생산수?: string;
+  목표?: string;
+}
+
+// 모니터링 - KPI - 공정불량률
+export interface MonitorKPIBadRate {
+  [attribute: string]: any | undefined;
+  NO?: number;
+  공정NO?: number;
+  공정명?: string;
+  총생산수?: string;
+  총불량수?: string;
+  불량률?: string;
+  목표?: string;
+}

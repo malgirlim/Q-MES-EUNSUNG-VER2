@@ -47,9 +47,9 @@ router.get("/", async (req, res) => {
         ,INSTRUCT_PROCESS.공정명 AS 공정
         ,INSTRUCT_PROCESS.시작일 AS 시작일
         ,[PDRS_USER_ID] AS 작업자ID
-        ,RESULT_USER.이름 AS 작업자
+        ,(SELECT [USER_NAME] FROM [QMES2022].[dbo].[MASTER_USER_TB] WHERE [USER_ID] = [PDRS_USER_ID]) AS 작업자
         ,[PDRS_FACILITY_PK] AS 설비NO
-        ,RESULT_FACILITY.설비명 AS 설비명
+        ,(SELECT [FCLT_NAME] FROM [QMES2022].[dbo].[MASTER_FACILITY_TB] WHERE [FCLT_PK] = [PDRS_FACILITY_PK]) AS 설비명
         ,CONVERT(VARCHAR, [PDRS_START_DT], 20) AS 시작일시
         ,CONVERT(VARCHAR, [PDRS_END_DT], 20) AS 종료일시
         ,[PDRS_PRODUCE_AMT] AS 생산수
@@ -64,7 +64,7 @@ router.get("/", async (req, res) => {
         SELECT
           [ISPC_PK] AS NO
           ,[ISPC_WORK_INSTRUCT_PK] AS 작업지시NO
-          ,WORK_INSTRUCT.코드 AS 작업코드
+          ,(SELECT [WKIS_CODE] FROM [QMES2022].[dbo].[MANAGE_WORK_INSTRUCT_TB] WHERE [WKIS_PK] = [ISPC_WORK_INSTRUCT_PK]) AS 작업코드
           ,[ISPC_ITEM_PK] AS 품목NO
           ,ITEM.구분 AS 품목구분
           ,ITEM.품번 AS 품번
@@ -72,87 +72,10 @@ router.get("/", async (req, res) => {
           ,ITEM.규격 AS 규격
           ,ITEM.단위 AS 단위
           ,[ISPC_AMOUNT] AS 지시수량
-          ,WORK_INSTRUCT.시작일 AS 시작일
+          ,(SELECT CONVERT(varchar, [WKIS_START_DATE], 23) FROM [QMES2022].[dbo].[MANAGE_WORK_INSTRUCT_TB] WHERE [WKIS_PK] = [ISPC_WORK_INSTRUCT_PK]) AS 시작일
           ,[ISPC_PROCESS_PK] AS 공정NO
-          ,PROCESS.공정명 AS 공정명
-          ,[ISPC_FACILITY_PK] AS 설비NO
-          ,FACILITY.설비명 AS 설비명
-          ,[ISPC_USER_ID] AS 작업자ID
-          ,USERS.이름 AS 작업자
-          ,[ISPC_CONDITION] AS 진행상황
+          ,(SELECT [PRCS_NAME] FROM [QMES2022].[dbo].[MASTER_PROCESS_TB] WHERE [PRCS_PK] = [ISPC_PROCESS_PK]) AS 공정명
         FROM [QMES2022].[dbo].[MANAGE_INSTRUCT_PROCESS_TB]
-        LEFT JOIN
-        (
-          SELECT
-            [WKIS_PK] AS NO
-            ,[WKIS_CODE] AS 코드
-            ,[WKIS_PRODUCE_PLAN_PK] AS 생산계획NO
-            ,[WKIS_ITEM_PK] AS 품목NO
-            ,ITEM.품목구분 AS 품목구분
-            ,ITEM.품번 AS 품번
-            ,ITEM.품명 AS 품명
-            ,ITEM.규격 AS 규격
-            ,ITEM.단위 AS 단위
-            ,[WKIS_AMOUNT] AS 수량
-            ,CONVERT(varchar, [WKIS_START_DATE], 23) AS 시작일
-          FROM [QMES2022].[dbo].[MANAGE_WORK_INSTRUCT_TB]
-          LEFT JOIN
-          (
-            SELECT
-              [ITEM_PK] AS NO
-              ,[ITEM_DIV] AS 품목구분
-              ,[ITEM_PRODUCT_NUM] AS 품번
-              ,[ITEM_NAME] AS 품명
-              ,[ITEM_SIZE] AS 규격
-              ,[ITEM_UNIT] AS 단위
-            FROM [QMES2022].[dbo].[MASTER_ITEM_TB]
-          ) AS ITEM ON ITEM.NO = [WKIS_ITEM_PK]
-        ) AS WORK_INSTRUCT ON WORK_INSTRUCT.NO = [ISPC_WORK_INSTRUCT_PK]
-        LEFT JOIN
-        (
-          SELECT
-            [PRCS_PK] AS NO
-            ,[PRCS_CODE] AS 코드
-            ,[PRCS_DIV] AS 구분
-            ,[PRCS_NAME] AS 공정명
-            ,[PRCS_CONTENT] AS 내용
-            ,[PRCS_FACILITY] AS 설비
-          FROM [QMES2022].[dbo].[MASTER_PROCESS_TB]
-        ) AS PROCESS ON PROCESS.NO = [ISPC_PROCESS_PK]
-        LEFT JOIN
-        (
-          SELECT
-            [FCLT_PK] AS NO
-            ,[FCLT_NAME] AS 설비명
-            ,[FCLT_LINE] AS 라인
-            ,[FCLT_SIZE] AS 규격
-            ,[FCLT_CLIENT_PK] AS 거래처NO
-            ,CLIENT.거래처명 AS 거래처명
-            ,[FCLT_BUY_DATE] AS 구입일
-            ,[FCLT_COST] AS 금액
-            ,[FCLT_PLACE] AS 장소
-            ,[FCLT_IMAGE] AS 사진
-          FROM [QMES2022].[dbo].[MASTER_FACILITY_TB]
-          LEFT JOIN
-          (
-            SELECT
-              [CLNT_PK] AS NO
-              ,[CLNT_NAME] AS 거래처명
-            FROM [QMES2022].[dbo].[MASTER_CLIENT_TB]
-          ) AS CLIENT ON CLIENT.NO = [FCLT_CLIENT_PK]
-        ) AS FACILITY ON FACILITY.NO = [ISPC_FACILITY_PK]
-        LEFT JOIN
-        (
-          SELECT
-            [USER_ID] AS 아이디,
-            [USER_NAME] AS 이름,
-            [USER_PHONE] AS 연락처,
-            [USER_EMAIL] AS 이메일,
-            [USER_DEPART] AS 부서명,
-            [USER_POSITION] AS 직책,
-            [USER_RANK] AS 직급
-          FROM [QMES2022].[dbo].[MASTER_USER_TB]
-        ) AS USERS ON USERS.아이디 = [ISPC_USER_ID]
         LEFT JOIN
         (
           SELECT
@@ -165,27 +88,6 @@ router.get("/", async (req, res) => {
           FROM [QMES2022].[dbo].[MASTER_ITEM_TB]
         ) AS ITEM ON ITEM.NO = [ISPC_ITEM_PK]
       ) AS INSTRUCT_PROCESS ON INSTRUCT_PROCESS.NO = [PDRS_INST_PROCESS_PK]
-      LEFT JOIN
-      (
-        SELECT
-          [FCLT_PK] AS NO
-          ,[FCLT_NAME] AS 설비명
-          ,[FCLT_LINE] AS 라인
-          ,[FCLT_SIZE] AS 규격
-        FROM [QMES2022].[dbo].[MASTER_FACILITY_TB]
-      ) AS RESULT_FACILITY ON RESULT_FACILITY.NO = [PDRS_FACILITY_PK]
-      LEFT JOIN
-      (
-        SELECT
-          [USER_ID] AS 아이디,
-          [USER_NAME] AS 이름,
-          [USER_PHONE] AS 연락처,
-          [USER_EMAIL] AS 이메일,
-          [USER_DEPART] AS 부서명,
-          [USER_POSITION] AS 직책,
-          [USER_RANK] AS 직급
-        FROM [QMES2022].[dbo].[MASTER_USER_TB]
-      ) AS RESULT_USER ON RESULT_USER.아이디 = [PDRS_USER_ID]
       ORDER BY [PDRS_PK] DESC
     `);
 
@@ -236,9 +138,9 @@ router.post("/", async (req, res) => {
             ,INSTRUCT_PROCESS.공정명 AS 공정
             ,INSTRUCT_PROCESS.시작일 AS 시작일
             ,[PDRS_USER_ID] AS 작업자ID
-            ,RESULT_USER.이름 AS 작업자
+            ,(SELECT [USER_NAME] FROM [QMES2022].[dbo].[MASTER_USER_TB] WHERE [USER_ID] = [PDRS_USER_ID]) AS 작업자
             ,[PDRS_FACILITY_PK] AS 설비NO
-            ,RESULT_FACILITY.설비명 AS 설비명
+            ,(SELECT [FCLT_NAME] FROM [QMES2022].[dbo].[MASTER_FACILITY_TB] WHERE [FCLT_PK] = [PDRS_FACILITY_PK]) AS 설비명
             ,CONVERT(VARCHAR, [PDRS_START_DT], 20) AS 시작일시
             ,CONVERT(VARCHAR, [PDRS_END_DT], 20) AS 종료일시
             ,[PDRS_PRODUCE_AMT] AS 생산수
@@ -253,7 +155,7 @@ router.post("/", async (req, res) => {
             SELECT
               [ISPC_PK] AS NO
               ,[ISPC_WORK_INSTRUCT_PK] AS 작업지시NO
-              ,WORK_INSTRUCT.코드 AS 작업코드
+              ,(SELECT [WKIS_CODE] FROM [QMES2022].[dbo].[MANAGE_WORK_INSTRUCT_TB] WHERE [WKIS_PK] = [ISPC_WORK_INSTRUCT_PK]) AS 작업코드
               ,[ISPC_ITEM_PK] AS 품목NO
               ,ITEM.구분 AS 품목구분
               ,ITEM.품번 AS 품번
@@ -261,87 +163,10 @@ router.post("/", async (req, res) => {
               ,ITEM.규격 AS 규격
               ,ITEM.단위 AS 단위
               ,[ISPC_AMOUNT] AS 지시수량
-              ,WORK_INSTRUCT.시작일 AS 시작일
+              ,(SELECT CONVERT(varchar, [WKIS_START_DATE], 23) FROM [QMES2022].[dbo].[MANAGE_WORK_INSTRUCT_TB] WHERE [WKIS_PK] = [ISPC_WORK_INSTRUCT_PK]) AS 시작일
               ,[ISPC_PROCESS_PK] AS 공정NO
-              ,PROCESS.공정명 AS 공정명
-              ,[ISPC_FACILITY_PK] AS 설비NO
-              ,FACILITY.설비명 AS 설비명
-              ,[ISPC_USER_ID] AS 작업자ID
-              ,USERS.이름 AS 작업자
-              ,[ISPC_CONDITION] AS 진행상황
+              ,(SELECT [PRCS_NAME] FROM [QMES2022].[dbo].[MASTER_PROCESS_TB] WHERE [PRCS_PK] = [ISPC_PROCESS_PK]) AS 공정명
             FROM [QMES2022].[dbo].[MANAGE_INSTRUCT_PROCESS_TB]
-            LEFT JOIN
-            (
-              SELECT
-                [WKIS_PK] AS NO
-                ,[WKIS_CODE] AS 코드
-                ,[WKIS_PRODUCE_PLAN_PK] AS 생산계획NO
-                ,[WKIS_ITEM_PK] AS 품목NO
-                ,ITEM.품목구분 AS 품목구분
-                ,ITEM.품번 AS 품번
-                ,ITEM.품명 AS 품명
-                ,ITEM.규격 AS 규격
-                ,ITEM.단위 AS 단위
-                ,[WKIS_AMOUNT] AS 수량
-                ,CONVERT(varchar, [WKIS_START_DATE], 23) AS 시작일
-              FROM [QMES2022].[dbo].[MANAGE_WORK_INSTRUCT_TB]
-              LEFT JOIN
-              (
-                SELECT
-                  [ITEM_PK] AS NO
-                  ,[ITEM_DIV] AS 품목구분
-                  ,[ITEM_PRODUCT_NUM] AS 품번
-                  ,[ITEM_NAME] AS 품명
-                  ,[ITEM_SIZE] AS 규격
-                  ,[ITEM_UNIT] AS 단위
-                FROM [QMES2022].[dbo].[MASTER_ITEM_TB]
-              ) AS ITEM ON ITEM.NO = [WKIS_ITEM_PK]
-            ) AS WORK_INSTRUCT ON WORK_INSTRUCT.NO = [ISPC_WORK_INSTRUCT_PK]
-            LEFT JOIN
-            (
-              SELECT
-                [PRCS_PK] AS NO
-                ,[PRCS_CODE] AS 코드
-                ,[PRCS_DIV] AS 구분
-                ,[PRCS_NAME] AS 공정명
-                ,[PRCS_CONTENT] AS 내용
-                ,[PRCS_FACILITY] AS 설비
-              FROM [QMES2022].[dbo].[MASTER_PROCESS_TB]
-            ) AS PROCESS ON PROCESS.NO = [ISPC_PROCESS_PK]
-            LEFT JOIN
-            (
-              SELECT
-                [FCLT_PK] AS NO
-                ,[FCLT_NAME] AS 설비명
-                ,[FCLT_LINE] AS 라인
-                ,[FCLT_SIZE] AS 규격
-                ,[FCLT_CLIENT_PK] AS 거래처NO
-                ,CLIENT.거래처명 AS 거래처명
-                ,[FCLT_BUY_DATE] AS 구입일
-                ,[FCLT_COST] AS 금액
-                ,[FCLT_PLACE] AS 장소
-                ,[FCLT_IMAGE] AS 사진
-              FROM [QMES2022].[dbo].[MASTER_FACILITY_TB]
-              LEFT JOIN
-              (
-                SELECT
-                  [CLNT_PK] AS NO
-                  ,[CLNT_NAME] AS 거래처명
-                FROM [QMES2022].[dbo].[MASTER_CLIENT_TB]
-              ) AS CLIENT ON CLIENT.NO = [FCLT_CLIENT_PK]
-            ) AS FACILITY ON FACILITY.NO = [ISPC_FACILITY_PK]
-            LEFT JOIN
-            (
-              SELECT
-                [USER_ID] AS 아이디,
-                [USER_NAME] AS 이름,
-                [USER_PHONE] AS 연락처,
-                [USER_EMAIL] AS 이메일,
-                [USER_DEPART] AS 부서명,
-                [USER_POSITION] AS 직책,
-                [USER_RANK] AS 직급
-              FROM [QMES2022].[dbo].[MASTER_USER_TB]
-            ) AS USERS ON USERS.아이디 = [ISPC_USER_ID]
             LEFT JOIN
             (
               SELECT
@@ -354,27 +179,6 @@ router.post("/", async (req, res) => {
               FROM [QMES2022].[dbo].[MASTER_ITEM_TB]
             ) AS ITEM ON ITEM.NO = [ISPC_ITEM_PK]
           ) AS INSTRUCT_PROCESS ON INSTRUCT_PROCESS.NO = [PDRS_INST_PROCESS_PK]
-          LEFT JOIN
-          (
-            SELECT
-              [FCLT_PK] AS NO
-              ,[FCLT_NAME] AS 설비명
-              ,[FCLT_LINE] AS 라인
-              ,[FCLT_SIZE] AS 규격
-            FROM [QMES2022].[dbo].[MASTER_FACILITY_TB]
-          ) AS RESULT_FACILITY ON RESULT_FACILITY.NO = [PDRS_FACILITY_PK]
-          LEFT JOIN
-          (
-            SELECT
-              [USER_ID] AS 아이디,
-              [USER_NAME] AS 이름,
-              [USER_PHONE] AS 연락처,
-              [USER_EMAIL] AS 이메일,
-              [USER_DEPART] AS 부서명,
-              [USER_POSITION] AS 직책,
-              [USER_RANK] AS 직급
-            FROM [QMES2022].[dbo].[MASTER_USER_TB]
-          ) AS RESULT_USER ON RESULT_USER.아이디 = [PDRS_USER_ID]
         ) AS RESULT
         WHERE (1=1)
         AND CONVERT(varchar, CONVERT(datetime, 시작일시), 12) >= ` +
@@ -428,9 +232,9 @@ router.post("/", async (req, res) => {
             ,INSTRUCT_PROCESS.공정명 AS 공정
             ,INSTRUCT_PROCESS.시작일 AS 시작일
             ,[PDRS_USER_ID] AS 작업자ID
-            ,RESULT_USER.이름 AS 작업자
+            ,(SELECT [USER_NAME] FROM [QMES2022].[dbo].[MASTER_USER_TB] WHERE [USER_ID] = [PDRS_USER_ID]) AS 작업자
             ,[PDRS_FACILITY_PK] AS 설비NO
-            ,RESULT_FACILITY.설비명 AS 설비명
+            ,(SELECT [FCLT_NAME] FROM [QMES2022].[dbo].[MASTER_FACILITY_TB] WHERE [FCLT_PK] = [PDRS_FACILITY_PK]) AS 설비명
             ,CONVERT(VARCHAR, [PDRS_START_DT], 20) AS 시작일시
             ,CONVERT(VARCHAR, [PDRS_END_DT], 20) AS 종료일시
             ,[PDRS_PRODUCE_AMT] AS 생산수
@@ -445,7 +249,7 @@ router.post("/", async (req, res) => {
             SELECT
               [ISPC_PK] AS NO
               ,[ISPC_WORK_INSTRUCT_PK] AS 작업지시NO
-              ,WORK_INSTRUCT.코드 AS 작업코드
+              ,(SELECT [WKIS_CODE] FROM [QMES2022].[dbo].[MANAGE_WORK_INSTRUCT_TB] WHERE [WKIS_PK] = [ISPC_WORK_INSTRUCT_PK]) AS 작업코드
               ,[ISPC_ITEM_PK] AS 품목NO
               ,ITEM.구분 AS 품목구분
               ,ITEM.품번 AS 품번
@@ -453,87 +257,10 @@ router.post("/", async (req, res) => {
               ,ITEM.규격 AS 규격
               ,ITEM.단위 AS 단위
               ,[ISPC_AMOUNT] AS 지시수량
-              ,WORK_INSTRUCT.시작일 AS 시작일
+              ,(SELECT CONVERT(varchar, [WKIS_START_DATE], 23) FROM [QMES2022].[dbo].[MANAGE_WORK_INSTRUCT_TB] WHERE [WKIS_PK] = [ISPC_WORK_INSTRUCT_PK]) AS 시작일
               ,[ISPC_PROCESS_PK] AS 공정NO
-              ,PROCESS.공정명 AS 공정명
-              ,[ISPC_FACILITY_PK] AS 설비NO
-              ,FACILITY.설비명 AS 설비명
-              ,[ISPC_USER_ID] AS 작업자ID
-              ,USERS.이름 AS 작업자
-              ,[ISPC_CONDITION] AS 진행상황
+              ,(SELECT [PRCS_NAME] FROM [QMES2022].[dbo].[MASTER_PROCESS_TB] WHERE [PRCS_PK] = [ISPC_PROCESS_PK]) AS 공정명
             FROM [QMES2022].[dbo].[MANAGE_INSTRUCT_PROCESS_TB]
-            LEFT JOIN
-            (
-              SELECT
-                [WKIS_PK] AS NO
-                ,[WKIS_CODE] AS 코드
-                ,[WKIS_PRODUCE_PLAN_PK] AS 생산계획NO
-                ,[WKIS_ITEM_PK] AS 품목NO
-                ,ITEM.품목구분 AS 품목구분
-                ,ITEM.품번 AS 품번
-                ,ITEM.품명 AS 품명
-                ,ITEM.규격 AS 규격
-                ,ITEM.단위 AS 단위
-                ,[WKIS_AMOUNT] AS 수량
-                ,CONVERT(varchar, [WKIS_START_DATE], 23) AS 시작일
-              FROM [QMES2022].[dbo].[MANAGE_WORK_INSTRUCT_TB]
-              LEFT JOIN
-              (
-                SELECT
-                  [ITEM_PK] AS NO
-                  ,[ITEM_DIV] AS 품목구분
-                  ,[ITEM_PRODUCT_NUM] AS 품번
-                  ,[ITEM_NAME] AS 품명
-                  ,[ITEM_SIZE] AS 규격
-                  ,[ITEM_UNIT] AS 단위
-                FROM [QMES2022].[dbo].[MASTER_ITEM_TB]
-              ) AS ITEM ON ITEM.NO = [WKIS_ITEM_PK]
-            ) AS WORK_INSTRUCT ON WORK_INSTRUCT.NO = [ISPC_WORK_INSTRUCT_PK]
-            LEFT JOIN
-            (
-              SELECT
-                [PRCS_PK] AS NO
-                ,[PRCS_CODE] AS 코드
-                ,[PRCS_DIV] AS 구분
-                ,[PRCS_NAME] AS 공정명
-                ,[PRCS_CONTENT] AS 내용
-                ,[PRCS_FACILITY] AS 설비
-              FROM [QMES2022].[dbo].[MASTER_PROCESS_TB]
-            ) AS PROCESS ON PROCESS.NO = [ISPC_PROCESS_PK]
-            LEFT JOIN
-            (
-              SELECT
-                [FCLT_PK] AS NO
-                ,[FCLT_NAME] AS 설비명
-                ,[FCLT_LINE] AS 라인
-                ,[FCLT_SIZE] AS 규격
-                ,[FCLT_CLIENT_PK] AS 거래처NO
-                ,CLIENT.거래처명 AS 거래처명
-                ,[FCLT_BUY_DATE] AS 구입일
-                ,[FCLT_COST] AS 금액
-                ,[FCLT_PLACE] AS 장소
-                ,[FCLT_IMAGE] AS 사진
-              FROM [QMES2022].[dbo].[MASTER_FACILITY_TB]
-              LEFT JOIN
-              (
-                SELECT
-                  [CLNT_PK] AS NO
-                  ,[CLNT_NAME] AS 거래처명
-                FROM [QMES2022].[dbo].[MASTER_CLIENT_TB]
-              ) AS CLIENT ON CLIENT.NO = [FCLT_CLIENT_PK]
-            ) AS FACILITY ON FACILITY.NO = [ISPC_FACILITY_PK]
-            LEFT JOIN
-            (
-              SELECT
-                [USER_ID] AS 아이디,
-                [USER_NAME] AS 이름,
-                [USER_PHONE] AS 연락처,
-                [USER_EMAIL] AS 이메일,
-                [USER_DEPART] AS 부서명,
-                [USER_POSITION] AS 직책,
-                [USER_RANK] AS 직급
-              FROM [QMES2022].[dbo].[MASTER_USER_TB]
-            ) AS USERS ON USERS.아이디 = [ISPC_USER_ID]
             LEFT JOIN
             (
               SELECT
@@ -546,27 +273,6 @@ router.post("/", async (req, res) => {
               FROM [QMES2022].[dbo].[MASTER_ITEM_TB]
             ) AS ITEM ON ITEM.NO = [ISPC_ITEM_PK]
           ) AS INSTRUCT_PROCESS ON INSTRUCT_PROCESS.NO = [PDRS_INST_PROCESS_PK]
-          LEFT JOIN
-          (
-            SELECT
-              [FCLT_PK] AS NO
-              ,[FCLT_NAME] AS 설비명
-              ,[FCLT_LINE] AS 라인
-              ,[FCLT_SIZE] AS 규격
-            FROM [QMES2022].[dbo].[MASTER_FACILITY_TB]
-          ) AS RESULT_FACILITY ON RESULT_FACILITY.NO = [PDRS_FACILITY_PK]
-          LEFT JOIN
-          (
-            SELECT
-              [USER_ID] AS 아이디,
-              [USER_NAME] AS 이름,
-              [USER_PHONE] AS 연락처,
-              [USER_EMAIL] AS 이메일,
-              [USER_DEPART] AS 부서명,
-              [USER_POSITION] AS 직책,
-              [USER_RANK] AS 직급
-            FROM [QMES2022].[dbo].[MASTER_USER_TB]
-          ) AS RESULT_USER ON RESULT_USER.아이디 = [PDRS_USER_ID]
         ) AS RESULT
         WHERE (1=1)
         AND CONVERT(varchar, CONVERT(datetime, 시작일시), 12) >= ` +
@@ -799,18 +505,18 @@ router.post("/delete", async (req, res) => {
           [PDRS_PK] AS NO
           ,[PDRS_INST_PROCESS_PK] AS 지시공정NO
           ,INSTRUCT_PROCESS.작업코드 AS 작업코드
-          ,INSTRUCT_PROCESS.구분 AS 구분
+          ,INSTRUCT_PROCESS.품목구분 AS 품목구분
           ,INSTRUCT_PROCESS.품번 AS 품번
           ,INSTRUCT_PROCESS.품명 AS 품명
           ,INSTRUCT_PROCESS.규격 AS 규격
           ,INSTRUCT_PROCESS.단위 AS 단위
-          ,INSTRUCT_PROCESS.수량 AS 수량
+          ,INSTRUCT_PROCESS.지시수량 AS 지시수량
           ,INSTRUCT_PROCESS.공정명 AS 공정
           ,INSTRUCT_PROCESS.시작일 AS 시작일
           ,[PDRS_USER_ID] AS 작업자ID
-          ,RESULT_USER.이름 AS 작업자
+          ,(SELECT [USER_NAME] FROM [QMES2022].[dbo].[MASTER_USER_TB] WHERE [USER_ID] = [PDRS_USER_ID]) AS 작업자
           ,[PDRS_FACILITY_PK] AS 설비NO
-          ,RESULT_FACILITY.설비명 AS 설비명
+          ,(SELECT [FCLT_NAME] FROM [QMES2022].[dbo].[MASTER_FACILITY_TB] WHERE [FCLT_PK] = [PDRS_FACILITY_PK]) AS 설비명
           ,CONVERT(VARCHAR, [PDRS_START_DT], 20) AS 시작일시
           ,CONVERT(VARCHAR, [PDRS_END_DT], 20) AS 종료일시
           ,[PDRS_PRODUCE_AMT] AS 생산수
@@ -825,104 +531,30 @@ router.post("/delete", async (req, res) => {
           SELECT
             [ISPC_PK] AS NO
             ,[ISPC_WORK_INSTRUCT_PK] AS 작업지시NO
-            ,WORK_INSTRUCT.코드 AS 작업코드
-            ,WORK_INSTRUCT.품목구분 AS 구분
-            ,WORK_INSTRUCT.품번 AS 품번
-            ,WORK_INSTRUCT.품명 AS 품명
-            ,WORK_INSTRUCT.규격 AS 규격
-            ,WORK_INSTRUCT.단위 AS 단위
-            ,WORK_INSTRUCT.수량 AS 수량
-            ,WORK_INSTRUCT.시작일 AS 시작일
+            ,(SELECT [WKIS_CODE] FROM [QMES2022].[dbo].[MANAGE_WORK_INSTRUCT_TB] WHERE [WKIS_PK] = [ISPC_WORK_INSTRUCT_PK]) AS 작업코드
+            ,[ISPC_ITEM_PK] AS 품목NO
+            ,ITEM.구분 AS 품목구분
+            ,ITEM.품번 AS 품번
+            ,ITEM.품명 AS 품명
+            ,ITEM.규격 AS 규격
+            ,ITEM.단위 AS 단위
+            ,[ISPC_AMOUNT] AS 지시수량
+            ,(SELECT CONVERT(varchar, [WKIS_START_DATE], 23) FROM [QMES2022].[dbo].[MANAGE_WORK_INSTRUCT_TB] WHERE [WKIS_PK] = [ISPC_WORK_INSTRUCT_PK]) AS 시작일
             ,[ISPC_PROCESS_PK] AS 공정NO
-            ,PROCESS.공정명 AS 공정명
-            ,[ISPC_FACILITY_PK] AS 설비NO
-            ,FACILITY.설비명 AS 설비명
-            ,[ISPC_USER_ID] AS 작업자ID
-            ,USERS.이름 AS 작업자
+            ,(SELECT [PRCS_NAME] FROM [QMES2022].[dbo].[MASTER_PROCESS_TB] WHERE [PRCS_PK] = [ISPC_PROCESS_PK]) AS 공정명
           FROM [QMES2022].[dbo].[MANAGE_INSTRUCT_PROCESS_TB]
           LEFT JOIN
           (
             SELECT
-              [WKIS_PK] AS NO
-              ,[WKIS_CODE] AS 코드
-              ,[WKIS_PRODUCE_PLAN_PK] AS 생산계획NO
-              ,[WKIS_ITEM_PK] AS 품목NO
-              ,ITEM.품목구분 AS 품목구분
-              ,ITEM.품번 AS 품번
-              ,ITEM.품명 AS 품명
-              ,ITEM.규격 AS 규격
-              ,ITEM.단위 AS 단위
-              ,[WKIS_AMOUNT] AS 수량
-              ,CONVERT(varchar, [WKIS_START_DATE], 23) AS 시작일
-            FROM [QMES2022].[dbo].[MANAGE_WORK_INSTRUCT_TB]
-            LEFT JOIN
-            (
-              SELECT
-                [ITEM_PK] AS NO
-                ,[ITEM_DIV] AS 품목구분
-                ,[ITEM_PRODUCT_NUM] AS 품번
-                ,[ITEM_NAME] AS 품명
-                ,[ITEM_SIZE] AS 규격
-                ,[ITEM_UNIT] AS 단위
-              FROM [QMES2022].[dbo].[MASTER_ITEM_TB]
-            ) AS ITEM ON ITEM.NO = [WKIS_ITEM_PK]
-          ) AS WORK_INSTRUCT ON WORK_INSTRUCT.NO = [ISPC_WORK_INSTRUCT_PK]
-          LEFT JOIN
-          (
-            SELECT
-              [PRCS_PK] AS NO
-              ,[PRCS_CODE] AS 코드
-              ,[PRCS_DIV] AS 구분
-              ,[PRCS_NAME] AS 공정명
-              ,[PRCS_CONTENT] AS 내용
-              ,[PRCS_FACILITY] AS 설비
-            FROM [QMES2022].[dbo].[MASTER_PROCESS_TB]
-          ) AS PROCESS ON PROCESS.NO = [ISPC_PROCESS_PK]
-          LEFT JOIN
-          (
-            SELECT
-              [FCLT_PK] AS NO
-              ,[FCLT_NAME] AS 설비명
-              ,[FCLT_LINE] AS 라인
-              ,[FCLT_SIZE] AS 규격
-            FROM [QMES2022].[dbo].[MASTER_FACILITY_TB]
-          ) AS FACILITY ON FACILITY.NO = [ISPC_FACILITY_PK]
-          LEFT JOIN
-          (
-            SELECT
-              [USER_ID] AS 아이디,
-              [USER_NAME] AS 이름,
-              [USER_PHONE] AS 연락처,
-              [USER_EMAIL] AS 이메일,
-              [USER_DEPART] AS 부서명,
-              [USER_POSITION] AS 직책,
-              [USER_RANK] AS 직급
-            FROM [QMES2022].[dbo].[MASTER_USER_TB]
-          ) AS USERS ON USERS.아이디 = [ISPC_USER_ID]
+              [ITEM_PK] AS NO
+              ,[ITEM_DIV] AS 구분
+              ,[ITEM_PRODUCT_NUM] AS 품번
+              ,[ITEM_NAME] AS 품명
+              ,[ITEM_SIZE] AS 규격
+              ,[ITEM_UNIT] AS 단위
+            FROM [QMES2022].[dbo].[MASTER_ITEM_TB]
+          ) AS ITEM ON ITEM.NO = [ISPC_ITEM_PK]
         ) AS INSTRUCT_PROCESS ON INSTRUCT_PROCESS.NO = [PDRS_INST_PROCESS_PK]
-        LEFT JOIN
-        (
-          SELECT
-            [FCLT_PK] AS NO
-            ,[FCLT_NAME] AS 설비명
-            ,[FCLT_LINE] AS 라인
-            ,[FCLT_SIZE] AS 규격
-          FROM [QMES2022].[dbo].[MASTER_FACILITY_TB]
-        ) AS RESULT_FACILITY ON RESULT_FACILITY.NO = [PDRS_FACILITY_PK]
-        LEFT JOIN
-        (
-          SELECT
-            [USER_ID] AS 아이디,
-            [USER_NAME] AS 이름,
-            [USER_PHONE] AS 연락처,
-            [USER_EMAIL] AS 이메일,
-            [USER_DEPART] AS 부서명,
-            [USER_POSITION] AS 직책,
-            [USER_RANK] AS 직급
-          FROM [QMES2022].[dbo].[MASTER_USER_TB]
-        WHERE [USER_ID] != 'admin'
-        AND [USER_ID] != 'kiosk'
-        ) AS RESULT_USER ON RESULT_USER.아이디 = [PDRS_USER_ID]
         WHERE [PDRS_PK] = @key
       `);
 
