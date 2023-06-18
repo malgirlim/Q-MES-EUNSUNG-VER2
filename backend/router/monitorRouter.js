@@ -7,6 +7,7 @@ const monitorKpiOEERouter = require("./monitor/monitorKpiOEE");
 const monitorKpiFacilityRateRouter = require("./monitor/monitorKpiFacilityRate");
 const monitorKpiBadRateRouter = require("./monitor/monitorKpiBadRate");
 const monitorKpiManHourRouter = require("./monitor/monitorKpiManHour");
+const monitorKpiProductHourRouter = require("./monitor/monitorKpiProductHour");
 
 const monitorPreventRouter = require("./monitor/monitorPrevent");
 const monitorDailyRouter = require("./monitor/monitorDaily");
@@ -28,6 +29,8 @@ router.use("/kpi/facilityrate", monitorKpiFacilityRateRouter);
 router.use("/kpi/badrate", monitorKpiBadRateRouter);
 // 모니터링 / kpi / 작업공수 - router/monitor/monitorKpiManHour.js
 router.use("/kpi/manhour", monitorKpiManHourRouter);
+// 모니터링 / kpi / 시간당생산량 - router/monitor/monitorKpiProductHour.js
+router.use("/kpi/producthour", monitorKpiProductHourRouter);
 
 // 모니터링 / 예방보전 현황 - router/monitor/monitorPrevent.js
 router.use("/prevent", monitorPreventRouter);

@@ -23,10 +23,11 @@ async function runSchedule() {
     // for (let data of refer_data) {
 
     // 발송시점의 기준을 판단 // 예 : data.필수점검 == "Y"
-    if (true) {
-      // 작업실행
-      runTask();
-    }
+    // if (true) {
+
+    // 작업실행
+    runTask();
+    // }
     // }
   }
   // }
