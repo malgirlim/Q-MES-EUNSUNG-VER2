@@ -36,12 +36,23 @@ const props = defineProps<{
 
 const chartData = computed<ChartData>(() => {
   return {
-    labels: props.x_label,
+    labels: props.x_label ?? [
+      "검사기",
+      "제판기",
+      "인쇄기1",
+      "인쇄기2",
+      "인쇄기3",
+      "인쇄기4",
+      "인쇄기5",
+      "인쇄기6",
+      "인쇄기7",
+      "인쇄기8",
+    ],
     datasets: [
       {
-        label: "효율",
+        label: props.dataset1_label ?? "효율",
         maxBarThickness: 60,
-        data: [20, 30, 55, 40, 60, 47, 46, 40, 75, 65],
+        data: props.dataset1_data ?? [20, 30, 55, 40, 60, 47, 46, 40, 75, 65],
         type: "bar",
         datalabels: {
           color: "black",
@@ -54,8 +65,8 @@ const chartData = computed<ChartData>(() => {
         order: 0,
       },
       {
-        label: "목표효율",
-        data: [50, 50, 50, 50, 50, 50, 50, 50, 50, 50],
+        label: props.dataset2_label ?? "목표효율",
+        data: props.dataset2_data ?? [50, 50, 50, 50, 50, 50, 50, 50, 50, 50],
         datalabels: { display: false },
         type: "line",
         pointStyle: false,
@@ -90,12 +101,14 @@ const chartOptions = computed<ChartOptions>(() => {
             return value + "%";
           },
         },
+        min: Math.floor(Math.min(...props.dataset1_data)),
+        max: Math.ceil(Math.max(...props.dataset1_data)),
       },
     },
     plugins: {
       title: {
         display: true,
-        text: "2023년",
+        text: props.title_text ?? "2023년",
         font: { size: 15 },
         padding: { bottom: 5, top: 5 },
       },
