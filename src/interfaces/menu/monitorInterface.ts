@@ -94,3 +94,14 @@ export interface MonitorKPIOEE {
   OEE?: string;
   목표?: string;
 }
+
+// 모니터링 - KPI - 작업공수
+export interface MonitorKPIManHour {
+  [attribute: string]: any | undefined;
+  NO?: number;
+  년월?: string;
+  총작업시간?: string;
+  총비가동시간?: string;
+  작업공수?: string;
+  목표?: string;
+}

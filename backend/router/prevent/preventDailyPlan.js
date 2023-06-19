@@ -230,6 +230,24 @@ router.post("/insert", async (req, res) => {
           (@설비NO,@구분,@내용,@검사방법,@기준,@단위,@최소,@최대,@담당자ID,@비고,@등록자,@등록일시)
       `);
 
+    // 일상점검 계획등록하면 바로 사용할 수 있게 등록 해야함
+    await Pool.request()
+      .input("등록자", req.body.user ?? "")
+      .input(
+        "등록일시",
+        moment().tz("Asia/Seoul").format("YYYY-MM-DD HH:mm:ss")
+      ).query(`
+        INSERT INTO [QMES2022].[dbo].[MANAGE_DAILY_INSPECT_TB]
+          ([DISPT_DAILY_INSPECT_PLAN_PK]
+          ,[DISPT_CONTENT]
+          ,[DISPT_RESULT]
+          ,[DISPT_NOTE]
+          ,[DISPT_REGIST_NM]
+          ,[DISPT_REGIST_DT])
+        VALUES
+          ((SELECT MAX([DISPP_PK]) FROM [QMES2022].[dbo].[MANAGE_DAILY_INSPECT_PLAN_TB]),'','미점검','',@등록자,@등록일시)
+      `);
+
     // 로그기록 저장
     await logSend(
       (type = "등록"),

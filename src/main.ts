@@ -31,15 +31,20 @@ await axios
   .then((res: any) => {
     auth_account = res.data;
     if (res.data.auth == "시스템개발자") auth_level = 시스템_개발자;
-    if (res.data.auth == "시스템관리자") auth_level = 시스템_관리자;
-    if (res.data.auth == "구매일반") auth_level = 구매_일반;
-    if (res.data.auth == "구매관리자") auth_level = 구매_관리자;
-    if (res.data.auth == "영업일반") auth_level = 영업_일반;
-    if (res.data.auth == "영업관리자") auth_level = 영업_관리자;
-    if (res.data.auth == "생산일반") auth_level = 생산_일반;
-    if (res.data.auth == "생산관리자") auth_level = 생산_관리자;
-    if (res.data.auth == "품질일반") auth_level = 품질_일반;
-    if (res.data.auth == "품질관리자") auth_level = 품질_관리자;
+    else if (res.data.auth == "시스템관리자") auth_level = 시스템_관리자;
+    else if (res.data.auth == "구매일반") auth_level = 구매_일반;
+    else if (res.data.auth == "구매관리자") auth_level = 구매_관리자;
+    else if (res.data.auth == "영업일반") auth_level = 영업_일반;
+    else if (res.data.auth == "영업관리자") auth_level = 영업_관리자;
+    else if (res.data.auth == "생산일반") auth_level = 생산_일반;
+    else if (res.data.auth == "생산관리자") auth_level = 생산_관리자;
+    else if (res.data.auth == "품질일반") auth_level = 품질_일반;
+    else if (res.data.auth == "품질관리자") auth_level = 품질_관리자;
+    else {
+      for (let key in 시스템_개발자) {
+        auth_level[key] = 1;
+      }
+    }
     //if (res.data.auth == "시스템개발자") show_debug_button.value = true;
   })
   .catch((res) => {
