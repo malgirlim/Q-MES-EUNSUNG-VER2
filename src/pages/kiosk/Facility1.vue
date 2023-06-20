@@ -1032,13 +1032,13 @@ const setWorkerChangeModal = (value: boolean) => {
 
   <!-- BEGIN: 불량변경 Modal -->
   <Dialog :open="badAddModal" size="xxl" @close="setBadAddModal(false)">
-    <Dialog.Panel>
-      <div class="p-3 text-center">
-        <div class="mt-8 text-4xl"><strong>불량변경</strong></div>
+    <Dialog.Panel style="top: -8%">
+      <div class="px-3 pt-3 text-center">
+        <div class="text-xl"><strong>불량변경</strong></div>
       </div>
       <div><BadAdd /></div>
 
-      <div class="px-5 pb-8 text-center">
+      <div class="px-5 pb-3 text-center">
         <Button
           variant="primary"
           type="button"
@@ -1047,14 +1047,14 @@ const setWorkerChangeModal = (value: boolean) => {
               setBadAddModal(false);
             }
           "
-          class="w-48 text-2xl mr-10"
+          class="w-40 py-1 text-base mr-10"
         >
           확인
         </Button>
         <Button
           variant="outline-primary"
           type="button"
-          class="w-48 text-2xl"
+          class="w-40 py-1 text-base"
           @click="setBadAddModal(false)"
         >
           닫기
@@ -1066,13 +1066,13 @@ const setWorkerChangeModal = (value: boolean) => {
 
   <!-- BEGIN: 투입자재변경 Modal -->
   <Dialog :open="itemAddModal" size="xxl" @close="setItemAddModal(false)">
-    <Dialog.Panel>
-      <div class="p-3 text-center">
-        <div class="mt-8 text-4xl"><strong>투입자재변경</strong></div>
+    <Dialog.Panel style="top: -8%">
+      <div class="px-3 pt-3 text-center">
+        <div class="text-xl"><strong>투입자재변경</strong></div>
       </div>
       <div><ItemAdd /></div>
 
-      <div class="px-5 pb-8 text-center">
+      <div class="px-5 pb-3 text-center">
         <Button
           variant="primary"
           type="button"
@@ -1081,14 +1081,14 @@ const setWorkerChangeModal = (value: boolean) => {
               setItemAddModal(false);
             }
           "
-          class="w-48 text-2xl mr-10"
+          class="w-40 py-1 text-base mr-10"
         >
           확인
         </Button>
         <Button
           variant="outline-primary"
           type="button"
-          class="w-48 text-2xl"
+          class="w-40 py-1 text-base"
           @click="setItemAddModal(false)"
         >
           닫기
