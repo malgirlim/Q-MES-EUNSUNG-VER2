@@ -139,7 +139,7 @@ const search = () => {
 
 // ########################## 등록, 수정, 삭제, 상세 Modal ##########################
 // ##### 등록 Modal #####
-let insertModalData: StockStock;
+let insertModalData: StockStockFCLTPart;
 const insertModal = ref(false);
 const setInsertModal = (value: boolean) => {
   router.push("/production/task-add");
@@ -160,7 +160,7 @@ const setEditModal = (value: boolean) => {
   editModal.value = value;
   search();
 };
-let editModalData: StockStock; // 수정할 변수
+let editModalData: StockStockFCLTPart; // 수정할 변수
 // 수정버튼 누르면 실행되는 함수
 const editDataFunction = async () => {
   await dataManager.editData(editModalData); // await : 이 함수가 끝나야 다음으로 넘어간다
@@ -700,12 +700,12 @@ const setStockLotModal = (value: boolean) => {
                 >
                   {{ table_setting.항목11.name }}
                 </Table.Th>
-                <!-- <Table.Th
+                <Table.Th
                   class="text-center border-b-0 whitespace-nowrap font-bold"
                   :style="table_setting.상세보기.style"
                 >
                   {{ table_setting.상세보기.name }}
-                </Table.Th> -->
+                </Table.Th>
               </Table.Tr>
             </Table.Thead>
             <Table.Tbody style="position: relative; z-index: 1">
@@ -799,7 +799,7 @@ const setStockLotModal = (value: boolean) => {
                 >
                   <div>{{ todo[table_setting.항목11.name] }}</div>
                 </Table.Td>
-                <!-- <Table.Td
+                <Table.Td
                   class="first:rounded-l-md last:rounded-r-md text-center bg-white border-b-0 dark:bg-darkmode-600 shadow-[20px_3px_20px_#0000000b] py-0 relative before:block before:w-px before:h-8 before:bg-slate-200 before:absolute before:left-0 before:inset-y-0 before:my-auto before:dark:bg-darkmode-400"
                   :style="table_setting.상세보기.style"
                 >
@@ -825,7 +825,7 @@ const setStockLotModal = (value: boolean) => {
                       상세
                     </a>
                   </div>
-                </Table.Td> -->
+                </Table.Td>
               </Table.Tr>
             </Table.Tbody>
           </Table>
