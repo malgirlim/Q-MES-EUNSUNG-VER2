@@ -46,6 +46,7 @@ router.get("/", async (req, res) => {
         [DLISP_PK] AS NO
         ,[DLISP_DELIVERY_PK] AS 납품NO
         ,DELIVERY.LOT코드 AS LOT코드
+        ,DELIVERY.품목NO AS 품목NO
         ,DELIVERY.품목구분 AS 품목구분
         ,DELIVERY.품명 AS 품명
         ,DELIVERY.규격 AS 규격
@@ -133,8 +134,8 @@ router.post("/", async (req, res) => {
       sql =
         `
         SELECT
-          NO AS NO, 납품NO AS 납품NO, LOT코드 AS LOT코드, 품목구분 AS 품목구분, 품명 AS 품명, 규격 AS 규격, 단위 AS 단위,
-          구분 AS 구분, 요청일시 AS 요청일시, 샘플수량 AS 샘플수량, 요청수량 AS 요청수량, 결과 AS 결과,
+          NO AS NO, 납품NO AS 납품NO, LOT코드 AS LOT코드, 품목NO AS 품목NO, 품목구분 AS 품목구분, 품명 AS 품명, 규격 AS 규격,
+          단위 AS 단위, 구분 AS 구분, 요청일시 AS 요청일시, 샘플수량 AS 샘플수량, 요청수량 AS 요청수량, 결과 AS 결과,
           내용1 AS 내용1, 내용2 AS 내용2, 내용3 AS 내용3, 내용4 AS 내용4, 내용5 AS 내용5, 내용6 AS 내용6, 내용7 AS 내용7,
           내용8 AS 내용8, 내용9 AS 내용9, 내용10 AS 내용10, 비고 AS 비고, 등록자 AS 등록자, 등록일시 AS 등록일시
         FROM(
@@ -142,6 +143,7 @@ router.post("/", async (req, res) => {
             [DLISP_PK] AS NO
             ,[DLISP_DELIVERY_PK] AS 납품NO
             ,DELIVERY.LOT코드 AS LOT코드
+            ,DELIVERY.품목NO AS 품목NO
             ,DELIVERY.품목구분 AS 품목구분
             ,DELIVERY.품명 AS 품명
             ,DELIVERY.규격 AS 규격
@@ -236,8 +238,8 @@ router.post("/", async (req, res) => {
       sql =
         `
         SELECT
-          NO AS NO, 납품NO AS 납품NO, LOT코드 AS LOT코드, 품목구분 AS 품목구분, 품명 AS 품명, 규격 AS 규격, 단위 AS 단위,
-          구분 AS 구분, 요청일시 AS 요청일시, 샘플수량 AS 샘플수량, 요청수량 AS 요청수량, 결과 AS 결과,
+          NO AS NO, 납품NO AS 납품NO, LOT코드 AS LOT코드, 품목NO AS 품목NO, 품목구분 AS 품목구분, 품명 AS 품명, 규격 AS 규격,
+          단위 AS 단위, 구분 AS 구분, 요청일시 AS 요청일시, 샘플수량 AS 샘플수량, 요청수량 AS 요청수량, 결과 AS 결과,
           내용1 AS 내용1, 내용2 AS 내용2, 내용3 AS 내용3, 내용4 AS 내용4, 내용5 AS 내용5, 내용6 AS 내용6, 내용7 AS 내용7,
           내용8 AS 내용8, 내용9 AS 내용9, 내용10 AS 내용10, 비고 AS 비고, 등록자 AS 등록자, 등록일시 AS 등록일시
         FROM(
@@ -245,6 +247,7 @@ router.post("/", async (req, res) => {
             [DLISP_PK] AS NO
             ,[DLISP_DELIVERY_PK] AS 납품NO
             ,DELIVERY.LOT코드 AS LOT코드
+            ,DELIVERY.품목NO AS 품목NO
             ,DELIVERY.품목구분 AS 품목구분
             ,DELIVERY.품명 AS 품명
             ,DELIVERY.규격 AS 규격
@@ -599,6 +602,7 @@ router.post("/delete", async (req, res) => {
           [DLISP_PK] AS NO
           ,[DLISP_DELIVERY_PK] AS 납품NO
           ,DELIVERY.LOT코드 AS LOT코드
+          ,DELIVERY.품목NO AS 품목NO
           ,DELIVERY.품목구분 AS 품목구분
           ,DELIVERY.품명 AS 품명
           ,DELIVERY.규격 AS 규격

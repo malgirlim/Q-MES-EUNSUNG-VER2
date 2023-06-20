@@ -46,6 +46,7 @@ router.get("/", async (req, res) => {
         [IPISP_PK] AS NO
         ,[IPISP_ORDER_PK] AS 발주NO
         ,ORDERORDER.발주코드 AS 발주코드
+        ,ORDERORDER.품목NO AS 품목NO
         ,ORDERORDER.품번 AS 발주품번
         ,ORDERORDER.품명 AS 발주품명
         ,ORDERORDER.수량 AS 발주수량
@@ -211,8 +212,8 @@ router.post("/", async (req, res) => {
       sql =
         `
         SELECT
-          NO AS NO, 발주NO AS 발주NO, 발주코드 AS 발주코드, 발주품번 AS 발주품번, 발주품명 AS 발주품명, 발주수량 AS 발주수량,
-          품질기준이미지 AS 품질기준이미지, 품질기준1 AS 품질기준1, 품질기준2 AS 품질기준2,
+          NO AS NO, 발주NO AS 발주NO, 발주코드 AS 발주코드, 품목NO AS 품목NO, 발주품번 AS 발주품번, 발주품명 AS 발주품명,
+          발주수량 AS 발주수량, 품질기준이미지 AS 품질기준이미지, 품질기준1 AS 품질기준1, 품질기준2 AS 품질기준2,
           품질기준3 AS 품질기준3, 품질기준4 AS 품질기준4, 품질기준5 AS 품질기준5, 품질기준6 AS 품질기준6,
           품질기준7 AS 품질기준7, 품질기준8 AS 품질기준8, 품질기준9 AS 품질기준9, 품질기준10 AS 품질기준10,
           구분 AS 구분, 샘플수량 AS 샘플수량, 입고수량 AS 입고수량, 결과 AS 결과, 내용1 AS 내용1, 내용2 AS 내용2,
@@ -223,6 +224,7 @@ router.post("/", async (req, res) => {
             [IPISP_PK] AS NO
             ,[IPISP_ORDER_PK] AS 발주NO
             ,ORDERORDER.발주코드 AS 발주코드
+            ,ORDERORDER.품목NO AS 품목NO
             ,ORDERORDER.품번 AS 발주품번
             ,ORDERORDER.품명 AS 발주품명
             ,ORDERORDER.수량 AS 발주수량
@@ -402,18 +404,19 @@ router.post("/", async (req, res) => {
       sql =
         `
         SELECT
-          NO AS NO, 발주NO AS 발주NO, 발주코드 AS 발주코드, 발주품번 AS 발주품번, 발주품명 AS 발주품명, 발주수량 AS 발주수량,
-          품질기준이미지 AS 품질기준이미지, 품질기준1 AS 품질기준1, 품질기준2 AS 품질기준2,
+          NO AS NO, 발주NO AS 발주NO, 발주코드 AS 발주코드, 품목NO AS 품목NO, 발주품번 AS 발주품번, 발주품명 AS 발주품명,
+          발주수량 AS 발주수량, 품질기준이미지 AS 품질기준이미지, 품질기준1 AS 품질기준1, 품질기준2 AS 품질기준2,
           품질기준3 AS 품질기준3, 품질기준4 AS 품질기준4, 품질기준5 AS 품질기준5, 품질기준6 AS 품질기준6,
           품질기준7 AS 품질기준7, 품질기준8 AS 품질기준8, 품질기준9 AS 품질기준9, 품질기준10 AS 품질기준10,
           구분 AS 구분, 샘플수량 AS 샘플수량, 입고수량 AS 입고수량, 결과 AS 결과, 내용1 AS 내용1, 내용2 AS 내용2,
           내용3 AS 내용3, 내용4 AS 내용4, 내용5 AS 내용5, 내용6 AS 내용6, 내용7 AS 내용7, 내용8 AS 내용8, 내용9 AS 내용9,
-          내용10 AS 내용10, 전달사항 AS 전달사항, 요청일시 AS 요청일시, 비고 AS 비고, 등록자 AS 등록자, 등록일시 AS 등록일시
+          내용10 AS 내용10, 요청일시 AS 요청일시, 전달사항 AS 전달사항, 비고 AS 비고, 등록자 AS 등록자, 등록일시 AS 등록일시
         FROM(
           SELECT
             [IPISP_PK] AS NO
             ,[IPISP_ORDER_PK] AS 발주NO
             ,ORDERORDER.발주코드 AS 발주코드
+            ,ORDERORDER.품목NO AS 품목NO
             ,ORDERORDER.품번 AS 발주품번
             ,ORDERORDER.품명 AS 발주품명
             ,ORDERORDER.수량 AS 발주수량
@@ -844,6 +847,7 @@ router.post("/delete", async (req, res) => {
           [IPISP_PK] AS NO
           ,[IPISP_ORDER_PK] AS 발주NO
           ,ORDERORDER.발주코드 AS 발주코드
+          ,ORDERORDER.품목NO AS 품목NO
           ,ORDERORDER.품번 AS 발주품번
           ,ORDERORDER.품명 AS 발주품명
           ,ORDERORDER.수량 AS 발주수량

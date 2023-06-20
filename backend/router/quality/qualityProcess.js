@@ -47,6 +47,7 @@ router.get("/", async (req, res) => {
         ,[PCISP_PRODUCE_RESULT_PK] AS 생산실적NO
         ,PRODUCE_RESULT.작업코드 AS 작업코드
         ,PRODUCE_RESULT.공정 AS 공정
+        ,PRODUCE_RESULT.품목NO AS 품목NO
         ,PRODUCE_RESULT.품목구분 AS 품목구분
         ,PRODUCE_RESULT.품번 AS 품번
         ,PRODUCE_RESULT.품명 AS 품명
@@ -78,6 +79,7 @@ router.get("/", async (req, res) => {
           [PDRS_PK] AS NO
           ,[PDRS_INST_PROCESS_PK] AS 지시공정NO
           ,INSTRUCT_PROCESS.작업코드 AS 작업코드
+          ,INSTRUCT_PROCESS.품목NO AS 품목NO
           ,INSTRUCT_PROCESS.품목구분 AS 품목구분
           ,INSTRUCT_PROCESS.품번 AS 품번
           ,INSTRUCT_PROCESS.품명 AS 품명
@@ -242,8 +244,8 @@ router.post("/", async (req, res) => {
       sql =
         `
         SELECT
-          NO AS NO, 생산실적NO AS 생산실적NO, 작업코드 AS 작업코드, 공정 AS 공정, 품목구분 AS 품목구분, 품번 AS 품번,
-          품명 AS 품명, 규격 AS 규격, 단위 AS 단위, 특이사항 AS 특이사항, 구분 AS 구분, 샘플수량 AS 샘플수량,
+          NO AS NO, 생산실적NO AS 생산실적NO, 작업코드 AS 작업코드, 공정 AS 공정, 품목NO AS 품목NO,  품목구분 AS 품목구분,
+          품번 AS 품번, 품명 AS 품명, 규격 AS 규격, 단위 AS 단위, 특이사항 AS 특이사항, 구분 AS 구분, 샘플수량 AS 샘플수량,
           입고수량 AS 입고수량, 결과 AS 결과, 내용1 AS 내용1, 내용2 AS 내용2, 내용3 AS 내용3, 내용4 AS 내용4,
           내용5 AS 내용5, 내용6 AS 내용6, 내용7 AS 내용7, 내용8 AS 내용8, 내용9 AS 내용9, 내용10 AS 내용10,
           요청일시 AS 요청일시, 비고 AS 비고, 등록자 AS 등록자, 등록일시 AS 등록일시
@@ -253,6 +255,7 @@ router.post("/", async (req, res) => {
             ,[PCISP_PRODUCE_RESULT_PK] AS 생산실적NO
             ,PRODUCE_RESULT.작업코드 AS 작업코드
             ,PRODUCE_RESULT.공정 AS 공정
+            ,PRODUCE_RESULT.품목NO AS 품목NO
             ,PRODUCE_RESULT.품목구분 AS 품목구분
             ,PRODUCE_RESULT.품번 AS 품번
             ,PRODUCE_RESULT.품명 AS 품명
@@ -284,6 +287,7 @@ router.post("/", async (req, res) => {
               [PDRS_PK] AS NO
               ,[PDRS_INST_PROCESS_PK] AS 지시공정NO
               ,INSTRUCT_PROCESS.작업코드 AS 작업코드
+              ,INSTRUCT_PROCESS.품목NO AS 품목NO
               ,INSTRUCT_PROCESS.품목구분 AS 품목구분
               ,INSTRUCT_PROCESS.품번 AS 품번
               ,INSTRUCT_PROCESS.품명 AS 품명
@@ -455,8 +459,8 @@ router.post("/", async (req, res) => {
       sql =
         `
         SELECT
-          NO AS NO, 생산실적NO AS 생산실적NO, 작업코드 AS 작업코드, 공정 AS 공정, 품목구분 AS 품목구분, 품번 AS 품번,
-          품명 AS 품명, 규격 AS 규격, 단위 AS 단위, 특이사항 AS 특이사항, 구분 AS 구분, 샘플수량 AS 샘플수량,
+          NO AS NO, 생산실적NO AS 생산실적NO, 작업코드 AS 작업코드, 공정 AS 공정, 품목NO AS 품목NO,  품목구분 AS 품목구분,
+          품번 AS 품번, 품명 AS 품명, 규격 AS 규격, 단위 AS 단위, 특이사항 AS 특이사항, 구분 AS 구분, 샘플수량 AS 샘플수량,
           입고수량 AS 입고수량, 결과 AS 결과, 내용1 AS 내용1, 내용2 AS 내용2, 내용3 AS 내용3, 내용4 AS 내용4,
           내용5 AS 내용5, 내용6 AS 내용6, 내용7 AS 내용7, 내용8 AS 내용8, 내용9 AS 내용9, 내용10 AS 내용10,
           요청일시 AS 요청일시, 비고 AS 비고, 등록자 AS 등록자, 등록일시 AS 등록일시
@@ -466,6 +470,7 @@ router.post("/", async (req, res) => {
             ,[PCISP_PRODUCE_RESULT_PK] AS 생산실적NO
             ,PRODUCE_RESULT.작업코드 AS 작업코드
             ,PRODUCE_RESULT.공정 AS 공정
+            ,PRODUCE_RESULT.품목NO AS 품목NO
             ,PRODUCE_RESULT.품목구분 AS 품목구분
             ,PRODUCE_RESULT.품번 AS 품번
             ,PRODUCE_RESULT.품명 AS 품명
@@ -497,6 +502,7 @@ router.post("/", async (req, res) => {
               [PDRS_PK] AS NO
               ,[PDRS_INST_PROCESS_PK] AS 지시공정NO
               ,INSTRUCT_PROCESS.작업코드 AS 작업코드
+              ,INSTRUCT_PROCESS.품목NO AS 품목NO
               ,INSTRUCT_PROCESS.품목구분 AS 품목구분
               ,INSTRUCT_PROCESS.품번 AS 품번
               ,INSTRUCT_PROCESS.품명 AS 품명
@@ -919,6 +925,7 @@ router.post("/delete", async (req, res) => {
           ,[PCISP_PRODUCE_RESULT_PK] AS 생산실적NO
           ,PRODUCE_RESULT.작업코드 AS 작업코드
           ,PRODUCE_RESULT.공정 AS 공정
+          ,PRODUCE_RESULT.품목NO AS 품목NO
           ,PRODUCE_RESULT.품목구분 AS 품목구분
           ,PRODUCE_RESULT.품번 AS 품번
           ,PRODUCE_RESULT.품명 AS 품명
@@ -950,6 +957,7 @@ router.post("/delete", async (req, res) => {
             [PDRS_PK] AS NO
             ,[PDRS_INST_PROCESS_PK] AS 지시공정NO
             ,INSTRUCT_PROCESS.작업코드 AS 작업코드
+            ,INSTRUCT_PROCESS.품목NO AS 품목NO
             ,INSTRUCT_PROCESS.품목구분 AS 품목구분
             ,INSTRUCT_PROCESS.품번 AS 품번
             ,INSTRUCT_PROCESS.품명 AS 품명

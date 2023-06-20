@@ -25,6 +25,7 @@ export interface QualityIncoming {
   NO?: number;
   발주NO?: number;
   발주코드?: string;
+  품목NO?: number;
   발주품번?: string;
   발주품명?: string;
   발주수량?: string;
@@ -67,6 +68,7 @@ export interface QualityProcess {
   생산실적NO?: number;
   작업코드?: string;
   공정?: string;
+  품목NO?: number;
   품목구분?: string;
   품번?: string;
   품명?: string;
@@ -99,6 +101,7 @@ export interface QualityShipment {
   NO?: number;
   납품NO?: number;
   LOT코드?: string;
+  품목NO?: number;
   품목구분?: string;
   품명?: string;
   규격?: string;

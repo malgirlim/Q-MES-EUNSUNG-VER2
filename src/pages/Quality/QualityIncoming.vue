@@ -33,6 +33,7 @@ const user_level = proxy.gstate.level.QualityIncoming; //권한레벨
 onMounted(async () => {
   dataManager.loadDatas(); // 메인으로 쓸 데이터 불러오기
   // incoming_order.loadDatas(); // 발주 데이터 불러오기
+  qualitystand.loadDatas(); // 품질기준서 데이터 불러오기
 });
 
 // 페이징기능
@@ -46,13 +47,13 @@ const pageChangeFirst = () => {
 const url = "/api/quality/incoming";
 const dataManager = useSendApi<QualityIncoming>(url, currentPage, rowsPerPage);
 
-// 추가 데이터
-// const url_process_facility = "/api/master/process/facility";
-// const process_facility = useSendApi<MasterFacility>(
-//   url_process_facility,
-//   currentPage,
-//   rowsPerPage
-// );
+// 품질기준서 데이터 가져오기
+const url_qualitystand = "/api/quality/incoming/qualitystand";
+const qualitystand = useSendApi<MasterQualityStand>(
+  url_qualitystand,
+  ref(1),
+  ref(10)
+);
 
 // 테이블항목 설정 및 가로크기 조정
 const table_setting = {
@@ -1869,11 +1870,21 @@ const checkDataFunction = async () => {
         <div class="mt-5 mb-5">
           <img
             class="mx-auto"
-            src="../../../backend/uploads/hwp_logo1686549034501.png"
+            :src="
+              '../../../backend/uploads/master/qualitystand/' +
+                qualitystand.dataSearchAll.value.filter(
+                  (c) => c.품목NO == editModalData.품목NO
+                )[0]?.이미지 ?? ''
+            "
           />
         </div>
         <a
-          href="../../../backend/uploads/hwp_logo1686549034501.png"
+          :href="
+            '../../../backend/uploads/master/qualitystand/' +
+              qualitystand.dataSearchAll.value.filter(
+                (c) => c.품목NO == editModalData.품목NO
+              )[0]?.이미지 ?? ''
+          "
           download
           style="outline: none"
         >
