@@ -36,11 +36,22 @@ const props = defineProps<{
 
 const chartData = computed<ChartData>(() => {
   return {
-    labels: props.x_label,
+    labels: props.x_label ?? [
+      "검사기",
+      "제판기",
+      "인쇄1호기",
+      "인쇄2호기",
+      "인쇄3호기",
+      "인쇄4호기",
+      "인쇄5호기",
+      "인쇄6호기",
+      "인쇄7호기",
+      "인쇄8호기",
+    ],
     datasets: [
       {
-        label: "목표시간",
-        data: [40, 25, 60, 35, 45, 55, 50, 60, 85, 80],
+        label: props.dataset2_label ?? "목표시간",
+        data: props.dataset2_data ?? [40, 25, 60, 35, 45, 55, 50, 60, 85, 80],
         maxBarThickness: 100,
         datalabels: { display: false },
         type: "bar",
@@ -48,9 +59,9 @@ const chartData = computed<ChartData>(() => {
         order: 1,
       },
       {
-        label: "측정시간",
+        label: props.dataset1_label ?? "측정시간",
         maxBarThickness: 60,
-        data: [20, 30, 55, 40, 60, 47, 46, 40, 75, 65],
+        data: props.dataset1_data ?? [20, 30, 55, 40, 60, 47, 46, 40, 75, 65],
         type: "bar",
         datalabels: {
           color: "black",
@@ -87,7 +98,7 @@ const chartOptions = computed<ChartOptions>(() => {
             size: 15,
           },
           callback: function (value: any) {
-            return value + "hr";
+            return value + (props.y_scale ?? "hr");
           },
         },
       },
@@ -95,7 +106,7 @@ const chartOptions = computed<ChartOptions>(() => {
     plugins: {
       title: {
         display: true,
-        text: "2023년",
+        text: props.title_text ?? "2023년",
         font: { size: 15 },
         padding: { bottom: 5, top: 5 },
       },

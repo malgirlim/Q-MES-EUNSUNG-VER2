@@ -24,7 +24,7 @@ import OEEChart_bar_bar from "../../components/Common/Monitoring/OEEChart_bar_ba
 
 // API 보내는 함수 및 인터페이스 불러오기
 import { useSendApi } from "../../composables/useSendApi";
-import { MonitorKPIOEE } from "../../interfaces/menu/monitorInterface";
+import { MonitorOEE } from "../../interfaces/menu/monitorInterface";
 
 // 컴포넌트 로드
 import MasterDetail from "../../components/Common/Detail/MasterClientDetail.vue";
@@ -45,8 +45,8 @@ const pageChangeFirst = () => {
 };
 
 // dataManager 만들기
-const url = "/api/monitor/kpi/oee";
-const dataManager = useSendApi<MonitorKPIOEE>(url, currentPage, rowsPerPage);
+const url = "/api/monitor/oee";
+const dataManager = useSendApi<MonitorOEE>(url, currentPage, rowsPerPage);
 
 // 테이블항목 설정 및 가로크기 조정
 const table_setting = {
@@ -286,7 +286,7 @@ function exportFile(data: any) {
         </div>
       </div>
       <div class="col-span-3 p-5 bg-white rounded rounded-md">
-        <div class="text-center font-bold text-xl">KPI 설비가동률</div>
+        <div class="text-center font-bold text-xl">OEE 현황</div>
         <div style="height: 270px">
           <OEEChart_bar_bar
             :x_label="

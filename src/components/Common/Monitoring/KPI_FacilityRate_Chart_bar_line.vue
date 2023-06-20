@@ -87,7 +87,7 @@ const chartOptions = computed<ChartOptions>(() => {
             size: 15,
           },
           callback: function (value: any) {
-            return value + "%";
+            return value + (props.y_scale ?? "%");
           },
         },
         min: Math.floor(Math.min(...props.dataset1_data)),

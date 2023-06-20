@@ -105,7 +105,7 @@ watch([selectYear], async (newValue, oldValue) => {
 
 // 그래프 데이터
 const 작업공수 = ref([0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]);
-const 목표 = ref([280, 280, 280, 280, 280, 280, 280, 280, 280, 280, 280, 280]);
+const 목표 = ref([0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]);
 function searchChartData() {
   const data = dataManager.dataSearchAll.value;
   작업공수.value = [
@@ -148,18 +148,18 @@ function searchChartData() {
   ];
 
   목표.value = [
-    Number(data[0]?.목표 ?? 280),
-    Number(data[0]?.목표 ?? 280),
-    Number(data[0]?.목표 ?? 280),
-    Number(data[0]?.목표 ?? 280),
-    Number(data[0]?.목표 ?? 280),
-    Number(data[0]?.목표 ?? 280),
-    Number(data[0]?.목표 ?? 280),
-    Number(data[0]?.목표 ?? 280),
-    Number(data[0]?.목표 ?? 280),
-    Number(data[0]?.목표 ?? 280),
-    Number(data[0]?.목표 ?? 280),
-    Number(data[0]?.목표 ?? 280),
+    Number(data[0]?.목표 ?? 0),
+    Number(data[0]?.목표 ?? 0),
+    Number(data[0]?.목표 ?? 0),
+    Number(data[0]?.목표 ?? 0),
+    Number(data[0]?.목표 ?? 0),
+    Number(data[0]?.목표 ?? 0),
+    Number(data[0]?.목표 ?? 0),
+    Number(data[0]?.목표 ?? 0),
+    Number(data[0]?.목표 ?? 0),
+    Number(data[0]?.목표 ?? 0),
+    Number(data[0]?.목표 ?? 0),
+    Number(data[0]?.목표 ?? 0),
   ];
 }
 

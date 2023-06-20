@@ -286,7 +286,7 @@ function exportFile(data: any) {
         </div>
       </div>
       <div class="col-span-3 p-5 bg-white rounded rounded-md">
-        <div class="text-center font-bold text-xl">KPI 설비가동률</div>
+        <div class="text-center font-bold text-xl">KPI 설비종합효율</div>
         <div style="height: 270px">
           <KPI_OEE_Chart_bar_line
             :x_label="

@@ -12,6 +12,10 @@ const monitorKpiProductHourRouter = require("./monitor/monitorKpiProductHour");
 const monitorPreventRouter = require("./monitor/monitorPrevent");
 const monitorDailyRouter = require("./monitor/monitorDaily");
 
+const monitorMTBFRouter = require("./monitor/monitorMTBF");
+const monitorMTTRRouter = require("./monitor/monitorMTTR");
+const monitorOEERouter = require("./monitor/monitorOEE");
+
 router.use((req, res, next) => {
   // console.log("middleware for test!");
   next();
@@ -36,5 +40,12 @@ router.use("/kpi/producthour", monitorKpiProductHourRouter);
 router.use("/prevent", monitorPreventRouter);
 // 모니터링 / 일상점검 현황 - router/monitor/monitorDaily.js
 router.use("/daily", monitorDailyRouter);
+
+// 모니터링 / MTBF 현황 - router/monitor/monitorMTBF.js
+router.use("/mtbf", monitorMTBFRouter);
+// 모니터링 / MTTR 현황 - router/monitor/monitorMTTR.js
+router.use("/mttr", monitorMTTRRouter);
+// 모니터링 / OEE 현황 - router/monitor/monitorOEE.js
+router.use("/oee", monitorOEERouter);
 
 module.exports = router;

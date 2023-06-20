@@ -105,3 +105,64 @@ export interface MonitorKPIManHour {
   작업공수?: string;
   목표?: string;
 }
+
+// 모니터링 - KPI - 재고비용
+export interface MonitorKPIStockCost {
+  [attribute: string]: any | undefined;
+  NO?: number;
+  년월?: string;
+  누적입고비용?: string;
+  누적사용비용?: string;
+  누적출하비용?: string;
+  누적재고비용?: string;
+  목표?: string;
+}
+
+// 모니터링 - KPI - 반품금액
+export interface MonitorKPIReturnCost {
+  [attribute: string]: any | undefined;
+  NO?: number;
+  년월?: string;
+  반품금액?: string;
+  목표?: string;
+  비고?: string;
+  등록자?: string;
+  등록일시?: string;
+}
+
+// 모니터링 - KPI - MTBF
+export interface MonitorMTBF {
+  [attribute: string]: any | undefined;
+  NO?: number;
+  설비NO?: number;
+  설비명?: string;
+  고장간격시간?: string;
+  고장내역건수?: string;
+  MTBF?: string;
+  목표?: string;
+}
+
+// 모니터링 - KPI - MTTR
+export interface MonitorMTTR {
+  [attribute: string]: any | undefined;
+  NO?: number;
+  설비NO?: number;
+  설비명?: string;
+  설비수리시간?: string;
+  수리내역건수?: string;
+  MTTR?: string;
+  목표?: string;
+}
+
+// 모니터링 - KPI - 설비종합효율(OEE)
+export interface MonitorOEE {
+  [attribute: string]: any | undefined;
+  NO?: number;
+  설비NO?: number;
+  설비명?: string;
+  가동효율?: string;
+  품질효율?: string;
+  성능효율?: string;
+  OEE?: string;
+  목표?: string;
+}

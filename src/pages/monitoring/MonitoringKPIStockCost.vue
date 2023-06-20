@@ -1,92 +1,253 @@
 <script setup lang="ts">
-import _, { isArguments } from "lodash";
-import { ref, Ref, getCurrentInstance } from "vue";
+import { ref, Ref, onMounted, watch, getCurrentInstance } from "vue";
+import router from "../../router";
 import Button from "../../base-components/Button";
-import { FormInput, FormSelect, FormCheck } from "../../base-components/Form";
+import {
+  FormInput,
+  FormSelect,
+  FormCheck,
+  FormTextarea,
+} from "../../base-components/Form";
 import Lucide from "../../base-components/Lucide";
 import { Dialog, Menu } from "../../base-components/Headless";
 import Table from "../../base-components/Table";
 import dayjs from "dayjs";
 import Litepicker from "../../base-components/Litepicker";
 import TomSelect from "tom-select";
+import { Tab } from "../../base-components/Headless";
 import * as XLSX from "xlsx";
 import { read, utils, writeFileXLSX } from "xlsx";
 import printJS from "print-js";
+import PaginationComponent from "../../components/Pagination/PaginationComponent.vue"; // 페이징설정
+import { toast } from "vue3-toastify";
 import KPI_StockCost_Chart_bar_line from "../../components/Common/Monitoring/KPI_StockCost_Chart_bar_line.vue";
 
 // API 보내는 함수 및 인터페이스 불러오기
 import { useSendApi } from "../../composables/useSendApi";
+import { MonitorKPIStockCost } from "../../interfaces/menu/monitorInterface";
 
-// 페이징기능
-import { onMounted, watch } from "vue";
-import PaginationComponent from "../../components/Pagination/PaginationComponent.vue"; // 페이징설정
+// 컴포넌트 로드
+import MasterDetail from "../../components/Common/Detail/MasterClientDetail.vue";
 
 const { proxy }: any = getCurrentInstance();
 const user_level = proxy.gstate.level.MonitoringKPIStockCost; //권한레벨
 
+// 페이지 로딩 시 시작
+onMounted(async () => {
+  await dataManager.loadDatas(); // 메인으로 쓸 데이터 불러오기
+  await searchChartData(); // 그래프 데이터 설정하기
+});
+
+// 페이징기능
 const currentPage = ref(1); // 현재페이지
 const rowsPerPage = ref(10); // 한 페이지에 보여질 데이터 갯수
-
-const pageChange = () => {
-  // 한 페이지에 보여질 데이터 갯수 변경 시 1페이지로 이동
-  currentPage.value = 1;
+const pageChangeFirst = () => {
+  currentPage.value = 1; // 데이터 갯수 변경 시 1페이지로 이동
 };
 
-// api 보내기
-const url = "";
-const {
-  datas,
-  dataAll,
-  dataCount,
-  datasAreLoading,
-  loadDatas,
-  searchDatas,
-  insertData,
-  editData,
-  deleteData,
-  insertAllData,
-  numberOfPages,
-} = useSendApi<StockUse>(url, currentPage, rowsPerPage);
+// dataManager 만들기
+const url = "/api/monitor/kpi/stockcost";
+const dataManager = useSendApi<MonitorKPIStockCost>(
+  url,
+  currentPage,
+  rowsPerPage
+);
 
+// 테이블항목 설정 및 가로크기 조정
+const table_setting = {
+  체크박스: { name: "체크박스", style: "width: 5px" },
+  순번: { name: "순번", style: "width: 5px; text-align: center;" },
+  항목1: { name: "년월", style: "width: 50px; text-align: center;" },
+  항목2: { name: "누적입고비용", style: "width: 50px; text-align: center;" },
+  항목3: { name: "누적사용비용", style: "width: 50px; text-align: center;" },
+  항목4: { name: "누적출하비용", style: "width: 50px; text-align: center;" },
+  항목5: { name: "누적재고비용", style: "width: 50px; text-align: center;" },
+  항목6: { name: "목표", style: "width: 50px; text-align: center;" },
+  상세보기: { name: "정보", style: "width: 50px; text-align: center;" },
+  편집: { name: "편집", style: "width: 50px; text-align: center;" },
+};
+
+// v-tom (모달 실시간 데이터 변동) 에 필요한 함수
+const vTom = {
+  mounted(el: any, binding: any, vnode: any) {
+    const options = binding.value || {};
+    const defaultOptions = {
+      onInitialize: function () {
+        // the onInitialize callback is invoked once the control is completely initialized.
+        // console.log("onInitialize", this);
+      },
+    };
+    new TomSelect(el, { ...defaultOptions, ...options });
+  },
+  unmounted(el: any) {
+    const tomSelect = el.tomselect;
+    if (tomSelect) {
+      tomSelect.destroy();
+      delete el.tomselect;
+    }
+  },
+};
+
+// ########################## 연도에 따른 조회 및 그래프 데이터 설정 ##########################
+// 연도 구하기
+const selectYear = ref("2023");
+// selectYear가  변경되면 실행
+watch([selectYear], async (newValue, oldValue) => {
+  await dataManager.searchDatas(
+    searchDate.value,
+    searchKey.value,
+    selectYear.value,
+    sortKey.value,
+    sortOrder.value
+  );
+  searchChartData();
+  pageChangeFirst();
+});
+
+// 그래프 데이터
+const 재고비용 = ref([0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]);
+const 목표 = ref([0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]);
+function searchChartData() {
+  const data = dataManager.dataSearchAll.value;
+  재고비용.value = [
+    Number(
+      data.filter((c) => c.년월 == selectYear.value + "-01")[0]?.누적재고비용 ??
+        0
+    ),
+    Number(
+      data.filter((c) => c.년월 == selectYear.value + "-02")[0]?.누적재고비용 ??
+        0
+    ),
+    Number(
+      data.filter((c) => c.년월 == selectYear.value + "-03")[0]?.누적재고비용 ??
+        0
+    ),
+    Number(
+      data.filter((c) => c.년월 == selectYear.value + "-04")[0]?.누적재고비용 ??
+        0
+    ),
+    Number(
+      data.filter((c) => c.년월 == selectYear.value + "-05")[0]?.누적재고비용 ??
+        0
+    ),
+    Number(
+      data.filter((c) => c.년월 == selectYear.value + "-06")[0]?.누적재고비용 ??
+        0
+    ),
+    Number(
+      data.filter((c) => c.년월 == selectYear.value + "-07")[0]?.누적재고비용 ??
+        0
+    ),
+    Number(
+      data.filter((c) => c.년월 == selectYear.value + "-08")[0]?.누적재고비용 ??
+        0
+    ),
+    Number(
+      data.filter((c) => c.년월 == selectYear.value + "-09")[0]?.누적재고비용 ??
+        0
+    ),
+    Number(
+      data.filter((c) => c.년월 == selectYear.value + "-10")[0]?.누적재고비용 ??
+        0
+    ),
+    Number(
+      data.filter((c) => c.년월 == selectYear.value + "-11")[0]?.누적재고비용 ??
+        0
+    ),
+    Number(
+      data.filter((c) => c.년월 == selectYear.value + "-12")[0]?.누적재고비용 ??
+        0
+    ),
+  ];
+
+  목표.value = [
+    Number(data[0]?.목표 ?? 0),
+    Number(data[0]?.목표 ?? 0),
+    Number(data[0]?.목표 ?? 0),
+    Number(data[0]?.목표 ?? 0),
+    Number(data[0]?.목표 ?? 0),
+    Number(data[0]?.목표 ?? 0),
+    Number(data[0]?.목표 ?? 0),
+    Number(data[0]?.목표 ?? 0),
+    Number(data[0]?.목표 ?? 0),
+    Number(data[0]?.목표 ?? 0),
+    Number(data[0]?.목표 ?? 0),
+    Number(data[0]?.목표 ?? 0),
+  ];
+}
+
+// ########################## 조회기간 설정 ##########################
+
+// 날짜 구하기
+const searchDate = ref("전체기간");
+const max_year = dayjs().format("YYYY");
+const min_year = dayjs().add(-3, "years").format("YYYY");
+// searchDate가  변경되면 실행
+watch([searchDate], (newValue, oldValue) => {
+  search();
+  pageChangeFirst();
+});
+// 날짜 리셋
+const reset_date = () => {
+  searchDate.value = "전체기간";
+  const litepicker_init = document.querySelector("#litepicker") as any;
+  litepicker_init.value = "전체기간";
+};
+// Litepicker ButtonText가 오류나서 없애기
+const litepikerButtonText: any = {
+  reset: "새로고침",
+  apply: "적용",
+  cancel: "취소",
+};
+
+// ########################## 조회  ##########################
 const searchKey = ref("전체");
 const searchInput = ref("");
-onMounted(async () => {
-  loadDatas();
-  product.loadDatas();
-}); // 페이지 로딩 시 데이터 불러오기
-
-// 조회
+const sortKey = ref("등록일");
+const sortOrder = ref("내림차순");
+const sortOrderToggle = () => {
+  sortOrder.value = sortOrder.value == "내림차순" ? "오름차순" : "내림차순";
+};
+//  정렬기준이 변경되면 실행
+watch([sortKey, sortOrder], (newValue, oldValue) => {
+  search();
+  pageChangeFirst();
+});
 const search = () => {
   // console.log(searchKey.value, searchInput.value);
-  searchDatas(now2.value, searchKey.value, searchInput.value);
+  dataManager.searchDatas(
+    searchDate.value,
+    searchKey.value,
+    searchInput.value,
+    sortKey.value,
+    sortOrder.value
+  );
 };
 
-// print.js 프린트 기능
-
-const printPage = (data: any) => {
-  printJS({
-    printable: data,
-    properties: [
-      "출고일시",
-      "품목코드",
-      "거래처명",
-      "품명",
-      "규격",
-      "단위",
-      "출고수",
-      "비고",
-    ],
-    type: "json",
-    documentTitle: "재고 관리 > 원자재 사용 등록",
-    repeatTableHeader: true,
-    style: "*{font-size:12px;}",
-  });
-};
-
+// ########################## Print 다운로드 ##########################
 // Print.js  Modal
 const printModal = ref(false);
 const setPrintModal = (value: boolean) => {
   printModal.value = value;
+};
+// print.js 프린트 기능
+const printPage = (data: any) => {
+  printJS({
+    printable: data,
+    properties: [
+      "사업자번호",
+      "거래처명",
+      "담당자",
+      "전화번호",
+      "휴대폰번호",
+      "팩스",
+      "이메일",
+    ],
+    type: "json",
+    documentTitle: "기준정보 > 거래처 관리",
+    repeatTableHeader: true,
+    style: "*{font-size:12px;}",
+  });
 };
 
 // ########################## 엑셀 다운로드 및 업로드 ##########################
@@ -103,50 +264,14 @@ function exportFile(data: any) {
   utils.book_append_sheet(wb, ws, "Data");
   writeFileXLSX(
     wb,
-    "재고관리_원자재사용등록" + dayjs().format("YYMMDD_HHmmss") + "_export.xlsx"
+    "기준정보_거래처관리_" + dayjs().format("YYMMDD_HHmmss") + "_export.xlsx"
   );
 }
-
-// 날짜 구하기
-const now = dayjs().format("YYYY-MM-DD");
-const nowPlus = dayjs().add(7, "days").format("YYYY-MM-DD");
-const max_year = dayjs().format("YYYY");
-const min_year = dayjs().add(-3, "years").format("YYYY");
-const now_year = dayjs().format("YYYY");
-const ago_1year = dayjs().add(-1, "years").format("YYYY");
-const ago_2year = dayjs().add(-2, "years").format("YYYY");
-const ago_3year = dayjs().add(-3, "years").format("YYYY");
-const ago_4year = dayjs().add(-4, "years").format("YYYY");
-const ago_5year = dayjs().add(-5, "years").format("YYYY");
-const now2 = ref("전체기간");
-// now2가 변경되면 실행
-watch([now2], (newValue, oldValue) => {
-  search();
-  pageChange();
-});
-
-// 날짜 리셋
-const reset_date = () => {
-  now2.value = "전체기간";
-  const litepicker_init = document.querySelector("#litepicker") as any;
-  litepicker_init.value = "전체기간";
-};
-
-// 테이블 열 크기 조정
-const table_width = [
-  "width: 50px",
-  "width: 50px",
-  "width: 50px",
-  "width: 50px",
-  "width: 50px",
-  "width: 50px",
-  "width: 50px",
-  "width: 50px",
-  "width: 50px",
-  "width: 50px",
-  "width: 50px",
-];
 </script>
+
+##########################################################################################################################
+##########################################################################################################################
+##########################################################################################################################
 
 <template>
   <div v-if="user_level >= 2">
@@ -173,7 +298,17 @@ const table_width = [
                 <div
                   class="mx-1 p-2 w-full h-12 text-2xl border-l-2 border-r-2 border-b-2 border-success rounded-b-md bg-green-200"
                 >
-                  <div class="text-2xl">54%</div>
+                  <div class="text-2xl">
+                    {{
+                      Number(
+                        dataManager.dataSearchAll.value.reduce(
+                          (sum, data) => Number(sum) + Number(data.목표),
+                          0
+                        ) / dataManager.dataSearchAll.value.length
+                      ).toLocaleString()
+                    }}
+                    원
+                  </div>
                 </div>
               </div>
               <div class="px-3 mt-5">
@@ -195,7 +330,18 @@ const table_width = [
                 <div
                   class="mx-1 p-2 w-full h-12 text-2xl border-l-2 border-r-2 border-b-2 border-success rounded-b-md bg-green-200"
                 >
-                  <div class="text-2xl">54%</div>
+                  <div class="text-2xl">
+                    {{
+                      Number(
+                        dataManager.dataSearchAll.value.reduce(
+                          (sum, data) =>
+                            Number(sum) + Number(data.누적재고비용),
+                          0
+                        ) / dataManager.dataSearchAll.value.length
+                      ).toLocaleString()
+                    }}
+                    원
+                  </div>
                 </div>
               </div>
               <div class="px-3 mt-5">
@@ -217,7 +363,20 @@ const table_width = [
                 <div
                   class="mx-1 p-2 w-full h-12 text-2xl border-l-2 border-r-2 border-b-2 border-success rounded-b-md bg-green-200"
                 >
-                  <div class="text-2xl">54%</div>
+                  <div class="text-2xl">
+                    {{
+                      Number(
+                        (dataManager.dataSearchAll.value[
+                          dataManager.dataSearchAll.value.length - 1
+                        ]?.목표 /
+                          dataManager.dataSearchAll.value[
+                            dataManager.dataSearchAll.value.length - 1
+                          ]?.누적재고비용) *
+                          100
+                      ).toLocaleString()
+                    }}
+                    %
+                  </div>
                 </div>
               </div>
             </div>
@@ -225,7 +384,7 @@ const table_width = [
         </div>
       </div>
       <div class="col-span-3 p-5 bg-white rounded rounded-md">
-        <div class="text-center font-bold text-xl">KPI 재고비용</div>
+        <div class="text-center font-bold text-xl">KPI 누적재고비용</div>
         <div style="height: 270px">
           <KPI_StockCost_Chart_bar_line
             :x_label="[
@@ -242,6 +401,11 @@ const table_width = [
               '11월',
               '12월',
             ]"
+            :dataset1_label="'재고비용'"
+            :dataset1_data="재고비용"
+            :dataset2_label="'목표'"
+            :dataset2_data="목표"
+            :title_text="selectYear + '년'"
           />
         </div>
       </div>
@@ -263,15 +427,28 @@ const table_width = [
 
         <div class="ml-5">
           <FormSelect
-            :modelValue="now_year + '년'"
+            v-model="selectYear"
+            :value="selectYear + '년'"
             class="w-30 mt-3 !box sm:mt-0"
           >
-            <option>{{ now_year }}년</option>
-            <option>{{ ago_1year }}년</option>
-            <option>{{ ago_2year }}년</option>
-            <option>{{ ago_3year }}년</option>
-            <option>{{ ago_4year }}년</option>
-            <option>{{ ago_5year }}년</option>
+            <option :value="dayjs().format('YYYY')">
+              {{ dayjs().format("YYYY") }}년
+            </option>
+            <option :value="dayjs().add(-1, 'years').format('YYYY')">
+              {{ dayjs().add(-1, "years").format("YYYY") }}년
+            </option>
+            <option :value="dayjs().add(-2, 'years').format('YYYY')">
+              {{ dayjs().add(-2, "years").format("YYYY") }}년
+            </option>
+            <option :value="dayjs().add(-3, 'years').format('YYYY')">
+              {{ dayjs().add(-3, "years").format("YYYY") }}년
+            </option>
+            <option :value="dayjs().add(-4, 'years').format('YYYY')">
+              {{ dayjs().add(-4, "years").format("YYYY") }}년
+            </option>
+            <option :value="dayjs().add(-5, 'years').format('YYYY')">
+              {{ dayjs().add(-5, "years").format("YYYY") }}년
+            </option>
           </FormSelect>
         </div>
 
@@ -295,19 +472,23 @@ const table_width = [
           </Menu>
         </div>
       </div>
+
       <!-- BEGIN: Pagination-->
       <div
         class="flex flex-wrap items-center col-span-12 mt-0 intro-y sm:flex-nowrap"
       >
         <div class="hidden mx-auto md:block text-slate-500"></div>
         <div>
-          <span class="mr-3">[ {{ dataCount }}개 데이터 조회됨 ] </span>
-          <span class="mr-5"
-            >[ {{ currentPage }} / {{ numberOfPages }} 페이지 ]</span
-          >
-          <!-- END: Pagination-->
+          <span class="mr-3">
+            [ {{ dataManager.dataCount }}개 데이터 조회됨 ]
+          </span>
+          <span class="mr-4">
+            [ {{ currentPage }} / {{ dataManager.numberOfPages }} 페이지 ]
+          </span>
         </div>
       </div>
+      <!-- END: Pagination-->
+
       <!-- BEGIN: Data List -->
       <!-- style="height: calc(100vh - 350px)" : 브라우저 화면 창크기에 맞게 변경됨 -->
       <div class="col-span-12 overflow-auto intro-y lg:overflow-visible">
@@ -321,126 +502,162 @@ const table_width = [
               style="position: sticky; top: 0px; z-index: 2"
             >
               <Table.Tr>
-                <Table.Th
+                <!-- <Table.Th
                   class="text-center border-b-0 whitespace-nowrap"
-                  :style="table_width[1]"
+                  id="checkbox"
+                  :style="table_setting.체크박스.style"
                 >
-                  순번
+                  <Input
+                    class="transition-all duration-100 ease-in-out shadow-sm border-slate-200 cursor-pointer rounded focus:ring-4 focus:ring-offset-0 focus:ring-primary focus:ring-opacity-20 [&[type='checkbox']]:checked:bg-primary [&[type='checkbox']]:checked:border-primary [&[type='checkbox']]:checked:border-opacity-10 [&:disabled:not(:checked)]:bg-slate-100 [&:disabled:not(:checked)]:cursor-not-allowed [&:disabled:checked]:opacity-70 [&:disabled:checked]:cursor-not-allowed"
+                    id="checkbox_all"
+                    type="checkbox"
+                    :value="mainCheckBox"
+                    @click="
+                      () => {
+                        checkAll(mainCheckBox);
+                        mainCheckBox = !mainCheckBox;
+                      }
+                    "
+                  />
+                </Table.Th> -->
+                <Table.Th
+                  class="text-center border-b-0 whitespace-nowrap font-bold"
+                  :style="table_setting.순번.style"
+                >
+                  {{ table_setting.순번.name }}
                 </Table.Th>
                 <Table.Th
-                  class="text-center border-b-0 whitespace-nowrap"
-                  :style="table_width[2]"
+                  class="text-center border-b-0 whitespace-nowrap font-bold"
+                  :style="table_setting.항목1.style"
                 >
-                  항목1
+                  {{ table_setting.항목1.name }}
                 </Table.Th>
                 <Table.Th
-                  class="text-center border-b-0 whitespace-nowrap"
-                  :style="table_width[3]"
+                  class="text-center border-b-0 whitespace-nowrap font-bold"
+                  :style="table_setting.항목2.style"
                 >
-                  항목2
+                  {{ table_setting.항목2.name }}
                 </Table.Th>
                 <Table.Th
-                  class="text-center border-b-0 whitespace-nowrap"
-                  :style="table_width[4]"
+                  class="text-center border-b-0 whitespace-nowrap font-bold"
+                  :style="table_setting.항목3.style"
                 >
-                  항목3
+                  {{ table_setting.항목3.name }}
                 </Table.Th>
                 <Table.Th
-                  class="text-center border-b-0 whitespace-nowrap"
-                  :style="table_width[5]"
+                  class="text-center border-b-0 whitespace-nowrap font-bold"
+                  :style="table_setting.항목4.style"
                 >
-                  항목4
+                  {{ table_setting.항목4.name }}
                 </Table.Th>
                 <Table.Th
-                  class="text-center border-b-0 whitespace-nowrap"
-                  :style="table_width[6]"
+                  class="text-center border-b-0 whitespace-nowrap font-bold"
+                  :style="table_setting.항목5.style"
                 >
-                  항목5
+                  {{ table_setting.항목5.name }}
                 </Table.Th>
                 <Table.Th
-                  class="text-center border-b-0 whitespace-nowrap"
-                  :style="table_width[7]"
+                  class="text-center border-b-0 whitespace-nowrap font-bold"
+                  :style="table_setting.항목6.style"
                 >
-                  항목6
+                  {{ table_setting.항목6.name }}
                 </Table.Th>
-                <Table.Th
-                  class="text-center border-b-0 whitespace-nowrap"
-                  :style="table_width[8]"
+                <!-- <Table.Th
+                  class="text-center border-b-0 whitespace-nowrap font-bold"
+                  :style="table_setting.상세보기.style"
                 >
-                  항목7
-                </Table.Th>
-                <Table.Th
-                  class="text-center border-b-0 whitespace-nowrap"
-                  :style="table_width[9]"
-                >
-                  항목8
-                </Table.Th>
+                  {{ table_setting.상세보기.name }}
+                </Table.Th> -->
               </Table.Tr>
             </Table.Thead>
             <Table.Tbody style="position: relative; z-index: 1">
               <Table.Tr
-                v-for="(todo, index) in datas"
-                :key="todo.NO"
+                v-for="(todo, index) in dataManager.dataSearchAll.value"
+                :key="todo.설비NO"
                 class="intro-x"
               >
+                <!-- <Table.Td
+                  class="first:rounded-l-md last:rounded-r-md text-center bg-white border-b-0 dark:bg-darkmode-600 shadow-[20px_3px_20px_#0000000b]"
+                  id="checkbox"
+                  :style="table_setting.체크박스.style"
+                >
+                  <input
+                    class="transition-all duration-100 ease-in-out shadow-sm border-slate-200 cursor-pointer rounded focus:ring-4 focus:ring-offset-0 focus:ring-primary focus:ring-opacity-20 [&[type='checkbox']]:checked:bg-primary [&[type='checkbox']]:checked:border-primary [&[type='checkbox']]:checked:border-opacity-10 [&:disabled:not(:checked)]:bg-slate-100 [&:disabled:not(:checked)]:cursor-not-allowed [&:disabled:checked]:opacity-70 [&:disabled:checked]:cursor-not-allowed"
+                    id="checkbox"
+                    type="checkbox"
+                    :value="todo.NO"
+                    v-model="checkDebug"
+                  />
+                </Table.Td> -->
                 <Table.Td
-                  class="first:rounded-l-md last:rounded-r-md w-5 text-center bg-white border-b-0 dark:bg-darkmode-600 shadow-[20px_3px_20px_#0000000b]"
-                  :style="table_width[1]"
+                  class="first:rounded-l-md last:rounded-r-md text-center bg-white border-b-0 dark:bg-darkmode-600 shadow-[20px_3px_20px_#0000000b]"
+                  :style="table_setting.순번.style"
                 >
                   <div>{{ index + 1 + (currentPage - 1) * rowsPerPage }}</div>
                 </Table.Td>
                 <Table.Td
-                  class="first:rounded-l-md last:rounded-r-md w-10 text-center bg-white border-b-0 dark:bg-darkmode-600 shadow-[20px_3px_20px_#0000000b]"
-                  :style="table_width[2]"
+                  class="first:rounded-l-md last:rounded-r-md text-center bg-white border-b-0 dark:bg-darkmode-600 shadow-[20px_3px_20px_#0000000b]"
+                  :style="table_setting.항목1.style"
                 >
-                  <div>예시데이터1</div>
+                  <div>{{ todo[table_setting.항목1.name] }}</div>
                 </Table.Td>
                 <Table.Td
-                  class="first:rounded-l-md last:rounded-r-md w-10 text-center bg-white border-b-0 dark:bg-darkmode-600 shadow-[20px_3px_20px_#0000000b]"
-                  :style="table_width[3]"
+                  class="first:rounded-l-md last:rounded-r-md text-center bg-white border-b-0 dark:bg-darkmode-600 shadow-[20px_3px_20px_#0000000b]"
+                  :style="table_setting.항목2.style"
                 >
-                  <div>예시데이터2</div>
+                  <div>{{ todo[table_setting.항목2.name] }}</div>
                 </Table.Td>
                 <Table.Td
-                  class="first:rounded-l-md last:rounded-r-md bg-white border-b-0 dark:bg-darkmode-600 shadow-[20px_3px_20px_#0000000b]"
-                  :style="table_width[4]"
+                  class="first:rounded-l-md last:rounded-r-md text-center bg-white border-b-0 dark:bg-darkmode-600 shadow-[20px_3px_20px_#0000000b]"
+                  :style="table_setting.항목3.style"
                 >
-                  <div>예시데이터3</div>
+                  <div>{{ todo[table_setting.항목3.name] }}</div>
                 </Table.Td>
                 <Table.Td
-                  class="first:rounded-l-md last:rounded-r-md w-50 bg-white border-b-0 dark:bg-darkmode-600 shadow-[20px_3px_20px_#0000000b]"
-                  :style="table_width[5]"
+                  class="first:rounded-l-md last:rounded-r-md text-center bg-white border-b-0 dark:bg-darkmode-600 shadow-[20px_3px_20px_#0000000b]"
+                  :style="table_setting.항목4.style"
                 >
-                  <div>예시데이터4</div>
+                  <div>{{ todo[table_setting.항목4.name] }}</div>
                 </Table.Td>
                 <Table.Td
-                  class="first:rounded-l-md last:rounded-r-md w-5 bg-white border-b-0 dark:bg-darkmode-600 shadow-[20px_3px_20px_#0000000b]"
-                  :style="table_width[6]"
+                  class="first:rounded-l-md last:rounded-r-md text-center bg-white border-b-0 dark:bg-darkmode-600 shadow-[20px_3px_20px_#0000000b]"
+                  :style="table_setting.항목5.style"
                 >
-                  <div>예시데이터5</div>
+                  <div>{{ todo[table_setting.항목5.name] }}</div>
                 </Table.Td>
                 <Table.Td
-                  class="first:rounded-l-md last:rounded-r-md w-10 text-center bg-white border-b-0 dark:bg-darkmode-600 shadow-[20px_3px_20px_#0000000b]"
-                  :style="table_width[7]"
+                  class="first:rounded-l-md last:rounded-r-md text-center bg-white border-b-0 dark:bg-darkmode-600 shadow-[20px_3px_20px_#0000000b]"
+                  :style="table_setting.항목6.style"
                 >
-                  <div>예시데이터6</div>
+                  <div>{{ todo[table_setting.항목6.name] }}</div>
                 </Table.Td>
-                <Table.Td
-                  class="first:rounded-l-md last:rounded-r-md w-10 text-center bg-white border-b-0 dark:bg-darkmode-600 shadow-[20px_3px_20px_#0000000b]"
-                  :style="table_width[8]"
+                <!-- <Table.Td
+                  class="first:rounded-l-md last:rounded-r-md text-center bg-white border-b-0 dark:bg-darkmode-600 shadow-[20px_3px_20px_#0000000b] py-0 relative before:block before:w-px before:h-8 before:bg-slate-200 before:absolute before:left-0 before:inset-y-0 before:my-auto before:dark:bg-darkmode-400"
+                  :style="table_setting.상세보기.style"
                 >
-                  <div>예시데이터7</div>
-                </Table.Td>
-                <Table.Td
-                  class="first:rounded-l-md last:rounded-r-md w-10 text-center bg-white border-b-0 dark:bg-darkmode-600 shadow-[20px_3px_20px_#0000000b]"
-                  :style="table_width[9]"
-                >
-                  <div>예시데이터8</div>
-                </Table.Td>
+                  <div class="flex items-center justify-center text-cyan-700">
+                    <a
+                      class="flex items-center mr-3"
+                      href="#"
+                      @click="
+                        () => {
+                          editModalData = todo;
+                          setDetailModal(true);
+                        }
+                      "
+                    >
+                      <Lucide icon="ListPlus" class="w-5 h-5 mr-1" />
+                      상세
+                    </a>
+                  </div>
+                </Table.Td> -->
               </Table.Tr>
             </Table.Tbody>
           </Table>
-          <div class="text-center mt-20" v-if="dataCount == 0">
+          <div
+            class="text-center mt-20"
+            v-if="dataManager.dataCount.value == 0"
+          >
             저장된 데이터가 없습니다.
           </div>
         </div>
@@ -470,6 +687,10 @@ const table_width = [
   </div>
   <!-- END: FOOTER(COPYRIGHT) -->
 
+  <!-- ############################################################################################################################
+############################################################################################################################
+############################################################################################################################ -->
+
   <!-- BEGIN: 엑셀 다운로드 Modal -->
   <Dialog :open="excelExportModal" @close="setExcelExportModal(false)">
     <Dialog.Panel>
@@ -485,7 +706,7 @@ const table_width = [
           class="w-38 mr-3"
           @click="
             () => {
-              exportFile(datas);
+              exportFile(dataManager.datas.value);
               setExcelExportModal(false);
             }
           "
@@ -498,7 +719,7 @@ const table_width = [
           class="w-38 mr-3"
           @click="
             () => {
-              exportFile(dataAll);
+              exportFile(dataManager.dataSearchAll.value);
               setExcelExportModal(false);
             }
           "
@@ -536,7 +757,7 @@ const table_width = [
           class="w-38 mr-3"
           @click="
             () => {
-              printPage(datas);
+              printPage(dataManager.datas.value);
               setPrintModal(false);
             }
           "
@@ -549,7 +770,7 @@ const table_width = [
           class="w-38 mr-3"
           @click="
             () => {
-              printPage(dataAll);
+              printPage(dataManager.dataSearchAll.value);
               setPrintModal(false);
             }
           "

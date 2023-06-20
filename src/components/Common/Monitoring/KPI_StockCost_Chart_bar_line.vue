@@ -36,12 +36,27 @@ const props = defineProps<{
 
 const chartData = computed<ChartData>(() => {
   return {
-    labels: props.x_label,
+    labels: props.x_label ?? [
+      "1월",
+      "2월",
+      "3월",
+      "4월",
+      "5월",
+      "6월",
+      "7월",
+      "8월",
+      "9월",
+      "10월",
+      "11월",
+      "12월",
+    ],
     datasets: [
       {
-        label: "재고비용",
+        label: props.dataset1_label ?? "재고비용",
         maxBarThickness: 60,
-        data: [20, 30, 55, 40, 60, 47, 46, 40, 75, 65, 35, 75],
+        data: props.dataset1_data ?? [
+          20, 30, 55, 40, 60, 47, 46, 40, 75, 65, 35, 75,
+        ],
         type: "bar",
         datalabels: {
           color: "black",
@@ -54,8 +69,10 @@ const chartData = computed<ChartData>(() => {
         order: 0,
       },
       {
-        label: "목표비용",
-        data: [50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50],
+        label: props.dataset2_label ?? "목표비용",
+        data: props.dataset2_data ?? [
+          50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50,
+        ],
         datalabels: { display: false },
         type: "line",
         pointStyle: false,
@@ -87,7 +104,7 @@ const chartOptions = computed<ChartOptions>(() => {
             size: 15,
           },
           callback: function (value: any) {
-            return value + "백만원";
+            return value + (props.y_scale ?? "백만원");
           },
         },
       },
@@ -95,7 +112,7 @@ const chartOptions = computed<ChartOptions>(() => {
     plugins: {
       title: {
         display: true,
-        text: "2023년",
+        text: props.dataset1_label ?? "2023년",
         font: { size: 15 },
         padding: { bottom: 5, top: 5 },
       },

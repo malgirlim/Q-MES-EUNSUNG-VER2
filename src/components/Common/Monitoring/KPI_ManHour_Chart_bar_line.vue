@@ -87,7 +87,7 @@ const chartOptions = computed<ChartOptions>(() => {
             size: 15,
           },
           callback: function (value: any) {
-            return value + "hr";
+            return value + (props.y_scale ?? "hr");
           },
         },
       },

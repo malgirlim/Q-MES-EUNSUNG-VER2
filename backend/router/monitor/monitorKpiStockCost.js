@@ -25,7 +25,7 @@ const logSend = async (type, ct, amount, user) => {
   const Pool = await pool;
   await Pool.request() // 로그기록 저장
     .input("type", type)
-    .input("menu", "예방보전_예방보전결과") // ############ *중요* 이거 메뉴 이름 바꿔야함 !! #########
+    .input("menu", "모니터링_재고비용 (KPI)") // ############ *중요* 이거 메뉴 이름 바꿔야함 !! #########
     .input("content", ct.substr(0, 500))
     .input("amount", amount)
     .input("user", user)
@@ -43,42 +43,141 @@ router.get("/", async (req, res) => {
     const Pool = await pool;
     const result = await Pool.request().query(`
       SELECT
-        [PRVNT_PK] AS NO
-        ,[PRVNT_PREVENT_PLAN_PK] AS 예방보전계획NO
-        ,PREVENT_PLAN.설비명 AS 설비명
-        ,PREVENT_PLAN.구분 AS 구분
-        ,PREVENT_PLAN.내용 AS 내용
-        ,PREVENT_PLAN.검사방법 AS 검사방법
-        ,PREVENT_PLAN.기준 AS 기준
-        ,PREVENT_PLAN.단위 AS 단위
-        ,PREVENT_PLAN.최소 AS 최소
-        ,PREVENT_PLAN.최대 AS 최대
-        ,[PRVNT_CONTENT] AS 결과내용
-        ,[PRVNT_RESULT] AS 결과
-        ,[PRVNT_NOTE] AS 비고
-        ,[PRVNT_REGIST_NM] AS 등록자
-        ,[PRVNT_REGIST_DT] AS 등록일시
-      FROM [QMES2022].[dbo].[MANAGE_PREVENT_TB]
-      LEFT JOIN
+        t1.년월
+        ,SUM(t2.입고비용) AS 누적입고비용
+        ,SUM(t2.사용비용) AS 누적사용비용
+        ,SUM(t2.출하비용) AS 누적출하비용
+        ,SUM(t2.재고비용) AS 누적재고비용
+        ,12000000 AS 목표
+      FROM
       (
         SELECT
-          [PVPL_PK] AS NO
-          ,[PVPL_FACILITY_PK] AS 설비NO
-          ,(SELECT [FCLT_NAME] FROM [QMES2022].[dbo].[MASTER_FACILITY_TB] WHERE [FCLT_PK] = [PVPL_FACILITY_PK]) AS 설비명
-          ,[PVPL_DIV] AS 구분
-          ,[PVPL_CONTENT] AS 내용
-          ,[PVPL_HOW] AS 검사방법
-          ,[PVPL_STAND] AS 기준
-          ,[PVPL_UNIT] AS 단위
-          ,[PVPL_MIN] AS 최소
-          ,[PVPL_MAX] AS 최대
-          ,CONVERT(varchar, [PVPL_DATE], 23) AS 계획일
-          ,CONVERT(varchar, [PVPL_WARN_DATE], 23) AS 예보일
-          ,[PVPL_USER_ID] AS 담당자ID
-          ,(SELECT [USER_NAME] FROM [QMES2022].[dbo].[MASTER_USER_TB] WHERE [USER_ID] = [PVPL_USER_ID]) AS 담당자
-        FROM [QMES2022].[dbo].[MANAGE_PREVENT_PLAN_TB]
-      ) AS PREVENT_PLAN ON PREVENT_PLAN.NO = [PRVNT_PREVENT_PLAN_PK]
-      ORDER BY [PRVNT_PK] DESC
+          RESULT.년월 AS 년월
+          ,SUM(입고비용) AS 입고비용
+          ,SUM(사용비용) AS 사용비용
+          ,SUM(출하비용) AS 출하비용
+          ,SUM(재고비용) AS 재고비용
+        FROM
+        (
+          SELECT
+            MASTER_ITEM.[ITEM_PK] AS 품목NO
+            ,RESULT_MIDDEL.년월 AS 년월
+            ,SUM(RESULT_MIDDEL.입고수)*COALESCE(MASTER_ITEM.[ITEM_COST],0) AS 입고비용
+            ,SUM(RESULT_MIDDEL.사용수)*COALESCE(MASTER_ITEM.[ITEM_COST],0) AS 사용비용
+            ,SUM(RESULT_MIDDEL.출하수)*COALESCE(MASTER_ITEM.[ITEM_COST],0) AS 출하비용
+            ,SUM(RESULT_MIDDEL.입고수)*COALESCE(MASTER_ITEM.[ITEM_COST],0) -
+            SUM(RESULT_MIDDEL.사용수)*COALESCE(MASTER_ITEM.[ITEM_COST],0) -
+            SUM(RESULT_MIDDEL.출하수)*COALESCE(MASTER_ITEM.[ITEM_COST],0) AS 재고비용
+          FROM [QMES2022].[dbo].[MASTER_ITEM_TB] AS MASTER_ITEM
+          LEFT JOIN
+          (
+            SELECT
+              [ITRC_ITEM_PK] AS 품목NO
+              ,LEFT(CONVERT(varchar, CONVERT(datetime, [ITRC_DT]), 23),7) AS 년월
+              ,SUM(CONVERT(numeric, COALESCE([ITRC_AMOUNT],0))) AS 입고수
+              ,0 AS 사용수
+              ,0 AS 출하수
+            FROM [QMES2022].[dbo].[MANAGE_ITEM_RECEIVE_TB]
+            WHERE (1=1)
+            AND LEFT(CONVERT(varchar, CONVERT(datetime, [ITRC_DT]), 23),4) <= '9999'
+            GROUP BY [ITRC_ITEM_PK], LEFT(CONVERT(varchar, CONVERT(datetime, [ITRC_DT]), 23),7)
+
+            UNION
+
+            SELECT
+              [PDUI_ITEM_PK] AS 품목NO
+              ,LEFT(CONVERT(varchar, CONVERT(datetime, [PDUI_DT]), 23),7) AS 년월
+              ,0 AS 입고수
+              ,SUM(CONVERT(numeric, COALESCE([PDUI_AMOUNT],0))) AS 사용수
+              ,0 AS 출하수
+            FROM [QMES2022].[dbo].[MANAGE_PRODUCE_USE_ITEM_TB]
+            WHERE (1=1)
+            AND LEFT(CONVERT(varchar, CONVERT(datetime, [PDUI_DT]), 23),4) <= '9999'
+            GROUP BY [PDUI_ITEM_PK], LEFT(CONVERT(varchar, CONVERT(datetime, [PDUI_DT]), 23),7)
+
+            UNION
+
+            SELECT
+              [DLVR_ITEM_PK] AS 품목NO
+              ,LEFT(CONVERT(varchar, CONVERT(datetime, [DLVR_DT]), 23),7) AS 년월
+              ,0 AS 입고수
+              ,0 AS 사용수
+              ,COALESCE(SUM(CONVERT(numeric, [DLVR_AMOUNT])),0) AS 출하수
+            FROM [QMES2022].[dbo].[MANAGE_DELIVERY_TB]
+            WHERE (1 = 1)
+            AND LEFT(CONVERT(varchar, CONVERT(datetime, [DLVR_DT]), 23),4) <= '9999'
+            AND [DLVR_RESULT] = '합격'
+            GROUP BY [DLVR_ITEM_PK], LEFT(CONVERT(varchar, CONVERT(datetime, [DLVR_DT]), 23),7)
+          ) AS RESULT_MIDDEL ON RESULT_MIDDEL.품목NO = MASTER_ITEM.ITEM_PK
+          GROUP BY [ITEM_PK],[ITEM_COST],RESULT_MIDDEL.년월
+        ) AS RESULT
+        GROUP BY RESULT.년월
+      ) AS t1
+      JOIN (
+        SELECT
+          RESULT.년월 AS 년월
+          ,SUM(입고비용) AS 입고비용
+          ,SUM(사용비용) AS 사용비용
+          ,SUM(출하비용) AS 출하비용
+          ,SUM(재고비용) AS 재고비용
+        FROM
+        (
+          SELECT
+            MASTER_ITEM.[ITEM_PK] AS 품목NO
+            ,RESULT_MIDDEL.년월 AS 년월
+            ,SUM(RESULT_MIDDEL.입고수)*COALESCE(MASTER_ITEM.[ITEM_COST],0) AS 입고비용
+            ,SUM(RESULT_MIDDEL.사용수)*COALESCE(MASTER_ITEM.[ITEM_COST],0) AS 사용비용
+            ,SUM(RESULT_MIDDEL.출하수)*COALESCE(MASTER_ITEM.[ITEM_COST],0) AS 출하비용
+            ,SUM(RESULT_MIDDEL.입고수)*COALESCE(MASTER_ITEM.[ITEM_COST],0) -
+            SUM(RESULT_MIDDEL.사용수)*COALESCE(MASTER_ITEM.[ITEM_COST],0) -
+            SUM(RESULT_MIDDEL.출하수)*COALESCE(MASTER_ITEM.[ITEM_COST],0) AS 재고비용
+          FROM [QMES2022].[dbo].[MASTER_ITEM_TB] AS MASTER_ITEM
+          LEFT JOIN
+          (
+            SELECT
+              [ITRC_ITEM_PK] AS 품목NO
+              ,LEFT(CONVERT(varchar, CONVERT(datetime, [ITRC_DT]), 23),7) AS 년월
+              ,SUM(CONVERT(numeric, COALESCE([ITRC_AMOUNT],0))) AS 입고수
+              ,0 AS 사용수
+              ,0 AS 출하수
+            FROM [QMES2022].[dbo].[MANAGE_ITEM_RECEIVE_TB]
+            WHERE (1=1)
+            AND LEFT(CONVERT(varchar, CONVERT(datetime, [ITRC_DT]), 23),4) <= '9999'
+            GROUP BY [ITRC_ITEM_PK], LEFT(CONVERT(varchar, CONVERT(datetime, [ITRC_DT]), 23),7)
+
+            UNION
+
+            SELECT
+              [PDUI_ITEM_PK] AS 품목NO
+              ,LEFT(CONVERT(varchar, CONVERT(datetime, [PDUI_DT]), 23),7) AS 년월
+              ,0 AS 입고수
+              ,SUM(CONVERT(numeric, COALESCE([PDUI_AMOUNT],0))) AS 사용수
+              ,0 AS 출하수
+            FROM [QMES2022].[dbo].[MANAGE_PRODUCE_USE_ITEM_TB]
+            WHERE (1=1)
+            AND LEFT(CONVERT(varchar, CONVERT(datetime, [PDUI_DT]), 23),4) <= '9999'
+            GROUP BY [PDUI_ITEM_PK], LEFT(CONVERT(varchar, CONVERT(datetime, [PDUI_DT]), 23),7)
+
+            UNION
+
+            SELECT
+              [DLVR_ITEM_PK] AS 품목NO
+              ,LEFT(CONVERT(varchar, CONVERT(datetime, [DLVR_DT]), 23),7) AS 년월
+              ,0 AS 입고수
+              ,0 AS 사용수
+              ,COALESCE(SUM(CONVERT(numeric, [DLVR_AMOUNT])),0) AS 출하수
+            FROM [QMES2022].[dbo].[MANAGE_DELIVERY_TB]
+            WHERE (1 = 1)
+            AND LEFT(CONVERT(varchar, CONVERT(datetime, [DLVR_DT]), 23),4) <= '9999'
+            AND [DLVR_RESULT] = '합격'
+            GROUP BY [DLVR_ITEM_PK], LEFT(CONVERT(varchar, CONVERT(datetime, [DLVR_DT]), 23),7)
+          ) AS RESULT_MIDDEL ON RESULT_MIDDEL.품목NO = MASTER_ITEM.ITEM_PK
+          GROUP BY [ITEM_PK],[ITEM_COST],RESULT_MIDDEL.년월
+        ) AS RESULT
+        GROUP BY RESULT.년월
+      ) t2 ON t2.년월 <= t1.년월
+      GROUP BY t1.년월
+      ORDER BY t1.년월
     `);
 
     // 로그기록 저장
@@ -106,123 +205,157 @@ router.get("/", async (req, res) => {
 router.post("/", async (req, res) => {
   try {
     var sql = "";
-    if (req.body.searchKey == "전체") {
-      sql =
-        `
+    sql =
+      `
+      SELECT
+        t1.년월
+        ,SUM(t2.입고비용) AS 누적입고비용
+        ,SUM(t2.사용비용) AS 누적사용비용
+        ,SUM(t2.출하비용) AS 누적출하비용
+        ,SUM(t2.재고비용) AS 누적재고비용
+        ,12000000 AS 목표
+      FROM
+      (
         SELECT
-          NO AS NO, 예방보전계획NO AS 예방보전계획NO, 설비명 AS 설비명, 구분 AS 구분, 내용 AS 내용, 검사방법 AS 검사방법,
-          기준 AS 기준, 단위 AS 단위, 최소 AS 최소, 최대 AS 최대, 비고 AS 비고, 등록자 AS 등록자, 등록일시 AS 등록일시
-        FROM(
+          RESULT.년월 AS 년월
+          ,SUM(입고비용) AS 입고비용
+          ,SUM(사용비용) AS 사용비용
+          ,SUM(출하비용) AS 출하비용
+          ,SUM(재고비용) AS 재고비용
+        FROM
+        (
           SELECT
-            [PRVNT_PK] AS NO
-            ,[PRVNT_PREVENT_PLAN_PK] AS 예방보전계획NO
-            ,PREVENT_PLAN.설비명 AS 설비명
-            ,PREVENT_PLAN.구분 AS 구분
-            ,PREVENT_PLAN.내용 AS 내용
-            ,PREVENT_PLAN.검사방법 AS 검사방법
-            ,PREVENT_PLAN.기준 AS 기준
-            ,PREVENT_PLAN.단위 AS 단위
-            ,PREVENT_PLAN.최소 AS 최소
-            ,PREVENT_PLAN.최대 AS 최대
-            ,[PRVNT_CONTENT] AS 결과내용
-            ,[PRVNT_RESULT] AS 결과
-            ,[PRVNT_NOTE] AS 비고
-            ,[PRVNT_REGIST_NM] AS 등록자
-            ,[PRVNT_REGIST_DT] AS 등록일시
-          FROM [QMES2022].[dbo].[MANAGE_PREVENT_TB]
+            MASTER_ITEM.[ITEM_PK] AS 품목NO
+            ,RESULT_MIDDEL.년월 AS 년월
+            ,SUM(RESULT_MIDDEL.입고수)*COALESCE(MASTER_ITEM.[ITEM_COST],0) AS 입고비용
+            ,SUM(RESULT_MIDDEL.사용수)*COALESCE(MASTER_ITEM.[ITEM_COST],0) AS 사용비용
+            ,SUM(RESULT_MIDDEL.출하수)*COALESCE(MASTER_ITEM.[ITEM_COST],0) AS 출하비용
+            ,SUM(RESULT_MIDDEL.입고수)*COALESCE(MASTER_ITEM.[ITEM_COST],0) -
+            SUM(RESULT_MIDDEL.사용수)*COALESCE(MASTER_ITEM.[ITEM_COST],0) -
+            SUM(RESULT_MIDDEL.출하수)*COALESCE(MASTER_ITEM.[ITEM_COST],0) AS 재고비용
+          FROM [QMES2022].[dbo].[MASTER_ITEM_TB] AS MASTER_ITEM
           LEFT JOIN
           (
             SELECT
-              [PVPL_PK] AS NO
-              ,[PVPL_FACILITY_PK] AS 설비NO
-              ,(SELECT [FCLT_NAME] FROM [QMES2022].[dbo].[MASTER_FACILITY_TB] WHERE [FCLT_PK] = [PVPL_FACILITY_PK]) AS 설비명
-              ,[PVPL_DIV] AS 구분
-              ,[PVPL_CONTENT] AS 내용
-              ,[PVPL_HOW] AS 검사방법
-              ,[PVPL_STAND] AS 기준
-              ,[PVPL_UNIT] AS 단위
-              ,[PVPL_MIN] AS 최소
-              ,[PVPL_MAX] AS 최대
-              ,CONVERT(varchar, [PVPL_DATE], 23) AS 계획일
-              ,CONVERT(varchar, [PVPL_WARN_DATE], 23) AS 예보일
-              ,[PVPL_USER_ID] AS 담당자ID
-              ,(SELECT [USER_NAME] FROM [QMES2022].[dbo].[MASTER_USER_TB] WHERE [USER_ID] = [PVPL_USER_ID]) AS 담당자
-            FROM [QMES2022].[dbo].[MANAGE_PREVENT_PLAN_TB]
-          ) AS PREVENT_PLAN ON PREVENT_PLAN.NO = [PRVNT_PREVENT_PLAN_PK]
+              [ITRC_ITEM_PK] AS 품목NO
+              ,LEFT(CONVERT(varchar, CONVERT(datetime, [ITRC_DT]), 23),7) AS 년월
+              ,SUM(CONVERT(numeric, COALESCE([ITRC_AMOUNT],0))) AS 입고수
+              ,0 AS 사용수
+              ,0 AS 출하수
+            FROM [QMES2022].[dbo].[MANAGE_ITEM_RECEIVE_TB]
+            WHERE (1=1)
+            AND LEFT(CONVERT(varchar, CONVERT(datetime, [ITRC_DT]), 23),4) <= ` +
+      req.body.searchInput +
+      `
+            GROUP BY [ITRC_ITEM_PK], LEFT(CONVERT(varchar, CONVERT(datetime, [ITRC_DT]), 23),7)
+
+            UNION
+
+            SELECT
+              [PDUI_ITEM_PK] AS 품목NO
+              ,LEFT(CONVERT(varchar, CONVERT(datetime, [PDUI_DT]), 23),7) AS 년월
+              ,0 AS 입고수
+              ,SUM(CONVERT(numeric, COALESCE([PDUI_AMOUNT],0))) AS 사용수
+              ,0 AS 출하수
+            FROM [QMES2022].[dbo].[MANAGE_PRODUCE_USE_ITEM_TB]
+            WHERE (1=1)
+            AND LEFT(CONVERT(varchar, CONVERT(datetime, [PDUI_DT]), 23),4) <= ` +
+      req.body.searchInput +
+      `
+            GROUP BY [PDUI_ITEM_PK], LEFT(CONVERT(varchar, CONVERT(datetime, [PDUI_DT]), 23),7)
+
+            UNION
+
+            SELECT
+              [DLVR_ITEM_PK] AS 품목NO
+              ,LEFT(CONVERT(varchar, CONVERT(datetime, [DLVR_DT]), 23),7) AS 년월
+              ,0 AS 입고수
+              ,0 AS 사용수
+              ,COALESCE(SUM(CONVERT(numeric, [DLVR_AMOUNT])),0) AS 출하수
+            FROM [QMES2022].[dbo].[MANAGE_DELIVERY_TB]
+            WHERE (1 = 1)
+            AND LEFT(CONVERT(varchar, CONVERT(datetime, [DLVR_DT]), 23),4) <= ` +
+      req.body.searchInput +
+      `
+            AND [DLVR_RESULT] = '합격'
+            GROUP BY [DLVR_ITEM_PK], LEFT(CONVERT(varchar, CONVERT(datetime, [DLVR_DT]), 23),7)
+          ) AS RESULT_MIDDEL ON RESULT_MIDDEL.품목NO = MASTER_ITEM.ITEM_PK
+          GROUP BY [ITEM_PK],[ITEM_COST],RESULT_MIDDEL.년월
         ) AS RESULT
-        WHERE (1=1)
-        AND ( 설비명 like concat('%',@input,'%')
-        OR 구분 like concat('%',@input,'%')
-        OR 내용 like concat('%',@input,'%')
-        OR 검사방법 like concat('%',@input,'%')
-        OR 기준 like concat('%',@input,'%')
-        OR 단위 like concat('%',@input,'%')
-        OR 최소 like concat('%',@input,'%')
-        OR 최대 like concat('%',@input,'%')
-        OR 결과내용 like concat('%',@input,'%')
-        OR 결과 like concat('%',@input,'%')
-        OR 비고 like concat('%',@input,'%'))
-        ORDER BY ` +
-        req.body.sortKey +
-        ` ` +
-        req.body.sortOrder +
-        `
-      `;
-    } else {
-      sql =
-        `
+        GROUP BY RESULT.년월
+      ) AS t1
+      JOIN (
         SELECT
-          NO AS NO, 예방보전계획NO AS 예방보전계획NO, 설비명 AS 설비명, 구분 AS 구분, 내용 AS 내용, 검사방법 AS 검사방법,
-          기준 AS 기준, 단위 AS 단위, 최소 AS 최소, 최대 AS 최대, 비고 AS 비고, 등록자 AS 등록자, 등록일시 AS 등록일시
-        FROM(
+          RESULT.년월 AS 년월
+          ,SUM(입고비용) AS 입고비용
+          ,SUM(사용비용) AS 사용비용
+          ,SUM(출하비용) AS 출하비용
+          ,SUM(재고비용) AS 재고비용
+        FROM
+        (
           SELECT
-            [PRVNT_PK] AS NO
-            ,[PRVNT_PREVENT_PLAN_PK] AS 예방보전계획NO
-            ,PREVENT_PLAN.설비명 AS 설비명
-            ,PREVENT_PLAN.구분 AS 구분
-            ,PREVENT_PLAN.내용 AS 내용
-            ,PREVENT_PLAN.검사방법 AS 검사방법
-            ,PREVENT_PLAN.기준 AS 기준
-            ,PREVENT_PLAN.단위 AS 단위
-            ,PREVENT_PLAN.최소 AS 최소
-            ,PREVENT_PLAN.최대 AS 최대
-            ,[PRVNT_CONTENT] AS 결과내용
-            ,[PRVNT_RESULT] AS 결과
-            ,[PRVNT_NOTE] AS 비고
-            ,[PRVNT_REGIST_NM] AS 등록자
-            ,[PRVNT_REGIST_DT] AS 등록일시
-          FROM [QMES2022].[dbo].[MANAGE_PREVENT_TB]
+            MASTER_ITEM.[ITEM_PK] AS 품목NO
+            ,RESULT_MIDDEL.년월 AS 년월
+            ,SUM(RESULT_MIDDEL.입고수)*COALESCE(MASTER_ITEM.[ITEM_COST],0) AS 입고비용
+            ,SUM(RESULT_MIDDEL.사용수)*COALESCE(MASTER_ITEM.[ITEM_COST],0) AS 사용비용
+            ,SUM(RESULT_MIDDEL.출하수)*COALESCE(MASTER_ITEM.[ITEM_COST],0) AS 출하비용
+            ,SUM(RESULT_MIDDEL.입고수)*COALESCE(MASTER_ITEM.[ITEM_COST],0) -
+            SUM(RESULT_MIDDEL.사용수)*COALESCE(MASTER_ITEM.[ITEM_COST],0) -
+            SUM(RESULT_MIDDEL.출하수)*COALESCE(MASTER_ITEM.[ITEM_COST],0) AS 재고비용
+          FROM [QMES2022].[dbo].[MASTER_ITEM_TB] AS MASTER_ITEM
           LEFT JOIN
           (
             SELECT
-              [PVPL_PK] AS NO
-              ,[PVPL_FACILITY_PK] AS 설비NO
-              ,(SELECT [FCLT_NAME] FROM [QMES2022].[dbo].[MASTER_FACILITY_TB] WHERE [FCLT_PK] = [PVPL_FACILITY_PK]) AS 설비명
-              ,[PVPL_DIV] AS 구분
-              ,[PVPL_CONTENT] AS 내용
-              ,[PVPL_HOW] AS 검사방법
-              ,[PVPL_STAND] AS 기준
-              ,[PVPL_UNIT] AS 단위
-              ,[PVPL_MIN] AS 최소
-              ,[PVPL_MAX] AS 최대
-              ,CONVERT(varchar, [PVPL_DATE], 23) AS 계획일
-              ,CONVERT(varchar, [PVPL_WARN_DATE], 23) AS 예보일
-              ,[PVPL_USER_ID] AS 담당자ID
-              ,(SELECT [USER_NAME] FROM [QMES2022].[dbo].[MASTER_USER_TB] WHERE [USER_ID] = [PVPL_USER_ID]) AS 담당자
-            FROM [QMES2022].[dbo].[MANAGE_PREVENT_PLAN_TB]
-          ) AS PREVENT_PLAN ON PREVENT_PLAN.NO = [PRVNT_PREVENT_PLAN_PK]
+              [ITRC_ITEM_PK] AS 품목NO
+              ,LEFT(CONVERT(varchar, CONVERT(datetime, [ITRC_DT]), 23),7) AS 년월
+              ,SUM(CONVERT(numeric, COALESCE([ITRC_AMOUNT],0))) AS 입고수
+              ,0 AS 사용수
+              ,0 AS 출하수
+            FROM [QMES2022].[dbo].[MANAGE_ITEM_RECEIVE_TB]
+            WHERE (1=1)
+            AND LEFT(CONVERT(varchar, CONVERT(datetime, [ITRC_DT]), 23),4) <= ` +
+      req.body.searchInput +
+      `
+            GROUP BY [ITRC_ITEM_PK], LEFT(CONVERT(varchar, CONVERT(datetime, [ITRC_DT]), 23),7)
+
+            UNION
+
+            SELECT
+              [PDUI_ITEM_PK] AS 품목NO
+              ,LEFT(CONVERT(varchar, CONVERT(datetime, [PDUI_DT]), 23),7) AS 년월
+              ,0 AS 입고수
+              ,SUM(CONVERT(numeric, COALESCE([PDUI_AMOUNT],0))) AS 사용수
+              ,0 AS 출하수
+            FROM [QMES2022].[dbo].[MANAGE_PRODUCE_USE_ITEM_TB]
+            WHERE (1=1)
+            AND LEFT(CONVERT(varchar, CONVERT(datetime, [PDUI_DT]), 23),4) <= ` +
+      req.body.searchInput +
+      `
+            GROUP BY [PDUI_ITEM_PK], LEFT(CONVERT(varchar, CONVERT(datetime, [PDUI_DT]), 23),7)
+
+            UNION
+
+            SELECT
+              [DLVR_ITEM_PK] AS 품목NO
+              ,LEFT(CONVERT(varchar, CONVERT(datetime, [DLVR_DT]), 23),7) AS 년월
+              ,0 AS 입고수
+              ,0 AS 사용수
+              ,COALESCE(SUM(CONVERT(numeric, [DLVR_AMOUNT])),0) AS 출하수
+            FROM [QMES2022].[dbo].[MANAGE_DELIVERY_TB]
+            WHERE (1 = 1)
+            AND LEFT(CONVERT(varchar, CONVERT(datetime, [DLVR_DT]), 23),4) <= ` +
+      req.body.searchInput +
+      `
+            AND [DLVR_RESULT] = '합격'
+            GROUP BY [DLVR_ITEM_PK], LEFT(CONVERT(varchar, CONVERT(datetime, [DLVR_DT]), 23),7)
+          ) AS RESULT_MIDDEL ON RESULT_MIDDEL.품목NO = MASTER_ITEM.ITEM_PK
+          GROUP BY [ITEM_PK],[ITEM_COST],RESULT_MIDDEL.년월
         ) AS RESULT
-        WHERE (1=1)
-        AND ` +
-        req.body.searchKey +
-        ` like concat('%',@input,'%')
-        ORDER BY ` +
-        req.body.sortKey +
-        ` ` +
-        req.body.sortOrder +
-        `
-      `;
-    }
+        GROUP BY RESULT.년월
+      ) t2 ON t2.년월 <= t1.년월
+      GROUP BY t1.년월
+      ORDER BY t1.년월
+    `;
 
     const Pool = await pool;
     const result = await Pool.request()
@@ -246,222 +379,6 @@ router.post("/", async (req, res) => {
     );
 
     res.send(JSON.stringify(result.recordset));
-  } catch (err) {
-    // 로그기록 저장
-    await logSend(
-      (type = "에러"),
-      (ct = err.message ?? ""),
-      (amount = 0),
-      (user = req.body.user ?? "")
-    );
-    res.status(500);
-    res.send(err.message);
-  }
-});
-
-// 등록
-router.post("/insert", async (req, res) => {
-  try {
-    const Pool = await pool;
-    await Pool.request()
-      .input("예방보전계획NO", req.body.data.예방보전계획NO ?? null)
-      .input("결과내용", req.body.data.결과내용 ?? "")
-      .input("결과", req.body.data.결과 ?? "")
-      .input("비고", req.body.data.비고 ?? "")
-      .input("등록자", req.body.user ?? "")
-      .input(
-        "등록일시",
-        moment().tz("Asia/Seoul").format("YYYY-MM-DD HH:mm:ss")
-      ).query(`
-        INSERT INTO [QMES2022].[dbo].[MANAGE_PREVENT_TB]
-          ([PRVNT_PREVENT_PLAN_PK]
-          ,[PRVNT_CONTENT]
-          ,[PRVNT_RESULT]
-          ,[PRVNT_NOTE]
-          ,[PRVNT_REGIST_NM]
-          ,[PRVNT_REGIST_DT])
-        VALUES
-          (@예방보전계획NO,@결과내용,@결과,@비고,@등록자,@등록일시)
-      `);
-
-    // 로그기록 저장
-    await logSend(
-      (type = "등록"),
-      (ct = JSON.stringify(req.body.data) + " 을 등록."),
-      (amount = 1),
-      (user = req.body.user ?? "")
-    );
-
-    res.send("등록완료");
-  } catch (err) {
-    // 로그기록 저장
-    await logSend(
-      (type = "에러"),
-      (ct = err.message ?? ""),
-      (amount = 0),
-      (user = req.body.user ?? "")
-    );
-    res.status(500);
-    res.send(err.message);
-  }
-});
-
-// 한번에 등록
-router.post("/insertAll", async (req, res) => {
-  try {
-    const Pool = await pool;
-    for (var i = 0; i < req.body.data.length; i++) {
-      await Pool.request()
-        .input("예방보전계획NO", req.body.data[i].예방보전계획NO ?? null)
-        .input("결과내용", req.body.data[i].결과내용 ?? "")
-        .input("결과", req.body.data[i].결과 ?? "")
-        .input("비고", req.body.data[i].비고 ?? "")
-        .input("등록자", req.body.user ?? "")
-        .input(
-          "등록일시",
-          moment().tz("Asia/Seoul").format("YYYY-MM-DD HH:mm:ss")
-        ).query(`
-        INSERT INTO [QMES2022].[dbo].[MANAGE_PREVENT_TB]
-          ([PRVNT_PREVENT_PLAN_PK]
-          ,[PRVNT_CONTENT]
-          ,[PRVNT_RESULT]
-          ,[PRVNT_NOTE]
-          ,[PRVNT_REGIST_NM]
-          ,[PRVNT_REGIST_DT])
-        VALUES
-          (@예방보전계획NO,@결과내용,@결과,@비고,@등록자,@등록일시)
-      `);
-
-      // 로그기록 저장
-      await logSend(
-        (type = "등록"),
-        (ct = JSON.stringify(req.body.data[i]) + " 을 등록."),
-        (amount = 1),
-        (user = req.body.user ?? "")
-      );
-    }
-    res.send("등록완료");
-  } catch (err) {
-    // 로그기록 저장
-    await logSend(
-      (type = "에러"),
-      (ct = err.message ?? ""),
-      (amount = 0),
-      (user = req.body.user ?? "")
-    );
-    res.status(500);
-    res.send(err.message);
-  }
-});
-
-// 수정
-router.post("/edit", async (req, res) => {
-  try {
-    const Pool = await pool;
-    await Pool.request()
-      .input("NO", req.body.data.NO ?? 0)
-      .input("예방보전계획NO", req.body.data.예방보전계획NO ?? null)
-      .input("결과내용", req.body.data.결과내용 ?? "")
-      .input("결과", req.body.data.결과 ?? "")
-      .input("비고", req.body.data.비고 ?? "")
-      .input("등록자", req.body.user ?? "")
-      .input(
-        "등록일시",
-        moment().tz("Asia/Seoul").format("YYYY-MM-DD HH:mm:ss")
-      ).query(`
-        UPDATE [QMES2022].[dbo].[MANAGE_PREVENT_TB]
-          SET 
-            [PRVNT_PREVENT_PLAN_PK] = @예방보전계획NO
-            ,[PRVNT_CONTENT] = @결과내용
-            ,[PRVNT_RESULT] = @결과
-            ,[PRVNT_NOTE] = @비고
-            ,[PRVNT_REGIST_NM] = @등록자
-            ,[PRVNT_REGIST_DT] = @등록일시
-          WHERE [PRVNT_PK] = @NO
-    `);
-
-    // 로그기록 저장
-    await logSend(
-      (type = "수정"),
-      (ct = JSON.stringify(req.body.data) + " 으로 수정."),
-      (amount = 1),
-      (user = req.body.user ?? "")
-    );
-
-    res.send("수정완료");
-  } catch (err) {
-    // 로그기록 저장
-    await logSend(
-      (type = "에러"),
-      (ct = err.message ?? ""),
-      (amount = 0),
-      (user = req.body.user ?? "")
-    );
-    res.status(500);
-    res.send(err.message);
-  }
-});
-
-// 삭제
-router.post("/delete", async (req, res) => {
-  try {
-    const Pool = await pool;
-    for (var i = 0; i < req.body.data.length; i++) {
-      const result = await Pool.request().input("key", req.body.data[i]).query(`
-        SELECT
-          [PRVNT_PK] AS NO
-          ,[PRVNT_PREVENT_PLAN_PK] AS 예방보전계획NO
-          ,PREVENT_PLAN.설비명 AS 설비명
-          ,PREVENT_PLAN.구분 AS 구분
-          ,PREVENT_PLAN.내용 AS 내용
-          ,PREVENT_PLAN.검사방법 AS 검사방법
-          ,PREVENT_PLAN.기준 AS 기준
-          ,PREVENT_PLAN.단위 AS 단위
-          ,PREVENT_PLAN.최소 AS 최소
-          ,PREVENT_PLAN.최대 AS 최대
-          ,[PRVNT_CONTENT] AS 결과내용
-          ,[PRVNT_RESULT] AS 결과
-          ,[PRVNT_NOTE] AS 비고
-          ,[PRVNT_REGIST_NM] AS 등록자
-          ,[PRVNT_REGIST_DT] AS 등록일시
-        FROM [QMES2022].[dbo].[MANAGE_PREVENT_TB]
-        LEFT JOIN
-        (
-          SELECT
-            [PVPL_PK] AS NO
-            ,[PVPL_FACILITY_PK] AS 설비NO
-            ,(SELECT [FCLT_NAME] FROM [QMES2022].[dbo].[MASTER_FACILITY_TB] WHERE [FCLT_PK] = [PVPL_FACILITY_PK]) AS 설비명
-            ,[PVPL_DIV] AS 구분
-            ,[PVPL_CONTENT] AS 내용
-            ,[PVPL_HOW] AS 검사방법
-            ,[PVPL_STAND] AS 기준
-            ,[PVPL_UNIT] AS 단위
-            ,[PVPL_MIN] AS 최소
-            ,[PVPL_MAX] AS 최대
-            ,CONVERT(varchar, [PVPL_DATE], 23) AS 계획일
-            ,CONVERT(varchar, [PVPL_WARN_DATE], 23) AS 예보일
-            ,[PVPL_USER_ID] AS 담당자ID
-            ,(SELECT [USER_NAME] FROM [QMES2022].[dbo].[MASTER_USER_TB] WHERE [USER_ID] = [PVPL_USER_ID]) AS 담당자
-          FROM [QMES2022].[dbo].[MANAGE_PREVENT_PLAN_TB]
-        ) AS PREVENT_PLAN ON PREVENT_PLAN.NO = [PRVNT_PREVENT_PLAN_PK]
-        WHERE [PRVNT_PK] = @key
-      `);
-
-      await Pool.request()
-        .input("key", req.body.data[i])
-        .query(
-          `DELETE FROM [QMES2022].[dbo].[MANAGE_PREVENT_TB] WHERE [PRVNT_PK] = @key`
-        );
-
-      // 로그기록 저장
-      await logSend(
-        (type = "삭제"),
-        (ct = JSON.stringify(result.recordset) + " 을 삭제."),
-        (amount = 1),
-        (user = req.body.user ?? "")
-      );
-    }
-    res.send("삭제완료");
   } catch (err) {
     // 로그기록 저장
     await logSend(

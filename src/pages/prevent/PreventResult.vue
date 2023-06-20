@@ -407,7 +407,7 @@ const onFileImport = (event: any) => {
           "
         >
           <Lucide icon="ExternalLink" class="w-4 h-4 mr-2" />
-          예방보전등록
+          예방보전계획
         </Button>
         <Button
           class="mr-2 shadow-md"

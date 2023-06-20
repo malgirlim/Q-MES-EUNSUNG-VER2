@@ -25,7 +25,7 @@ const logSend = async (type, ct, amount, user) => {
   const Pool = await pool;
   await Pool.request() // 로그기록 저장
     .input("type", type)
-    .input("menu", "예방보전_예방보전결과") // ############ *중요* 이거 메뉴 이름 바꿔야함 !! #########
+    .input("menu", "모니터링_반품금액(KPI)") // ############ *중요* 이거 메뉴 이름 바꿔야함 !! #########
     .input("content", ct.substr(0, 500))
     .input("amount", amount)
     .input("user", user)
@@ -43,42 +43,15 @@ router.get("/", async (req, res) => {
     const Pool = await pool;
     const result = await Pool.request().query(`
       SELECT
-        [PRVNT_PK] AS NO
-        ,[PRVNT_PREVENT_PLAN_PK] AS 예방보전계획NO
-        ,PREVENT_PLAN.설비명 AS 설비명
-        ,PREVENT_PLAN.구분 AS 구분
-        ,PREVENT_PLAN.내용 AS 내용
-        ,PREVENT_PLAN.검사방법 AS 검사방법
-        ,PREVENT_PLAN.기준 AS 기준
-        ,PREVENT_PLAN.단위 AS 단위
-        ,PREVENT_PLAN.최소 AS 최소
-        ,PREVENT_PLAN.최대 AS 최대
-        ,[PRVNT_CONTENT] AS 결과내용
-        ,[PRVNT_RESULT] AS 결과
-        ,[PRVNT_NOTE] AS 비고
-        ,[PRVNT_REGIST_NM] AS 등록자
-        ,[PRVNT_REGIST_DT] AS 등록일시
-      FROM [QMES2022].[dbo].[MANAGE_PREVENT_TB]
-      LEFT JOIN
-      (
-        SELECT
-          [PVPL_PK] AS NO
-          ,[PVPL_FACILITY_PK] AS 설비NO
-          ,(SELECT [FCLT_NAME] FROM [QMES2022].[dbo].[MASTER_FACILITY_TB] WHERE [FCLT_PK] = [PVPL_FACILITY_PK]) AS 설비명
-          ,[PVPL_DIV] AS 구분
-          ,[PVPL_CONTENT] AS 내용
-          ,[PVPL_HOW] AS 검사방법
-          ,[PVPL_STAND] AS 기준
-          ,[PVPL_UNIT] AS 단위
-          ,[PVPL_MIN] AS 최소
-          ,[PVPL_MAX] AS 최대
-          ,CONVERT(varchar, [PVPL_DATE], 23) AS 계획일
-          ,CONVERT(varchar, [PVPL_WARN_DATE], 23) AS 예보일
-          ,[PVPL_USER_ID] AS 담당자ID
-          ,(SELECT [USER_NAME] FROM [QMES2022].[dbo].[MASTER_USER_TB] WHERE [USER_ID] = [PVPL_USER_ID]) AS 담당자
-        FROM [QMES2022].[dbo].[MANAGE_PREVENT_PLAN_TB]
-      ) AS PREVENT_PLAN ON PREVENT_PLAN.NO = [PRVNT_PREVENT_PLAN_PK]
-      ORDER BY [PRVNT_PK] DESC
+        [KRC_PK] AS NO
+        ,[KRC_MONTH] AS 년월
+        ,[KRC_COST] AS 반품금액
+        ,[KRC_TARGET] AS 목표
+        ,[KRC_NOTE] AS 비고
+        ,[KRC_REGIST_NM] AS 등록자
+        ,[KRC_REGIST_DT] AS 등록일시
+      FROM [QMES2022].[dbo].[MANAGE_KPI_RETURN_COST_TB]
+      ORDER BY [KRC_MONTH] ASC
     `);
 
     // 로그기록 저장
@@ -106,123 +79,23 @@ router.get("/", async (req, res) => {
 router.post("/", async (req, res) => {
   try {
     var sql = "";
-    if (req.body.searchKey == "전체") {
-      sql =
-        `
+    sql =
+      `
         SELECT
-          NO AS NO, 예방보전계획NO AS 예방보전계획NO, 설비명 AS 설비명, 구분 AS 구분, 내용 AS 내용, 검사방법 AS 검사방법,
-          기준 AS 기준, 단위 AS 단위, 최소 AS 최소, 최대 AS 최대, 비고 AS 비고, 등록자 AS 등록자, 등록일시 AS 등록일시
-        FROM(
-          SELECT
-            [PRVNT_PK] AS NO
-            ,[PRVNT_PREVENT_PLAN_PK] AS 예방보전계획NO
-            ,PREVENT_PLAN.설비명 AS 설비명
-            ,PREVENT_PLAN.구분 AS 구분
-            ,PREVENT_PLAN.내용 AS 내용
-            ,PREVENT_PLAN.검사방법 AS 검사방법
-            ,PREVENT_PLAN.기준 AS 기준
-            ,PREVENT_PLAN.단위 AS 단위
-            ,PREVENT_PLAN.최소 AS 최소
-            ,PREVENT_PLAN.최대 AS 최대
-            ,[PRVNT_CONTENT] AS 결과내용
-            ,[PRVNT_RESULT] AS 결과
-            ,[PRVNT_NOTE] AS 비고
-            ,[PRVNT_REGIST_NM] AS 등록자
-            ,[PRVNT_REGIST_DT] AS 등록일시
-          FROM [QMES2022].[dbo].[MANAGE_PREVENT_TB]
-          LEFT JOIN
-          (
-            SELECT
-              [PVPL_PK] AS NO
-              ,[PVPL_FACILITY_PK] AS 설비NO
-              ,(SELECT [FCLT_NAME] FROM [QMES2022].[dbo].[MASTER_FACILITY_TB] WHERE [FCLT_PK] = [PVPL_FACILITY_PK]) AS 설비명
-              ,[PVPL_DIV] AS 구분
-              ,[PVPL_CONTENT] AS 내용
-              ,[PVPL_HOW] AS 검사방법
-              ,[PVPL_STAND] AS 기준
-              ,[PVPL_UNIT] AS 단위
-              ,[PVPL_MIN] AS 최소
-              ,[PVPL_MAX] AS 최대
-              ,CONVERT(varchar, [PVPL_DATE], 23) AS 계획일
-              ,CONVERT(varchar, [PVPL_WARN_DATE], 23) AS 예보일
-              ,[PVPL_USER_ID] AS 담당자ID
-              ,(SELECT [USER_NAME] FROM [QMES2022].[dbo].[MASTER_USER_TB] WHERE [USER_ID] = [PVPL_USER_ID]) AS 담당자
-            FROM [QMES2022].[dbo].[MANAGE_PREVENT_PLAN_TB]
-          ) AS PREVENT_PLAN ON PREVENT_PLAN.NO = [PRVNT_PREVENT_PLAN_PK]
-        ) AS RESULT
+          [KRC_PK] AS NO
+          ,[KRC_MONTH] AS 년월
+          ,[KRC_COST] AS 반품금액
+          ,[KRC_TARGET] AS 목표
+          ,[KRC_NOTE] AS 비고
+          ,[KRC_REGIST_NM] AS 등록자
+          ,[KRC_REGIST_DT] AS 등록일시
+        FROM [QMES2022].[dbo].[MANAGE_KPI_RETURN_COST_TB]
         WHERE (1=1)
-        AND ( 설비명 like concat('%',@input,'%')
-        OR 구분 like concat('%',@input,'%')
-        OR 내용 like concat('%',@input,'%')
-        OR 검사방법 like concat('%',@input,'%')
-        OR 기준 like concat('%',@input,'%')
-        OR 단위 like concat('%',@input,'%')
-        OR 최소 like concat('%',@input,'%')
-        OR 최대 like concat('%',@input,'%')
-        OR 결과내용 like concat('%',@input,'%')
-        OR 결과 like concat('%',@input,'%')
-        OR 비고 like concat('%',@input,'%'))
-        ORDER BY ` +
-        req.body.sortKey +
-        ` ` +
-        req.body.sortOrder +
-        `
+        AND LEFT([KRC_MONTH],4) = ` +
+      req.body.searchInput +
+      `
+        ORDER BY [KRC_MONTH] ASC
       `;
-    } else {
-      sql =
-        `
-        SELECT
-          NO AS NO, 예방보전계획NO AS 예방보전계획NO, 설비명 AS 설비명, 구분 AS 구분, 내용 AS 내용, 검사방법 AS 검사방법,
-          기준 AS 기준, 단위 AS 단위, 최소 AS 최소, 최대 AS 최대, 비고 AS 비고, 등록자 AS 등록자, 등록일시 AS 등록일시
-        FROM(
-          SELECT
-            [PRVNT_PK] AS NO
-            ,[PRVNT_PREVENT_PLAN_PK] AS 예방보전계획NO
-            ,PREVENT_PLAN.설비명 AS 설비명
-            ,PREVENT_PLAN.구분 AS 구분
-            ,PREVENT_PLAN.내용 AS 내용
-            ,PREVENT_PLAN.검사방법 AS 검사방법
-            ,PREVENT_PLAN.기준 AS 기준
-            ,PREVENT_PLAN.단위 AS 단위
-            ,PREVENT_PLAN.최소 AS 최소
-            ,PREVENT_PLAN.최대 AS 최대
-            ,[PRVNT_CONTENT] AS 결과내용
-            ,[PRVNT_RESULT] AS 결과
-            ,[PRVNT_NOTE] AS 비고
-            ,[PRVNT_REGIST_NM] AS 등록자
-            ,[PRVNT_REGIST_DT] AS 등록일시
-          FROM [QMES2022].[dbo].[MANAGE_PREVENT_TB]
-          LEFT JOIN
-          (
-            SELECT
-              [PVPL_PK] AS NO
-              ,[PVPL_FACILITY_PK] AS 설비NO
-              ,(SELECT [FCLT_NAME] FROM [QMES2022].[dbo].[MASTER_FACILITY_TB] WHERE [FCLT_PK] = [PVPL_FACILITY_PK]) AS 설비명
-              ,[PVPL_DIV] AS 구분
-              ,[PVPL_CONTENT] AS 내용
-              ,[PVPL_HOW] AS 검사방법
-              ,[PVPL_STAND] AS 기준
-              ,[PVPL_UNIT] AS 단위
-              ,[PVPL_MIN] AS 최소
-              ,[PVPL_MAX] AS 최대
-              ,CONVERT(varchar, [PVPL_DATE], 23) AS 계획일
-              ,CONVERT(varchar, [PVPL_WARN_DATE], 23) AS 예보일
-              ,[PVPL_USER_ID] AS 담당자ID
-              ,(SELECT [USER_NAME] FROM [QMES2022].[dbo].[MASTER_USER_TB] WHERE [USER_ID] = [PVPL_USER_ID]) AS 담당자
-            FROM [QMES2022].[dbo].[MANAGE_PREVENT_PLAN_TB]
-          ) AS PREVENT_PLAN ON PREVENT_PLAN.NO = [PRVNT_PREVENT_PLAN_PK]
-        ) AS RESULT
-        WHERE (1=1)
-        AND ` +
-        req.body.searchKey +
-        ` like concat('%',@input,'%')
-        ORDER BY ` +
-        req.body.sortKey +
-        ` ` +
-        req.body.sortOrder +
-        `
-      `;
-    }
 
     const Pool = await pool;
     const result = await Pool.request()
@@ -264,25 +137,25 @@ router.post("/insert", async (req, res) => {
   try {
     const Pool = await pool;
     await Pool.request()
-      .input("예방보전계획NO", req.body.data.예방보전계획NO ?? null)
-      .input("결과내용", req.body.data.결과내용 ?? "")
-      .input("결과", req.body.data.결과 ?? "")
+      .input("년월", req.body.data.년월 ?? "")
+      .input("반품금액", req.body.data.반품금액 ?? "")
+      .input("목표", req.body.data.목표 ?? "")
       .input("비고", req.body.data.비고 ?? "")
       .input("등록자", req.body.user ?? "")
       .input(
         "등록일시",
         moment().tz("Asia/Seoul").format("YYYY-MM-DD HH:mm:ss")
       ).query(`
-        INSERT INTO [QMES2022].[dbo].[MANAGE_PREVENT_TB]
-          ([PRVNT_PREVENT_PLAN_PK]
-          ,[PRVNT_CONTENT]
-          ,[PRVNT_RESULT]
-          ,[PRVNT_NOTE]
-          ,[PRVNT_REGIST_NM]
-          ,[PRVNT_REGIST_DT])
+        INSERT INTO [QMES2022].[dbo].[MANAGE_KPI_RETURN_COST_TB]
+          ([KRC_MONTH]
+          ,[KRC_COST]
+          ,[KRC_TARGET]
+          ,[KRC_NOTE]
+          ,[KRC_REGIST_NM]
+          ,[KRC_REGIST_DT])
         VALUES
-          (@예방보전계획NO,@결과내용,@결과,@비고,@등록자,@등록일시)
-      `);
+          (@년월,@반품금액,@목표,@비고,@등록자,@등록일시)
+    `);
 
     // 로그기록 저장
     await logSend(
@@ -312,25 +185,25 @@ router.post("/insertAll", async (req, res) => {
     const Pool = await pool;
     for (var i = 0; i < req.body.data.length; i++) {
       await Pool.request()
-        .input("예방보전계획NO", req.body.data[i].예방보전계획NO ?? null)
-        .input("결과내용", req.body.data[i].결과내용 ?? "")
-        .input("결과", req.body.data[i].결과 ?? "")
+        .input("년월", req.body.data[i].년월 ?? "")
+        .input("반품금액", req.body.data[i].반품금액 ?? "")
+        .input("목표", req.body.data[i].목표 ?? "")
         .input("비고", req.body.data[i].비고 ?? "")
         .input("등록자", req.body.user ?? "")
         .input(
           "등록일시",
           moment().tz("Asia/Seoul").format("YYYY-MM-DD HH:mm:ss")
         ).query(`
-        INSERT INTO [QMES2022].[dbo].[MANAGE_PREVENT_TB]
-          ([PRVNT_PREVENT_PLAN_PK]
-          ,[PRVNT_CONTENT]
-          ,[PRVNT_RESULT]
-          ,[PRVNT_NOTE]
-          ,[PRVNT_REGIST_NM]
-          ,[PRVNT_REGIST_DT])
+        INSERT INTO [QMES2022].[dbo].[MANAGE_KPI_RETURN_COST_TB]
+          ([KRC_MONTH]
+          ,[KRC_COST]
+          ,[KRC_TARGET]
+          ,[KRC_NOTE]
+          ,[KRC_REGIST_NM]
+          ,[KRC_REGIST_DT])
         VALUES
-          (@예방보전계획NO,@결과내용,@결과,@비고,@등록자,@등록일시)
-      `);
+          (@년월,@반품금액,@목표,@비고,@등록자,@등록일시)
+    `);
 
       // 로그기록 저장
       await logSend(
@@ -360,24 +233,24 @@ router.post("/edit", async (req, res) => {
     const Pool = await pool;
     await Pool.request()
       .input("NO", req.body.data.NO ?? 0)
-      .input("예방보전계획NO", req.body.data.예방보전계획NO ?? null)
-      .input("결과내용", req.body.data.결과내용 ?? "")
-      .input("결과", req.body.data.결과 ?? "")
+      .input("년월", req.body.data.년월 ?? "")
+      .input("반품금액", req.body.data.반품금액 ?? "")
+      .input("목표", req.body.data.목표 ?? "")
       .input("비고", req.body.data.비고 ?? "")
       .input("등록자", req.body.user ?? "")
       .input(
         "등록일시",
         moment().tz("Asia/Seoul").format("YYYY-MM-DD HH:mm:ss")
       ).query(`
-        UPDATE [QMES2022].[dbo].[MANAGE_PREVENT_TB]
+        UPDATE [QMES2022].[dbo].[MANAGE_KPI_RETURN_COST_TB]
           SET 
-            [PRVNT_PREVENT_PLAN_PK] = @예방보전계획NO
-            ,[PRVNT_CONTENT] = @결과내용
-            ,[PRVNT_RESULT] = @결과
-            ,[PRVNT_NOTE] = @비고
-            ,[PRVNT_REGIST_NM] = @등록자
-            ,[PRVNT_REGIST_DT] = @등록일시
-          WHERE [PRVNT_PK] = @NO
+            [KRC_MONTH] = @년월
+            ,[KRC_COST] = @반품금액
+            ,[KRC_TARGET] = @목표
+            ,[KRC_NOTE] = @비고
+            ,[KRC_REGIST_NM] = @등록자
+            ,[KRC_REGIST_DT] = @등록일시
+          WHERE [KRC_PK] = @NO
     `);
 
     // 로그기록 저장
@@ -409,48 +282,21 @@ router.post("/delete", async (req, res) => {
     for (var i = 0; i < req.body.data.length; i++) {
       const result = await Pool.request().input("key", req.body.data[i]).query(`
         SELECT
-          [PRVNT_PK] AS NO
-          ,[PRVNT_PREVENT_PLAN_PK] AS 예방보전계획NO
-          ,PREVENT_PLAN.설비명 AS 설비명
-          ,PREVENT_PLAN.구분 AS 구분
-          ,PREVENT_PLAN.내용 AS 내용
-          ,PREVENT_PLAN.검사방법 AS 검사방법
-          ,PREVENT_PLAN.기준 AS 기준
-          ,PREVENT_PLAN.단위 AS 단위
-          ,PREVENT_PLAN.최소 AS 최소
-          ,PREVENT_PLAN.최대 AS 최대
-          ,[PRVNT_CONTENT] AS 결과내용
-          ,[PRVNT_RESULT] AS 결과
-          ,[PRVNT_NOTE] AS 비고
-          ,[PRVNT_REGIST_NM] AS 등록자
-          ,[PRVNT_REGIST_DT] AS 등록일시
-        FROM [QMES2022].[dbo].[MANAGE_PREVENT_TB]
-        LEFT JOIN
-        (
-          SELECT
-            [PVPL_PK] AS NO
-            ,[PVPL_FACILITY_PK] AS 설비NO
-            ,(SELECT [FCLT_NAME] FROM [QMES2022].[dbo].[MASTER_FACILITY_TB] WHERE [FCLT_PK] = [PVPL_FACILITY_PK]) AS 설비명
-            ,[PVPL_DIV] AS 구분
-            ,[PVPL_CONTENT] AS 내용
-            ,[PVPL_HOW] AS 검사방법
-            ,[PVPL_STAND] AS 기준
-            ,[PVPL_UNIT] AS 단위
-            ,[PVPL_MIN] AS 최소
-            ,[PVPL_MAX] AS 최대
-            ,CONVERT(varchar, [PVPL_DATE], 23) AS 계획일
-            ,CONVERT(varchar, [PVPL_WARN_DATE], 23) AS 예보일
-            ,[PVPL_USER_ID] AS 담당자ID
-            ,(SELECT [USER_NAME] FROM [QMES2022].[dbo].[MASTER_USER_TB] WHERE [USER_ID] = [PVPL_USER_ID]) AS 담당자
-          FROM [QMES2022].[dbo].[MANAGE_PREVENT_PLAN_TB]
-        ) AS PREVENT_PLAN ON PREVENT_PLAN.NO = [PRVNT_PREVENT_PLAN_PK]
-        WHERE [PRVNT_PK] = @key
+          [KRC_PK] AS NO
+          ,[KRC_MONTH] AS 년월
+          ,[KRC_COST] AS 반품금액
+          ,[KRC_TARGET] AS 목표
+          ,[KRC_NOTE] AS 비고
+          ,[KRC_REGIST_NM] AS 등록자
+          ,[KRC_REGIST_DT] AS 등록일시
+        FROM [QMES2022].[dbo].[MANAGE_KPI_RETURN_COST_TB]
+        WHERE [KRC_PK] = @key
       `);
 
       await Pool.request()
         .input("key", req.body.data[i])
         .query(
-          `DELETE FROM [QMES2022].[dbo].[MANAGE_PREVENT_TB] WHERE [PRVNT_PK] = @key`
+          `DELETE FROM [QMES2022].[dbo].[MANAGE_KPI_RETURN_COST_TB] WHERE [KRC_PK] = @key`
         );
 
       // 로그기록 저장
