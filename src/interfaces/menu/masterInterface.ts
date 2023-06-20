@@ -28,6 +28,7 @@ export interface MasterClient {
   팩스?: string;
   이메일?: string;
   담당자?: string;
+  사업자등록증?: string;
   비고?: string;
   등록자?: string;
   등록일시?: string;

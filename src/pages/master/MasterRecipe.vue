@@ -60,10 +60,11 @@ const table_setting = {
   항목2: { name: "품번", style: "width: 100px; text-align: center;" },
   항목3: { name: "품명", style: "width: 150px; text-align: center;" },
   항목4: { name: "비고", style: "width: 50px; text-align: center;" },
-  항목5: { name: "사진", style: "width: 50px; text-align: center;" },
+  항목5: { name: "항목5", style: "width: 50px; text-align: center;" },
   항목6: { name: "항목6", style: "width: 50px; text-align: center;" },
   항목7: { name: "항목7", style: "width: 50px; text-align: center;" },
   항목8: { name: "항목8", style: "width: 50px; text-align: center;" },
+  사진: { name: "사진", style: "width: 50px; text-align: center;" },
   상세보기: { name: "정보", style: "width: 50px; text-align: center;" },
   편집: { name: "편집", style: "width: 50px; text-align: center;" },
 };
@@ -153,16 +154,27 @@ const insert_check = () => {
     pass_flag = false;
   }
 
-  if (set_사진.value != null && set_사진.value != "") {
-    insertModalData.사진 = set_사진.value;
-  } else {
-    set_사진.value = "";
-    pass_flag = false;
-  }
+  // if (set_사진.value != null && set_사진.value != "") {
+  //   insertModalData.사진 = set_사진.value;
+  // } else {
+  //   set_사진.value = "";
+  //   pass_flag = false;
+  // }
 
   if (pass_flag == false) {
     return;
   }
+};
+
+// ##################################### 사진파일 업로드 #####################################
+let file = "";
+const handleFileUpload = (event: any) => {
+  file = event.target.files[0];
+};
+// ##### 사진열기 Modal #####
+const photoModal = ref(false);
+const setPhotoModal = (value: boolean) => {
+  photoModal.value = value;
 };
 
 // ########################## 등록, 수정, 삭제, 상세 Modal ##########################
@@ -174,6 +186,8 @@ const setInsertModal = (value: boolean) => {
     set_품목.value = null;
     set_사진.value = null;
     insertModal.value = value;
+
+    file = ""; // 파일 업로드 초기화
     insertModalData = {}; // 변수 초기화
   } else {
     toast.warning("액세스 권한이 없습니다.\n관리자에게 문의하세요.");
@@ -189,6 +203,10 @@ const insertDataFunction = async () => {
     toast.warning("등록 내용에 오류가 있습니다. \n 오류 내용을 확인하세요.");
     return;
   } else {
+    if (file != "") {
+      await dataManager.uploadFile(file);
+      insertModalData.사진 = dataManager.fileUploadName.value;
+    }
     await dataManager.insertData(insertModalData);
     await setInsertModal(false);
     await search();
@@ -201,6 +219,7 @@ const editModal = ref(false);
 const setEditModal = (value: boolean) => {
   if (user_level >= 4) {
     editModal.value = value;
+    file = ""; // 파일 업로드 초기화
     search();
   } else {
     toast.warning("액세스 권한이 없습니다.\n관리자에게 문의하세요.");
@@ -209,6 +228,10 @@ const setEditModal = (value: boolean) => {
 let editModalData: MasterRecipe; // 수정할 변수
 // 수정버튼 누르면 실행되는 함수
 const editDataFunction = async () => {
+  if (file != "") {
+    await dataManager.uploadFile(file);
+    editModalData.사진 = dataManager.fileUploadName.value;
+  }
   await dataManager.editData(editModalData); // await : 이 함수가 끝나야 다음으로 넘어간다
   search();
 };
@@ -234,12 +257,6 @@ const deleteDataFunction = async () => {
 const detailModal = ref(false);
 const setDetailModal = (value: boolean) => {
   detailModal.value = value;
-};
-
-// ##### 사진열기 Modal #####
-const photoModal = ref(false);
-const setPhotoModal = (value: boolean) => {
-  photoModal.value = value;
 };
 
 // ########################## 체크박스 설정 ##########################
@@ -626,9 +643,9 @@ const onFileImport = (event: any) => {
                 </Table.Th>
                 <Table.Th
                   class="text-center border-b-0 whitespace-nowrap font-bold"
-                  :style="table_setting.항목5.style"
+                  :style="table_setting.사진.style"
                 >
-                  {{ table_setting.항목5.name }}
+                  {{ table_setting.사진.name }}
                 </Table.Th>
                 <Table.Th
                   class="text-center border-b-0 whitespace-nowrap font-bold"
@@ -695,16 +712,21 @@ const onFileImport = (event: any) => {
                 </Table.Td>
                 <Table.Td
                   class="first:rounded-l-md last:rounded-r-md text-center bg-white border-b-0 dark:bg-darkmode-600 shadow-[20px_3px_20px_#0000000b]"
-                  :style="table_setting.항목5.style"
+                  :style="table_setting.사진.style"
                 >
                   <div
                     class="flex"
-                    v-if="todo[table_setting.항목5.name] != ''"
-                    @click="setPhotoModal(true)"
+                    v-if="todo[table_setting.사진.name] != ''"
+                    @click="
+                      () => {
+                        editModalData = todo;
+                        setPhotoModal(true);
+                      }
+                    "
                   >
                     <div class="flex m-auto text-success cursor-pointer">
                       <div><Lucide class="w-5 h-5 mr-1" icon="Image" /></div>
-                      <div>등록됨</div>
+                      <div>보기</div>
                     </div>
                   </div>
                 </Table.Td>
@@ -781,6 +803,11 @@ const onFileImport = (event: any) => {
     <footer>&copy;2023 QInnotek. All rights reserved.</footer>
   </div>
   <!-- END: FOOTER(COPYRIGHT) -->
+
+  <!-- #######################################################################################################################
+  #######################################################################################################################
+  ####################################################################################################################### -->
+
   <!-- BEGIN: Insert Modal Content -->
   <Dialog size="md" :open="insertModal">
     <Dialog.Panel class="p-10 text-center">
@@ -816,19 +843,18 @@ const onFileImport = (event: any) => {
                 품목이 선택되지 않았습니다.
               </div>
               <div class="mt-3">
-                <FormLabel htmlFor="vertical-form-3">사진</FormLabel
-                ><label class="text-danger"><sup>*</sup></label>
+                <FormLabel htmlFor="vertical-form-11">사진</FormLabel>
                 <FormInput
-                  id="vertical-form-3"
+                  id="vertical-form-11"
                   type="file"
-                  v-model="insertModalData.사진"
                   accept="image/png, image/jpeg"
                   placeholder=""
+                  @change="handleFileUpload($event)"
                 />
               </div>
-              <div v-if="set_사진 == ''" class="text-danger text-xs mt-1">
+              <!-- <div v-if="set_사진 == ''" class="text-danger text-xs mt-1">
                 사진이 등록되지 않았습니다.
-              </div>
+              </div> -->
             </div>
           </Tab.Panel>
           <Tab.Panel class="leading-relaxed">
@@ -920,13 +946,13 @@ const onFileImport = (event: any) => {
                 </select>
               </div>
               <div class="mt-3">
-                <FormLabel htmlFor="vertical-form-3">사진</FormLabel>
+                <FormLabel htmlFor="vertical-form-11">사진</FormLabel>
                 <FormInput
-                  id="vertical-form-3"
+                  id="vertical-form-11"
                   type="file"
-                  v-model="editModalData.사진"
                   accept="image/png, image/jpeg"
                   placeholder=""
+                  @change="handleFileUpload($event)"
                 />
               </div>
             </div>
@@ -1197,6 +1223,11 @@ const onFileImport = (event: any) => {
     </Dialog.Panel>
   </Dialog>
   <!-- END: 프린트 출력 Modal -->
+
+  <!-- ########################################################################################################################
+  ######################################################  사진파일열기  ###############################################################
+  ######################################################################################################################### -->
+
   <!-- BEGIN: 사진열기 Modal Content -->
   <Dialog
     size="xl"
@@ -1213,11 +1244,13 @@ const onFileImport = (event: any) => {
         <div class="mt-5 mb-5">
           <img
             class="mx-auto"
-            src="../../../backend/uploads/hwp_logo1686549034501.png"
+            :src="
+              '../../../backend/uploads/master/recipe/' + editModalData.사진
+            "
           />
         </div>
         <a
-          href="../../../backend/uploads/hwp_logo1686549034501.png"
+          :href="'../../../backend/uploads/master/recipe/' + editModalData.사진"
           download
           style="outline: none"
         >

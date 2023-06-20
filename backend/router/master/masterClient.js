@@ -4,8 +4,16 @@ const bodyParser = require("body-parser");
 // const database = require("./database");
 const { sql, pool } = require("../../mssql");
 
+const multer = require("multer"); // 파일 업로드에 필요
+const path = require("path"); // 파일 업로드에 필요
+
 const router = express.Router();
+
 router.use(bodyParser.json());
+
+router.use(express.urlencoded({ extended: false })); // 파일 업로드에 필요
+router.use(express.json()); // 파일 업로드에 필요
+router.use(express.static(`${__dirname}/public`)); // 파일 업로드에 필요
 
 router.use((req, res, next) => {
   // console.log("middleware for test!");
@@ -46,6 +54,7 @@ router.get("/", async (req, res) => {
       ,[CLNT_FAX] AS 팩스
       ,[CLNT_EMAIL] AS 이메일
       ,[CLNT_AGENT] AS 담당자
+      ,[CLNT_IMAGE] AS 사업자등록증
       ,[CLNT_NOTE] AS 비고
       ,[CLNT_REGIST_NM] AS 등록자
       ,[CLNT_REGIST_DT] AS 등록일시
@@ -83,8 +92,8 @@ router.post("/", async (req, res) => {
         `
         SELECT
           NO AS NO, 코드 AS 코드, 구분 AS 구분, 거래처명 AS 거래처명, 사업자번호 AS 사업자번호,
-          주소 AS 주소, 전화번호 AS 전화번호, 휴대폰번호 AS 휴대폰번호, 팩스 AS 팩스,
-          이메일 AS 이메일, 담당자 AS 담당자, 비고 AS 비고, 등록자 AS 등록자, 등록일시 AS 등록일시
+          주소 AS 주소, 전화번호 AS 전화번호, 휴대폰번호 AS 휴대폰번호, 팩스 AS 팩스, 이메일 AS 이메일,
+          담당자 AS 담당자, 사업자등록증 AS 사업자등록증, 비고 AS 비고, 등록자 AS 등록자, 등록일시 AS 등록일시
         FROM(
         SELECT
           [CLNT_PK] AS NO
@@ -98,6 +107,7 @@ router.post("/", async (req, res) => {
           ,[CLNT_FAX] AS 팩스
           ,[CLNT_EMAIL] AS 이메일
           ,[CLNT_AGENT] AS 담당자
+          ,[CLNT_IMAGE] AS 사업자등록증
           ,[CLNT_NOTE] AS 비고
           ,[CLNT_REGIST_NM] AS 등록자
           ,[CLNT_REGIST_DT] AS 등록일시
@@ -126,8 +136,8 @@ router.post("/", async (req, res) => {
         `
         SELECT
           NO AS NO, 코드 AS 코드, 구분 AS 구분, 거래처명 AS 거래처명, 사업자번호 AS 사업자번호,
-          주소 AS 주소, 전화번호 AS 전화번호, 휴대폰번호 AS 휴대폰번호, 팩스 AS 팩스,
-          이메일 AS 이메일, 담당자 AS 담당자, 비고 AS 비고, 등록자 AS 등록자, 등록일시 AS 등록일시
+          주소 AS 주소, 전화번호 AS 전화번호, 휴대폰번호 AS 휴대폰번호, 팩스 AS 팩스, 이메일 AS 이메일,
+          담당자 AS 담당자, 사업자등록증 AS 사업자등록증, 비고 AS 비고, 등록자 AS 등록자, 등록일시 AS 등록일시
         FROM(
         SELECT
           [CLNT_PK] AS NO
@@ -141,6 +151,7 @@ router.post("/", async (req, res) => {
           ,[CLNT_FAX] AS 팩스
           ,[CLNT_EMAIL] AS 이메일
           ,[CLNT_AGENT] AS 담당자
+          ,[CLNT_IMAGE] AS 사업자등록증
           ,[CLNT_NOTE] AS 비고
           ,[CLNT_REGIST_NM] AS 등록자
           ,[CLNT_REGIST_DT] AS 등록일시
@@ -208,6 +219,7 @@ router.post("/insert", async (req, res) => {
       .input("팩스", telFormat(req.body.data.팩스) ?? "")
       .input("이메일", req.body.data.이메일 ?? "")
       .input("담당자", req.body.data.담당자 ?? "")
+      .input("사업자등록증", req.body.data.사업자등록증 ?? "")
       .input("비고", req.body.data.비고 ?? "")
       .input("등록자", req.body.user ?? "")
       .input(
@@ -225,11 +237,12 @@ router.post("/insert", async (req, res) => {
           ,[CLNT_FAX]
           ,[CLNT_EMAIL]
           ,[CLNT_AGENT]
+          ,[CLNT_IMAGE]
           ,[CLNT_NOTE]
           ,[CLNT_REGIST_NM]
           ,[CLNT_REGIST_DT])
         VALUES
-          (@코드,@구분,@거래처명,@사업자번호,@주소,@전화번호,@휴대폰번호,@팩스,@이메일,@담당자,@비고,@등록자,@등록일시)
+          (@코드,@구분,@거래처명,@사업자번호,@주소,@전화번호,@휴대폰번호,@팩스,@이메일,@담당자,@사업자등록증,@비고,@등록자,@등록일시)
     `);
 
     // 로그기록 저장
@@ -270,6 +283,7 @@ router.post("/insertAll", async (req, res) => {
         .input("팩스", telFormat(req.body.data[i].팩스) ?? "")
         .input("이메일", req.body.data[i].이메일 ?? "")
         .input("담당자", req.body.data[i].담당자 ?? "")
+        .input("사업자등록증", req.body.data[i].사업자등록증 ?? "")
         .input("비고", req.body.data[i].비고 ?? "")
         .input("등록자", req.body.user ?? "")
         .input(
@@ -287,11 +301,12 @@ router.post("/insertAll", async (req, res) => {
           ,[CLNT_FAX]
           ,[CLNT_EMAIL]
           ,[CLNT_AGENT]
+          ,[CLNT_IMAGE]
           ,[CLNT_NOTE]
           ,[CLNT_REGIST_NM]
           ,[CLNT_REGIST_DT])
         VALUES
-          (@코드,@구분,@거래처명,@사업자번호,@주소,@전화번호,@휴대폰번호,@팩스,@이메일,@담당자,@비고,@등록자,@등록일시)
+          (@코드,@구분,@거래처명,@사업자번호,@주소,@전화번호,@휴대폰번호,@팩스,@이메일,@담당자,@사업자등록증,@비고,@등록자,@등록일시)
       `);
 
       // 로그기록 저장
@@ -332,6 +347,7 @@ router.post("/edit", async (req, res) => {
       .input("팩스", telFormat(req.body.data.팩스) ?? "")
       .input("이메일", req.body.data.이메일 ?? "")
       .input("담당자", req.body.data.담당자 ?? "")
+      .input("사업자등록증", req.body.data.사업자등록증 ?? "")
       .input("비고", req.body.data.비고 ?? "")
       .input("등록자", req.body.user ?? "")
       .input(
@@ -350,6 +366,7 @@ router.post("/edit", async (req, res) => {
           ,[CLNT_FAX] = @팩스
           ,[CLNT_EMAIL] = @이메일
           ,[CLNT_AGENT] = @담당자
+          ,[CLNT_IMAGE] = @사업자등록증
           ,[CLNT_NOTE] = @비고
           ,[CLNT_REGIST_NM] = @등록자
           ,[CLNT_REGIST_DT] = @등록일시
@@ -396,6 +413,7 @@ router.post("/delete", async (req, res) => {
         ,[CLNT_FAX] AS 팩스
         ,[CLNT_EMAIL] AS 이메일
         ,[CLNT_AGENT] AS 담당자
+        ,[CLNT_IMAGE] AS 사업자등록증
         ,[CLNT_NOTE] AS 비고
         ,[CLNT_REGIST_NM] AS 등록자
         ,[CLNT_REGIST_DT] AS 등록일시
@@ -429,6 +447,31 @@ router.post("/delete", async (req, res) => {
     res.status(500);
     res.send(err.message);
   }
+});
+
+// 파일 업로드
+let fileUploadName = "";
+const upload = multer({
+  storage: multer.diskStorage({
+    destination: (req, file, done) => {
+      done(null, "uploads/master/client");
+    },
+    filename: (req, file, done) => {
+      file.originalname = Buffer.from(file.originalname, "latin1").toString(
+        "utf8"
+      );
+      fileUploadName = "";
+      const ext = path.extname(file.originalname);
+      fileUploadName =
+        path.basename(file.originalname, ext) + "_" + Date.now() + ext;
+      done(null, fileUploadName);
+    },
+  }),
+  limits: { fileSize: 5 * 1024 * 1024 },
+});
+
+router.post("/upload", upload.single("file"), (req, res) => {
+  res.send(fileUploadName);
 });
 
 // ########################################   나머지 기능   #############################################################

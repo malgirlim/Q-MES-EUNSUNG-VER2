@@ -4,8 +4,16 @@ const bodyParser = require("body-parser");
 // const database = require("./database");
 const { sql, pool } = require("../../mssql");
 
+const multer = require("multer"); // 파일 업로드에 필요
+const path = require("path"); // 파일 업로드에 필요
+
 const router = express.Router();
+
 router.use(bodyParser.json());
+
+router.use(express.urlencoded({ extended: false })); // 파일 업로드에 필요
+router.use(express.json()); // 파일 업로드에 필요
+router.use(express.static(`${__dirname}/public`)); // 파일 업로드에 필요
 
 router.use((req, res, next) => {
   // console.log("middleware for test!");
@@ -476,6 +484,31 @@ router.post("/delete", async (req, res) => {
     res.status(500);
     res.send(err.message);
   }
+});
+
+// 파일 업로드
+let fileUploadName = "";
+const upload = multer({
+  storage: multer.diskStorage({
+    destination: (req, file, done) => {
+      done(null, "uploads/master/mold");
+    },
+    filename: (req, file, done) => {
+      file.originalname = Buffer.from(file.originalname, "latin1").toString(
+        "utf8"
+      );
+      fileUploadName = "";
+      const ext = path.extname(file.originalname);
+      fileUploadName =
+        path.basename(file.originalname, ext) + "_" + Date.now() + ext;
+      done(null, fileUploadName);
+    },
+  }),
+  limits: { fileSize: 5 * 1024 * 1024 },
+});
+
+router.post("/upload", upload.single("file"), (req, res) => {
+  res.send(fileUploadName);
 });
 
 // ########################################   나머지 기능   #############################################################

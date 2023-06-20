@@ -110,6 +110,7 @@ const table_setting = {
   항목9: { name: "교체수명일", style: "width: 50px; text-align: center;" },
   항목10: { name: "보관장소", style: "width: 50px; text-align: center;" },
   항목11: { name: "사용여부", style: "width: 50px; text-align: center;" },
+  사진: { name: "사진", style: "width: 50px; text-align: center;" },
   상세보기: { name: "정보", style: "width: 50px; text-align: center;" },
   편집: { name: "편집", style: "width: 50px; text-align: center;" },
 };
@@ -220,6 +221,17 @@ watch([radioSelect], (newValue, oldValue) => {
   mold_inspect.searchDatas("", "금형NO", radioSelect.value, "", ""); //날짜,조회기준,조회값,정렬기준,정렬값
 });
 
+// ##################################### 사진파일 업로드 #####################################
+let file = "";
+const handleFileUpload = (event: any) => {
+  file = event.target.files[0];
+};
+// ##### 사진열기 Modal #####
+const photoModal = ref(false);
+const setPhotoModal = (value: boolean) => {
+  photoModal.value = value;
+};
+
 // ########################## 등록, 수정, 삭제, 상세 Modal ##########################
 // ##### 등록 Modal #####
 let insertModalData: MasterMold;
@@ -227,6 +239,8 @@ const insertModal = ref(false);
 const setInsertModal = (value: boolean) => {
   if (user_level >= 3) {
     insertModal.value = value;
+
+    file = ""; // 파일 업로드 초기화
     insertModalData = {}; // 변수 초기화
   } else {
     toast.warning("액세스 권한이 없습니다.\n관리자에게 문의하세요.");
@@ -234,6 +248,10 @@ const setInsertModal = (value: boolean) => {
 };
 // 등록버튼 누르면 실행되는 함수
 const insertDataFunction = async () => {
+  if (file != "") {
+    await dataManager.uploadFile(file);
+    insertModalData.사진 = dataManager.fileUploadName.value;
+  }
   await dataManager.insertData(insertModalData);
   await setInsertModal(false);
   await search();
@@ -245,6 +263,7 @@ const editModal = ref(false);
 const setEditModal = (value: boolean) => {
   if (user_level >= 4) {
     editModal.value = value;
+    file = ""; // 파일 업로드 초기화
     search();
   } else {
     toast.warning("액세스 권한이 없습니다.\n관리자에게 문의하세요.");
@@ -253,6 +272,10 @@ const setEditModal = (value: boolean) => {
 let editModalData: MasterMold; // 수정할 변수
 // 수정버튼 누르면 실행되는 함수
 const editDataFunction = async () => {
+  if (file != "") {
+    await dataManager.uploadFile(file);
+    editModalData.사진 = dataManager.fileUploadName.value;
+  }
   await dataManager.editData(editModalData); // await : 이 함수가 끝나야 다음으로 넘어간다
   await setEditModal(false);
   search();
@@ -826,6 +849,12 @@ const setPrintDocumentModal = (value: boolean) => {
                     </Table.Th>
                     <Table.Th
                       class="text-center border-b-0 whitespace-nowrap font-bold"
+                      :style="table_setting.사진.style"
+                    >
+                      {{ table_setting.사진.name }}
+                    </Table.Th>
+                    <Table.Th
+                      class="text-center border-b-0 whitespace-nowrap font-bold"
                       :style="table_setting.상세보기.style"
                     >
                       {{ table_setting.상세보기.name }}
@@ -971,6 +1000,28 @@ const setPrintDocumentModal = (value: boolean) => {
                       :style="table_setting.항목11.style"
                     >
                       <div>{{ todo[table_setting.항목11.name] }}</div>
+                    </Table.Td>
+                    <Table.Td
+                      class="first:rounded-l-md last:rounded-r-md text-center bg-white border-b-0 dark:bg-darkmode-600 shadow-[20px_3px_20px_#0000000b]"
+                      :style="table_setting.사진.style"
+                    >
+                      <div
+                        class="flex"
+                        v-if="todo[table_setting.사진.name] != ''"
+                        @click="
+                          () => {
+                            editModalData = todo;
+                            setPhotoModal(true);
+                          }
+                        "
+                      >
+                        <div class="flex m-auto text-success cursor-pointer">
+                          <div>
+                            <Lucide class="w-5 h-5 mr-1" icon="Image" />
+                          </div>
+                          <div>보기</div>
+                        </div>
+                      </div>
                     </Table.Td>
                     <Table.Td
                       :class="[
@@ -1627,12 +1678,13 @@ const setPrintDocumentModal = (value: boolean) => {
                 />
               </div>
               <div class="mt-3">
-                <FormLabel htmlFor="vertical-form-14">사진</FormLabel>
+                <FormLabel htmlFor="vertical-form-11">사업자등록증</FormLabel>
                 <FormInput
-                  id="vertical-form-14"
+                  id="vertical-form-11"
                   type="file"
-                  v-model="insertModalData.사진"
+                  accept="image/png, image/jpeg"
                   placeholder=""
+                  @change="handleFileUpload($event)"
                 />
               </div>
               <div class="mt-3">
@@ -1860,12 +1912,13 @@ const setPrintDocumentModal = (value: boolean) => {
                 />
               </div>
               <div class="mt-3">
-                <FormLabel htmlFor="vertical-form-14">사진</FormLabel>
+                <FormLabel htmlFor="vertical-form-11">사업자등록증</FormLabel>
                 <FormInput
-                  id="vertical-form-14"
+                  id="vertical-form-11"
                   type="file"
-                  v-model="editModalData.사진"
+                  accept="image/png, image/jpeg"
                   placeholder=""
+                  @change="handleFileUpload($event)"
                 />
               </div>
               <div class="mt-3">
@@ -2231,7 +2284,7 @@ const setPrintDocumentModal = (value: boolean) => {
           type="button"
           @click="
             () => {
-              setDeleteModaItem(false);
+              setDeleteModalItem(false);
             }
           "
           class="w-24 mr-1"
@@ -2611,7 +2664,7 @@ const setPrintDocumentModal = (value: boolean) => {
           type="button"
           @click="
             () => {
-              setDeleteModaInspect(false);
+              setDeleteModalInspect(false);
             }
           "
           class="w-24 mr-1"
@@ -2687,4 +2740,59 @@ const setPrintDocumentModal = (value: boolean) => {
     </Dialog.Panel>
   </Dialog>
   <!-- END: 수주서 확인 Modal -->
+
+  <!-- ########################################################################################################################
+  ######################################################  사진파일열기  ###############################################################
+  ######################################################################################################################### -->
+
+  <!-- BEGIN: 사진열기 Modal Content -->
+  <Dialog
+    size="xl"
+    :open="photoModal"
+    @close="
+      () => {
+        setPhotoModal(false);
+      }
+    "
+  >
+    <Dialog.Panel>
+      <div class="p-5 text-center">
+        <div class="text-2xl font-bold">사진 상세보기</div>
+        <div class="mt-5 mb-5">
+          <img
+            class="mx-auto"
+            :src="'../../../backend/uploads/master/mold/' + editModalData.사진"
+          />
+        </div>
+        <a
+          :href="'../../../backend/uploads/master/mold/' + editModalData.사진"
+          download
+          style="outline: none"
+        >
+          <Button
+            variant="outline-primary"
+            as="a"
+            type="button"
+            class="w-24 mr-5"
+          >
+            다운로드
+          </Button>
+        </a>
+        <Button
+          variant="outline-primary"
+          as="a"
+          type="button"
+          @click="
+            () => {
+              setPhotoModal(false);
+            }
+          "
+          class="w-24 mr-1"
+        >
+          닫기
+        </Button>
+      </div>
+    </Dialog.Panel>
+  </Dialog>
+  <!-- END: 사진열기 Modal Content -->
 </template>

@@ -4,8 +4,16 @@ const bodyParser = require("body-parser");
 // const database = require("./database");
 const { sql, pool } = require("../../mssql");
 
+const multer = require("multer"); // 파일 업로드에 필요
+const path = require("path"); // 파일 업로드에 필요
+
 const router = express.Router();
+
 router.use(bodyParser.json());
+
+router.use(express.urlencoded({ extended: false })); // 파일 업로드에 필요
+router.use(express.json()); // 파일 업로드에 필요
+router.use(express.static(`${__dirname}/public`)); // 파일 업로드에 필요
 
 router.use((req, res, next) => {
   // console.log("middleware for test!");

@@ -254,6 +254,46 @@ export function useSendApi<T>(
     }
   };
 
+  // 이미지 또는 파일 저장
+  const fileUploadName = ref(""); // 폴더에 업로드된 파일 이름을 가져오기 위한 변수
+  const uploadFile = async (file: any) => {
+    let formData = new FormData();
+    await formData.append("file", file);
+    try {
+      await axios
+        .post(url + "/upload", formData, {
+          headers: {
+            "Content-Type": "multipart/form-data",
+          },
+        })
+        .then((res) => {
+          console.log("SUCCESS!!");
+          fileUploadName.value = res.data; // 무사히 파일이 저장되면 업로드된 파일이름을 가져옴
+        })
+        .catch(function () {
+          console.log("FAILURE!!");
+        });
+    } catch (err: any) {
+      console.log(err);
+      if (proxy.gstate.debug.active == "on") {
+        toast.error(
+          "status : " +
+            err.response.status +
+            "\nstatusText : " +
+            err.response.statusText +
+            "\ndata : " +
+            err.response.data,
+          { autoClose: 2000 }
+        );
+      } else {
+        toast.error(
+          "에러가 발생하였습니다.\n에러코드 : " + err.response.status
+        );
+      }
+      // noti(err);
+    }
+  };
+
   // 페이징 기능
   const { paginatedArray, numberOfPages } = usePagination<T>({
     rowsPerPage,
@@ -273,6 +313,8 @@ export function useSendApi<T>(
     editData,
     deleteData,
     insertAllData,
+    uploadFile,
+    fileUploadName,
     numberOfPages,
   };
 }

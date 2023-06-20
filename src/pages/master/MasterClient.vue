@@ -52,7 +52,7 @@ const table_setting = {
   항목5: { name: "휴대폰번호", style: "width: 50px; text-align: center;" },
   항목6: { name: "팩스", style: "width: 50px; text-align: center;" },
   항목7: { name: "이메일", style: "width: 50px; text-align: center;" },
-  항목8: { name: "항목8", style: "width: 50px; text-align: center;" },
+  사진: { name: "사업자등록증", style: "width: 50px; text-align: center;" },
   상세보기: { name: "정보", style: "width: 50px; text-align: center;" },
   편집: { name: "편집", style: "width: 50px; text-align: center;" },
 };
@@ -168,6 +168,17 @@ const insert_check = () => {
   }
 };
 
+// ##################################### 사진파일 업로드 #####################################
+let file = "";
+const handleFileUpload = (event: any) => {
+  file = event.target.files[0];
+};
+// ##### 사진열기 Modal #####
+const photoModal = ref(false);
+const setPhotoModal = (value: boolean) => {
+  photoModal.value = value;
+};
+
 // ########################## 등록, 수정, 삭제, 상세 Modal ##########################
 // ##### 등록 Modal #####
 let insertModalData: MasterClient;
@@ -179,6 +190,8 @@ const setInsertModal = (value: boolean) => {
     set_휴대폰번호.value = null;
     set_담당자.value = null;
     insertModal.value = value;
+
+    file = ""; // 파일 업로드 초기화
     insertModalData = {}; // 변수 초기화
   } else {
     toast.warning("액세스 권한이 없습니다.\n관리자에게 문의하세요.");
@@ -191,6 +204,10 @@ const insertDataFunction = async () => {
     toast.warning("등록 내용에 오류가 있습니다. \n 오류 내용을 확인하세요.");
     return;
   } else {
+    if (file != "") {
+      await dataManager.uploadFile(file);
+      insertModalData.사업자등록증 = dataManager.fileUploadName.value;
+    }
     await dataManager.insertData(insertModalData);
     await setInsertModal(false);
     await search();
@@ -203,6 +220,7 @@ const editModal = ref(false);
 const setEditModal = (value: boolean) => {
   if (user_level >= 4) {
     editModal.value = value;
+    file = ""; // 파일 업로드 초기화
     search();
   } else {
     toast.warning("액세스 권한이 없습니다.\n관리자에게 문의하세요.");
@@ -211,6 +229,10 @@ const setEditModal = (value: boolean) => {
 let editModalData: MasterClient; // 수정할 변수
 // 수정버튼 누르면 실행되는 함수
 const editDataFunction = async () => {
+  if (file != "") {
+    await dataManager.uploadFile(file);
+    editModalData.사업자등록증 = dataManager.fileUploadName.value;
+  }
   await dataManager.editData(editModalData); // await : 이 함수가 끝나야 다음으로 넘어간다
   search();
 };
@@ -655,6 +677,12 @@ const onFileImport = (event: any) => {
                 </Table.Th>
                 <Table.Th
                   class="text-center border-b-0 whitespace-nowrap font-bold"
+                  :style="table_setting.사진.style"
+                >
+                  {{ table_setting.사진.name }}
+                </Table.Th>
+                <Table.Th
+                  class="text-center border-b-0 whitespace-nowrap font-bold"
                   :style="table_setting.상세보기.style"
                 >
                   {{ table_setting.상세보기.name }}
@@ -735,6 +763,26 @@ const onFileImport = (event: any) => {
                   <div>{{ todo[table_setting.항목7.name] }}</div>
                 </Table.Td>
                 <Table.Td
+                  class="first:rounded-l-md last:rounded-r-md text-center bg-white border-b-0 dark:bg-darkmode-600 shadow-[20px_3px_20px_#0000000b]"
+                  :style="table_setting.사진.style"
+                >
+                  <div
+                    class="flex"
+                    v-if="todo[table_setting.사진.name] != ''"
+                    @click="
+                      () => {
+                        editModalData = todo;
+                        setPhotoModal(true);
+                      }
+                    "
+                  >
+                    <div class="flex m-auto text-success cursor-pointer">
+                      <div><Lucide class="w-5 h-5 mr-1" icon="Image" /></div>
+                      <div>보기</div>
+                    </div>
+                  </div>
+                </Table.Td>
+                <Table.Td
                   class="first:rounded-l-md last:rounded-r-md text-center bg-white border-b-0 dark:bg-darkmode-600 shadow-[20px_3px_20px_#0000000b] py-0 relative before:block before:w-px before:h-8 before:bg-slate-200 before:absolute before:left-0 before:inset-y-0 before:my-auto before:dark:bg-darkmode-400"
                   :style="table_setting.상세보기.style"
                 >
@@ -807,6 +855,11 @@ const onFileImport = (event: any) => {
     <footer>&copy;2023 QInnotek. All rights reserved.</footer>
   </div>
   <!-- END: FOOTER(COPYRIGHT) -->
+
+  <!-- ###########################################################################################################################
+###########################################################################################################################
+########################################################################################################################### -->
+
   <!-- BEGIN: Insert Modal Content -->
   <Dialog size="md" :open="insertModal">
     <Dialog.Panel class="p-10 text-center">
@@ -823,7 +876,14 @@ const onFileImport = (event: any) => {
         </Tab.List>
         <Tab.Panels class="mt-5">
           <Tab.Panel class="leading-relaxed">
-            <div style="text-align: left">
+            <div
+              style="
+                text-align: left;
+                overflow-y: scroll;
+                overflow-x: hidden;
+                height: 500px;
+              "
+            >
               <div class="mt-3">
                 <FormLabel htmlFor="vertical-form-3">거래처명</FormLabel
                 ><label class="text-danger"><sup>*</sup></label>
@@ -921,7 +981,14 @@ const onFileImport = (event: any) => {
               </div>
             </div> </Tab.Panel
           ><Tab.Panel class="leading-relaxed">
-            <div style="text-align: left">
+            <div
+              style="
+                text-align: left;
+                overflow-y: scroll;
+                overflow-x: hidden;
+                height: 500px;
+              "
+            >
               <div>
                 <FormLabel htmlFor="vertical-form-1">코드</FormLabel>
                 <FormInput
@@ -947,6 +1014,16 @@ const onFileImport = (event: any) => {
                   type="text"
                   v-model="insertModalData.주소"
                   placeholder=""
+                />
+              </div>
+              <div class="mt-3">
+                <FormLabel htmlFor="vertical-form-11">사업자등록증</FormLabel>
+                <FormInput
+                  id="vertical-form-11"
+                  type="file"
+                  accept="image/png, image/jpeg"
+                  placeholder=""
+                  @change="handleFileUpload($event)"
                 />
               </div>
               <div class="mt-3">
@@ -1005,7 +1082,14 @@ const onFileImport = (event: any) => {
         </Tab.List>
         <Tab.Panels class="mt-5">
           <Tab.Panel class="leading-relaxed">
-            <div style="text-align: left">
+            <div
+              style="
+                text-align: left;
+                overflow-y: scroll;
+                overflow-x: hidden;
+                height: 500px;
+              "
+            >
               <div class="mt-3">
                 <FormLabel htmlFor="vertical-form-3">거래처명</FormLabel>
                 <FormInput
@@ -1071,7 +1155,14 @@ const onFileImport = (event: any) => {
               </div>
             </div> </Tab.Panel
           ><Tab.Panel class="leading-relaxed">
-            <div style="text-align: left">
+            <div
+              style="
+                text-align: left;
+                overflow-y: scroll;
+                overflow-x: hidden;
+                height: 500px;
+              "
+            >
               <div>
                 <FormLabel htmlFor="vertical-form-1">코드</FormLabel>
                 <FormInput
@@ -1097,6 +1188,16 @@ const onFileImport = (event: any) => {
                   type="text"
                   v-model="editModalData.주소"
                   placeholder=""
+                />
+              </div>
+              <div class="mt-3">
+                <FormLabel htmlFor="vertical-form-11">사업자등록증</FormLabel>
+                <FormInput
+                  id="vertical-form-11"
+                  type="file"
+                  accept="image/png, image/jpeg"
+                  placeholder=""
+                  @change="handleFileUpload($event)"
                 />
               </div>
               <div class="mt-3">
@@ -1363,4 +1464,60 @@ const onFileImport = (event: any) => {
     </Dialog.Panel>
   </Dialog>
   <!-- END: 프린트 출력 Modal -->
+  <!-- BEGIN: 사진열기 Modal Content -->
+  <Dialog
+    size="xl"
+    :open="photoModal"
+    @close="
+      () => {
+        setPhotoModal(false);
+      }
+    "
+  >
+    <Dialog.Panel>
+      <div class="p-5 text-center">
+        <div class="text-2xl font-bold">사진 상세보기</div>
+        <div class="mt-5 mb-5">
+          <img
+            class="mx-auto"
+            :src="
+              '../../../backend/uploads/master/client/' +
+              editModalData.사업자등록증
+            "
+          />
+        </div>
+        <a
+          :href="
+            '../../../backend/uploads/master/client/' +
+            editModalData.사업자등록증
+          "
+          download
+          style="outline: none"
+        >
+          <Button
+            variant="outline-primary"
+            as="a"
+            type="button"
+            class="w-24 mr-5"
+          >
+            다운로드
+          </Button>
+        </a>
+        <Button
+          variant="outline-primary"
+          as="a"
+          type="button"
+          @click="
+            () => {
+              setPhotoModal(false);
+            }
+          "
+          class="w-24 mr-1"
+        >
+          닫기
+        </Button>
+      </div>
+    </Dialog.Panel>
+  </Dialog>
+  <!-- END: 사진열기 Modal Content -->
 </template>
