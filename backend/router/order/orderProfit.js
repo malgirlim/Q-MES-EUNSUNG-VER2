@@ -45,9 +45,9 @@ router.get("/", async (req, res) => {
         ,ITEM.단가 AS 단가
         ,총수량 AS 총수량
         ,COALESCE(CONVERT(numeric,COALESCE(ITEM.단가,0)),0) * 총수량 AS 소계
-        ,총공급가액 - 총세액 AS 총공급가액
+        ,총공급가액 AS 총공급가액
         ,총세액 AS 총세액
-        ,총공급가액 AS 총액
+        ,총공급가액 + 총세액 AS 총액
       FROM
       (
         SELECT
@@ -121,9 +121,9 @@ router.post("/", async (req, res) => {
           ,ITEM.단가 AS 단가
           ,총수량 AS 총수량
           ,COALESCE(CONVERT(numeric,COALESCE(ITEM.단가,0)),0) * 총수량 AS 소계
-          ,총공급가액 - 총세액 AS 총공급가액
+          ,총공급가액 AS 총공급가액
           ,총세액 AS 총세액
-          ,총공급가액 AS 총액
+          ,총공급가액 + 총세액 AS 총액
         FROM
         (
           SELECT
@@ -188,9 +188,9 @@ router.post("/", async (req, res) => {
           ,ITEM.단가 AS 단가
           ,총수량 AS 총수량
           ,COALESCE(CONVERT(numeric,COALESCE(ITEM.단가,0)),0) * 총수량 AS 소계
-          ,총공급가액 - 총세액 AS 총공급가액
+          ,총공급가액 AS 총공급가액
           ,총세액 AS 총세액
-          ,총공급가액 AS 총액
+          ,총공급가액 + 총세액 AS 총액
         FROM
         (
           SELECT
