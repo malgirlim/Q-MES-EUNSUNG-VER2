@@ -836,15 +836,15 @@ const menu_list = [
             class="mr-2 shadow-md"
             variant="primary"
             @click="
-              () => {
-                insert_check();
+              async () => {
+                await insert_check();
                 if (pass_flag == false) {
                   toast.warning(
                     '등록 내용에 오류가 있습니다. \n 오류 내용을 확인하세요.'
                   );
                   return;
                 } else {
-                  insertData(insertModalData);
+                  await insertData(insertModalData);
                   pass_flag = false;
                   setInsertModal(false);
                   search();
