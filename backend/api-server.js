@@ -12,6 +12,7 @@ const infoRouter = require("./router/infoRouter");
 const masterRouter = require("./router/masterRouter");
 const orderRouter = require("./router/orderRouter");
 const productionRouter = require("./router/productionRouter");
+const processRouter = require("./router/processRouter");
 const stockRouter = require("./router/stockRouter");
 const qualityRouter = require("./router/qualityRouter");
 const moldRouter = require("./router/moldRouter");
@@ -51,6 +52,9 @@ app.use("/api/order", orderRouter);
 
 // 생산관리 - router/productionrRouter.js
 app.use("/api/production", productionRouter);
+
+// 공정관리 - router/processRouter.js
+app.use("/api/process", processRouter);
 
 // 재고관리 - router/stockRouter.js
 app.use("/api/stock", stockRouter);
