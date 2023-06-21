@@ -49,9 +49,9 @@ router.get("/", async (req, res) => {
         ,[LOG_CONTENT] AS 내용
         ,[LOG_DATA_AMT] AS 데이터사용량
         ,[LOG_REGIST_NM] AS 등록자
-        ,[LOG_REGIST_DT] AS 등록일시
+        ,CONVERT(varchar, [LOG_REGIST_DT], 20) AS 등록일시
       FROM [QMES2022].[dbo].[MANAGE_LOG_TB]
-      ORDER BY [LOG_PK] DESC
+      ORDER BY [LOG_REGIST_DT] DESC
     `);
 
     // 로그기록 저장
@@ -93,10 +93,16 @@ router.post("/", async (req, res) => {
             ,[LOG_CONTENT] AS 내용
             ,[LOG_DATA_AMT] AS 데이터사용량
             ,[LOG_REGIST_NM] AS 등록자
-            ,[LOG_REGIST_DT] AS 등록일시
+            ,CONVERT(varchar, [LOG_REGIST_DT], 20) AS 등록일시
           FROM [QMES2022].[dbo].[MANAGE_LOG_TB]
         ) AS RESULT
         WHERE (1=1)
+        AND CONVERT(varchar, CONVERT(datetime, 등록일시), 12) >= ` +
+        req.body.startDate +
+        `
+        AND CONVERT(varchar, CONVERT(datetime, 등록일시), 12) <= ` +
+        req.body.endDate +
+        `
         AND ( 타입 like concat('%',@input,'%')
         OR 메뉴 like concat('%',@input,'%')
         OR 내용 like concat('%',@input,'%')
@@ -123,10 +129,16 @@ router.post("/", async (req, res) => {
             ,[LOG_CONTENT] AS 내용
             ,[LOG_DATA_AMT] AS 데이터사용량
             ,[LOG_REGIST_NM] AS 등록자
-            ,[LOG_REGIST_DT] AS 등록일시
+            ,CONVERT(varchar, [LOG_REGIST_DT], 20) AS 등록일시
           FROM [QMES2022].[dbo].[MANAGE_LOG_TB]
         ) AS RESULT
         WHERE (1=1)
+        AND CONVERT(varchar, CONVERT(datetime, 등록일시), 12) >= ` +
+        req.body.startDate +
+        `
+        AND CONVERT(varchar, CONVERT(datetime, 등록일시), 12) <= ` +
+        req.body.endDate +
+        `
         AND ` +
         req.body.searchKey +
         ` like concat('%',@input,'%')

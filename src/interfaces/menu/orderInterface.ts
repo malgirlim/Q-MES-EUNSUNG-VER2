@@ -101,3 +101,21 @@ export interface OrderDelivery {
   등록자?: string;
   등록일시?: string;
 }
+
+// 주문관리 - 품목별이익 관리
+export interface OrderProfit {
+  [attribute: string]: any | undefined;
+  NO?: number;
+  품목NO?: number;
+  품번?: string;
+  품목구분?: string;
+  품명?: string;
+  규격?: string;
+  단위?: string;
+  단가?: string;
+  총수량?: string;
+  소계?: string;
+  총공급가액?: string;
+  총세액?: string;
+  총액?: string;
+}
