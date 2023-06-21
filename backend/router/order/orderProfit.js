@@ -166,14 +166,9 @@ router.post("/", async (req, res) => {
         OR 품목구분 like concat('%',@input,'%')
         OR 품명 like concat('%',@input,'%')
         OR 규격 like concat('%',@input,'%')
-        OR 기준 like concat('%',@input,'%')
         OR 단위 like concat('%',@input,'%')
         OR 단가 like concat('%',@input,'%')
-        OR 총수량 like concat('%',@input,'%')
-        OR 소계 like concat('%',@input,'%')
-        OR 총공급가액 like concat('%',@input,'%')
-        OR 총세액 like concat('%',@input,'%')
-        OR 총액 like concat('%',@input,'%'))
+        OR 총수량 like concat('%',@input,'%'))
         ORDER BY ` +
         req.body.sortKey +
         ` ` +
