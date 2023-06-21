@@ -90,8 +90,22 @@ const chartOptions = computed<ChartOptions>(() => {
             return value + (props.y_scale ?? "%");
           },
         },
-        min: Math.floor(Math.min(...props.dataset1_data)),
-        max: Math.ceil(Math.max(...props.dataset1_data)),
+        min: Math.floor(
+          Math.min(
+            ...[
+              ...(props.dataset1_data ?? [0]),
+              ...(props.dataset2_data ?? [0]),
+            ]
+          )
+        ),
+        max: Math.ceil(
+          Math.max(
+            ...[
+              ...(props.dataset1_data ?? [100]),
+              ...(props.dataset2_data ?? [100]),
+            ]
+          )
+        ),
       },
     },
     plugins: {
