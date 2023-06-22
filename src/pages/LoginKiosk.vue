@@ -91,108 +91,108 @@ const delete_pin = () => {
 
 <template>
   <div class="bg-[#3a437c]">
-    <div class="p-8 intro-y">
+    <div class="p-4 intro-y">
       <div>
-        <img class="m-auto mb-5 w-1/6" src="../assets/images/kiosk_logo.svg" />
+        <img class="m-auto mb-3 h-12" src="../assets/images/kiosk_logo.svg" />
       </div>
-      <div class="text-2xl text-center text-slate-200 mt-3">
+      <div class="text-xl text-center text-slate-200 mt-2">
         <strong>은성프린터스 현장 시스템</strong>
       </div>
       <div>
-        <div class="p-3 mt-5">
-          <div class="mb-2 text-base box p-2 w-3/5 m-auto">
-            <div class="text-3xl text-slate-500 text-center text-black mt-5">
+        <div class="px-2 pt-2 mt-3">
+          <div class="mb-2 text-base box p-2 w-4/5 m-auto">
+            <div class="text-2xl text-slate-500 text-center text-black mt-3">
               <strong>로그인 PIN 입력</strong>
             </div>
 
             <div
-              class="text-center text-5xl mt-5 mb-10 border-2 w-2/5 h-20 m-auto"
+              class="text-center text-4xl mt-3 mb-5 border-2 w-2/5 h-16 m-auto"
             >
               <div class="mt-2">{{ pin_block }}</div>
             </div>
 
-            <div class="w-2/5 m-auto">
-              <div class="flex mt-10">
+            <div class="w-3/5 m-auto">
+              <div class="flex mt-3">
                 <Button
-                  class="m-auto mr-5 text-6xl"
-                  style="width: 140px; height: 87px"
+                  class="m-auto mr-5 text-4xl"
+                  style="width: 140px; height: 65px"
                   @click="insert_pin('1')"
                   >1</Button
                 >
                 <Button
-                  class="m-auto mr-5 text-6xl"
-                  style="width: 140px; height: 87px"
+                  class="m-auto mr-5 text-4xl"
+                  style="width: 140px; height: 65px"
                   @click="insert_pin('2')"
                   >2</Button
                 >
                 <Button
-                  class="m-auto text-6xl"
-                  style="width: 140px; height: 87px"
+                  class="m-auto text-4xl"
+                  style="width: 140px; height: 65px"
                   @click="insert_pin('3')"
                   >3</Button
                 >
               </div>
-              <div class="flex mt-5">
+              <div class="flex mt-3">
                 <Button
-                  class="m-auto mr-5 text-6xl"
-                  style="width: 140px; height: 87px"
+                  class="m-auto mr-5 text-4xl"
+                  style="width: 140px; height: 65px"
                   @click="insert_pin('4')"
                   >4</Button
                 >
                 <Button
-                  class="m-auto mr-5 text-6xl"
-                  style="width: 140px; height: 87px"
+                  class="m-auto mr-5 text-4xl"
+                  style="width: 140px; height: 65px"
                   @click="insert_pin('5')"
                   >5</Button
                 >
                 <Button
-                  class="m-auto text-6xl"
-                  style="width: 140px; height: 87px"
+                  class="m-auto text-4xl"
+                  style="width: 140px; height: 65px"
                   @click="insert_pin('6')"
                   >6</Button
                 >
               </div>
-              <div class="flex mt-5">
+              <div class="flex mt-3">
                 <Button
-                  class="m-auto mr-5 text-6xl"
-                  style="width: 140px; height: 87px"
+                  class="m-auto mr-5 text-4xl"
+                  style="width: 140px; height: 65px"
                   @click="insert_pin('7')"
                   >7</Button
                 >
                 <Button
-                  class="m-auto mr-5 text-6xl"
-                  style="width: 140px; height: 87px"
+                  class="m-auto mr-5 text-4xl"
+                  style="width: 140px; height: 65px"
                   @click="insert_pin('8')"
                   >8</Button
                 >
                 <Button
-                  class="m-auto text-6xl"
-                  style="width: 140px; height: 87px"
+                  class="m-auto text-4xl"
+                  style="width: 140px; height: 65px"
                   @click="insert_pin('9')"
                   >9</Button
                 >
               </div>
-              <div class="flex mt-5 mb-10">
+              <div class="flex mt-3 mb-10">
                 <Button
-                  class="m-auto mr-5 text-6xl"
-                  style="width: 140px; height: 87px"
+                  class="m-auto mr-5 text-4xl"
+                  style="width: 140px; height: 65px"
                   @click="reset_pin()"
                   ><Lucide
                     icon="RotateCcw"
-                    class="w-14 h-14 mx-auto text-danger"
+                    class="w-12 h-12 mx-auto text-danger"
                 /></Button>
                 <Button
-                  class="m-auto mr-5 text-6xl"
-                  style="width: 140px; height: 87px"
+                  class="m-auto mr-5 text-4xl"
+                  style="width: 140px; height: 65px"
                   @click="insert_pin('0')"
                   >0</Button
                 >
                 <Button
-                  class="m-auto text-6xl"
-                  style="width: 140px; height: 87px"
+                  class="m-auto text-4xl"
+                  style="width: 140px; height: 65px"
                   @click="delete_pin()"
                 >
-                  <Lucide icon="Delete" class="w-16 h-16 mx-auto text-info"
+                  <Lucide icon="Delete" class="w-14 h-14 mx-auto text-info"
                 /></Button>
               </div>
             </div>
@@ -201,7 +201,7 @@ const delete_pin = () => {
       </div>
     </div>
     <!-- BEGIN: FOOTER(COPYRIGHT) -->
-    <div class="intro-y mt-1 py-1 text-slate-200" style="text-align: center">
+    <div class="intro-y -mt-3 text-slate-200" style="text-align: center">
       <footer>&copy;2023 QInnotek. All rights reserved.</footer>
     </div>
     <!-- END: FOOTER(COPYRIGHT) -->
