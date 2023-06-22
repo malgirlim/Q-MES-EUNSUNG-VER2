@@ -1632,8 +1632,14 @@ const search_itemReceive = () => {
             <FormSelect v-model="searchKey_item" class="w-30 mt-3 !box sm:mt-0">
               <option>전체</option>
               <option>거래처명</option>
-              <option>사업자번호</option>
-              <option>주소</option>
+              <option>구분</option>
+              <option>품번</option>
+              <option>품명</option>
+              <option>차종</option>
+              <option>규격</option>
+              <option>단위</option>
+              <option>안전재고</option>
+              <option>단가</option>
               <option>비고</option>
             </FormSelect>
           </div>
@@ -1675,8 +1681,15 @@ const search_itemReceive = () => {
             <FormSelect v-model="sortKey_item" class="w-30 mt-3 !box sm:mt-0">
               <option>등록일</option>
               <option>거래처명</option>
-              <option>사업자번호</option>
-              <option>주소</option>
+              <option>구분</option>
+              <option>품번</option>
+              <option>품명</option>
+              <option>차종</option>
+              <option>규격</option>
+              <option>단위</option>
+              <option>안전재고</option>
+              <option>단가</option>
+              <option>비고</option>
             </FormSelect>
           </div>
           <div class="ml-3">

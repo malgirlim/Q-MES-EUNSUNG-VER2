@@ -734,6 +734,7 @@ router.get("/product", async (req, res) => {
         ,[ITEM_REGIST_NM] AS 등록자
         ,[ITEM_REGIST_DT] AS 등록일시
       FROM [QMES2022].[dbo].[MASTER_ITEM_TB] 
+      WHERE [ITEM_DIV] = '완제품'
       ORDER BY [ITEM_PK] DESC
     `);
     res.send(JSON.stringify(result.recordset));
@@ -777,6 +778,7 @@ router.post("/product", async (req, res) => {
               ,[CLNT_NAME] AS 거래처명
             FROM [QMES2022].[dbo].[MASTER_CLIENT_TB]
           ) AS CLIENT ON CLIENT.NO = [ITEM_CLIENT_PK]
+          WHERE [ITEM_DIV] = '완제품'
         ) AS RESULT
         WHERE (1=1)
         AND ( 구분 like concat('%',@input,'%')
@@ -825,6 +827,7 @@ router.post("/product", async (req, res) => {
               ,[CLNT_NAME] AS 거래처명
             FROM [QMES2022].[dbo].[MASTER_CLIENT_TB]
           ) AS CLIENT ON CLIENT.NO = [ITEM_CLIENT_PK]
+          WHERE [ITEM_DIV] = '완제품'
         ) AS RESULT
         WHERE (1=1)
         AND ` +

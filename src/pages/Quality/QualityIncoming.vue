@@ -853,6 +853,8 @@ const checkDataFunction = async () => {
                       @click="
                         () => {
                           editModalData = todo;
+                          editModalData.샘플수량 = '0';
+                          editModalData.입고수량 = '0';
                           itemReceiveData.수입검사NO = todo.NO;
                           itemReceiveData.입고코드 =
                             (todo.발주코드 ?? '') +

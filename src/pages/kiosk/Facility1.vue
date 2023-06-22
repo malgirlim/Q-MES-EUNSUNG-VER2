@@ -80,8 +80,8 @@ onMounted(async () => {
 });
 
 // 임시데이터
-const running = "가동중";
-const task_status = "작업중";
+const running = "미가동중";
+const task_status = "작업미확인";
 const checked = false;
 const 지시수량 = ref("3000");
 const 완료수량 = ref("0");

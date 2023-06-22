@@ -616,9 +616,9 @@ router.post("/product", async (req, res) => {
               ,[CLNT_NAME] AS 거래처명
             FROM [QMES2022].[dbo].[MASTER_CLIENT_TB]
           ) AS CLIENT ON CLIENT.NO = [ITEM_CLIENT_PK]
+          WHERE ([ITEM_DIV] = '반제품' OR [ITEM_DIV] = '완제품')
         ) AS RESULT
         WHERE (1=1)
-        AND 구분 = '반제품' OR 구분 = '완제품'
         AND ( 구분 like concat('%',@input,'%')
         OR 품번 like concat('%',@input,'%')
         OR 품명 like concat('%',@input,'%')
@@ -665,9 +665,9 @@ router.post("/product", async (req, res) => {
               ,[CLNT_NAME] AS 거래처명
             FROM [QMES2022].[dbo].[MASTER_CLIENT_TB]
           ) AS CLIENT ON CLIENT.NO = [ITEM_CLIENT_PK]
+          WHERE ([ITEM_DIV] = '반제품' OR [ITEM_DIV] = '완제품')
         ) AS RESULT
         WHERE (1=1)
-        AND 구분 = '반제품' OR 구분 = '완제품'
         AND ` +
         req.body.searchKey +
         ` like concat('%',@input,'%')
