@@ -104,8 +104,9 @@ router.get("/", async (req, res) => {
 router.post("/", async (req, res) => {
   try {
     var sql = "";
-    sql =
-      `
+    if (req.body.searchKey == "설비별") {
+      sql =
+        `
       SELECT
         설비NO AS 설비NO
         ,설비명 AS 설비명
@@ -136,16 +137,97 @@ router.post("/", async (req, res) => {
           FROM [QMES2022].[dbo].[MANAGE_PRODUCE_RESULT_TB]
           WHERE ( 1 = 1 )
         AND CONVERT(varchar, CONVERT(datetime, [PDRS_START_DT]), 12) >= ` +
-      req.body.startDate +
-      `
+        req.body.startDate +
+        `
         AND CONVERT(varchar, CONVERT(datetime, [PDRS_START_DT]), 12) <= ` +
-      req.body.endDate +
-      `
+        req.body.endDate +
+        `
         ) AS RESULT_MIDDLE
         GROUP BY 설비NO, 설비명
       ) AS RESULT
       ORDER BY 설비명 ASC
     `;
+    } else if (req.body.searchKey == "월별") {
+      sql =
+        `
+      SELECT
+        년월 AS 년월
+        ,CONVERT(NUMERIC(5,1) ,ROUND(가동효율*100,1)) AS 가동효율
+        ,CONVERT(NUMERIC(5,1) ,ROUND(품질효율*100,1)) AS 품질효율
+        ,CONVERT(NUMERIC(5,1) ,ROUND(성능효율*100,1)) AS 성능효율
+        ,CONVERT(NUMERIC(5,1) ,ROUND(가동효율*품질효율*성능효율*100,1)) AS OEE
+        ,95 AS 목표
+      FROM
+      (
+        SELECT
+          년월 AS 년월
+          ,CASE WHEN (SUM(생산시간) > 0) THEN ((SUM(생산시간) - SUM(비가동시간))/SUM(생산시간)) ELSE 0 END AS 가동효율
+          ,CASE WHEN (SUM(생산수) > 0) THEN ((SUM(생산수) - SUM(불량수))/SUM(생산수)) ELSE 0 END AS 품질효율
+          ,CASE WHEN (SUM(지시수량) > 0) THEN (SUM(생산수)/SUM(지시수량)) ELSE 0 END AS 성능효율
+        FROM
+        (
+          SELECT
+            LEFT(CONVERT(varchar, CONVERT(datetime, [PDRS_START_DT]), 23),7) AS 년월
+            ,COALESCE(DATEDIFF(minute,CONVERT(varchar, [PDRS_START_DT], 20),CONVERT(varchar, [PDRS_END_DT], 20)),0)/60.0 AS 생산시간
+            ,(SELECT COALESCE(SUM(DATEDIFF(minute, CONVERT(varchar, [PDNW_START_DT], 20) ,CONVERT(varchar, [PDNW_END_DT], 20))),0)/60.0
+              FROM [QMES2022].[dbo].[MANAGE_PRODUCE_NONWORK_TB] WHERE [PDNW_PRODUCE_RESULT_PK] = [PDRS_PK]) AS 비가동시간
+            ,(SELECT CONVERT(numeric, COALESCE([ISPC_AMOUNT],0)) FROM [QMES2022].[dbo].[MANAGE_INSTRUCT_PROCESS_TB] WHERE [ISPC_PK] = [PDRS_INST_PROCESS_PK]) AS 지시수량
+            ,COALESCE([PDRS_PRODUCE_AMT],0) AS 생산수
+            ,(SELECT COALESCE(SUM(CONVERT(numeric, [PDDF_AMOUNT])),0) FROM [QMES2022].[dbo].[MANAGE_PRODUCE_DEFECT_TB] WHERE [PDDF_PRODUCE_RESULT_PK] = [PDRS_PK]) AS 불량수
+          FROM [QMES2022].[dbo].[MANAGE_PRODUCE_RESULT_TB]
+          WHERE ( 1 = 1 )
+        AND LEFT(CONVERT(varchar, CONVERT(datetime, [PDRS_START_DT]), 23),4) = ` +
+        req.body.searchInput +
+        `
+        ) AS RESULT_MIDDLE
+        GROUP BY 년월
+      ) AS RESULT
+      ORDER BY 년월 ASC
+    `;
+    } else {
+      sql =
+        `
+      SELECT
+        설비NO AS 설비NO
+        ,설비명 AS 설비명
+        ,CONVERT(NUMERIC(5,1) ,ROUND(가동효율*100,1)) AS 가동효율
+        ,CONVERT(NUMERIC(5,1) ,ROUND(품질효율*100,1)) AS 품질효율
+        ,CONVERT(NUMERIC(5,1) ,ROUND(성능효율*100,1)) AS 성능효율
+        ,CONVERT(NUMERIC(5,1) ,ROUND(가동효율*품질효율*성능효율*100,1)) AS OEE
+        ,95 AS 목표
+      FROM
+      (
+        SELECT
+          설비NO AS 설비NO
+          ,설비명 AS 설비명
+          ,CASE WHEN (SUM(생산시간) > 0) THEN ((SUM(생산시간) - SUM(비가동시간))/SUM(생산시간)) ELSE 0 END AS 가동효율
+          ,CASE WHEN (SUM(생산수) > 0) THEN ((SUM(생산수) - SUM(불량수))/SUM(생산수)) ELSE 0 END AS 품질효율
+          ,CASE WHEN (SUM(지시수량) > 0) THEN (SUM(생산수)/SUM(지시수량)) ELSE 0 END AS 성능효율
+        FROM
+        (
+          SELECT
+            [PDRS_FACILITY_PK] AS 설비NO
+            ,(SELECT [FCLT_NAME] FROM [QMES2022].[dbo].[MASTER_FACILITY_TB] WHERE [FCLT_PK] = [PDRS_FACILITY_PK]) AS 설비명
+            ,COALESCE(DATEDIFF(minute,CONVERT(varchar, [PDRS_START_DT], 20),CONVERT(varchar, [PDRS_END_DT], 20)),0)/60.0 AS 생산시간
+            ,(SELECT COALESCE(SUM(DATEDIFF(minute, CONVERT(varchar, [PDNW_START_DT], 20) ,CONVERT(varchar, [PDNW_END_DT], 20))),0)/60.0
+              FROM [QMES2022].[dbo].[MANAGE_PRODUCE_NONWORK_TB] WHERE [PDNW_PRODUCE_RESULT_PK] = [PDRS_PK]) AS 비가동시간
+            ,(SELECT CONVERT(numeric, COALESCE([ISPC_AMOUNT],0)) FROM [QMES2022].[dbo].[MANAGE_INSTRUCT_PROCESS_TB] WHERE [ISPC_PK] = [PDRS_INST_PROCESS_PK]) AS 지시수량
+            ,COALESCE([PDRS_PRODUCE_AMT],0) AS 생산수
+            ,(SELECT COALESCE(SUM(CONVERT(numeric, [PDDF_AMOUNT])),0) FROM [QMES2022].[dbo].[MANAGE_PRODUCE_DEFECT_TB] WHERE [PDDF_PRODUCE_RESULT_PK] = [PDRS_PK]) AS 불량수
+          FROM [QMES2022].[dbo].[MANAGE_PRODUCE_RESULT_TB]
+          WHERE ( 1 = 1 )
+        AND CONVERT(varchar, CONVERT(datetime, [PDRS_START_DT]), 12) >= ` +
+        req.body.startDate +
+        `
+        AND CONVERT(varchar, CONVERT(datetime, [PDRS_START_DT]), 12) <= ` +
+        req.body.endDate +
+        `
+        ) AS RESULT_MIDDLE
+        GROUP BY 설비NO, 설비명
+      ) AS RESULT
+      ORDER BY 설비명 ASC
+    `;
+    }
 
     const Pool = await pool;
     const result = await Pool.request()

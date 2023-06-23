@@ -34,7 +34,8 @@ const user_level = proxy.gstate.level.MonitoringKPIOEE; //권한레벨
 
 // 페이지 로딩 시 시작
 onMounted(async () => {
-  dataManager.loadDatas(); // 메인으로 쓸 데이터 불러오기
+  await dataManager.loadDatas(); // 메인으로 쓸 데이터 불러오기
+  await searchChartData(); // 그래프 데이터 불러오기
 });
 
 // 페이징기능
@@ -53,11 +54,12 @@ const table_setting = {
   체크박스: { name: "체크박스", style: "width: 5px" },
   순번: { name: "순번", style: "width: 5px; text-align: center;" },
   항목1: { name: "설비명", style: "width: 50px; text-align: center;" },
-  항목2: { name: "가동효율", style: "width: 50px; text-align: center;" },
-  항목3: { name: "품질효율", style: "width: 50px; text-align: center;" },
-  항목4: { name: "성능효율", style: "width: 50px; text-align: center;" },
-  항목5: { name: "OEE", style: "width: 50px; text-align: center;" },
-  항목6: { name: "목표", style: "width: 50px; text-align: center;" },
+  항목2: { name: "년월", style: "width: 50px; text-align: center;" },
+  항목3: { name: "가동효율", style: "width: 50px; text-align: center;" },
+  항목4: { name: "품질효율", style: "width: 50px; text-align: center;" },
+  항목5: { name: "성능효율", style: "width: 50px; text-align: center;" },
+  항목6: { name: "OEE", style: "width: 50px; text-align: center;" },
+  항목7: { name: "목표", style: "width: 50px; text-align: center;" },
   상세보기: { name: "정보", style: "width: 50px; text-align: center;" },
   편집: { name: "편집", style: "width: 50px; text-align: center;" },
 };
@@ -83,6 +85,59 @@ const vTom = {
   },
 };
 
+// ########################## 연도에 따른 조회 및 그래프 데이터 설정 ##########################
+// 연도 구하기
+const selectYear = ref("2023");
+// selectYear가  변경되면 실행
+watch([selectYear], async (newValue, oldValue) => {
+  await searchChartData();
+  pageChangeFirst();
+});
+
+// 그래프 데이터
+const 월별_OEE = ref([0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]);
+const 월별_목표 = ref([0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]);
+async function searchChartData() {
+  await dataManager.searchDatas(
+    searchDate.value,
+    searchKey.value,
+    selectYear.value,
+    sortKey.value,
+    sortOrder.value
+  );
+
+  const data = dataManager.dataSearchAll.value;
+  월별_OEE.value = [
+    Number(data.filter((c) => c.년월 == selectYear.value + "-01")[0]?.OEE ?? 0),
+    Number(data.filter((c) => c.년월 == selectYear.value + "-02")[0]?.OEE ?? 0),
+    Number(data.filter((c) => c.년월 == selectYear.value + "-03")[0]?.OEE ?? 0),
+    Number(data.filter((c) => c.년월 == selectYear.value + "-04")[0]?.OEE ?? 0),
+    Number(data.filter((c) => c.년월 == selectYear.value + "-05")[0]?.OEE ?? 0),
+    Number(data.filter((c) => c.년월 == selectYear.value + "-06")[0]?.OEE ?? 0),
+    Number(data.filter((c) => c.년월 == selectYear.value + "-07")[0]?.OEE ?? 0),
+    Number(data.filter((c) => c.년월 == selectYear.value + "-08")[0]?.OEE ?? 0),
+    Number(data.filter((c) => c.년월 == selectYear.value + "-09")[0]?.OEE ?? 0),
+    Number(data.filter((c) => c.년월 == selectYear.value + "-10")[0]?.OEE ?? 0),
+    Number(data.filter((c) => c.년월 == selectYear.value + "-11")[0]?.OEE ?? 0),
+    Number(data.filter((c) => c.년월 == selectYear.value + "-12")[0]?.OEE ?? 0),
+  ];
+
+  월별_목표.value = [
+    Number(data[0]?.목표 ?? 0),
+    Number(data[0]?.목표 ?? 0),
+    Number(data[0]?.목표 ?? 0),
+    Number(data[0]?.목표 ?? 0),
+    Number(data[0]?.목표 ?? 0),
+    Number(data[0]?.목표 ?? 0),
+    Number(data[0]?.목표 ?? 0),
+    Number(data[0]?.목표 ?? 0),
+    Number(data[0]?.목표 ?? 0),
+    Number(data[0]?.목표 ?? 0),
+    Number(data[0]?.목표 ?? 0),
+    Number(data[0]?.목표 ?? 0),
+  ];
+}
+
 // ########################## 조회기간 설정 ##########################
 // 날짜 구하기
 const searchDate = ref("전체기간");
@@ -107,7 +162,7 @@ const litepikerButtonText: any = {
 };
 
 // ########################## 조회  ##########################
-const searchKey = ref("전체");
+const searchKey = ref("설비별");
 const searchInput = ref("");
 const sortKey = ref("등록일");
 const sortOrder = ref("내림차순");
@@ -188,62 +243,159 @@ function exportFile(data: any) {
         <div class="text-center font-bold text-xl">
           <div class="text-center">
             <div class="mt-1">
-              <div class="px-3">
-                <div
-                  class="text-lg mx-1 py-0.5 w-full border-l-2 border-r-2 border-t-2 border-success bg-success text-white rounded-t-md"
-                >
-                  <div class="flex">
-                    <div class="flex m-auto items-center">
-                      <div>
-                        <Lucide class="w-5 h-5 text-white mr-1" icon="Flag" />
+              <div class="grid grid-cols-3">
+                <div class="px-3 col-span-1">
+                  <div
+                    class="text-lg mx-1 py-0.5 w-full border-l-2 border-r-2 border-t-2 border-success bg-success text-white rounded-t-md"
+                  >
+                    <div class="flex">
+                      <div class="flex m-auto items-center">
+                        <div>
+                          <Lucide
+                            class="w-5 h-5 text-white mr-1"
+                            icon="LineChart"
+                          />
+                        </div>
+                        <div>평균가동</div>
                       </div>
-                      <div>목표</div>
+                    </div>
+                  </div>
+                  <div
+                    class="mx-1 p-2 w-full h-12 text-2xl border-l-2 border-r-2 border-b-2 border-success rounded-b-md bg-green-200"
+                  >
+                    <div class="text-2xl">
+                      {{
+                        Number(
+                          dataManager.dataSearchAll.value.reduce(
+                            (sum, data) => Number(sum) + Number(data.가동효율),
+                            0
+                          ) / dataManager.dataSearchAll.value.length
+                        ).toLocaleString()
+                      }}%
                     </div>
                   </div>
                 </div>
-                <div
-                  class="mx-1 p-2 w-full h-12 text-2xl border-l-2 border-r-2 border-b-2 border-success rounded-b-md bg-green-200"
-                >
-                  <div class="text-2xl">
-                    {{
-                      Number(
-                        dataManager.dataSearchAll.value.reduce(
-                          (sum, data) => Number(sum) + Number(data.목표),
-                          0
-                        ) / dataManager.dataSearchAll.value.length
-                      ).toLocaleString()
-                    }}%
+                <div class="px-3 col-span-1">
+                  <div
+                    class="text-lg mx-1 py-0.5 w-full border-l-2 border-r-2 border-t-2 border-success bg-success text-white rounded-t-md"
+                  >
+                    <div class="flex">
+                      <div class="flex m-auto items-center">
+                        <div>
+                          <Lucide
+                            class="w-5 h-5 text-white mr-1"
+                            icon="LineChart"
+                          />
+                        </div>
+                        <div>평균품질</div>
+                      </div>
+                    </div>
+                  </div>
+                  <div
+                    class="mx-1 p-2 w-full h-12 text-2xl border-l-2 border-r-2 border-b-2 border-success rounded-b-md bg-green-200"
+                  >
+                    <div class="text-2xl">
+                      {{
+                        Number(
+                          dataManager.dataSearchAll.value.reduce(
+                            (sum, data) => Number(sum) + Number(data.품질효율),
+                            0
+                          ) / dataManager.dataSearchAll.value.length
+                        ).toLocaleString()
+                      }}%
+                    </div>
+                  </div>
+                </div>
+                <div class="px-3 col-span-1">
+                  <div
+                    class="text-lg mx-1 py-0.5 w-full border-l-2 border-r-2 border-t-2 border-success bg-success text-white rounded-t-md"
+                  >
+                    <div class="flex">
+                      <div class="flex m-auto items-center">
+                        <div>
+                          <Lucide
+                            class="w-5 h-5 text-white mr-1"
+                            icon="LineChart"
+                          />
+                        </div>
+                        <div>평균성능</div>
+                      </div>
+                    </div>
+                  </div>
+                  <div
+                    class="mx-1 p-2 w-full h-12 text-2xl border-l-2 border-r-2 border-b-2 border-success rounded-b-md bg-green-200"
+                  >
+                    <div class="text-2xl">
+                      {{
+                        Number(
+                          dataManager.dataSearchAll.value.reduce(
+                            (sum, data) => Number(sum) + Number(data.성능효율),
+                            0
+                          ) / dataManager.dataSearchAll.value.length
+                        ).toLocaleString()
+                      }}%
+                    </div>
                   </div>
                 </div>
               </div>
-              <div class="px-3 mt-5">
-                <div
-                  class="text-lg mx-1 py-0.5 w-full border-l-2 border-r-2 border-t-2 border-success bg-success text-white rounded-t-md"
-                >
-                  <div class="flex">
-                    <div class="flex m-auto items-center">
-                      <div>
-                        <Lucide
-                          class="w-5 h-5 text-white mr-1"
-                          icon="LineChart"
-                        />
+              <div class="grid grid-cols-2">
+                <div class="px-3 mt-5 col-span-1">
+                  <div
+                    class="text-lg mx-1 py-0.5 w-full border-l-2 border-r-2 border-t-2 border-success bg-success text-white rounded-t-md"
+                  >
+                    <div class="flex">
+                      <div class="flex m-auto items-center">
+                        <div>
+                          <Lucide class="w-5 h-5 text-white mr-1" icon="Flag" />
+                        </div>
+                        <div>목표</div>
                       </div>
-                      <div>평균효율</div>
+                    </div>
+                  </div>
+                  <div
+                    class="mx-1 p-2 w-full h-12 text-2xl border-l-2 border-r-2 border-b-2 border-success rounded-b-md bg-green-200"
+                  >
+                    <div class="text-2xl">
+                      {{
+                        Number(
+                          dataManager.dataSearchAll.value.reduce(
+                            (sum, data) => Number(sum) + Number(data.목표),
+                            0
+                          ) / dataManager.dataSearchAll.value.length
+                        ).toLocaleString()
+                      }}%
                     </div>
                   </div>
                 </div>
-                <div
-                  class="mx-1 p-2 w-full h-12 text-2xl border-l-2 border-r-2 border-b-2 border-success rounded-b-md bg-green-200"
-                >
-                  <div class="text-2xl">
-                    {{
-                      Number(
-                        dataManager.dataSearchAll.value.reduce(
-                          (sum, data) => Number(sum) + Number(data.OEE),
-                          0
-                        ) / dataManager.dataSearchAll.value.length
-                      ).toLocaleString()
-                    }}%
+                <div class="px-3 mt-5 col-span-1">
+                  <div
+                    class="text-lg mx-1 py-0.5 w-full border-l-2 border-r-2 border-t-2 border-success bg-success text-white rounded-t-md"
+                  >
+                    <div class="flex">
+                      <div class="flex m-auto items-center">
+                        <div>
+                          <Lucide
+                            class="w-5 h-5 text-white mr-1"
+                            icon="LineChart"
+                          />
+                        </div>
+                        <div>평균OEE</div>
+                      </div>
+                    </div>
+                  </div>
+                  <div
+                    class="mx-1 p-2 w-full h-12 text-2xl border-l-2 border-r-2 border-b-2 border-success rounded-b-md bg-green-200"
+                  >
+                    <div class="text-2xl">
+                      {{
+                        Number(
+                          dataManager.dataSearchAll.value.reduce(
+                            (sum, data) => Number(sum) + Number(data.OEE),
+                            0
+                          ) / dataManager.dataSearchAll.value.length
+                        ).toLocaleString()
+                      }}%
+                    </div>
                   </div>
                 </div>
               </div>
@@ -289,6 +441,7 @@ function exportFile(data: any) {
         <div class="text-center font-bold text-xl">KPI 설비종합효율</div>
         <div style="height: 270px">
           <KPI_OEE_Chart_bar_line
+            v-if="searchKey == '설비별'"
             :x_label="
               dataManager.dataSearchAll.value.map((data) => data.설비명)
             "
@@ -296,11 +449,37 @@ function exportFile(data: any) {
             :dataset1_data="
               dataManager.dataSearchAll.value.map((data) => data.OEE)
             "
+            :dataset1_type="'bar'"
             :dataset2_label="'목표'"
             :dataset2_data="
               dataManager.dataSearchAll.value.map((data) => data.목표)
             "
+            :dataset2_type="'bar'"
             :title_text="searchDate"
+          />
+          <KPI_OEE_Chart_bar_line
+            v-if="searchKey == '월별'"
+            :x_label="[
+              '1월',
+              '2월',
+              '3월',
+              '4월',
+              '5월',
+              '6월',
+              '7월',
+              '8월',
+              '9월',
+              '10월',
+              '11월',
+              '12월',
+            ]"
+            :dataset1_label="'OEE'"
+            :dataset1_data="월별_OEE"
+            :dataset1_type="'line'"
+            :dataset2_label="'목표'"
+            :dataset2_data="월별_목표"
+            :dataset2_type="'line'"
+            :title_text="selectYear + '년'"
           />
         </div>
       </div>
@@ -314,13 +493,61 @@ function exportFile(data: any) {
       <div
         class="flex flex-wrap items-center col-span-12 mt-2 mb-2 intro-y sm:flex-nowrap"
       >
+        <div v-if="searchKey == '설비별'">
+          <Button
+            class="w-20 mr-3"
+            variant="primary"
+            @click="
+              () => {
+                searchKey = '설비별';
+                search();
+              }
+            "
+            >설비별</Button
+          >
+          <Button
+            class="w-20"
+            variant="outline-primary"
+            @click="
+              () => {
+                searchKey = '월별';
+                searchChartData();
+              }
+            "
+            >월별</Button
+          >
+        </div>
+        <div v-if="searchKey == '월별'">
+          <Button
+            class="w-20 mr-3"
+            variant="outline-primary"
+            @click="
+              () => {
+                searchKey = '설비별';
+                search();
+              }
+            "
+            >설비별</Button
+          >
+          <Button
+            class="w-20"
+            variant="primary"
+            @click="
+              () => {
+                searchKey = '월별';
+                searchChartData();
+              }
+            "
+            >월별</Button
+          >
+        </div>
         <div class="hidden mx-auto md:block text-slate-500"></div>
         <div class="">
           <a href="" class="flex items-center ml-auto text-primary">
             <Lucide icon="RefreshCcw" class="w-4 h-4 mr-2" /> 새로고침
           </a>
         </div>
-        <div class="ml-5">
+        <div class="ml-5" v-if="searchKey == '설비별'">
           <Button
             class="mr-2 shadow-md"
             as="a"
@@ -331,7 +558,7 @@ function exportFile(data: any) {
             ><Lucide icon="CalendarX" class="w-5 h-5"
           /></Button>
         </div>
-        <div class="text-center">
+        <div class="text-center" v-if="searchKey == '설비별'">
           <div>
             <Litepicker
               v-model="searchDate"
@@ -356,6 +583,32 @@ function exportFile(data: any) {
               placeholder="전체기간"
             />
           </div>
+        </div>
+        <div class="ml-5" v-if="searchKey == '월별'">
+          <FormSelect
+            v-model="selectYear"
+            :value="selectYear + '년'"
+            class="w-30 mt-3 !box sm:mt-0"
+          >
+            <option :value="dayjs().format('YYYY')">
+              {{ dayjs().format("YYYY") }}년
+            </option>
+            <option :value="dayjs().add(-1, 'years').format('YYYY')">
+              {{ dayjs().add(-1, "years").format("YYYY") }}년
+            </option>
+            <option :value="dayjs().add(-2, 'years').format('YYYY')">
+              {{ dayjs().add(-2, "years").format("YYYY") }}년
+            </option>
+            <option :value="dayjs().add(-3, 'years').format('YYYY')">
+              {{ dayjs().add(-3, "years").format("YYYY") }}년
+            </option>
+            <option :value="dayjs().add(-4, 'years').format('YYYY')">
+              {{ dayjs().add(-4, "years").format("YYYY") }}년
+            </option>
+            <option :value="dayjs().add(-5, 'years').format('YYYY')">
+              {{ dayjs().add(-5, "years").format("YYYY") }}년
+            </option>
+          </FormSelect>
         </div>
 
         <div class="ml-3">
@@ -433,12 +686,14 @@ function exportFile(data: any) {
                   {{ table_setting.순번.name }}
                 </Table.Th>
                 <Table.Th
+                  v-if="searchKey == '설비별'"
                   class="text-center border-b-0 whitespace-nowrap font-bold"
                   :style="table_setting.항목1.style"
                 >
                   {{ table_setting.항목1.name }}
                 </Table.Th>
                 <Table.Th
+                  v-if="searchKey == '월별'"
                   class="text-center border-b-0 whitespace-nowrap font-bold"
                   :style="table_setting.항목2.style"
                 >
@@ -467,6 +722,12 @@ function exportFile(data: any) {
                   :style="table_setting.항목6.style"
                 >
                   {{ table_setting.항목6.name }}
+                </Table.Th>
+                <Table.Th
+                  class="text-center border-b-0 whitespace-nowrap font-bold"
+                  :style="table_setting.항목7.style"
+                >
+                  {{ table_setting.항목7.name }}
                 </Table.Th>
                 <!-- <Table.Th
                   class="text-center border-b-0 whitespace-nowrap font-bold"
@@ -502,12 +763,14 @@ function exportFile(data: any) {
                   <div>{{ index + 1 + (currentPage - 1) * rowsPerPage }}</div>
                 </Table.Td>
                 <Table.Td
+                  v-if="searchKey == '설비별'"
                   class="first:rounded-l-md last:rounded-r-md text-center bg-white border-b-0 dark:bg-darkmode-600 shadow-[20px_3px_20px_#0000000b]"
                   :style="table_setting.항목1.style"
                 >
                   <div>{{ todo[table_setting.항목1.name] }}</div>
                 </Table.Td>
                 <Table.Td
+                  v-if="searchKey == '월별'"
                   class="first:rounded-l-md last:rounded-r-md text-center bg-white border-b-0 dark:bg-darkmode-600 shadow-[20px_3px_20px_#0000000b]"
                   :style="table_setting.항목2.style"
                 >
@@ -536,6 +799,12 @@ function exportFile(data: any) {
                   :style="table_setting.항목6.style"
                 >
                   <div>{{ todo[table_setting.항목6.name] }}</div>
+                </Table.Td>
+                <Table.Td
+                  class="first:rounded-l-md last:rounded-r-md text-center bg-white border-b-0 dark:bg-darkmode-600 shadow-[20px_3px_20px_#0000000b]"
+                  :style="table_setting.항목7.style"
+                >
+                  <div>{{ todo[table_setting.항목7.name] }}</div>
                 </Table.Td>
                 <!-- <Table.Td
                   class="first:rounded-l-md last:rounded-r-md text-center bg-white border-b-0 dark:bg-darkmode-600 shadow-[20px_3px_20px_#0000000b] py-0 relative before:block before:w-px before:h-8 before:bg-slate-200 before:absolute before:left-0 before:inset-y-0 before:my-auto before:dark:bg-darkmode-400"

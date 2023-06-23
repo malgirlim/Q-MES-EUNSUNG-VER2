@@ -17,10 +17,11 @@ export interface KioskWork {
   설비명: string;
   작업자ID: string;
   작업자: string;
+  진행상황: string;
   시작일시: string;
   생산수: string;
   특이사항: string;
-  현황: string;
+  설비현황: string;
   비고: string;
   등록자: string;
   등록일시: string;

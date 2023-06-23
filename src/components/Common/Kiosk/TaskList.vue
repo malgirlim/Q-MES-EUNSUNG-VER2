@@ -122,7 +122,7 @@ let kiosk_work: KioskWork;
                       dataManager.insertData({
                         NO: props.키오스크no,
                         지시공정NO: data.NO,
-                        현황: data.진행상황,
+                        설비현황: '미가동',
                       });
                       emit(`update:modalclose`, false);
                     }

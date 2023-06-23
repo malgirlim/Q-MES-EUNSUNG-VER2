@@ -59,10 +59,11 @@ router.get("/", async (req, res) => {
         ,INST_PROCESS.공정명 AS 공정명
         ,INST_PROCESS.설비NO AS 설비NO
         ,INST_PROCESS.설비명 AS 설비명
+        ,INST_PROCESS.진행상황 AS 진행상황
         ,[KSKWK_START_DT] AS 시작일시
         ,[KSKWK_PRODUCE_AMT] AS 생산수
         ,[KSKWK_REPORT] AS 특이사항
-        ,[KSKWK_STATUS] AS 현황
+        ,[KSKWK_STATUS] AS 설비현황
         ,[KSKWK_NOTE] AS 비고
         ,[KSKWK_REGIST_NM] AS 등록자
         ,[KSKWK_REGIST_DT] AS 등록일시
@@ -93,6 +94,7 @@ router.get("/", async (req, res) => {
           ,(SELECT [PRCS_NAME] FROM [QMES2022].[dbo].[MASTER_PROCESS_TB] WHERE [PRCS_PK] = [ISPC_PROCESS_PK]) AS 공정명
           ,[ISPC_FACILITY_PK] AS 설비NO
           ,(SELECT [FCLT_NAME] FROM [QMES2022].[dbo].[MASTER_FACILITY_TB] WHERE [FCLT_PK] = [ISPC_FACILITY_PK]) AS 설비명
+          ,[ISPC_CONDITION] AS 진행상황
         FROM [QMES2022].[dbo].[MANAGE_INSTRUCT_PROCESS_TB]
         LEFT JOIN
         (
@@ -146,8 +148,8 @@ router.post("/", async (req, res) => {
         SELECT
           NO AS NO, 작업자ID AS 작업자ID, 작업자 AS 작업자, 지시공정NO AS 지시공정NO, 작업코드 AS 작업코드, 품목구분 AS 품목구분,
           품번 AS 품번, 품명 AS 품명, 규격 AS 규격, 단위 AS 단위, 지시수량 AS 지시수량, 완료수량 AS 완료수량, 시작일 AS 시작일,
-          공정명 AS 공정명, 설비NO AS 설비NO, 설비명 AS 설비명, 작업자ID AS 작업자ID, 작업자 AS 작업자, 시작일시 AS 시작일시,
-          생산수 AS 생산수, 특이사항 AS 특이사항, 현황 AS 현황, 비고 AS 비고, 등록자 AS 등록자, 등록일시 AS 등록일시
+          공정명 AS 공정명, 설비NO AS 설비NO, 설비명 AS 설비명, 작업자ID AS 작업자ID, 작업자 AS 작업자, 진행상황 AS 진행상황, 시작일시 AS 시작일시,
+          생산수 AS 생산수, 특이사항 AS 특이사항, 설비현황 AS 설비현황, 비고 AS 비고, 등록자 AS 등록자, 등록일시 AS 등록일시
         FROM(
           SELECT
             [KSKWK_PK] AS NO
@@ -166,10 +168,11 @@ router.post("/", async (req, res) => {
             ,INST_PROCESS.공정명 AS 공정명
             ,INST_PROCESS.설비NO AS 설비NO
             ,INST_PROCESS.설비명 AS 설비명
+            ,INST_PROCESS.진행상황 AS 진행상황
             ,[KSKWK_START_DT] AS 시작일시
             ,[KSKWK_PRODUCE_AMT] AS 생산수
             ,[KSKWK_REPORT] AS 특이사항
-            ,[KSKWK_STATUS] AS 현황
+            ,[KSKWK_STATUS] AS 설비현황
             ,[KSKWK_NOTE] AS 비고
             ,[KSKWK_REGIST_NM] AS 등록자
             ,[KSKWK_REGIST_DT] AS 등록일시
@@ -200,6 +203,7 @@ router.post("/", async (req, res) => {
               ,(SELECT [PRCS_NAME] FROM [QMES2022].[dbo].[MASTER_PROCESS_TB] WHERE [PRCS_PK] = [ISPC_PROCESS_PK]) AS 공정명
               ,[ISPC_FACILITY_PK] AS 설비NO
               ,(SELECT [FCLT_NAME] FROM [QMES2022].[dbo].[MASTER_FACILITY_TB] WHERE [FCLT_PK] = [ISPC_FACILITY_PK]) AS 설비명
+              ,[ISPC_CONDITION] AS 진행상황
             FROM [QMES2022].[dbo].[MANAGE_INSTRUCT_PROCESS_TB]
             LEFT JOIN
             (
@@ -223,7 +227,7 @@ router.post("/", async (req, res) => {
           ) AS INST_PROCESS ON INST_PROCESS.NO = [KSKWK_INST_PROCESS_PK]
         ) AS RESULT
         WHERE (1=1)
-        AND [KSKWK_PK] = @input
+        AND NO = @input
       `;
 
     const Pool = await pool;

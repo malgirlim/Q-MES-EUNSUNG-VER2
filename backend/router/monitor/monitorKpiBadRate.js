@@ -99,8 +99,9 @@ router.get("/", async (req, res) => {
 router.post("/", async (req, res) => {
   try {
     var sql = "";
-    sql =
-      `
+    if (req.body.searchKey == "설비별") {
+      sql =
+        `
       SELECT
         공정NO AS 공정NO
         ,공정명 AS 공정명
@@ -127,15 +128,78 @@ router.post("/", async (req, res) => {
         ) AS INSTRUCT_PROCESS ON INSTRUCT_PROCESS.NO = [PDRS_INST_PROCESS_PK]
         WHERE ( 1 = 1 )
         AND CONVERT(varchar, CONVERT(datetime, [PDRS_START_DT]), 12) >= ` +
-      req.body.startDate +
-      `
+        req.body.startDate +
+        `
         AND CONVERT(varchar, CONVERT(datetime, [PDRS_START_DT]), 12) <= ` +
-      req.body.endDate +
-      `
+        req.body.endDate +
+        `
       ) AS RESULT
       GROUP BY 공정NO, 공정명
       ORDER BY 공정명 ASC
     `;
+    } else if (req.body.searchKey == "월별") {
+      sql =
+        `
+      SELECT
+        년월 AS 년월
+        ,SUM(생산수) AS 총생산수
+        ,SUM(불량수) AS 총불량수
+        ,CASE WHEN (SUM(생산수) > 0) THEN CONVERT(NUMERIC(5,1) ,ROUND(SUM(불량수)/SUM(생산수)*100.0,1)) ELSE 0 END AS 불량률
+        ,1.5 AS 목표
+      FROM
+      (
+        SELECT
+          LEFT(CONVERT(varchar, CONVERT(datetime, [PDRS_START_DT]), 23),7) AS 년월
+          ,COALESCE([PDRS_PRODUCE_AMT],0) AS 생산수
+          ,(SELECT COALESCE(SUM(CONVERT(numeric, [PDDF_AMOUNT])),0) FROM [QMES2022].[dbo].[MANAGE_PRODUCE_DEFECT_TB] WHERE [PDDF_PRODUCE_RESULT_PK] = [PDRS_PK]) AS 불량수
+        FROM [QMES2022].[dbo].[MANAGE_PRODUCE_RESULT_TB]
+        WHERE ( 1 = 1 )
+        AND LEFT(CONVERT(varchar, CONVERT(datetime, [PDRS_START_DT]), 23),4) = ` +
+        req.body.searchInput +
+        `
+      ) AS RESULT
+      GROUP BY 년월
+      ORDER BY 년월 ASC
+    `;
+    } else {
+      sql =
+        `
+      SELECT
+        공정NO AS 공정NO
+        ,공정명 AS 공정명
+        ,SUM(생산수) AS 총생산수
+        ,SUM(불량수) AS 총불량수
+        ,CASE WHEN (SUM(생산수) > 0) THEN CONVERT(NUMERIC(5,1) ,ROUND(SUM(불량수)/SUM(생산수)*100.0,1)) ELSE 0 END AS 불량률
+        ,1.5 AS 목표
+      FROM
+      (
+        SELECT
+          INSTRUCT_PROCESS.공정NO AS 공정NO
+          ,INSTRUCT_PROCESS.공정명 AS 공정명
+          ,COALESCE([PDRS_PRODUCE_AMT],0) AS 생산수
+          ,(SELECT COALESCE(SUM(CONVERT(numeric, [PDDF_AMOUNT])),0) FROM [QMES2022].[dbo].[MANAGE_PRODUCE_DEFECT_TB] WHERE [PDDF_PRODUCE_RESULT_PK] = [PDRS_PK]) AS 불량수
+        FROM [QMES2022].[dbo].[MANAGE_PRODUCE_RESULT_TB]
+        LEFT JOIN
+        (
+          SELECT
+            [ISPC_PK] AS NO
+            ,[ISPC_WORK_INSTRUCT_PK] AS 작업지시NO
+            ,[ISPC_PROCESS_PK] AS 공정NO
+            ,(SELECT [PRCS_NAME] FROM [QMES2022].[dbo].[MASTER_PROCESS_TB] WHERE [PRCS_PK] = [ISPC_PROCESS_PK]) AS 공정명
+          FROM [QMES2022].[dbo].[MANAGE_INSTRUCT_PROCESS_TB]
+        ) AS INSTRUCT_PROCESS ON INSTRUCT_PROCESS.NO = [PDRS_INST_PROCESS_PK]
+        WHERE ( 1 = 1 )
+        AND CONVERT(varchar, CONVERT(datetime, [PDRS_START_DT]), 12) >= ` +
+        req.body.startDate +
+        `
+        AND CONVERT(varchar, CONVERT(datetime, [PDRS_START_DT]), 12) <= ` +
+        req.body.endDate +
+        `
+      ) AS RESULT
+      GROUP BY 공정NO, 공정명
+      ORDER BY 공정명 ASC
+    `;
+    }
 
     const Pool = await pool;
     const result = await Pool.request()

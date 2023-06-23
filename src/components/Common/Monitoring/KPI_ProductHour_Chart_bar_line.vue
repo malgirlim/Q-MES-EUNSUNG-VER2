@@ -29,8 +29,10 @@ const props = defineProps<{
   y_scale?: any;
   dataset1_label?: any;
   dataset1_data?: any;
+  dataset1_type?: any;
   dataset2_label?: any;
   dataset2_data?: any;
+  dataset2_type?: any;
   title_text?: any;
 }>();
 
@@ -53,7 +55,7 @@ const chartData = computed<ChartData>(() => {
         label: props.dataset1_label ?? "효율",
         maxBarThickness: 60,
         data: props.dataset1_data ?? [20, 30, 55, 40, 60, 47, 46, 40, 75, 65],
-        type: "bar",
+        type: props.dataset1_type ?? "bar",
         datalabels: {
           color: "black",
           anchor: "end",
@@ -61,6 +63,7 @@ const chartData = computed<ChartData>(() => {
           align: "end",
           offset: -5,
         },
+        borderColor: "rgba(255, 99, 132, 1)",
         backgroundColor: "rgba(255, 99, 132, 1)",
         order: 0,
       },
@@ -69,7 +72,7 @@ const chartData = computed<ChartData>(() => {
         maxBarThickness: 100,
         data: props.dataset2_data ?? [50, 50, 50, 50, 50, 50, 50, 50, 50, 50],
         datalabels: { display: false },
-        type: "bar",
+        type: props.dataset2_type ?? "bar",
         pointStyle: false,
         borderColor: "rgba(54, 162, 235, 1)",
         backgroundColor: "rgba(54, 162, 235, 0.5)",

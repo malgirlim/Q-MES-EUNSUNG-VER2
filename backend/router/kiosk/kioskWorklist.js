@@ -194,7 +194,7 @@ router.post("/insert", async (req, res) => {
     await Pool.request()
       .input("NO", req.body.data.NO ?? null)
       .input("지시공정NO", req.body.data.지시공정NO ?? null)
-      .input("현황", req.body.data.현황 ?? "")
+      .input("설비현황", req.body.data.설비현황 ?? "미가동")
       .input("비고", req.body.data.비고 ?? "")
       .input("등록자", req.body.user ?? "")
       .input(
@@ -221,7 +221,7 @@ router.post("/insert", async (req, res) => {
           ,[KSKWK_REGIST_DT])
         VALUES
           (@NO,@지시공정NO,(SELECT [ISPC_USER_ID] FROM [QMES2022].[dbo].[MANAGE_INSTRUCT_PROCESS_TB] WHERE [ISPC_PK] = @지시공정NO),
-            GETDATE(),'0','',@현황,@비고,@등록자,@등록일시);
+            GETDATE(),'0','',@설비현황,@비고,@등록자,@등록일시);
 
         -- 키오스크 투입자재 등록
         INSERT INTO [QMES2022].[dbo].[KIOSK_ITEM_TB]

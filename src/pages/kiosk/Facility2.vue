@@ -29,7 +29,7 @@ import AlertAdd from "../../components/Common/Kiosk/AlertAdd.vue";
 
 /* ##########################################  키오스크 정보 관련 (중요!)  ########################################## */
 
-const 키오스크NO = 1;
+const 키오스크NO = 2;
 const 설비명 = "인쇄기2";
 
 /* ################################################################################################################ */
@@ -80,8 +80,8 @@ onMounted(async () => {
 });
 
 // 임시데이터
-const running = "가동중";
-const task_status = "작업중";
+const running = "미가동";
+const task_status = "작업미확인";
 const checked = false;
 const 지시수량 = ref("3000");
 const 완료수량 = ref("0");

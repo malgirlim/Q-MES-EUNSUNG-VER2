@@ -52,6 +52,7 @@ export interface MonitorKPIProductHour {
   NO?: number;
   설비NO?: number;
   설비명?: string;
+  년월?: string;
   총생산시간?: string;
   총생산수?: string;
   시간당생산수?: string;
@@ -64,6 +65,7 @@ export interface MonitorKPIBadRate {
   NO?: number;
   공정NO?: number;
   공정명?: string;
+  년월?: string;
   총생산수?: string;
   총불량수?: string;
   불량률?: string;
@@ -76,6 +78,7 @@ export interface MonitorKPIFacilityRate {
   NO?: number;
   설비NO?: number;
   설비명?: string;
+  년월?: string;
   총가동시간?: string;
   총비가동시간?: string;
   가동률?: string;
@@ -88,6 +91,7 @@ export interface MonitorKPIOEE {
   NO?: number;
   설비NO?: number;
   설비명?: string;
+  년월?: string;
   가동효율?: string;
   품질효율?: string;
   성능효율?: string;

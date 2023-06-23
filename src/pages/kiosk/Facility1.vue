@@ -17,8 +17,11 @@ import { toast } from "vue3-toastify";
 import axios from "axios";
 import router from "../../router";
 
-//컴포넌트 로드
+// API 보내는 함수 및 인터페이스 불러오기
+import { useSendApi } from "../../composables/useSendApi";
+import { KioskWork } from "../../interfaces/menu/kioskInterface";
 
+//컴포넌트 로드
 import TaskList from "../../components/Common/Kiosk/TaskList.vue";
 import CheckList from "../../components/Common/Kiosk/CheckList.vue";
 import NonOPAdd from "../../components/Common/Kiosk/NonOPAdd.vue";
@@ -69,6 +72,14 @@ const setLogoutModal = (value: boolean) => {
 };
 /*로그인 관련 END*/
 
+/* ################################################################################################################ */
+
+// dataManager 만들기
+const url_kiosk_work = "/api/kiosk/work";
+const kiosk_work = useSendApi<KioskWork>(url_kiosk_work, ref(1), ref(100));
+
+/* ################################################################################################################ */
+
 // 날짜 구하기
 const now = ref(dayjs().format("YYYY-MM-DD HH:mm:ss"));
 
@@ -77,23 +88,45 @@ onMounted(async () => {
   setInterval(() => {
     now.value = dayjs().format("YYYY-MM-DD HH:mm:ss");
   }, 1000);
+
+  await kiosk_work.loadDatas();
+  await kiosk_work.searchDatas("전체기간", "", String(키오스크NO), "", "");
+
+  kiosk_work_data.value = kiosk_work.dataSearchAll.value.filter(
+    (f) => f.NO == 키오스크NO
+  )[0];
+
+  running.value = kiosk_work_data.value.설비현황 ?? "미가동";
+  task_status.value = kiosk_work_data.value.진행상황 ?? "작업미확인";
+  지시수량.value = kiosk_work_data.value.지시수량 ?? "0";
+  완료수량.value = kiosk_work_data.value.완료수량 ?? "0";
+  생산수량.value = kiosk_work_data.value.생산수 ?? "0";
+  불량수량.value = "0";
+  양품수량.value = String(
+    Number(완료수량.value) + Number(생산수량.value) - Number(불량수량.value)
+  );
+
+  checked.value = false;
 });
 
-// 임시데이터
-const running = "미가동중";
-const task_status = "작업미확인";
-const checked = false;
-const 지시수량 = ref("3000");
+// 작업현황
+const kiosk_work_data = ref({} as KioskWork);
+
+// 작업현황 초기값 설정
+const running = ref("미가동");
+const task_status = ref("작업미확인");
+const 지시수량 = ref("0");
 const 완료수량 = ref("0");
 
 // 생산실적 초기값 설정
 const 생산수량 = ref("0");
-const 불량수량 = ref("27");
-const 양품수량 = ref(
-  String(
-    Number(완료수량.value) + Number(생산수량.value) - Number(불량수량.value)
-  )
-);
+const 불량수량 = ref("0");
+const 양품수량 = ref("0");
+
+// 일상점검 확인
+const checked = ref(false);
+
+/* ################################################################################################################ */
 
 // ########################### 키패드 (생산수입력) BEGIN ###########################
 const 입력수량 = ref("0");
@@ -156,6 +189,8 @@ watch([생산수량], (newValue, oldValue) => {
 });
 
 // ########################### 키패드 (생산수입력) END ###########################
+
+/* ################################################################################################################ */
 
 /* 작업지시목록 Modal */
 const taskListModal = ref(false);
@@ -334,7 +369,7 @@ const setWorkerChangeModal = (value: boolean) => {
             >부하시간 : 14:43:00</strong
           >
         </div>
-        <div class="flex ml-auto items-center mr-3">
+        <div class="flex items-center mr-3">
           <Lucide class="w-5 h-5 mr-1 mb-0.5" icon="PlayCircle" /><strong
             >운전시간 : 14:43:00</strong
           >
@@ -365,7 +400,9 @@ const setWorkerChangeModal = (value: boolean) => {
                     >
                       품번
                     </td>
-                    <td class="pl-2 text-left">2074-G901-1</td>
+                    <td class="pl-2 text-left">
+                      {{ kiosk_work_data.품번 }}
+                    </td>
                   </tr>
                   <tr class="border-b-2 border-success h-7">
                     <td
@@ -373,7 +410,9 @@ const setWorkerChangeModal = (value: boolean) => {
                     >
                       구분
                     </td>
-                    <td class="pl-2 text-left">반제품</td>
+                    <td class="pl-2 text-left">
+                      {{ kiosk_work_data.품목구분 }}
+                    </td>
                   </tr>
                   <tr class="border-b-2 border-success h-7">
                     <td
@@ -381,7 +420,9 @@ const setWorkerChangeModal = (value: boolean) => {
                     >
                       품명
                     </td>
-                    <td class="pl-2 text-left">POWER TERMINAL PRE-MOLD</td>
+                    <td class="pl-2 text-left">
+                      {{ kiosk_work_data.품명 }}
+                    </td>
                   </tr>
                   <tr class="border-b-2 border-success h-7">
                     <td
@@ -389,7 +430,9 @@ const setWorkerChangeModal = (value: boolean) => {
                     >
                       규격
                     </td>
-                    <td class="pl-2 text-left">A2 E-EGR</td>
+                    <td class="pl-2 text-left">
+                      {{ kiosk_work_data.규격 }}
+                    </td>
                   </tr>
                   <tr class="border-b-2 border-success h-7">
                     <td
@@ -588,7 +631,9 @@ const setWorkerChangeModal = (value: boolean) => {
                     >
                       작업코드
                     </td>
-                    <td class="pl-2 text-left">TAS0022112202</td>
+                    <td class="pl-2 text-left">
+                      {{ kiosk_work_data.작업코드 }}
+                    </td>
                   </tr>
                   <tr class="border-b-2 border-success h-7">
                     <td
@@ -596,7 +641,9 @@ const setWorkerChangeModal = (value: boolean) => {
                     >
                       시작일
                     </td>
-                    <td class="pl-2 text-left">2023-05-11</td>
+                    <td class="pl-2 text-left">
+                      {{ kiosk_work_data.시작일 }}
+                    </td>
                   </tr>
 
                   <tr class="border-b-2 border-success h-7">
@@ -605,7 +652,9 @@ const setWorkerChangeModal = (value: boolean) => {
                     >
                       공정명
                     </td>
-                    <td class="pl-2 text-left">인쇄2공정</td>
+                    <td class="pl-2 text-left">
+                      {{ kiosk_work_data.공정명 }}
+                    </td>
                   </tr>
                   <tr class="border-b-2 border-success h-7">
                     <td
@@ -613,7 +662,9 @@ const setWorkerChangeModal = (value: boolean) => {
                     >
                       설비명
                     </td>
-                    <td class="pl-2 text-left">인쇄기1</td>
+                    <td class="pl-2 text-left">
+                      {{ kiosk_work_data.설비명 }}
+                    </td>
                   </tr>
                   <tr class="border-b-2 border-success h-7">
                     <td
@@ -631,7 +682,9 @@ const setWorkerChangeModal = (value: boolean) => {
                     >
                       단위
                     </td>
-                    <td class="pl-2 text-left">매</td>
+                    <td class="pl-2 text-left">
+                      {{ kiosk_work_data.단위 }}
+                    </td>
                   </tr>
                   <tr class="border-b-2 border-success h-7">
                     <td
@@ -641,7 +694,9 @@ const setWorkerChangeModal = (value: boolean) => {
                     </td>
                     <td class="pl-2 text-left">
                       <div class="flex">
-                        <div class="mr-auto">박명한</div>
+                        <div class="mr-auto">
+                          {{ kiosk_work_data.작업자 }}
+                        </div>
                         <div class="ml-auto">
                           <Button
                             class="h-7 text-white mr-2"
