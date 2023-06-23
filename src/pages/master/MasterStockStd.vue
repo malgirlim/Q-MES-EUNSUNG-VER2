@@ -147,23 +147,23 @@ let pass_flag = false;
 const insert_check = () => {
   pass_flag = true;
 
-  if (set_품목.value != null && set_품목.value != "") {
-    insertModalData.품목 = set_품목.value;
-  } else {
-    set_품목.value = "";
-    pass_flag = false;
-  }
+  // if (set_품목.value != null && set_품목.value != "") {
+  //   insertModalData.품목 = set_품목.value;
+  // } else {
+  //   set_품목.value = "";
+  //   pass_flag = false;
+  // }
 
-  if (set_내용.value != null && set_내용.value != "") {
-    insertModalData.내용 = set_내용.value;
-  } else {
-    set_내용.value = "";
-    pass_flag = false;
-  }
+  // if (set_내용.value != null && set_내용.value != "") {
+  //   insertModalData.내용 = set_내용.value;
+  // } else {
+  //   set_내용.value = "";
+  //   pass_flag = false;
+  // }
 
-  if (pass_flag == false) {
-    return;
-  }
+  // if (pass_flag == false) {
+  //   return;
+  // }
 };
 
 // ########################## 등록, 수정, 삭제, 상세 Modal ##########################
