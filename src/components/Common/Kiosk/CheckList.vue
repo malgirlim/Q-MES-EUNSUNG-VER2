@@ -1,9 +1,36 @@
 <script setup lang="ts">
-import { ref, watch } from "vue";
+import { ref, watch, onMounted } from "vue";
 import Button from "../../../base-components/Button";
 import Lucide from "../../../base-components/Lucide";
 import { FormSelect } from "../../../base-components/Form";
 import dayjs from "dayjs";
+
+// API 보내는 함수 및 인터페이스 불러오기
+import { useSendApi } from "../../../composables/useSendApi";
+import { PreventDaily } from "../../../interfaces/menu/preventInterface";
+
+// 데이터 가져오기
+const props = defineProps<{
+  키오스크no?: any;
+  설비명?: any;
+}>();
+
+// 데이터 내보내기
+const output = ref();
+const emit = defineEmits(["update:output"]);
+emit(`update:output`, output.value); // 실제로 내보낼 때 쓰는 코드
+
+// 페이지 로딩 시 시작
+onMounted(async () => {
+  await dataManager.loadDatas(); // 메인으로 쓸 데이터 불러오기
+  await dataManager.searchDatas("전체기간", "설비명", props.설비명, "", ""); // 메인으로 쓸 데이터 불러오기
+
+  console.log(dataManager.dataSearchAll.value);
+});
+
+// dataManager 만들기
+const url = "/api/prevent/dailyresult";
+const dataManager = useSendApi<PreventDaily>(url, ref(1), ref(100));
 
 // 오늘날짜
 dayjs.locale("ko");
@@ -128,37 +155,43 @@ watch([num], (newValue, oldValue) => {
             <tbody>
               <tr
                 class="text-center h-14"
-                v-for="(i, index) in Array(15).fill('10')"
+                v-for="(todo, index) in dataManager.dataSearchAll.value.filter(
+                  (c) =>
+                    c.등록일시?.slice(0, 10) == dayjs(now).format('YYYY-MM-DD')
+                )"
               >
                 <td class="border-l-2 border-b-2 border-r-2 border-success">
-                  1
+                  {{ index + 1 }}
                 </td>
                 <td class="text-left px-1 border-b-2 border-r-2 border-success">
-                  불이 잘 꺼져 있나요
+                  {{ todo.내용 }}
                 </td>
                 <td
                   class="text-center px-1 border-b-2 border-r-2 border-success"
                 >
-                  불이 꺼짐
+                  {{ todo.기준 }}
                 </td>
                 <td
                   class="text-center px-1 border-b-2 border-r-2 border-success"
                 >
-                  -
+                  {{ todo.단위 }}
                 </td>
                 <td
                   class="text-center px-1 border-b-2 border-r-2 border-success"
                 >
-                  -
+                  {{ todo.최소 }}
                 </td>
                 <td
                   class="text-center px-1 border-b-2 border-r-2 border-success"
                 >
-                  -
+                  {{ todo.최대 }}
                 </td>
                 <td class="border-b-2 border-r-2 border-success">
                   <div class="flex">
-                    <div v-if="true" class="flex m-auto items-center">
+                    <div
+                      v-if="todo.검사방법 == '육안검사'"
+                      class="flex m-auto items-center"
+                    >
                       <label class="cursor-pointer">
                         <div class="flex items-center mr-3">
                           <div>
@@ -196,9 +229,14 @@ watch([num], (newValue, oldValue) => {
                         </div></label
                       >
                     </div>
-                    <div v-if="false" class="flex m-auto items-center">
+                    <div
+                      v-if="todo.검사방법 == '치수검사'"
+                      class="flex m-auto items-center"
+                    >
                       <div class="flex items-center mr-2">
-                        <div class="p-2 w-20 border-2 border-slate-200">24</div>
+                        <div class="p-2 w-20 border-2 border-slate-200">
+                          {{ todo.결과내용 }}
+                        </div>
                       </div>
 
                       <div class="mr-3">
@@ -208,7 +246,7 @@ watch([num], (newValue, oldValue) => {
                       </div>
                       <div class="flex items-center">
                         <div class="text-success mb-0.5">●</div>
-                        <div v-if="true">양호</div>
+                        <div v-if="true">적합</div>
                         <div v-if="false">부적합</div>
                         <div v-if="false">미점검</div>
                       </div>

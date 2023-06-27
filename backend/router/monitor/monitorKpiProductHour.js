@@ -128,7 +128,7 @@ router.post("/", async (req, res) => {
         년월 AS 년월
         ,ROUND(SUM(생산시간),1) AS 총생산시간
         ,ROUND(SUM(생산수 - 불량수),1) AS 총생산수
-        ,CASE WHEN (SUM(생산시간) > 0) THEN ROUND((SUM(생산수 - 불량수)/SUM(생산시간)),1) ELSE 0 END AS 시간당생산수
+        ,CASE WHEN (SUM(생산시간) > 0) THEN ROUND((SUM(생산수*1.0 - 불량수*1.0)/SUM(생산시간*1.0)),1) ELSE 0 END AS 시간당생산수
         ,2750 AS 목표
       FROM
       (

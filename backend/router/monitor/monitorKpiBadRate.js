@@ -144,7 +144,7 @@ router.post("/", async (req, res) => {
         년월 AS 년월
         ,SUM(생산수) AS 총생산수
         ,SUM(불량수) AS 총불량수
-        ,CASE WHEN (SUM(생산수) > 0) THEN CONVERT(NUMERIC(5,1) ,ROUND(SUM(불량수)/SUM(생산수)*100.0,1)) ELSE 0 END AS 불량률
+        ,CASE WHEN (SUM(생산수) > 0) THEN CONVERT(NUMERIC(5,1) ,ROUND(SUM(불량수*1.0)/SUM(생산수*1.0)*100.0,1)) ELSE 0 END AS 불량률
         ,1.5 AS 목표
       FROM
       (

@@ -175,6 +175,63 @@ router.post("/", async (req, res) => {
         req.body.sortOrder +
         `
       `;
+    } else if (req.body.searchKey == "작업지시공정NO") {
+      sql =
+        `
+        SELECT
+          NO AS NO, 구분 AS 구분, 작업지시공정NO AS 작업지시공정NO, 품목NO AS 품목NO, LOT코드 AS LOT코드,
+          품목구분 AS 품목구분, 품번 AS 품번, 품명 AS 품명, 규격 AS 규격, 단위 AS 단위, 수량 AS 수량, 일시 AS 일시,
+          비고 AS 비고, 등록자 AS 등록자, 등록일시 AS 등록일시
+        FROM(
+          SELECT
+            [ISPCI_PK] AS NO
+            ,[ISPCI_DIV] AS 구분
+            ,[ISPCI_INSTRUCT_PROCESS_PK] AS 작업지시공정NO
+            ,[ISPCI_ITEM_PK] AS 품목NO
+            ,[ISPCI_LOTCODE] AS LOT코드
+            ,ITEM.구분 AS 품목구분
+            ,ITEM.품번 AS 품번
+            ,ITEM.품명 AS 품명
+            ,ITEM.규격 AS 규격
+            ,ITEM.단위 AS 단위
+            ,[ISPCI_AMOUNT] AS 수량
+            ,CONVERT(varchar, [ISPCI_DT], 20) AS 일시
+            ,[ISPCI_NOTE] AS 비고
+            ,[ISPCI_REGIST_NM] AS 등록자
+            ,[ISPCI_REGIST_DT] AS 등록일시
+          FROM [QMES2022].[dbo].[MANAGE_INSTRUCT_PROCESS_ITEM_TB]
+          LEFT JOIN
+          (
+            SELECT
+              [ITEM_PK] AS NO
+              ,[ITEM_CLIENT_PK] AS 거래처NO
+              ,CLIENT.거래처명 AS 거래처명
+              ,[ITEM_DIV] AS 구분
+              ,[ITEM_PRODUCT_NUM] AS 품번
+              ,[ITEM_NAME] AS 품명
+              ,[ITEM_CAR] AS 차종
+              ,[ITEM_SIZE] AS 규격
+              ,[ITEM_UNIT] AS 단위
+              ,[ITEM_SAFE] AS 안전재고
+              ,[ITEM_COST] AS 단가
+            FROM [QMES2022].[dbo].[MASTER_ITEM_TB]
+            LEFT JOIN
+            (
+              SELECT
+                [CLNT_PK] AS NO
+                ,[CLNT_NAME] AS 거래처명
+              FROM [QMES2022].[dbo].[MASTER_CLIENT_TB]
+            ) AS CLIENT ON CLIENT.NO = [ITEM_CLIENT_PK]
+          ) AS ITEM ON ITEM.NO = [ISPCI_ITEM_PK]
+        ) AS RESULT
+        WHERE (1=1)
+        AND 작업지시공정NO = @input
+        ORDER BY ` +
+        req.body.sortKey +
+        ` ` +
+        req.body.sortOrder +
+        `
+      `;
     } else {
       sql =
         `

@@ -246,6 +246,101 @@ router.post("/", async (req, res) => {
         req.body.sortOrder +
         `
       `;
+    } else if (req.body.searchKey == "작업지시NO") {
+      sql =
+        `
+        SELECT
+          NO AS NO, 작업구분 AS 작업구분, 작업지시NO AS 작업지시NO, 공정NO AS 공정NO, 공정명 AS 공정명, 설비NO AS 설비NO, 설비명 AS 설비명,
+          작업자ID AS 작업자ID, 작업자 AS 작업자, 품목NO AS 품목NO, 품번 AS 품번, 구분 AS 구분, 품명 AS 품명, 규격 AS 규격,
+          단위 AS 단위, 수량 AS 수량, 진행상황 AS 진행상황, 비고 AS 비고, 등록자 AS 등록자, 등록일시 AS 등록일시
+        FROM(
+          SELECT
+            [ISPC_PK] AS NO
+            ,[ISPC_DIV] AS 작업구분
+            ,[ISPC_WORK_INSTRUCT_PK] AS 작업지시NO
+            ,[ISPC_PROCESS_PK] AS 공정NO
+            ,PROCESS.공정명 AS 공정명
+            ,[ISPC_FACILITY_PK] AS 설비NO
+            ,FACILITY.설비명 AS 설비명
+            ,[ISPC_USER_ID] AS 작업자ID
+            ,USERS.이름 AS 작업자
+            ,[ISPC_ITEM_PK] AS 품목NO
+            ,ITEM.품번 AS 품번
+            ,ITEM.구분 AS 구분
+            ,ITEM.품명 AS 품명
+            ,ITEM.규격 AS 규격
+            ,ITEM.단위 AS 단위
+            ,[ISPC_AMOUNT] AS 수량
+            ,[ISPC_CONDITION] AS 진행상황
+            ,[ISPC_NOTE] AS 비고
+            ,[ISPC_REGIST_NM] AS 등록자
+            ,[ISPC_REGIST_DT] AS 등록일시
+          FROM [QMES2022].[dbo].[MANAGE_INSTRUCT_PROCESS_TB]
+          LEFT JOIN
+          (
+            SELECT
+              [PRCS_PK] AS NO
+              ,[PRCS_CODE] AS 코드
+              ,[PRCS_DIV] AS 구분
+              ,[PRCS_NAME] AS 공정명
+              ,[PRCS_CONTENT] AS 내용
+              ,[PRCS_FACILITY] AS 설비
+            FROM [QMES2022].[dbo].[MASTER_PROCESS_TB]
+          ) AS PROCESS ON PROCESS.NO = [ISPC_PROCESS_PK]
+          LEFT JOIN
+          (
+            SELECT
+              [FCLT_PK] AS NO
+              ,[FCLT_NAME] AS 설비명
+              ,[FCLT_LINE] AS 라인
+              ,[FCLT_SIZE] AS 규격
+              ,[FCLT_CLIENT_PK] AS 거래처NO
+              ,CLIENT.거래처명 AS 거래처명
+              ,[FCLT_BUY_DATE] AS 구입일
+              ,[FCLT_COST] AS 금액
+              ,[FCLT_PLACE] AS 장소
+              ,[FCLT_IMAGE] AS 사진
+            FROM [QMES2022].[dbo].[MASTER_FACILITY_TB]
+            LEFT JOIN
+            (
+              SELECT
+                [CLNT_PK] AS NO
+                ,[CLNT_NAME] AS 거래처명
+              FROM [QMES2022].[dbo].[MASTER_CLIENT_TB]
+            ) AS CLIENT ON CLIENT.NO = [FCLT_CLIENT_PK]
+          ) AS FACILITY ON FACILITY.NO = [ISPC_FACILITY_PK]
+          LEFT JOIN
+          (
+            SELECT
+              [USER_ID] AS 아이디,
+              [USER_NAME] AS 이름,
+              [USER_PHONE] AS 연락처,
+              [USER_EMAIL] AS 이메일,
+              [USER_DEPART] AS 부서명,
+              [USER_POSITION] AS 직책,
+              [USER_RANK] AS 직급
+            FROM [QMES2022].[dbo].[MASTER_USER_TB]
+          ) AS USERS ON USERS.아이디 = [ISPC_USER_ID]
+          LEFT JOIN
+          (
+            SELECT
+              [ITEM_PK] AS NO
+              ,[ITEM_DIV] AS 구분
+              ,[ITEM_PRODUCT_NUM] AS 품번
+              ,[ITEM_NAME] AS 품명
+              ,[ITEM_SIZE] AS 규격
+              ,[ITEM_UNIT] AS 단위
+            FROM [QMES2022].[dbo].[MASTER_ITEM_TB]
+          ) AS ITEM ON ITEM.NO = [ISPC_ITEM_PK]
+        ) AS RESULT
+        WHERE (1=1)
+        AND 작업지시NO = @input
+        ORDER BY ` +
+        req.body.sortKey +
+        ` ` +
+        req.body.sortOrder +
+        `
+      `;
     } else {
       sql =
         `

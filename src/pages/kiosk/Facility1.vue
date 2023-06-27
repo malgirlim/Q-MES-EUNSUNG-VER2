@@ -33,7 +33,7 @@ import AlertAdd from "../../components/Common/Kiosk/AlertAdd.vue";
 /* ##########################################  키오스크 정보 관련 (중요!)  ########################################## */
 
 const 키오스크NO = 1;
-const 설비명 = "인쇄기1";
+const 설비명 = "TESTTESTEST"; // 인쇄기1
 
 /* ################################################################################################################ */
 
@@ -90,21 +90,7 @@ onMounted(async () => {
   }, 1000);
 
   await kiosk_work.loadDatas();
-  await kiosk_work.searchDatas("전체기간", "", String(키오스크NO), "", "");
-
-  kiosk_work_data.value = kiosk_work.dataSearchAll.value.filter(
-    (f) => f.NO == 키오스크NO
-  )[0];
-
-  running.value = kiosk_work_data.value.설비현황 ?? "미가동";
-  task_status.value = kiosk_work_data.value.진행상황 ?? "작업미확인";
-  지시수량.value = kiosk_work_data.value.지시수량 ?? "0";
-  완료수량.value = kiosk_work_data.value.완료수량 ?? "0";
-  생산수량.value = kiosk_work_data.value.생산수 ?? "0";
-  불량수량.value = "0";
-  양품수량.value = String(
-    Number(완료수량.value) + Number(생산수량.value) - Number(불량수량.value)
-  );
+  await searchKioskWork();
 
   checked.value = false;
 });
@@ -125,6 +111,27 @@ const 양품수량 = ref("0");
 
 // 일상점검 확인
 const checked = ref(false);
+
+async function searchKioskWork() {
+  await kiosk_work.searchDatas("전체기간", "", String(키오스크NO), "", "");
+
+  kiosk_work_data.value = kiosk_work.dataSearchAll.value.filter(
+    (f) => f.NO === 키오스크NO
+  )[0];
+
+  kiosk_work_data.value.작업자ID = kiosk_work_data.value.작업자ID[0];
+  kiosk_work_data.value.작업자 = kiosk_work_data.value.작업자[0];
+
+  running.value = kiosk_work_data.value.설비현황 ?? "미가동";
+  task_status.value = kiosk_work_data.value.진행상황 ?? "작업미확인";
+  지시수량.value = kiosk_work_data.value.지시수량 ?? "0";
+  완료수량.value = kiosk_work_data.value.완료수량 ?? "0";
+  생산수량.value = kiosk_work_data.value.생산수 ?? "0";
+  불량수량.value = "0";
+  양품수량.value = String(
+    Number(완료수량.value) + Number(생산수량.value) - Number(불량수량.value)
+  );
+}
 
 /* ################################################################################################################ */
 
@@ -274,6 +281,28 @@ const workerChangeModal = ref(false);
 const setWorkerChangeModal = (value: boolean) => {
   workerChangeModal.value = value;
 };
+
+// [watch] 모달이 켜지거나 꺼질 때 작업현황데이터를 갱신하기 위해
+watch(
+  [
+    taskListModal,
+    checkListModal,
+    taskStartModal,
+    nonOPModal,
+    nonOPAddModal,
+    badAddModal,
+    itemAddModal,
+    taskFinishModal,
+    taskCancleModal,
+    alertModal,
+    alertAddModal,
+    taskStandardModal,
+    workerChangeModal,
+  ],
+  (newValue, oldValue) => {
+    searchKioskWork();
+  }
+);
 </script>
 
 <!-- 
@@ -296,7 +325,7 @@ const setWorkerChangeModal = (value: boolean) => {
         </h2>
       </div>
       <div class="text-center text-sm">
-        <strong>인쇄기1 설비 작업현황</strong>
+        <strong>{{ 설비명 }} 설비 작업현황</strong>
       </div>
       <div class="mx-auto">
         <div></div>
@@ -323,7 +352,10 @@ const setWorkerChangeModal = (value: boolean) => {
       <div class="flex items-center col-span-1 text-sm">
         <div class="flex items-center mr-3">
           <Lucide class="w-5 h-5 mr-1" icon="CalendarClock" /><strong
-            >가동시작 : 2023-05-11 14:43</strong
+            >가동시작 :
+            {{
+              dayjs(kiosk_work_data.시작일시).format("YYYY-MM-DD HH:mm")
+            }}</strong
           >
         </div>
         <div class="flex items-center">
@@ -926,7 +958,7 @@ const setWorkerChangeModal = (value: boolean) => {
       <div class="p-3 text-center">
         <div class="text-xl"><strong>일상점검</strong></div>
       </div>
-      <div><CheckList /></div>
+      <div><CheckList :키오스크no="키오스크NO" :설비명="설비명" /></div>
       <label class="cursor-pointer"
         ><div class="flex text-center text-base mb-3">
           <div class="flex m-auto mt-2">
