@@ -66,7 +66,7 @@ router.get("/", async (req, res) => {
           ,'비가동' AS 설비8
           ,'비가동' AS 설비9
           ,'비가동' AS 설비10
-      )
+      ) AS RESULT
     `);
 
     // 로그기록 저장

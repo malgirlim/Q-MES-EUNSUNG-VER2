@@ -85,6 +85,7 @@ onMounted(async () => {
 // 날짜 구하기
 dayjs.locale("ko");
 const now = ref(dayjs().format("YYYY-MM-DD(dd) HH:mm:ss"));
+const currentYear = ref(dayjs().format("YYYY"));
 
 // 페이지 전환
 const switch_page = ref("first");
@@ -105,6 +106,8 @@ const facilitystatus = useSendApi<MainFacilityStatus>(
   ref(1)
 );
 // KPI 공정불량률 가져오기
+const 공정불량률_실적 = ref([0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]); // 그래프 데이터
+const 공정불량률_목표 = ref([0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]); // 그래프 데이터
 const url_main_kpi_badrate = "/api/main/kpi/badrate";
 const kpi_badrate = useSendApi<MonitorKPIBadRate>(
   url_main_kpi_badrate,
@@ -112,6 +115,8 @@ const kpi_badrate = useSendApi<MonitorKPIBadRate>(
   ref(1)
 );
 // KPI 설비가동률 가져오기
+const 설비가동률_실적 = ref([0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]); // 그래프 데이터
+const 설비가동률_목표 = ref([0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]); // 그래프 데이터
 const url_main_kpi_facilityrate = "/api/main/kpi/facilityrate";
 const kpi_facilityrate = useSendApi<MonitorKPIFacilityRate>(
   url_main_kpi_facilityrate,
@@ -119,6 +124,8 @@ const kpi_facilityrate = useSendApi<MonitorKPIFacilityRate>(
   ref(1)
 );
 // KPI 작업공수 가져오기
+const 작업공수_실적 = ref([0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]); // 그래프 데이터
+const 작업공수_목표 = ref([0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]); // 그래프 데이터
 const url_main_kpi_manhour = "/api/main/kpi/manhour";
 const kpi_manhour = useSendApi<MonitorKPIManHour>(
   url_main_kpi_manhour,
@@ -126,9 +133,13 @@ const kpi_manhour = useSendApi<MonitorKPIManHour>(
   ref(1)
 );
 // KPI OEE 가져오기
+const OEE_실적 = ref([0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]); // 그래프 데이터
+const OEE_목표 = ref([0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]); // 그래프 데이터
 const url_main_kpi_oee = "/api/main/kpi/oee";
 const kpi_oee = useSendApi<MonitorKPIOEE>(url_main_kpi_oee, ref(1), ref(1));
 // KPI 시간당 생산량 가져오기
+const 시간당생산량_실적 = ref([0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]); // 그래프 데이터
+const 시간당생산량_목표 = ref([0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]); // 그래프 데이터
 const url_main_kpi_producthour = "/api/main/kpi/producthour";
 const kpi_producthour = useSendApi<MonitorKPIProductHour>(
   url_main_kpi_producthour,
@@ -136,6 +147,8 @@ const kpi_producthour = useSendApi<MonitorKPIProductHour>(
   ref(1)
 );
 // KPI 반품비용 가져오기
+const 반품비용_실적 = ref([0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]); // 그래프 데이터
+const 반품비용_목표 = ref([0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]); // 그래프 데이터
 const url_main_kpi_returncost = "/api/main/kpi/returncost";
 const kpi_returncost = useSendApi<MonitorKPIReturnCost>(
   url_main_kpi_returncost,
@@ -143,6 +156,8 @@ const kpi_returncost = useSendApi<MonitorKPIReturnCost>(
   ref(1)
 );
 // KPI 재고비용 가져오기
+const 재고비용_실적 = ref([0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]); // 그래프 데이터
+const 재고비용_목표 = ref([0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]); // 그래프 데이터
 const url_main_kpi_stockcost = "/api/main/kpi/stockcost";
 const kpi_stockcost = useSendApi<MonitorKPIStockCost>(
   url_main_kpi_stockcost,
@@ -159,6 +174,109 @@ const getMainData = async () => {
   await kpi_producthour.loadDatas();
   await kpi_returncost.loadDatas();
   await kpi_stockcost.loadDatas();
+
+  const badrate_data = kpi_badrate.dataSearchAll.value;
+  const facilityrate_data = kpi_facilityrate.dataSearchAll.value;
+  const manhour_data = kpi_manhour.dataSearchAll.value;
+  const oee_data = kpi_oee.dataSearchAll.value;
+  const producthour_data = kpi_producthour.dataSearchAll.value;
+  const returncost_data = kpi_returncost.dataSearchAll.value;
+  const stockcost_data = kpi_stockcost.dataSearchAll.value;
+
+  currentYear.value = dayjs().format("YYYY");
+  const months = Array.from({ length: 12 }, (_, i) =>
+    (i + 1).toString().padStart(2, "0")
+  );
+  공정불량률_실적.value = months.map((month) => {
+    return Number(
+      badrate_data.filter((c) => c.년월 == `${currentYear.value}-${month}`)[0]
+        ?.불량률 ?? 0
+    );
+  });
+  공정불량률_목표.value = months.map((month) => {
+    return Number(
+      badrate_data.filter((c) => c.년월 == `${currentYear.value}-${month}`)[0]
+        ?.목표 ?? 0
+    );
+  });
+  설비가동률_실적.value = months.map((month) => {
+    return Number(
+      facilityrate_data.filter(
+        (c) => c.년월 == `${currentYear.value}-${month}`
+      )[0]?.가동률 ?? 0
+    );
+  });
+  설비가동률_목표.value = months.map((month) => {
+    return Number(
+      facilityrate_data.filter(
+        (c) => c.년월 == `${currentYear.value}-${month}`
+      )[0]?.목표 ?? 0
+    );
+  });
+  작업공수_실적.value = months.map((month) => {
+    return Number(
+      manhour_data.filter((c) => c.년월 == `${currentYear.value}-${month}`)[0]
+        ?.작업공수 ?? 0
+    );
+  });
+  작업공수_목표.value = months.map((month) => {
+    return Number(
+      manhour_data.filter((c) => c.년월 == `${currentYear.value}-${month}`)[0]
+        ?.목표 ?? 0
+    );
+  });
+  OEE_실적.value = months.map((month) => {
+    return Number(
+      oee_data.filter((c) => c.년월 == `${currentYear.value}-${month}`)[0]
+        ?.OEE ?? 0
+    );
+  });
+  OEE_목표.value = months.map((month) => {
+    return Number(
+      oee_data.filter((c) => c.년월 == `${currentYear.value}-${month}`)[0]
+        ?.목표 ?? 0
+    );
+  });
+  시간당생산량_실적.value = months.map((month) => {
+    return Number(
+      producthour_data.filter(
+        (c) => c.년월 == `${currentYear.value}-${month}`
+      )[0]?.시간당생산수 ?? 0
+    );
+  });
+  시간당생산량_목표.value = months.map((month) => {
+    return Number(
+      producthour_data.filter(
+        (c) => c.년월 == `${currentYear.value}-${month}`
+      )[0]?.목표 ?? 0
+    );
+  });
+  반품비용_실적.value = months.map((month) => {
+    return Number(
+      returncost_data.filter(
+        (c) => c.년월 == `${currentYear.value}-${month}`
+      )[0]?.반품금액 ?? 0
+    );
+  });
+  반품비용_목표.value = months.map((month) => {
+    return Number(
+      returncost_data.filter(
+        (c) => c.년월 == `${currentYear.value}-${month}`
+      )[0]?.목표 ?? 0
+    );
+  });
+  재고비용_실적.value = months.map((month) => {
+    return Number(
+      stockcost_data.filter((c) => c.년월 == `${currentYear.value}-${month}`)[0]
+        ?.누적재고비용 ?? 0
+    );
+  });
+  재고비용_목표.value = months.map((month) => {
+    return Number(
+      stockcost_data.filter((c) => c.년월 == `${currentYear.value}-${month}`)[0]
+        ?.목표 ?? 0
+    );
+  });
 };
 </script>
 
@@ -192,27 +310,27 @@ const getMainData = async () => {
       <RunningCard
         @click="$router.push('process/checker')"
         name="검사기"
-        :run="true"
+        :run="facilitystatus.dataSearchAll.value[0]?.설비1 == '가동'"
       />
       <RunningCard
         @click="$router.push('process/plate')"
         name="제판기"
-        :run="true"
+        :run="facilitystatus.dataSearchAll.value[0]?.설비2 == '가동'"
       />
       <RunningCard
         @click="$router.push('process/printer1')"
         name="인쇄기1"
-        :run="true"
+        :run="facilitystatus.dataSearchAll.value[0]?.설비3 == '가동'"
       />
       <RunningCard
         @click="$router.push('process/printer2')"
         name="인쇄기2"
-        :run="true"
+        :run="facilitystatus.dataSearchAll.value[0]?.설비4 == '가동'"
       />
       <RunningCard
         @click="$router.push('process/printer3')"
         name="인쇄기3"
-        :run="false"
+        :run="facilitystatus.dataSearchAll.value[0]?.설비5 == '가동'"
       />
       <NoticeCard2 type="all" />
     </div>
@@ -225,27 +343,27 @@ const getMainData = async () => {
       <RunningCard
         @click="$router.push('process/printer3')"
         name="인쇄기4"
-        :run="false"
+        :run="facilitystatus.dataSearchAll.value[0]?.설비6 == '가동'"
       />
       <RunningCard
         @click="$router.push('process/printer5')"
         name="인쇄기5"
-        :run="false"
+        :run="facilitystatus.dataSearchAll.value[0]?.설비7 == '가동'"
       />
       <RunningCard
         @click="$router.push('process/printer6')"
         name="인쇄기6"
-        :run="false"
+        :run="facilitystatus.dataSearchAll.value[0]?.설비8 == '가동'"
       />
       <RunningCard
         @click="$router.push('process/printer7')"
         name="인쇄기7"
-        :run="false"
+        :run="facilitystatus.dataSearchAll.value[0]?.설비9 == '가동'"
       />
       <RunningCard
         @click="$router.push('process/printer8')"
         name="인쇄기8"
-        :run="false"
+        :run="facilitystatus.dataSearchAll.value[0]?.설비10 == '가동'"
       />
       <NoticeCard2 type="part" />
     </div>
