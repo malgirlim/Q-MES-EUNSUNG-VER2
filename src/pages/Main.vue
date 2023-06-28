@@ -15,6 +15,23 @@ import KPIChart_bar_line from "../components/Common/Main/KPIChart_bar_line.vue";
 import KPIChart_line_filled from "../components/Common/Main/KPIChart_line_filled.vue";
 import KPIChart_bar_bar from "../components/Common/Main/KPIChart_bar_bar.vue";
 
+import KPI_BadRate_Chart_bar_line from "../components/Common/Monitoring/KPI_BadRate_Chart_bar_line.vue";
+import KPI_FacilityRate_Chart_bar_line from "../components/Common/Monitoring/KPI_FacilityRate_Chart_bar_line.vue";
+import KPI_ManHour_Chart_bar_line from "../components/Common/Monitoring/KPI_ManHour_Chart_bar_line.vue";
+import KPI_OEE_Chart_bar_line from "../components/Common/Monitoring/KPI_OEE_Chart_bar_line.vue";
+import KPI_ProductHour_Chart_bar_line from "../components/Common/Monitoring/KPI_ProductHour_Chart_bar_line.vue";
+import KPI_ReturnCost_Chart_bar_line from "../components/Common/Monitoring/KPI_ReturnCost_Chart_bar_line.vue";
+import KPI_StockCost_Chart_bar_line from "../components/Common/Monitoring/KPI_StockCost_Chart_bar_line.vue";
+import {
+  MonitorKPIBadRate,
+  MonitorKPIFacilityRate,
+  MonitorKPIManHour,
+  MonitorKPIOEE,
+  MonitorKPIProductHour,
+  MonitorKPIReturnCost,
+  MonitorKPIStockCost,
+} from "../interfaces/menu/monitorInterface";
+
 import dayjs from "dayjs";
 
 import RunningCard from "../components/Common/Main/RunningCard.vue";
@@ -25,6 +42,10 @@ import NoticeCard2 from "../components/Common/Main/NoticeCard2.vue";
 
 import { Chart } from "chart.js";
 import router from "../router";
+
+// API 보내는 함수 및 인터페이스 불러오기
+import { useSendApi } from "../composables/useSendApi";
+import { MainFacilityStatus } from "../interfaces/mainInterface";
 
 var mobilecheck = function () {
   var check = false;
@@ -53,6 +74,12 @@ onMounted(async () => {
   // setInterval(() => {
   //   switch_page_func();
   // }, 5000);
+
+  // 60초마다 데이터 불러오기
+  await getMainData(); // 첫 실행
+  setInterval(() => {
+    getMainData();
+  }, 60000);
 });
 
 // 날짜 구하기
@@ -61,7 +88,6 @@ const now = ref(dayjs().format("YYYY-MM-DD(dd) HH:mm:ss"));
 
 // 페이지 전환
 const switch_page = ref("first");
-
 const switch_page_func = () => {
   if (switch_page.value == "second") {
     switch_page.value = "first";
@@ -69,7 +95,76 @@ const switch_page_func = () => {
     switch_page.value = "second";
   }
 };
+
+// ################################################### 데이터 가져오기 ###################################################
+// 설비상태현황 가져오기
+const url_main_facilitystatus = "/api/main/facilitystatus";
+const facilitystatus = useSendApi<MainFacilityStatus>(
+  url_main_facilitystatus,
+  ref(1),
+  ref(1)
+);
+// KPI 공정불량률 가져오기
+const url_main_kpi_badrate = "/api/main/kpi/badrate";
+const kpi_badrate = useSendApi<MonitorKPIBadRate>(
+  url_main_kpi_badrate,
+  ref(1),
+  ref(1)
+);
+// KPI 설비가동률 가져오기
+const url_main_kpi_facilityrate = "/api/main/kpi/facilityrate";
+const kpi_facilityrate = useSendApi<MonitorKPIFacilityRate>(
+  url_main_kpi_facilityrate,
+  ref(1),
+  ref(1)
+);
+// KPI 작업공수 가져오기
+const url_main_kpi_manhour = "/api/main/kpi/manhour";
+const kpi_manhour = useSendApi<MonitorKPIManHour>(
+  url_main_kpi_manhour,
+  ref(1),
+  ref(1)
+);
+// KPI OEE 가져오기
+const url_main_kpi_oee = "/api/main/kpi/oee";
+const kpi_oee = useSendApi<MonitorKPIOEE>(url_main_kpi_oee, ref(1), ref(1));
+// KPI 시간당 생산량 가져오기
+const url_main_kpi_producthour = "/api/main/kpi/producthour";
+const kpi_producthour = useSendApi<MonitorKPIProductHour>(
+  url_main_kpi_producthour,
+  ref(1),
+  ref(1)
+);
+// KPI 반품비용 가져오기
+const url_main_kpi_returncost = "/api/main/kpi/returncost";
+const kpi_returncost = useSendApi<MonitorKPIReturnCost>(
+  url_main_kpi_returncost,
+  ref(1),
+  ref(1)
+);
+// KPI 재고비용 가져오기
+const url_main_kpi_stockcost = "/api/main/kpi/stockcost";
+const kpi_stockcost = useSendApi<MonitorKPIStockCost>(
+  url_main_kpi_stockcost,
+  ref(1),
+  ref(1)
+);
+// 데이터 불러오기 및 가공
+const getMainData = async () => {
+  await facilitystatus.loadDatas();
+  await kpi_badrate.loadDatas();
+  await kpi_facilityrate.loadDatas();
+  await kpi_manhour.loadDatas();
+  await kpi_oee.loadDatas();
+  await kpi_producthour.loadDatas();
+  await kpi_returncost.loadDatas();
+  await kpi_stockcost.loadDatas();
+};
 </script>
+
+#############################################################################################################################
+#############################################################################################################################
+#############################################################################################################################
 
 <template>
   <div>

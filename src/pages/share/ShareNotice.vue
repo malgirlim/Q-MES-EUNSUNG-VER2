@@ -805,13 +805,10 @@ const onFileImport = (event: any) => {
                 <FormLabel htmlFor="vertical-form-1">구분</FormLabel>
                 <FormSelect v-model="insertModalData.구분" class="">
                   <option>전체</option>
-                  <option>경영</option>
-                  <option>금형</option>
-                  <option>설비</option>
-                  <option>생산</option>
+                  <option>총괄</option>
                   <option>영업</option>
-                  <option>외주</option>
-                  <option>자재</option>
+                  <option>구매</option>
+                  <option>생산</option>
                   <option>품질</option>
                 </FormSelect>
               </div>
@@ -898,13 +895,10 @@ const onFileImport = (event: any) => {
                 <FormLabel htmlFor="vertical-form-1">구분</FormLabel>
                 <FormSelect v-model="editModalData.구분" class="">
                   <option>전체</option>
-                  <option>경영</option>
-                  <option>금형</option>
-                  <option>설비</option>
-                  <option>생산</option>
+                  <option>총괄</option>
                   <option>영업</option>
-                  <option>외주</option>
-                  <option>자재</option>
+                  <option>구매</option>
+                  <option>생산</option>
                   <option>품질</option>
                 </FormSelect>
               </div>
