@@ -4,6 +4,7 @@ import Button from "../../../base-components/Button";
 import Lucide from "../../../base-components/Lucide";
 import { FormSelect } from "../../../base-components/Form";
 import dayjs from "dayjs";
+dayjs.locale("ko");
 
 // API 보내는 함수 및 인터페이스 불러오기
 import { useSendApi } from "../../../composables/useSendApi";
@@ -17,7 +18,7 @@ const props = defineProps<{
 
 // 데이터 내보내기
 const output = ref();
-const emit = defineEmits(["update:output"]);
+const emit = defineEmits(["update:output", "update:modalclose"]);
 emit(`update:output`, output.value); // 실제로 내보낼 때 쓰는 코드
 
 // 페이지 로딩 시 시작
@@ -25,15 +26,19 @@ onMounted(async () => {
   await dataManager.loadDatas(); // 메인으로 쓸 데이터 불러오기
   await dataManager.searchDatas("전체기간", "설비명", props.설비명, "", ""); // 메인으로 쓸 데이터 불러오기
 
-  console.log(dataManager.dataSearchAll.value);
+  todayData.value = dataManager.dataSearchAll.value.filter(
+    (c) => c.등록일시?.slice(0, 10) == dayjs().format("YYYY-MM-DD")
+  );
 });
 
 // dataManager 만들기
-const url = "/api/prevent/dailyresult";
+const url = "/api/kiosk/checklist";
 const dataManager = useSendApi<PreventDaily>(url, ref(1), ref(100));
 
+const todayData = ref({} as PreventDaily);
+
+// #############################################  날짜 검색  #############################################
 // 오늘날짜
-dayjs.locale("ko");
 let now = ref(dayjs().format("YYYY-MM-DD"));
 
 const changeDate = (type: any) => {
@@ -61,6 +66,7 @@ const changeDate = (type: any) => {
   }
 };
 
+// #############################################  키패드  #############################################
 // 키패드
 const num = ref("0");
 const num_show = ref("0");
@@ -98,7 +104,20 @@ watch([num], (newValue, oldValue) => {
     num_show.value += num_dot;
   num_show.value += num_split[1];
 });
+
+// #############################################  저장 등록  #############################################
+const checkListCheckBox = ref(false); // 점검확인 체크박스
+const updateDailyCheck = () => {
+  for (const data of Object.values(todayData.value)) {
+    dataManager.editData(data);
+  }
+};
 </script>
+
+################################################################################################################################
+################################################################################################################################
+################################################################################################################################
+
 <template>
   <div class="px-7">
     <div class="flex">
@@ -155,15 +174,101 @@ watch([num], (newValue, oldValue) => {
             <tbody>
               <tr
                 class="text-center h-14"
+                v-if="
+                  dayjs().format('YYYY-MM-DD') !=
+                  dayjs(now).format('YYYY-MM-DD')
+                "
                 v-for="(todo, index) in dataManager.dataSearchAll.value.filter(
                   (c) =>
                     c.등록일시?.slice(0, 10) == dayjs(now).format('YYYY-MM-DD')
                 )"
+                :key="todo.NO"
               >
                 <td class="border-l-2 border-b-2 border-r-2 border-success">
                   {{ index + 1 }}
                 </td>
-                <td class="text-left px-1 border-b-2 border-r-2 border-success">
+                <td
+                  class="text-left px-1 border-b-2 border-r-2 border-success"
+                  :style="{
+                    'word-break': 'break-word',
+                    'white-space': 'normal',
+                  }"
+                >
+                  {{ todo.내용 }}
+                </td>
+                <td
+                  class="text-center px-1 border-b-2 border-r-2 border-success"
+                >
+                  {{ todo.기준 }}
+                </td>
+                <td
+                  class="text-center px-1 border-b-2 border-r-2 border-success"
+                >
+                  {{ todo.단위 }}
+                </td>
+                <td
+                  class="text-center px-1 border-b-2 border-r-2 border-success"
+                >
+                  {{ todo.최소 }}
+                </td>
+                <td
+                  class="text-center px-1 border-b-2 border-r-2 border-success"
+                >
+                  {{ todo.최대 }}
+                </td>
+                <td class="border-b-2 border-r-2 border-success">
+                  <div class="flex">
+                    <div
+                      v-if="todo.검사방법 == '육안검사'"
+                      class="flex m-auto items-center"
+                    >
+                      {{ todo.결과 }}
+                    </div>
+                    <div
+                      v-if="todo.검사방법 == '치수검사'"
+                      class="flex m-auto items-center"
+                    >
+                      <div class="flex items-center mr-2">
+                        <div class="p-2 w-20 border-2 border-slate-200">
+                          {{ todo.결과내용 }}
+                        </div>
+                      </div>
+                      <div class="flex items-center">
+                        <div
+                          :class="[
+                            'mb-0.5',
+                            { 'text-success': todo.결과 == '적합' },
+                            { 'text-danger': todo.결과 == '부적합' },
+                            { 'text-orange-500': todo.결과 == '미점검' },
+                          ]"
+                        >
+                          ●
+                        </div>
+                        <div>{{ todo.결과 }}</div>
+                      </div>
+                    </div>
+                  </div>
+                </td>
+              </tr>
+              <tr
+                class="text-center h-14"
+                v-if="
+                  dayjs().format('YYYY-MM-DD') ==
+                  dayjs(now).format('YYYY-MM-DD')
+                "
+                v-for="(todo, index) in todayData"
+                :key="todo.NO"
+              >
+                <td class="border-l-2 border-b-2 border-r-2 border-success">
+                  {{ Number(index) + 1 }}
+                </td>
+                <td
+                  class="text-left px-1 border-b-2 border-r-2 border-success"
+                  :style="{
+                    'word-break': 'break-word',
+                    'white-space': 'normal',
+                  }"
+                >
                   {{ todo.내용 }}
                 </td>
                 <td
@@ -199,11 +304,17 @@ watch([num], (newValue, oldValue) => {
                               class="mr-1 mb-1 w-5 h-5 transition-all duration-100 ease-in-out shadow-sm border-slate-200 cursor-pointer focus:ring-4 focus:ring-offset-0 focus:ring-primary focus:ring-opacity-20 dark:bg-darkmode-800 dark:border-transparent dark:focus:ring-slate-700 dark:focus:ring-opacity-50 [&[type='radio']]:checked:bg-primary [&[type='radio']]:checked:border-primary [&[type='radio']]:checked:border-opacity-10"
                               :name="'result' + index"
                               type="radio"
+                              :checked="todo.결과 == '양호'"
+                              @click="
+                                () => {
+                                  todo.결과 = '양호';
+                                }
+                              "
                             />
                           </div>
                           <div>양호</div>
-                        </div></label
-                      >
+                        </div>
+                      </label>
                       <label class="cursor-pointer">
                         <div class="flex items-center mr-3">
                           <div>
@@ -211,11 +322,17 @@ watch([num], (newValue, oldValue) => {
                               class="mr-1 mb-1 w-5 h-5 transition-all duration-100 ease-in-out shadow-sm border-slate-200 cursor-pointer focus:ring-4 focus:ring-offset-0 focus:ring-primary focus:ring-opacity-20 dark:bg-darkmode-800 dark:border-transparent dark:focus:ring-slate-700 dark:focus:ring-opacity-50 [&[type='radio']]:checked:bg-primary [&[type='radio']]:checked:border-primary [&[type='radio']]:checked:border-opacity-10"
                               :name="'result' + index"
                               type="radio"
+                              :checked="todo.결과 == '점검필요'"
+                              @click="
+                                () => {
+                                  todo.결과 = '점검필요';
+                                }
+                              "
                             />
                           </div>
                           <div>점검필요</div>
-                        </div></label
-                      >
+                        </div>
+                      </label>
                       <label class="cursor-pointer">
                         <div class="flex items-center">
                           <div>
@@ -223,11 +340,17 @@ watch([num], (newValue, oldValue) => {
                               class="mr-1 mb-1 w-5 h-5 transition-all duration-100 ease-in-out shadow-sm border-slate-200 cursor-pointer focus:ring-4 focus:ring-offset-0 focus:ring-primary focus:ring-opacity-20 dark:bg-darkmode-800 dark:border-transparent dark:focus:ring-slate-700 dark:focus:ring-opacity-50 [&[type='radio']]:checked:bg-primary [&[type='radio']]:checked:border-primary [&[type='radio']]:checked:border-opacity-10"
                               :name="'result' + index"
                               type="radio"
+                              :checked="todo.결과 == '불량'"
+                              @click="
+                                () => {
+                                  todo.결과 = '불량';
+                                }
+                              "
                             />
                           </div>
                           <div>불량</div>
-                        </div></label
-                      >
+                        </div>
+                      </label>
                     </div>
                     <div
                       v-if="todo.검사방법 == '치수검사'"
@@ -240,15 +363,38 @@ watch([num], (newValue, oldValue) => {
                       </div>
 
                       <div class="mr-3">
-                        <Button class="text-white" variant="success"
-                          ><Lucide class="w-5 h-5 mx-auto" icon="Edit"></Lucide
-                        ></Button>
+                        <Button
+                          class="text-white"
+                          variant="success"
+                          @click="
+                            () => {
+                              todo.결과내용 = num;
+                              if (
+                                Number(todo.최소) <= Number(num) &&
+                                Number(num) <= Number(todo.최대)
+                              ) {
+                                todo.결과 = '적합';
+                              } else {
+                                todo.결과 = '부적합';
+                              }
+                            }
+                          "
+                        >
+                          <Lucide class="w-5 h-5 mx-auto" icon="Edit"></Lucide>
+                        </Button>
                       </div>
                       <div class="flex items-center">
-                        <div class="text-success mb-0.5">●</div>
-                        <div v-if="true">적합</div>
-                        <div v-if="false">부적합</div>
-                        <div v-if="false">미점검</div>
+                        <div
+                          :class="[
+                            'mb-0.5',
+                            { 'text-success': todo.결과 == '적합' },
+                            { 'text-danger': todo.결과 == '부적합' },
+                            { 'text-orange-500': todo.결과 == '미점검' },
+                          ]"
+                        >
+                          ●
+                        </div>
+                        <div>{{ todo.결과 }}</div>
                       </div>
                     </div>
                   </div>
@@ -368,6 +514,55 @@ watch([num], (newValue, oldValue) => {
           </div>
         </div>
       </div>
+    </div>
+    <label class="cursor-pointer">
+      <div class="flex text-center text-base mb-3">
+        <div
+          class="flex m-auto mt-2"
+          v-if="dayjs().format('YYYY-MM-DD') == dayjs(now).format('YYYY-MM-DD')"
+        >
+          <div>
+            <Input
+              class="w-4 h-4 mb-1 transition-all duration-100 ease-in-out shadow-sm border-slate-200 cursor-pointer rounded focus:ring-4 focus:ring-offset-0 focus:ring-primary focus:ring-opacity-20 [&[type='checkbox']]:checked:bg-primary [&[type='checkbox']]:checked:border-primary [&[type='checkbox']]:checked:border-opacity-10 [&:disabled:not(:checked)]:bg-slate-100 [&:disabled:not(:checked)]:cursor-not-allowed [&:disabled:checked]:opacity-70 [&:disabled:checked]:cursor-not-allowed"
+              id="checkListCheckBox"
+              type="checkbox"
+              :value="checkListCheckBox"
+              v-model="checkListCheckBox"
+            />
+          </div>
+          <div class="ml-2">위 점검 목록을 확인하였습니다.</div>
+        </div>
+      </div>
+    </label>
+    <div class="px-5 pb-8 text-center">
+      <Button
+        v-if="dayjs().format('YYYY-MM-DD') == dayjs(now).format('YYYY-MM-DD')"
+        variant="primary"
+        type="button"
+        class="w-32 mr-10 text-base"
+        :disabled="!checkListCheckBox"
+        @click="
+          () => {
+            updateDailyCheck();
+            emit(`update:modalclose`, false);
+          }
+        "
+      >
+        저장
+      </Button>
+
+      <Button
+        variant="outline-primary"
+        type="button"
+        class="w-32 text-base"
+        @click="
+          () => {
+            emit(`update:modalclose`, false);
+          }
+        "
+      >
+        닫기
+      </Button>
     </div>
   </div>
 </template>

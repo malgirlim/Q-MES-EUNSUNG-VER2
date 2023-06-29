@@ -366,12 +366,16 @@ function exportFile(data: any) {
                   <div class="text-2xl">
                     {{
                       Number(
-                        (dataManager.dataSearchAll.value[
-                          dataManager.dataSearchAll.value.length - 1
-                        ]?.목표 /
+                        (Number(
                           dataManager.dataSearchAll.value[
                             dataManager.dataSearchAll.value.length - 1
-                          ]?.누적재고비용) *
+                          ]?.목표
+                        ) /
+                          Number(
+                            dataManager.dataSearchAll.value[
+                              dataManager.dataSearchAll.value.length - 1
+                            ]?.누적재고비용
+                          )) *
                           100
                       ).toLocaleString()
                     }}

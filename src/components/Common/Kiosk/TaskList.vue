@@ -3,6 +3,9 @@ import { ref, onMounted, watch } from "vue";
 import Button from "../../../base-components/Button";
 import Lucide from "../../../base-components/Lucide";
 
+import dayjs from "dayjs";
+dayjs.locale("ko");
+
 // API 보내는 함수 및 인터페이스 불러오기
 import { useSendApi } from "../../../composables/useSendApi";
 import { ProductionTaskCurrent } from "../../../interfaces/menu/productionInterface";

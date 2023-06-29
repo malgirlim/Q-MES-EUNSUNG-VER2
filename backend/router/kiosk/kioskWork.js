@@ -60,7 +60,7 @@ router.get("/", async (req, res) => {
         ,INST_PROCESS.설비NO AS 설비NO
         ,INST_PROCESS.설비명 AS 설비명
         ,INST_PROCESS.진행상황 AS 진행상황
-        ,[KSKWK_START_DT] AS 시작일시
+        ,CONVERT(VARCHAR, [KSKWK_START_DT], 20) AS 시작일시
         ,[KSKWK_PRODUCE_AMT] AS 생산수
         ,[KSKWK_REPORT] AS 특이사항
         ,[KSKWK_STATUS] AS 설비현황
@@ -169,7 +169,7 @@ router.post("/", async (req, res) => {
             ,INST_PROCESS.설비NO AS 설비NO
             ,INST_PROCESS.설비명 AS 설비명
             ,INST_PROCESS.진행상황 AS 진행상황
-            ,[KSKWK_START_DT] AS 시작일시
+            ,CONVERT(VARCHAR, [KSKWK_START_DT], 20) AS 시작일시
             ,[KSKWK_PRODUCE_AMT] AS 생산수
             ,[KSKWK_REPORT] AS 특이사항
             ,[KSKWK_STATUS] AS 설비현황
@@ -265,7 +265,7 @@ router.post("/", async (req, res) => {
   }
 });
 
-// 생산수 수정
+// #############################################  생산수 수정  #############################################
 router.post("/edit", async (req, res) => {
   try {
     const Pool = await pool;

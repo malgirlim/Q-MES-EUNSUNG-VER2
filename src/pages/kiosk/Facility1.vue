@@ -12,6 +12,7 @@ import "vue-inner-image-zoom/lib/vue-inner-image-zoom.css";
 import VueJsProgress from "vue-js-progress";
 
 import dayjs from "dayjs";
+
 import { toast } from "vue3-toastify";
 
 import axios from "axios";
@@ -33,7 +34,7 @@ import AlertAdd from "../../components/Common/Kiosk/AlertAdd.vue";
 /* ##########################################  키오스크 정보 관련 (중요!)  ########################################## */
 
 const 키오스크NO = 1;
-const 설비명 = "TESTTESTEST"; // 인쇄기1
+const 설비명 = "TEST설비명"; // 인쇄기1
 
 /* ################################################################################################################ */
 
@@ -83,6 +84,11 @@ const kiosk_work = useSendApi<KioskWork>(url_kiosk_work, ref(1), ref(100));
 // 날짜 구하기
 const now = ref(dayjs().format("YYYY-MM-DD HH:mm:ss"));
 
+// 가동시간 구하기
+const 부하시간 = ref("00h00m00s");
+const 운전시간 = ref("00h00m00s");
+const 비가동시간 = ref("00h00m00s");
+
 // 페이지 로딩 시 시작
 onMounted(async () => {
   setInterval(() => {
@@ -112,6 +118,7 @@ const 양품수량 = ref("0");
 // 일상점검 확인
 const checked = ref(false);
 
+// 작업현황 조회 함수
 async function searchKioskWork() {
   await kiosk_work.searchDatas("전체기간", "", String(키오스크NO), "", "");
 
@@ -206,7 +213,6 @@ const setTaskListModal = (value: boolean) => {
 };
 
 /* 점검목록 Modal */
-const checkListCheckBox = ref(false);
 const checkListModal = ref(false);
 const setCheckListModal = (value: boolean) => {
   checkListModal.value = value;
@@ -352,10 +358,7 @@ watch(
       <div class="flex items-center col-span-1 text-sm">
         <div class="flex items-center mr-3">
           <Lucide class="w-5 h-5 mr-1" icon="CalendarClock" /><strong
-            >가동시작 :
-            {{
-              dayjs(kiosk_work_data.시작일시).format("YYYY-MM-DD HH:mm")
-            }}</strong
+            >가동시작 : {{ kiosk_work_data.시작일시 }}</strong
           >
         </div>
         <div class="flex items-center">
@@ -397,19 +400,16 @@ watch(
 
       <div class="flex items-center col-span-1 text-right text-sm">
         <div class="flex ml-auto items-center mr-3">
-          <Lucide class="w-5 h-5 mr-1 mb-0.5" icon="ArrowUpCircle" /><strong
-            >부하시간 : 14:43:00</strong
-          >
+          <Lucide class="w-5 h-5 mr-1 mb-0.5" icon="ArrowUpCircle" />
+          <strong>부하시간 : {{ 부하시간 }}</strong>
         </div>
         <div class="flex items-center mr-3">
-          <Lucide class="w-5 h-5 mr-1 mb-0.5" icon="PlayCircle" /><strong
-            >운전시간 : 14:43:00</strong
-          >
+          <Lucide class="w-5 h-5 mr-1 mb-0.5" icon="PlayCircle" />
+          <strong>운전시간 : {{ 운전시간 }}</strong>
         </div>
         <div class="flex items-center">
-          <Lucide class="w-5 h-5 mr-1 mb-0.5" icon="PauseCircle" /><strong
-            >비가동시간 : 14:43:00</strong
-          >
+          <Lucide class="w-5 h-5 mr-1 mb-0.5" icon="PauseCircle" />
+          <strong>비가동시간 : {{ 비가동시간 }}</strong>
         </div>
       </div>
     </div>
@@ -831,11 +831,18 @@ watch(
             @click="$router.push('/kiosk')"
             ><strong>설비선택</strong></Button
           >
-          <Button
+          <!-- <Button
             :class="[
               'mx-2 mb-3 h-10 w-full text-xl text-white',
               { 'border-4 border-danger': checked == false },
             ]"
+            as="a"
+            variant="success"
+            @click="setCheckListModal(true)"
+            ><strong>일상점검</strong></Button
+          > -->
+          <Button
+            class="mx-2 mb-3 h-10 w-full text-xl text-white"
             as="a"
             variant="success"
             @click="setCheckListModal(true)"
@@ -904,7 +911,12 @@ watch(
             "
             class="mx-2 mb-3 h-10 w-full text-xl"
             variant="danger"
-            @click="setTaskCancleModal(true)"
+            @click="
+              () => {
+                kiosk_work_data.비고 = '미입력';
+                setTaskCancleModal(true);
+              }
+            "
             :disabled="task_status == ''"
             ><strong>작업반려</strong></Button
           >
@@ -958,63 +970,12 @@ watch(
       <div class="p-3 text-center">
         <div class="text-xl"><strong>일상점검</strong></div>
       </div>
-      <div><CheckList :키오스크no="키오스크NO" :설비명="설비명" /></div>
-      <label class="cursor-pointer"
-        ><div class="flex text-center text-base mb-3">
-          <div class="flex m-auto mt-2">
-            <div>
-              <Input
-                class="w-4 h-4 mb-1 transition-all duration-100 ease-in-out shadow-sm border-slate-200 cursor-pointer rounded focus:ring-4 focus:ring-offset-0 focus:ring-primary focus:ring-opacity-20 [&[type='checkbox']]:checked:bg-primary [&[type='checkbox']]:checked:border-primary [&[type='checkbox']]:checked:border-opacity-10 [&:disabled:not(:checked)]:bg-slate-100 [&:disabled:not(:checked)]:cursor-not-allowed [&:disabled:checked]:opacity-70 [&:disabled:checked]:cursor-not-allowed"
-                id="checkListCheckBox"
-                type="checkbox"
-                :value="checkListCheckBox"
-                v-model="checkListCheckBox"
-              />
-            </div>
-            <div class="ml-2">위 점검 목록을 확인하였습니다.</div>
-          </div>
-        </div></label
-      >
-      <div class="mt-1 mb-3 text-center text-base">
-        <div class="flex">
-          <div class="flex mx-auto">
-            <div class="mr-3 mt-1.5">점검자 :</div>
-            <div>
-              <FormSelect class="w-32" model-value="강민철">
-                <option>강민철</option>
-                <option>고범석</option>
-                <option>김주현</option>
-                <option>박명한</option>
-                <option>사은미</option>
-                <option>손정일</option>
-                <option>송은아</option>
-                <option>윤호상</option>
-                <option>이훈노</option>
-                <option>최순우</option>
-              </FormSelect>
-            </div>
-          </div>
-        </div>
-      </div>
-      <div class="px-5 pb-8 text-center">
-        <Button
-          variant="primary"
-          type="button"
-          class="w-32 mr-10 text-base"
-          :disabled="!checkListCheckBox"
-          @click="setCheckListModal(false)"
-        >
-          저장
-        </Button>
-
-        <Button
-          variant="outline-primary"
-          type="button"
-          class="w-32 text-base"
-          @click="setCheckListModal(false)"
-        >
-          취소
-        </Button>
+      <div>
+        <CheckList
+          :키오스크no="키오스크NO"
+          :설비명="설비명"
+          v-model:modalclose="checkListModal"
+        />
       </div>
     </Dialog.Panel>
   </Dialog>
@@ -1337,7 +1298,11 @@ watch(
         <div class="mt-3 text-2xl">반려 사유를 입력해주세요.</div>
         <div class="mt-5">
           <div class="mt-5">
-            <FormSelect class="w-64" formSelectSize="xxl" model-value="미입력">
+            <FormSelect
+              class="w-64"
+              formSelectSize="xxl"
+              v-model="kiosk_work_data.비고"
+            >
               <option>미입력</option>
               <option>원자재 부족</option>
               <option>부자재 부족</option>
@@ -1355,7 +1320,16 @@ watch(
           variant="danger"
           type="button"
           class="w-40 text-2xl mr-10"
-          @click="setTaskCancleModal(false)"
+          @click="
+            () => {
+              const kiosk_work_return =
+                useSendApi <
+                KioskWork >
+                ('/api/kiosk/taskcancle', ref(1), ref(1));
+              kiosk_work_return.insertData(kiosk_work_data);
+              setTaskCancleModal(false);
+            }
+          "
         >
           작업반려
         </Button>

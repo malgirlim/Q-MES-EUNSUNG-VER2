@@ -59,7 +59,7 @@ export interface KioskDefect {
   등록일시: string;
 }
 
-// 키오스크 - 불량관리
+// 키오스크 - 비가동관리
 export interface KioskNonwork {
   [attribute: string]: any | undefined;
   NO?: number;
