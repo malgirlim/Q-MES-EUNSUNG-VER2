@@ -410,7 +410,7 @@ router.get("/work", async (req, res) => {
         ,[KSKWK_STATUS] AS 설비현황
         ,[KSKWK_NOTE] AS 비고
         ,[KSKWK_REGIST_NM] AS 등록자
-        ,[KSKWK_REGIST_DT] AS 등록일시
+        ,CONVERT(VARCHAR, [KSKWK_REGIST_DT], 20) AS 등록일시
       FROM [QMES2022].[dbo].[KIOSK_WORK_TB]
       LEFT JOIN
       (
@@ -511,7 +511,7 @@ router.post("/work", async (req, res) => {
             ,[KSKWK_STATUS] AS 설비현황
             ,[KSKWK_NOTE] AS 비고
             ,[KSKWK_REGIST_NM] AS 등록자
-            ,[KSKWK_REGIST_DT] AS 등록일시
+            ,CONVERT(VARCHAR, [KSKWK_REGIST_DT], 20) AS 등록일시
           FROM [QMES2022].[dbo].[KIOSK_WORK_TB]
           LEFT JOIN
           (
