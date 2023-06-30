@@ -113,33 +113,45 @@ router.post("/insert", async (req, res) => {
     // 작업현황을 원래대로 돌려놓기
     await Pool.request()
       .input("작업NO", req.body.data.작업NO ?? null)
-      .input("비가동NO", req.body.data.비가동NO ?? null)
-      .input(
-        "시작일시",
-        moment(req.body.data.시작일시).format("YYYY-MM-DD HH:mm:ss") ??
-          moment().tz("Asia/Seoul").format("YYYY-MM-DD HH:mm:ss")
-      )
-      .input(
-        "종료일시",
-        moment(req.body.data.종료일시).format("YYYY-MM-DD HH:mm:ss") ??
-          moment().tz("Asia/Seoul").format("YYYY-MM-DD HH:mm:ss")
-      )
       .input("비고", req.body.data.비고 ?? "")
       .input("등록자", req.body.user ?? "")
       .input(
         "등록일시",
         moment().tz("Asia/Seoul").format("YYYY-MM-DD HH:mm:ss")
       ).query(`
-        INSERT INTO [QMES2022].[dbo].[KIOSK_NONWORK_TB]
-          ([KSKNW_WORK_PK]
-          ,[KSKNW_NONWORK_PK]
-          ,[KSKNW_START_DT]
-          ,[KSKNW_END_DT]
-          ,[KSKNW_NOTE]
-          ,[KSKNW_REGIST_NM]
-          ,[KSKNW_REGIST_DT])
-        VALUES
-          (@작업NO,@비가동NO,@시작일시,@종료일시,@비고,@등록자,@등록일시)
+        -- 만약 키오스크 작업현황에 작업지시공정이 있다면
+        IF NULL = (SELECT [KSKWK_INST_PROCESS_PK] FROM [QMES2022].[dbo].[KIOSK_WORK_TB] WHERE [KSKWK_PK] = @NO)
+        BEGIN
+          -- 만약 작업지시공정의 진행상황이 작업중이었다면
+          IF (SELECT [ISPC_CONDITION] FROM [QMES2022].[dbo].[MANAGE_INSTRUCT_PROCESS_TB]
+              WHERE [ISPC_PK] = (SELECT [KSKWK_INST_PROCESS_PK] FROM [QMES2022].[dbo].[KIOSK_WORK_TB] WHERE [KSKWK_PK] = @NO)) == '작업중'
+          BEGIN
+            -- 현황을 변경
+            UPDATE [QMES2022].[dbo].[KIOSK_WORK_TB]
+            SET
+              [KSKWK_STATUS] = '가동중'
+              ,[KSKWK_REGIST_DT] = @등록일시
+            WHERE [KSKWK_PK] = @NO
+          END
+          ELSE
+          BEGIN
+            -- 현황을 변경
+            UPDATE [QMES2022].[dbo].[KIOSK_WORK_TB]
+            SET
+              [KSKWK_STATUS] = '미가동'
+              ,[KSKWK_REGIST_DT] = @등록일시
+            WHERE [KSKWK_PK] = @NO
+          END
+        END
+        ELSE
+        BEGIN
+          -- 현황을 변경
+          UPDATE [QMES2022].[dbo].[KIOSK_WORK_TB]
+          SET
+            [KSKWK_STATUS] = '미가동'
+            ,[KSKWK_REGIST_DT] = @등록일시
+          WHERE [KSKWK_PK] = @NO
+        END
       `);
 
     // 로그기록 저장
