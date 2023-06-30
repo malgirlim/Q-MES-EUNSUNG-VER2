@@ -1,6 +1,8 @@
 const express = require("express");
 const router = express.Router();
 
+const kioskModalRouter = require("./kiosk/kioskModal");
+
 const kioskWorkRouter = require("./kiosk/kioskWork");
 const kioskItemRouter = require("./kiosk/kioskItem");
 const kioskDefectRouter = require("./kiosk/kioskDefect");
@@ -16,6 +18,9 @@ router.use((req, res, next) => {
   // console.log("middleware for test!");
   next();
 });
+
+// 키오스크 / 모달 - router/kiosk/kioskModal.js
+router.use("/modal", kioskModalRouter);
 
 // 키오스크 / 작업관리 - router/kiosk/kioskWork.js
 router.use("/work", kioskWorkRouter);

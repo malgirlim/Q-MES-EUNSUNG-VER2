@@ -53,6 +53,7 @@ export interface KioskDefect {
   불량코드: string;
   구분: string;
   불량명: string;
+  내용: string;
   수량: string;
   비고: string;
   등록자: string;

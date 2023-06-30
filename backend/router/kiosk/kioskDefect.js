@@ -49,6 +49,7 @@ router.get("/", async (req, res) => {
         ,DEFECT.코드 AS 불량코드
         ,DEFECT.구분 AS 구분
         ,DEFECT.불량명 AS 불량명
+        ,DEFECT.내용 AS 내용
         ,[KSKDF_AMOUNT] AS 수량
         ,[KSKDF_NOTE] AS 비고
         ,[KSKDF_REGIST_NM] AS 등록자
@@ -61,15 +62,16 @@ router.get("/", async (req, res) => {
           ,[DEFT_CODE] AS 코드
           ,[DEFT_DIV] AS 구분
           ,[DEFT_NAME] AS 불량명
+          ,[DEFT_CONTENT] AS 내용
         FROM [QMES2022].[dbo].[MASTER_DEFECT_TB]
-      ) AS ITEM ON ITEM.NO = [KSKIT_ITEM_PK]
-      ORDER BY [KSKIT_PK] DESC
+      ) AS DEFECT ON DEFECT.NO = [KSKDF_DEFECT_PK]
+      ORDER BY [KSKDF_PK] DESC
     `);
 
     // 로그기록 저장
     await logSend(
       (type = "조회"),
-      (ct = "키오스크 사용자재 데이터를 열람함."),
+      (ct = "키오스크 불량 데이터를 열람함."),
       (amount = result.recordset.length ?? 0),
       (user = req.query.user ?? "")
     );
@@ -95,41 +97,38 @@ router.post("/", async (req, res) => {
       sql =
         `
         SELECT
-          NO AS NO, 작업NO AS 작업NO, 품목NO AS 품목NO, LOT코드 AS LOT코드, 품목구분 AS 품목구분, 품명 AS 품명,
-          규격 AS 규격, 단위 AS 단위, 수량 AS 수량, 비고 AS 비고, 등록자 AS 등록자, 등록일시 AS 등록일시
+          NO AS NO, 작업NO AS 작업NO, 불량NO AS 불량NO, 불량코드 AS 불량코드, 구분 AS 구분, 불량명 AS 불량명, 내용 AS 내용,
+          수량 AS 수량, 비고 AS 비고, 등록자 AS 등록자, 등록일시 AS 등록일시
         FROM(
           SELECT
-            [KSKIT_PK] AS NO
-            ,[KSKIT_WORK_PK] AS 작업NO 
-            ,[KSKIT_ITEM_PK] AS 품목NO
-            ,[KSKIT_LOTCODE] AS LOT코드
-            ,ITEM.품목구분 AS 품목구분
-            ,ITEM.품명 AS 품명
-            ,ITEM.규격 AS 규격
-            ,ITEM.단위 AS 단위
-            ,[KSKIT_AMOUNT] AS 수량
-            ,[KSKIT_NOTE] AS 비고
-            ,[KSKIT_REGIST_NM] AS 등록자
-            ,[KSKIT_REGIST_DT] AS 등록일시
-          FROM [QMES2022].[dbo].[KIOSK_ITEM_TB]
+            [KSKDF_PK] AS NO
+            ,[KSKDF_WORK_PK] AS 작업NO
+            ,[KSKDF_DEFECT_PK] AS 불량NO
+            ,DEFECT.코드 AS 불량코드
+            ,DEFECT.구분 AS 구분
+            ,DEFECT.불량명 AS 불량명
+            ,DEFECT.내용 AS 내용
+            ,[KSKDF_AMOUNT] AS 수량
+            ,[KSKDF_NOTE] AS 비고
+            ,[KSKDF_REGIST_NM] AS 등록자
+            ,[KSKDF_REGIST_DT] AS 등록일시
+          FROM [QMES2022].[dbo].[KIOSK_DEFECT_TB]
           LEFT JOIN
           (
             SELECT
-              [ITEM_PK] AS NO
-              ,[ITEM_DIV] AS 구분
-              ,[ITEM_PRODUCT_NUM] AS 품번
-              ,[ITEM_NAME] AS 품명
-              ,[ITEM_SIZE] AS 규격
-              ,[ITEM_UNIT] AS 단위
-            FROM [QMES2022].[dbo].[MASTER_ITEM_TB]
-          ) AS ITEM ON ITEM.NO = [KSKIT_ITEM_PK]
+              [DEFT_PK] AS NO
+              ,[DEFT_CODE] AS 코드
+              ,[DEFT_DIV] AS 구분
+              ,[DEFT_NAME] AS 불량명
+              ,[DEFT_CONTENT] AS 내용
+            FROM [QMES2022].[dbo].[MASTER_DEFECT_TB]
+          ) AS DEFECT ON DEFECT.NO = [KSKDF_DEFECT_PK]
         ) AS RESULT
         WHERE (1=1)
-        AND ( LOT코드 like concat('%',@input,'%')
-        OR 품목구분 like concat('%',@input,'%')
-        OR 품명 like concat('%',@input,'%')
-        OR 규격 like concat('%',@input,'%')
-        OR 단위 like concat('%',@input,'%')
+        AND ( 불량코드 like concat('%',@input,'%')
+        OR 구분 like concat('%',@input,'%')
+        OR 불량명 like concat('%',@input,'%')
+        OR 내용 like concat('%',@input,'%')
         OR 수량 like concat('%',@input,'%')
         OR 비고 like concat('%',@input,'%'))
         ORDER BY ` +
@@ -142,34 +141,32 @@ router.post("/", async (req, res) => {
       sql =
         `
         SELECT
-          NO AS NO, 작업NO AS 작업NO, 품목NO AS 품목NO, LOT코드 AS LOT코드, 품목구분 AS 품목구분, 품명 AS 품명,
-          규격 AS 규격, 단위 AS 단위, 수량 AS 수량, 비고 AS 비고, 등록자 AS 등록자, 등록일시 AS 등록일시
+          NO AS NO, 작업NO AS 작업NO, 불량NO AS 불량NO, 불량코드 AS 불량코드, 구분 AS 구분, 불량명 AS 불량명, 내용 AS 내용,
+          수량 AS 수량, 비고 AS 비고, 등록자 AS 등록자, 등록일시 AS 등록일시
         FROM(
           SELECT
-            [KSKIT_PK] AS NO
-            ,[KSKIT_WORK_PK] AS 작업NO 
-            ,[KSKIT_ITEM_PK] AS 품목NO
-            ,[KSKIT_LOTCODE] AS LOT코드
-            ,ITEM.품목구분 AS 품목구분
-            ,ITEM.품명 AS 품명
-            ,ITEM.규격 AS 규격
-            ,ITEM.단위 AS 단위
-            ,[KSKIT_AMOUNT] AS 수량
-            ,[KSKIT_NOTE] AS 비고
-            ,[KSKIT_REGIST_NM] AS 등록자
-            ,[KSKIT_REGIST_DT] AS 등록일시
-          FROM [QMES2022].[dbo].[KIOSK_ITEM_TB]
+            [KSKDF_PK] AS NO
+            ,[KSKDF_WORK_PK] AS 작업NO
+            ,[KSKDF_DEFECT_PK] AS 불량NO
+            ,DEFECT.코드 AS 불량코드
+            ,DEFECT.구분 AS 구분
+            ,DEFECT.불량명 AS 불량명
+            ,DEFECT.내용 AS 내용
+            ,[KSKDF_AMOUNT] AS 수량
+            ,[KSKDF_NOTE] AS 비고
+            ,[KSKDF_REGIST_NM] AS 등록자
+            ,[KSKDF_REGIST_DT] AS 등록일시
+          FROM [QMES2022].[dbo].[KIOSK_DEFECT_TB]
           LEFT JOIN
           (
             SELECT
-              [ITEM_PK] AS NO
-              ,[ITEM_DIV] AS 구분
-              ,[ITEM_PRODUCT_NUM] AS 품번
-              ,[ITEM_NAME] AS 품명
-              ,[ITEM_SIZE] AS 규격
-              ,[ITEM_UNIT] AS 단위
-            FROM [QMES2022].[dbo].[MASTER_ITEM_TB]
-          ) AS ITEM ON ITEM.NO = [KSKIT_ITEM_PK]
+              [DEFT_PK] AS NO
+              ,[DEFT_CODE] AS 코드
+              ,[DEFT_DIV] AS 구분
+              ,[DEFT_NAME] AS 불량명
+              ,[DEFT_CONTENT] AS 내용
+            FROM [QMES2022].[dbo].[MASTER_DEFECT_TB]
+          ) AS DEFECT ON DEFECT.NO = [KSKDF_DEFECT_PK]
         ) AS RESULT
         WHERE (1=1)
         AND ` +
@@ -224,8 +221,7 @@ router.post("/insert", async (req, res) => {
     const Pool = await pool;
     await Pool.request()
       .input("작업NO", req.body.data.작업NO ?? null)
-      .input("품목NO", req.body.data.품목NO ?? null)
-      .input("LOT코드", req.body.data.LOT코드 ?? "")
+      .input("불량NO", req.body.data.불량NO ?? null)
       .input("수량", req.body.data.수량 ?? "")
       .input("비고", req.body.data.비고 ?? "")
       .input("등록자", req.body.user ?? "")
@@ -233,17 +229,15 @@ router.post("/insert", async (req, res) => {
         "등록일시",
         moment().tz("Asia/Seoul").format("YYYY-MM-DD HH:mm:ss")
       ).query(`
-        INSERT INTO [QMES2022].[dbo].[KIOSK_ITEM_TB]
-          ([KSKIT_WORK_PK]
-          ,[KSKIT_ITEM_PK]
-          ,[KSKIT_LOTCODE]
-          ,[KSKIT_AMOUNT]
-          ,[KSKIT_DT]
-          ,[KSKIT_NOTE]
-          ,[KSKIT_REGIST_NM]
-          ,[KSKIT_REGIST_DT])
+        INSERT INTO [QMES2022].[dbo].[KIOSK_DEFECT_TB]
+          ([KSKDF_WORK_PK]
+          ,[KSKDF_DEFECT_PK]
+          ,[KSKDF_AMOUNT]
+          ,[KSKDF_NOTE]
+          ,[KSKDF_REGIST_NM]
+          ,[KSKDF_REGIST_DT])
         VALUES
-          (@작업NO,@품목NO,@LOT코드,@수량,@비고,@등록자,@등록일시)
+          (@작업NO,@불량NO,@수량,@비고,@등록자,@등록일시)
       `);
 
     // 로그기록 저장
@@ -275,8 +269,7 @@ router.post("/edit", async (req, res) => {
     await Pool.request()
       .input("NO", req.body.data.NO ?? 0)
       .input("작업NO", req.body.data.작업NO ?? null)
-      .input("품목NO", req.body.data.품목NO ?? null)
-      .input("LOT코드", req.body.data.LOT코드 ?? "")
+      .input("불량NO", req.body.data.불량NO ?? null)
       .input("수량", req.body.data.수량 ?? "")
       .input("비고", req.body.data.비고 ?? "")
       .input("등록자", req.body.user ?? "")
@@ -284,16 +277,15 @@ router.post("/edit", async (req, res) => {
         "등록일시",
         moment().tz("Asia/Seoul").format("YYYY-MM-DD HH:mm:ss")
       ).query(`
-        UPDATE [QMES2022].[dbo].[KIOSK_ITEM_TB]
+        UPDATE [QMES2022].[dbo].[KIOSK_DEFECT_TB]
           SET 
-            [KSKIT_WORK_PK] = @작업NO 
-            ,[KSKIT_ITEM_PK] = @품목NO
-            ,[KSKIT_LOTCODE] = @LOT코드
-            ,[KSKIT_AMOUNT] = @수량
-            ,[KSKIT_NOTE] = @비고
-            ,[KSKIT_REGIST_NM] = @등록자
-            ,[KSKIT_REGIST_DT] = @등록일시
-          WHERE [KSKIT_PK] = @NO
+            [KSKDF_WORK_PK] = @작업NO
+            ,[KSKDF_DEFECT_PK] = @불량NO
+            ,[KSKDF_AMOUNT] = @수량
+            ,[KSKDF_NOTE] = @비고
+            ,[KSKDF_REGIST_NM] = @등록자
+            ,[KSKDF_REGIST_DT] = @등록일시
+          WHERE [KSKDF_PK] = @NO
     `);
 
     // 로그기록 저장
@@ -325,37 +317,35 @@ router.post("/delete", async (req, res) => {
     for (var i = 0; i < req.body.data.length; i++) {
       const result = await Pool.request().input("key", req.body.data[i]).query(`
         SELECT
-          [KSKIT_PK] AS NO
-          ,[KSKIT_WORK_PK] AS 작업NO 
-          ,[KSKIT_ITEM_PK] AS 품목NO
-          ,[KSKIT_LOTCODE] AS LOT코드
-          ,ITEM.품목구분 AS 품목구분
-          ,ITEM.품명 AS 품명
-          ,ITEM.규격 AS 규격
-          ,ITEM.단위 AS 단위
-          ,[KSKIT_AMOUNT] AS 수량
-          ,[KSKIT_NOTE] AS 비고
-          ,[KSKIT_REGIST_NM] AS 등록자
-          ,[KSKIT_REGIST_DT] AS 등록일시
-        FROM [QMES2022].[dbo].[KIOSK_ITEM_TB]
+          [KSKDF_PK] AS NO
+          ,[KSKDF_WORK_PK] AS 작업NO
+          ,[KSKDF_DEFECT_PK] AS 불량NO
+          ,DEFECT.코드 AS 불량코드
+          ,DEFECT.구분 AS 구분
+          ,DEFECT.불량명 AS 불량명
+          ,DEFECT.내용 AS 내용
+          ,[KSKDF_AMOUNT] AS 수량
+          ,[KSKDF_NOTE] AS 비고
+          ,[KSKDF_REGIST_NM] AS 등록자
+          ,[KSKDF_REGIST_DT] AS 등록일시
+        FROM [QMES2022].[dbo].[KIOSK_DEFECT_TB]
         LEFT JOIN
         (
           SELECT
-            [ITEM_PK] AS NO
-            ,[ITEM_DIV] AS 구분
-            ,[ITEM_PRODUCT_NUM] AS 품번
-            ,[ITEM_NAME] AS 품명
-            ,[ITEM_SIZE] AS 규격
-            ,[ITEM_UNIT] AS 단위
-          FROM [QMES2022].[dbo].[MASTER_ITEM_TB]
-        ) AS ITEM ON ITEM.NO = [KSKIT_ITEM_PK]
-        WHERE [KSKIT_PK] = @key
+            [DEFT_PK] AS NO
+            ,[DEFT_CODE] AS 코드
+            ,[DEFT_DIV] AS 구분
+            ,[DEFT_NAME] AS 불량명
+            ,[DEFT_CONTENT] AS 내용
+          FROM [QMES2022].[dbo].[MASTER_DEFECT_TB]
+        ) AS DEFECT ON DEFECT.NO = [KSKDF_DEFECT_PK]
+        WHERE [KSKDF_PK] = @key
       `);
 
       await Pool.request()
         .input("key", req.body.data[i])
         .query(
-          `DELETE FROM [QMES2022].[dbo].[KIOSK_ITEM_TB] WHERE [KSKIT_PK] = @key`
+          `DELETE FROM [QMES2022].[dbo].[KIOSK_DEFECT_TB] WHERE [KSKDF_PK] = @key`
         );
 
       // 로그기록 저장

@@ -7,7 +7,11 @@ import dayjs from "dayjs";
 
 // API 보내는 함수 및 인터페이스 불러오기
 import { useSendApi } from "../../../composables/useSendApi";
-import { KioskWork } from "../../../interfaces/menu/kioskInterface";
+import {
+  KioskWork,
+  KioskNonwork,
+} from "../../../interfaces/menu/kioskInterface";
+import { MasterNonWork } from "../../../interfaces/menu/masterInterface";
 
 // 데이터 가져오기
 const props = defineProps<{
@@ -20,16 +24,53 @@ const output = ref();
 const emit = defineEmits(["update:output", "update:modalclose"]);
 emit(`update:output`, output.value); // 실제로 내보낼 때 쓰는 코드
 
-// 날짜 구하기
-const now = dayjs().format("YYYY-MM-DD HH:mm:ss");
+// 페이지 로딩 시 시작
+onMounted(async () => {
+  await kiosk_alert.editData({ NO: props.키오스크no } as KioskNonwork); // 고장발생 등록
+  await kiosk_modal_work.searchDatas("", "NO", props.키오스크no, "", ""); // 작업현황 불러오기
+  await kiosk_modal_nonwork.searchDatas("", "구분", "고장", "", ""); // 비가동 데이터 불러오기
+
+  // 고장 시작일시를 따로 받기
+  alertInsertData.value.시작일시 =
+    kiosk_modal_work.dataSearchAll.value[0].등록일시;
+
+  // 고장 시작일시로부터 현재 시간의 차이 계산
+  setInterval(() => {
+    경과시간.value = dayjs.duration(
+      dayjs().diff(alertInsertData.value.시작일시)
+    );
+  }, 1000);
+});
+
+const r1 = ref(1);
 
 // 고장발생
 const url_kiosk_alert = "/api/kiosk/alert";
-const kiosk_alert = useSendApi<KioskWork>(url_kiosk_alert, ref(1), ref(1));
-kiosk_alert.editData({ NO: props.키오스크no } as KioskWork);
+const kiosk_alert = useSendApi<KioskNonwork>(url_kiosk_alert, r1, r1);
 
-// 임시 데이터
+// 키오스크 작업 현황 데이터 가져오기
+const url_kiosk_modal_work = "/api/kiosk/modal/work";
+const kiosk_modal_work = useSendApi<KioskWork>(url_kiosk_modal_work, r1, r1);
+
+// 비가동 데이터 가져오기
+const url_kiosk_modal_nonwork = "/api/kiosk/modal/nonwork";
+const kiosk_modal_nonwork = useSendApi<MasterNonWork>(
+  url_kiosk_modal_nonwork,
+  r1,
+  r1
+);
+
+// ##########################  등록  ##########################
+const alertInsertData = ref({} as KioskNonwork);
+
+// ##########################  조회  ##########################
+const 경과시간 = ref();
 </script>
+
+######################################################################################################################
+######################################################################################################################
+######################################################################################################################
+
 <template>
   <div class="pb-2">
     <div
@@ -50,16 +91,23 @@ kiosk_alert.editData({ NO: props.키오스크no } as KioskWork);
           <th class="border-t-2 border-r-2 border-danger w-20">선택</th>
         </thead>
         <tbody>
-          <tr class="text-center" v-for="i in Array(10).fill('10')">
+          <tr
+            class="text-center"
+            v-for="todo in kiosk_modal_nonwork.dataSearchAll.value"
+            :key="todo.NO"
+          >
             <td class="border-l-2 border-b-2 border-r-2 border-danger h-9">
-              NOE0021
+              {{ todo.코드 }}
             </td>
-            <td class="border-b-2 border-r-2 border-danger h-7">설비고장</td>
-            <td class="border-b-2 border-r-2 border-danger h-7">고장수리</td>
             <td class="border-b-2 border-r-2 border-danger h-7">
-              설비 고장 수리중
+              {{ todo.구분 }}
             </td>
-
+            <td class="border-b-2 border-r-2 border-danger h-7">
+              {{ todo.비가동명 }}
+            </td>
+            <td class="border-b-2 border-r-2 border-danger h-7">
+              {{ todo.내용 }}
+            </td>
             <td class="border-b-2 border-r-2 border-danger h-7">
               <Button class="h-7" variant="primary"
                 ><Lucide class="w-6 h-6 mx-auto" icon="CheckSquare"
@@ -80,7 +128,7 @@ kiosk_alert.editData({ NO: props.키오스크no } as KioskWork);
                 조치내역
               </td>
               <td class="p-2 border-r-2 border-danger text-center">
-                <FormSelect class="w-full" model-value="미입력">
+                <FormSelect class="w-full" v-model="alertInsertData.조치내역">
                   <option>미입력</option>
                   <option>수리 접수</option>
                   <option>수리 진행중</option>
@@ -101,7 +149,9 @@ kiosk_alert.editData({ NO: props.키오스크no } as KioskWork);
             >
               코드
             </td>
-            <td class="pl-2 border-r-2 border-danger text-left">NOE0021</td>
+            <td class="pl-2 border-r-2 border-danger text-left">
+              {{ alertInsertData.비가동코드 }}
+            </td>
           </tr>
           <tr class="border-b-2 border-l-2 border-danger h-7">
             <td
@@ -109,7 +159,9 @@ kiosk_alert.editData({ NO: props.키오스크no } as KioskWork);
             >
               구분
             </td>
-            <td class="pl-2 border-r-2 border-danger text-left">설비고장</td>
+            <td class="pl-2 border-r-2 border-danger text-left">
+              {{ alertInsertData.구분 }}
+            </td>
           </tr>
           <tr class="border-b-2 border-danger h-7">
             <td
@@ -117,7 +169,9 @@ kiosk_alert.editData({ NO: props.키오스크no } as KioskWork);
             >
               비가동명
             </td>
-            <td class="pl-2 border-r-2 border-danger text-left">고장수리</td>
+            <td class="pl-2 border-r-2 border-danger text-left">
+              {{ alertInsertData.비가동명 }}
+            </td>
           </tr>
           <tr class="border-b-2 border-danger h-7">
             <td
@@ -126,7 +180,7 @@ kiosk_alert.editData({ NO: props.키오스크no } as KioskWork);
               내용
             </td>
             <td class="pl-2 border-r-2 border-danger text-left">
-              설비 고장 수리중
+              {{ alertInsertData.내용 }}
             </td>
           </tr>
           <tr class="border-b-2 border-danger h-7">
@@ -136,7 +190,7 @@ kiosk_alert.editData({ NO: props.키오스크no } as KioskWork);
               시작일시
             </td>
             <td class="pl-2 border-r-2 border-danger text-left">
-              {{ now }}
+              {{ alertInsertData.시작일시 }}
             </td>
           </tr>
           <tr class="border-b-2 border-danger h-7">
@@ -145,10 +199,27 @@ kiosk_alert.editData({ NO: props.키오스크no } as KioskWork);
             >
               경과시간
             </td>
-            <td class="pl-2 border-r-2 border-danger text-left">00:00:00</td>
+            <td class="pl-2 border-r-2 border-danger text-left">
+              {{ 경과시간.hours() }}h {{ 경과시간.minutes() }}m
+              {{ 경과시간.seconds() }}s
+            </td>
           </tr>
         </tbody>
       </table>
+    </div>
+    <div class="px-5 pb-2 text-center">
+      <Button
+        variant="primary"
+        type="button"
+        class="w-48 text-base"
+        @click="
+          () => {
+            emit(`update:modalclose`, false);
+          }
+        "
+      >
+        설비재개
+      </Button>
     </div>
   </div>
 </template>

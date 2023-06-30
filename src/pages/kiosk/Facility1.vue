@@ -146,6 +146,11 @@ async function searchKioskWork() {
     양품수량.value = String(
       Number(완료수량.value) + Number(생산수량.value) - Number(불량수량.value)
     );
+
+    // 만약 설비현황상태가 고장중이면 자동으로 고장 모달이 켜지도록
+    if (running.value == "고장중") {
+      alertAddModal.value = true;
+    }
   }
 }
 
@@ -1401,17 +1406,12 @@ watch(
           고장 사유를 선택하고 설비를 재개해 주세요
         </div>
       </div>
-      <div><AlertAdd /></div>
-
-      <div class="px-5 pb-2 text-center">
-        <Button
-          variant="primary"
-          type="button"
-          class="w-48 text-base"
-          @click="setAlertAddModal(false)"
-        >
-          설비재개
-        </Button>
+      <div>
+        <AlertAdd
+          :키오스크no="키오스크NO"
+          :설비명="설비명"
+          v-model:modalclose="alertAddModal"
+        />
       </div>
     </Dialog.Panel>
   </Dialog>

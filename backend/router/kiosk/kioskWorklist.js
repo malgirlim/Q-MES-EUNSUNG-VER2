@@ -185,9 +185,7 @@ router.get("/", async (req, res) => {
   }
 });
 
-// 선택
-
-// 등록
+// 작업지시공정 선택
 router.post("/insert", async (req, res) => {
   try {
     const Pool = await pool;
@@ -254,116 +252,6 @@ router.post("/insert", async (req, res) => {
       (user = req.body.user ?? "")
     );
 
-    res.send("등록완료");
-  } catch (err) {
-    // 로그기록 저장
-    await logSend(
-      (type = "에러"),
-      (ct = err.message ?? ""),
-      (amount = 0),
-      (user = req.body.user ?? "")
-    );
-    res.status(500);
-    res.send(err.message);
-  }
-});
-
-// 수정
-router.post("/edit", async (req, res) => {
-  try {
-    const Pool = await pool;
-    await Pool.request()
-      .input("NO", req.body.data.NO ?? 0)
-      .input("작업지시NO", req.body.data.작업지시NO ?? null)
-      .input("공정NO", req.body.data.공정NO ?? null)
-      .input("설비NO", req.body.data.설비NO ?? null)
-      .input("작업자ID", req.body.data.작업자ID ?? "")
-      .input("품목NO", req.body.data.품목NO ?? null)
-      .input("지시수량", req.body.data.지시수량 ?? "")
-      .input("진행상황", req.body.data.진행상황 ?? "작업대기")
-      .input("비고", req.body.data.비고 ?? "")
-      .input("등록자", req.body.user ?? "")
-      .input(
-        "등록일시",
-        moment().tz("Asia/Seoul").format("YYYY-MM-DD HH:mm:ss")
-      ).query(`
-        UPDATE [QMES2022].[dbo].[MANAGE_INSTRUCT_PROCESS_TB]
-          SET 
-          [ISPC_WORK_INSTRUCT_PK] = @작업지시NO
-          ,[ISPC_PROCESS_PK] = @공정NO
-          ,[ISPC_FACILITY_PK] = @설비NO
-          ,[ISPC_USER_ID] = @작업자ID
-          ,[ISPC_ITEM_PK] = @품목NO
-          ,[ISPC_AMOUNT] = @지시수량
-          ,[ISPC_CONDITION] = @진행상황
-          ,[ISPC_NOTE] = @비고
-          ,[ISPC_REGIST_NM] = @등록자
-          ,[ISPC_REGIST_DT] = @등록일시
-        WHERE [ISPC_PK] = @NO
-    `);
-
-    // 로그기록 저장
-    await logSend(
-      (type = "수정"),
-      (ct = JSON.stringify(req.body.data) + " 으로 수정."),
-      (amount = 1),
-      (user = req.body.user ?? "")
-    );
-
-    res.send("수정완료");
-  } catch (err) {
-    // 로그기록 저장
-    await logSend(
-      (type = "에러"),
-      (ct = err.message ?? ""),
-      (amount = 0),
-      (user = req.body.user ?? "")
-    );
-    res.status(500);
-    res.send(err.message);
-  }
-});
-
-// 실적 소요자재 등록
-router.post("/resultuseitem/insertAll", async (req, res) => {
-  try {
-    const Pool = await pool;
-    for (var i = 0; i < req.body.data.length; i++) {
-      await Pool.request()
-        .input("품목NO", req.body.data[i].품목NO ?? null)
-        .input("LOT코드", req.body.data[i].LOT코드 ?? "")
-        .input("수량", req.body.data[i].수량 ?? "")
-        .input("비고", req.body.data[i].비고 ?? "")
-        .input("등록자", req.body.user ?? "")
-        .input(
-          "등록일시",
-          moment().tz("Asia/Seoul").format("YYYY-MM-DD HH:mm:ss")
-        ).query(`
-          INSERT INTO [QMES2022].[dbo].[MANAGE_PRODUCE_USE_ITEM_TB]
-            ([PDUI_DIV]
-            ,[PDUI_PRODUCE_RESULT_PK]
-            ,[PDUI_ITEM_PK]
-            ,[PDUI_LOTCODE]
-            ,[PDUI_AMOUNT]
-            ,[PDUI_DT]
-            ,[PDUI_NOTE]
-            ,[PDUI_REGIST_NM]
-            ,[PDUI_REGIST_DT])
-          VALUES
-            ('생산실적투입자재',(SELECT MAX([PDRS_PK]) FROM [QMES2022].[dbo].[MANAGE_PRODUCE_RESULT_TB]),@품목NO,@LOT코드,@수량,GETDATE(),@비고,@등록자,@등록일시)
-        `);
-
-      // 로그기록 저장
-      await logSend(
-        (type = "등록"),
-        (ct =
-          "실적소요자재등록 : " +
-          JSON.stringify(req.body.data[i]) +
-          " 을 등록."),
-        (amount = 1),
-        (user = req.body.user ?? "")
-      );
-    }
     res.send("등록완료");
   } catch (err) {
     // 로그기록 저장
