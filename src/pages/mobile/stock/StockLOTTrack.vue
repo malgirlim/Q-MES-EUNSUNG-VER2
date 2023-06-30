@@ -351,9 +351,11 @@ const setBarcodeReaderModal = (value: boolean) => {
       }
     "
   >
-    <Dialog.Panel style="top: 25%">
+    <Dialog.Panel style="top: -8%">
       <div class="p-3">
-        <div class="font-bold text-xl text-center pt-4">바코드리더 테스트</div>
+        <div class="font-bold text-xl text-center pt-4">
+          바코드를 읽어주세요
+        </div>
         <div><BarcodeReader /></div>
         <div class="px-5 pb-4 pt-5 text-center">
           <Button

@@ -9,7 +9,7 @@ const user_level = proxy.gstate.level.OrderFacilityParts; //권한레벨
 
 const companyInfo = {
   사업자등록번호: "126-81-10319",
-  상호: "(주)은성프린터스",
+  상호: "(주)큐이노텍",
   대표자: "차준은",
   주소: "경기도 이천시 이섭대천로1032번길 78 (율현동 91-1)",
   업태: "제조",
