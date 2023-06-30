@@ -59,7 +59,7 @@ router.post("/insert", async (req, res) => {
         -- 작업지시를 반려로 수정
         UPDATE [QMES2022].[dbo].[MANAGE_INSTRUCT_PROCESS_TB]
           SET
-          ,[ISPC_CONDITION] = '작업반려'
+          [ISPC_CONDITION] = '작업반려'
           ,[ISPC_NOTE] = @비고
         WHERE [ISPC_PK] = @지시공정NO
     `);

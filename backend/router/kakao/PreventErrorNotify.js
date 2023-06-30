@@ -39,7 +39,10 @@ async function request_post() {
       // 보낼 데이터가 여러개인 경우가 있으므로 for문 실행
       for (let data of send_data) {
         // 설비NO과 발송시점의 기준을 판단
-        if (data.설비명 == judge.설비명) {
+        if (
+          data.설비명 == judge.설비명 &&
+          dayjs().diff(dayjs(data.발생일시), "minute") <= 1
+        ) {
           kakaoSendData.설비명 = data.설비명 ?? "";
           kakaoSendData.발생일시 = data.발생일시 ?? "";
           kakaoSendData.부서 = data.부서 ?? "";

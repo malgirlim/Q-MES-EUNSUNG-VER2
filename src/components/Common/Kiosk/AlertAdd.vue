@@ -1,11 +1,32 @@
 <script setup lang="ts">
+import { getCurrentInstance, onMounted, ref, watch } from "vue";
 import Button from "../../../base-components/Button";
 import Lucide from "../../../base-components/Lucide";
 import { FormSelect } from "../../../base-components/Form";
 import dayjs from "dayjs";
 
+// API 보내는 함수 및 인터페이스 불러오기
+import { useSendApi } from "../../../composables/useSendApi";
+import { KioskWork } from "../../../interfaces/menu/kioskInterface";
+
+// 데이터 가져오기
+const props = defineProps<{
+  키오스크no?: any;
+  설비명?: any;
+}>();
+
+// 데이터 내보내기
+const output = ref();
+const emit = defineEmits(["update:output", "update:modalclose"]);
+emit(`update:output`, output.value); // 실제로 내보낼 때 쓰는 코드
+
 // 날짜 구하기
 const now = dayjs().format("YYYY-MM-DD HH:mm:ss");
+
+// 고장발생
+const url_kiosk_alert = "/api/kiosk/alert";
+const kiosk_alert = useSendApi<KioskWork>(url_kiosk_alert, ref(1), ref(1));
+kiosk_alert.editData({ NO: props.키오스크no } as KioskWork);
 
 // 임시 데이터
 </script>

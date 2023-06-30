@@ -75,19 +75,20 @@ const setLogoutModal = (value: boolean) => {
 
 /* ################################################################################################################ */
 
+const r1 = ref(1);
+
 // dataManager 만들기
 const url_kiosk_work = "/api/kiosk/work";
-const kiosk_work = useSendApi<KioskWork>(url_kiosk_work, ref(1), ref(100));
+const kiosk_work = useSendApi<KioskWork>(url_kiosk_work, r1, ref(100));
+
+// 작업반려
+const url_kiosk_taskcancle = "/api/kiosk/taskcancle";
+const kiosk_taskcancle = useSendApi<KioskWork>(url_kiosk_taskcancle, r1, r1);
 
 /* ################################################################################################################ */
 
 // 날짜 구하기
 const now = ref(dayjs().format("YYYY-MM-DD HH:mm:ss"));
-
-// 가동시간 구하기
-const 부하시간 = ref("00h00m00s");
-const 운전시간 = ref("00h00m00s");
-const 비가동시간 = ref("00h00m00s");
 
 // 페이지 로딩 시 시작
 onMounted(async () => {
@@ -103,6 +104,11 @@ onMounted(async () => {
 
 // 작업현황
 const kiosk_work_data = ref({} as KioskWork);
+
+// 가동시간 구하기
+const 부하시간 = ref("00h00m00s");
+const 운전시간 = ref("00h00m00s");
+const 비가동시간 = ref("00h00m00s");
 
 // 작업현황 초기값 설정
 const running = ref("미가동");
@@ -126,18 +132,21 @@ async function searchKioskWork() {
     (f) => f.NO === 키오스크NO
   )[0];
 
-  kiosk_work_data.value.작업자ID = kiosk_work_data.value.작업자ID[0];
-  kiosk_work_data.value.작업자 = kiosk_work_data.value.작업자[0];
+  // 키오스크NO가 있으면 실행
+  if (kiosk_work_data.value != undefined) {
+    kiosk_work_data.value.작업자ID = kiosk_work_data.value.작업자ID[0] ?? 0;
+    kiosk_work_data.value.작업자 = kiosk_work_data.value.작업자[0] ?? "";
 
-  running.value = kiosk_work_data.value.설비현황 ?? "미가동";
-  task_status.value = kiosk_work_data.value.진행상황 ?? "작업미확인";
-  지시수량.value = kiosk_work_data.value.지시수량 ?? "0";
-  완료수량.value = kiosk_work_data.value.완료수량 ?? "0";
-  생산수량.value = kiosk_work_data.value.생산수 ?? "0";
-  불량수량.value = "0";
-  양품수량.value = String(
-    Number(완료수량.value) + Number(생산수량.value) - Number(불량수량.value)
-  );
+    running.value = kiosk_work_data.value.설비현황 ?? "미가동";
+    task_status.value = kiosk_work_data.value.진행상황 ?? "작업미확인";
+    지시수량.value = kiosk_work_data.value.지시수량 ?? "0";
+    완료수량.value = kiosk_work_data.value.완료수량 ?? "0";
+    생산수량.value = kiosk_work_data.value.생산수 ?? "0";
+    불량수량.value = "0";
+    양품수량.value = String(
+      Number(완료수량.value) + Number(생산수량.value) - Number(불량수량.value)
+    );
+  }
 }
 
 /* ################################################################################################################ */
@@ -306,7 +315,9 @@ watch(
     workerChangeModal,
   ],
   (newValue, oldValue) => {
-    searchKioskWork();
+    setTimeout(() => {
+      searchKioskWork();
+    }, 500);
   }
 );
 </script>
@@ -358,7 +369,7 @@ watch(
       <div class="flex items-center col-span-1 text-sm">
         <div class="flex items-center mr-3">
           <Lucide class="w-5 h-5 mr-1" icon="CalendarClock" /><strong
-            >가동시작 : {{ kiosk_work_data.시작일시 }}</strong
+            >가동시작 : {{ kiosk_work_data?.시작일시 ?? "" }}</strong
           >
         </div>
         <div class="flex items-center">
@@ -433,7 +444,7 @@ watch(
                       품번
                     </td>
                     <td class="pl-2 text-left">
-                      {{ kiosk_work_data.품번 }}
+                      {{ kiosk_work_data?.품번 ?? "" }}
                     </td>
                   </tr>
                   <tr class="border-b-2 border-success h-7">
@@ -443,7 +454,7 @@ watch(
                       구분
                     </td>
                     <td class="pl-2 text-left">
-                      {{ kiosk_work_data.품목구분 }}
+                      {{ kiosk_work_data?.품목구분 ?? "" }}
                     </td>
                   </tr>
                   <tr class="border-b-2 border-success h-7">
@@ -453,7 +464,7 @@ watch(
                       품명
                     </td>
                     <td class="pl-2 text-left">
-                      {{ kiosk_work_data.품명 }}
+                      {{ kiosk_work_data?.품명 ?? "" }}
                     </td>
                   </tr>
                   <tr class="border-b-2 border-success h-7">
@@ -463,7 +474,7 @@ watch(
                       규격
                     </td>
                     <td class="pl-2 text-left">
-                      {{ kiosk_work_data.규격 }}
+                      {{ kiosk_work_data?.규격 ?? "" }}
                     </td>
                   </tr>
                   <tr class="border-b-2 border-success h-7">
@@ -664,7 +675,7 @@ watch(
                       작업코드
                     </td>
                     <td class="pl-2 text-left">
-                      {{ kiosk_work_data.작업코드 }}
+                      {{ kiosk_work_data?.작업코드 ?? "" }}
                     </td>
                   </tr>
                   <tr class="border-b-2 border-success h-7">
@@ -674,7 +685,7 @@ watch(
                       시작일
                     </td>
                     <td class="pl-2 text-left">
-                      {{ kiosk_work_data.시작일 }}
+                      {{ kiosk_work_data?.시작일 ?? "" }}
                     </td>
                   </tr>
 
@@ -685,7 +696,7 @@ watch(
                       공정명
                     </td>
                     <td class="pl-2 text-left">
-                      {{ kiosk_work_data.공정명 }}
+                      {{ kiosk_work_data?.공정명 ?? "" }}
                     </td>
                   </tr>
                   <tr class="border-b-2 border-success h-7">
@@ -695,7 +706,7 @@ watch(
                       설비명
                     </td>
                     <td class="pl-2 text-left">
-                      {{ kiosk_work_data.설비명 }}
+                      {{ kiosk_work_data?.설비명 ?? "" }}
                     </td>
                   </tr>
                   <tr class="border-b-2 border-success h-7">
@@ -715,7 +726,7 @@ watch(
                       단위
                     </td>
                     <td class="pl-2 text-left">
-                      {{ kiosk_work_data.단위 }}
+                      {{ kiosk_work_data?.단위 ?? "" }}
                     </td>
                   </tr>
                   <tr class="border-b-2 border-success h-7">
@@ -727,7 +738,7 @@ watch(
                     <td class="pl-2 text-left">
                       <div class="flex">
                         <div class="mr-auto">
-                          {{ kiosk_work_data.작업자 }}
+                          {{ kiosk_work_data?.작업자 ?? "" }}
                         </div>
                         <div class="ml-auto">
                           <Button
@@ -1321,12 +1332,8 @@ watch(
           type="button"
           class="w-40 text-2xl mr-10"
           @click="
-            () => {
-              const kiosk_work_return =
-                useSendApi <
-                KioskWork >
-                ('/api/kiosk/taskcancle', ref(1), ref(1));
-              kiosk_work_return.insertData(kiosk_work_data);
+            async () => {
+              await kiosk_taskcancle.insertData(kiosk_work_data);
               setTaskCancleModal(false);
             }
           "

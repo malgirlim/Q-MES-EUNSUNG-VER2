@@ -10,6 +10,7 @@ const kioskChecklistRouter = require("./kiosk/kioskChecklist");
 const kioskWorklistRouter = require("./kiosk/kioskWorklist");
 
 const kioskTaskCancleRouter = require("./kiosk/kioskTaskCancle");
+const kioskAlertRouter = require("./kiosk/kioskAlert");
 
 router.use((req, res, next) => {
   // console.log("middleware for test!");
@@ -32,5 +33,7 @@ router.use("/worklist", kioskWorklistRouter);
 
 // 키오스크 / 작업반려 - router/kiosk/kioskTaskCancle.js
 router.use("/taskcancle", kioskTaskCancleRouter);
+// 키오스크 / 고장발생 - router/kiosk/kioskAlert.js
+router.use("/alert", kioskAlertRouter);
 
 module.exports = router;
