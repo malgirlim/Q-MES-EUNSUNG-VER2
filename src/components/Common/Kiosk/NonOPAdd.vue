@@ -13,7 +13,7 @@ const now = dayjs().format("YYYY-MM-DD HH:mm:ss");
   <div class="pb-7">
     <div
       class="pl-7 pr-3 text-base"
-      style="height: 180px; overflow-y: scroll; overflow-x: hidden"
+      style="height: 275px; overflow-y: scroll; overflow-x: hidden"
     >
       <table class="w-full">
         <thead
