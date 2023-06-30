@@ -77,7 +77,7 @@ const 경과시간 = ref();
   <div class="pb-2">
     <div
       class="pl-7 pr-3 text-base"
-      style="height: 150px; overflow-y: scroll; overflow-x: hidden"
+      style="height: 215px; overflow-y: scroll; overflow-x: hidden"
     >
       <table class="w-full">
         <thead
@@ -142,7 +142,10 @@ const 경과시간 = ref();
                 조치내역
               </td>
               <td class="p-2 border-r-2 border-danger text-center">
-                <FormSelect class="w-full" v-model="alertInsertData.조치내역">
+                <FormSelect
+                  class="w-full h-9"
+                  v-model="alertInsertData.조치내역"
+                >
                   <option>미입력</option>
                   <option>수리 접수</option>
                   <option>수리 진행중</option>

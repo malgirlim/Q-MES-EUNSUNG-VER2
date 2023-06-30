@@ -1008,9 +1008,15 @@ const setWorkerChangeModal = (value: boolean) => {
   <Dialog :open="nonOPAddModal" size="lg">
     <Dialog.Panel style="top: -8%">
       <div class="p-3 text-center">
-        <Lucide icon="Pause" class="w-16 h-16 mx-auto text-[#D9821C]" />
-        <div class="mt-4 text-xl"><strong>설비가 비가동중입니다</strong></div>
-        <div class="mt-2 text-lg">
+        <div class="flex items-center">
+          <div class="flex mx-auto items-center">
+            <Lucide icon="Pause" class="w-9 h-9 mx-auto text-[#D9821C]" />
+            <div class="pt-1 mx-2 text-lg">
+              <strong>설비가 비가동중입니다</strong>
+            </div>
+          </div>
+        </div>
+        <div class="mt-1 text-sm">
           비가동 사유를 선택하고 작업을 재개해 주세요
         </div>
       </div>

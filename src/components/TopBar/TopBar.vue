@@ -20,7 +20,7 @@ export default {
 <script setup lang="ts">
 import { getCurrentInstance, ref, watch } from "vue";
 import Lucide from "../../base-components/Lucide";
-import logoUrl from "../../assets/images/logo.png";
+import logoUrl from "../../assets/images/logo.svg";
 import Breadcrumb from "../../base-components/Breadcrumb";
 import Button from "../../base-components/Button";
 import { FormInput } from "../../base-components/Form";
@@ -180,7 +180,7 @@ const setDebugMode = () => {
             props.layout == 'simple-menu' && 'hidden',
           ]"
         >
-          EUNSUNG PRINTERS
+          QINNOTEK
         </span>
       </RouterLink>
       <!-- END: Logo -->

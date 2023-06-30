@@ -96,7 +96,7 @@ const delete_pin = () => {
         <img class="m-auto mb-3 h-12" src="../assets/images/kiosk_logo.svg" />
       </div>
       <div class="text-xl text-center text-slate-200 mt-2">
-        <strong>은성프린터스 현장 시스템</strong>
+        <strong>큐이노텍 현장 시스템</strong>
       </div>
       <div>
         <div class="px-2 pt-2 mt-3">

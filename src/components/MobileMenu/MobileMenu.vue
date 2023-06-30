@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { useRoute } from "vue-router";
 import { twMerge } from "tailwind-merge";
-import logoUrl from "../../assets/images/logo.png";
+import logoUrl from "../../assets/images/logo.svg";
 import Devider from "./Devider.vue";
 import Menu from "./Menu.vue";
 import Lucide from "../../base-components/Lucide";
@@ -64,7 +64,7 @@ onMounted(() => {
           :src="logoUrl"
         />
       </a>
-      <div class="text-white font-bold text-2xl mr-auto">EUNSUNG PRINTERS</div>
+      <div class="text-white font-bold text-2xl mr-auto">QINNOTEK</div>
       <a href="#" @click="(e) => e.preventDefault()">
         <Lucide
           icon="BarChart2"

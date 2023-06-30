@@ -86,7 +86,7 @@ axios.get("/api/auth").then((res: any) => {
               class="w-6"
               :src="logoUrl"
             />
-            <span class="ml-3 text-lg text-white"> EUNSUNG PRINTERS </span>
+            <span class="ml-3 text-lg text-white"> QINNOTEK </span>
           </a>
           <div class="my-auto">
             <img
@@ -97,7 +97,7 @@ axios.get("/api/auth").then((res: any) => {
             <div
               class="mt-10 text-4xl font-medium leading-tight text-white -intro-x"
             >
-              은성프린터스 Q-MES
+              큐이노텍 Q-MES
             </div>
             <div
               class="mt-5 text-lg text-white -intro-x text-opacity-70 dark:text-slate-400"
@@ -118,7 +118,7 @@ axios.get("/api/auth").then((res: any) => {
             <div
               class="mt-2 text-xl text-center intro-x text-slate-400 xl:hidden"
             >
-              은성프린터스 MES
+              큐이노텍 MES
             </div>
             <div class="mt-8 intro-x">
               <FormInput
