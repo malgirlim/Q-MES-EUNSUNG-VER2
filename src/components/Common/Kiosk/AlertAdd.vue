@@ -31,6 +31,8 @@ onMounted(async () => {
   await kiosk_modal_nonwork.searchDatas("", "구분", "고장", "", ""); // 비가동 데이터 불러오기
 
   // 고장 시작일시를 따로 받기
+  alertInsertData.value.작업NO = props.키오스크no;
+  // 고장 시작일시를 따로 받기
   alertInsertData.value.시작일시 =
     kiosk_modal_work.dataSearchAll.value[0].등록일시;
 
@@ -82,12 +84,12 @@ const 경과시간 = ref();
           class="border-b-2 border-danger bg-slate-200 h-7"
           style="position: sticky; top: 0px; z-index: 2"
         >
-          <th class="border-l-2 border-t-2 border-r-2 border-danger w-24">
+          <th class="border-l-2 border-t-2 border-r-2 border-danger w-20">
             코드
           </th>
-          <th class="border-t-2 border-r-2 border-danger w-24">구분</th>
-          <th class="border-t-2 border-r-2 border-danger w-20">비가동명</th>
-          <th class="border-t-2 border-r-2 border-danger w-28">내용</th>
+          <th class="border-t-2 border-r-2 border-danger w-20">구분</th>
+          <th class="border-t-2 border-r-2 border-danger w-24">비가동명</th>
+          <th class="border-t-2 border-r-2 border-danger w-30">내용</th>
           <th class="border-t-2 border-r-2 border-danger w-20">선택</th>
         </thead>
         <tbody>
@@ -109,9 +111,21 @@ const 경과시간 = ref();
               {{ todo.내용 }}
             </td>
             <td class="border-b-2 border-r-2 border-danger h-7">
-              <Button class="h-7" variant="primary"
-                ><Lucide class="w-6 h-6 mx-auto" icon="CheckSquare"
-              /></Button>
+              <Button
+                class="h-7"
+                variant="primary"
+                @click="
+                  () => {
+                    alertInsertData.비가동NO = todo?.NO ?? 0;
+                    alertInsertData.비가동코드 = todo?.코드 ?? '';
+                    alertInsertData.구분 = todo?.구분 ?? '';
+                    alertInsertData.비가동명 = todo?.비가동명 ?? '';
+                    alertInsertData.내용 = todo?.내용 ?? '';
+                  }
+                "
+              >
+                <Lucide class="w-6 h-6 mx-auto" icon="CheckSquare" />
+              </Button>
             </td>
           </tr>
         </tbody>
@@ -150,7 +164,7 @@ const 경과시간 = ref();
               코드
             </td>
             <td class="pl-2 border-r-2 border-danger text-left">
-              {{ alertInsertData.비가동코드 }}
+              {{ alertInsertData?.비가동코드 }}
             </td>
           </tr>
           <tr class="border-b-2 border-l-2 border-danger h-7">
@@ -160,7 +174,7 @@ const 경과시간 = ref();
               구분
             </td>
             <td class="pl-2 border-r-2 border-danger text-left">
-              {{ alertInsertData.구분 }}
+              {{ alertInsertData?.구분 }}
             </td>
           </tr>
           <tr class="border-b-2 border-danger h-7">
@@ -170,7 +184,7 @@ const 경과시간 = ref();
               비가동명
             </td>
             <td class="pl-2 border-r-2 border-danger text-left">
-              {{ alertInsertData.비가동명 }}
+              {{ alertInsertData?.비가동명 }}
             </td>
           </tr>
           <tr class="border-b-2 border-danger h-7">
@@ -180,7 +194,7 @@ const 경과시간 = ref();
               내용
             </td>
             <td class="pl-2 border-r-2 border-danger text-left">
-              {{ alertInsertData.내용 }}
+              {{ alertInsertData?.내용 }}
             </td>
           </tr>
           <tr class="border-b-2 border-danger h-7">
@@ -190,7 +204,7 @@ const 경과시간 = ref();
               시작일시
             </td>
             <td class="pl-2 border-r-2 border-danger text-left">
-              {{ alertInsertData.시작일시 }}
+              {{ alertInsertData?.시작일시 }}
             </td>
           </tr>
           <tr class="border-b-2 border-danger h-7">
@@ -200,20 +214,25 @@ const 경과시간 = ref();
               경과시간
             </td>
             <td class="pl-2 border-r-2 border-danger text-left">
-              {{ 경과시간.hours() }}h {{ 경과시간.minutes() }}m
-              {{ 경과시간.seconds() }}s
+              {{ 경과시간?.hours() ?? "00" }}h
+              {{ 경과시간?.minutes() ?? "00" }}m
+              {{ 경과시간?.seconds() ?? "00" }}s
             </td>
           </tr>
         </tbody>
       </table>
     </div>
-    <div class="px-5 pb-2 text-center">
+    <div class="px-5 pb-2 text-center mt-3">
       <Button
         variant="primary"
         type="button"
         class="w-48 text-base"
         @click="
-          () => {
+          async () => {
+            alertInsertData.종료일시 = await dayjs()
+              .locale('ko')
+              .format('YYYY-MM-DD HH:mm:ss');
+            await kiosk_alert.insertData(alertInsertData);
             emit(`update:modalclose`, false);
           }
         "

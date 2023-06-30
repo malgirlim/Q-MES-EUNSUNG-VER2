@@ -23,7 +23,7 @@ const options = {
 
 request_post(); //최초 즉시 실행
 
-setInterval(() => request_post(), 60000); // 이후 60초마다 실행
+setInterval(() => request_post(), 30000); // 이후 60초마다 실행
 
 async function request_post() {
   // 판단 조건 가져오기
@@ -39,10 +39,7 @@ async function request_post() {
       // 보낼 데이터가 여러개인 경우가 있으므로 for문 실행
       for (let data of send_data) {
         // 설비NO과 발송시점의 기준을 판단
-        if (
-          data.설비명 == judge.설비명 &&
-          dayjs().diff(dayjs(data.발생일시), "minute") <= 1
-        ) {
+        if (data.설비명 == judge.설비명) {
           kakaoSendData.설비명 = data.설비명 ?? "";
           kakaoSendData.발생일시 = data.발생일시 ?? "";
           kakaoSendData.부서 = data.부서 ?? "";
@@ -67,7 +64,6 @@ async function request_post() {
               insertAlertLog(user, data, res);
             });
           }
-
           // 수주대비납품 예보에 등록하기
           insertForecastNotify(data);
         }
@@ -150,7 +146,7 @@ async function getSendData() {
       SELECT
         설비NO AS 설비NO
         ,설비명 AS 설비명
-        ,CONVERT(VARCHAR, GETDATE(), 20) AS 발생일시
+        ,등록일시 AS 발생일시
         ,부서 AS 부서
         ,작업자 AS 담당자
         ,직급 AS 직급
@@ -184,7 +180,7 @@ async function getSendData() {
           ,[KSKWK_STATUS] AS 현황
           ,[KSKWK_NOTE] AS 비고
           ,[KSKWK_REGIST_NM] AS 등록자
-          ,[KSKWK_REGIST_DT] AS 등록일시
+          ,CONVERT(VARCHAR, [KSKWK_REGIST_DT], 20) AS 등록일시
         FROM [QMES2022].[dbo].[KIOSK_WORK_TB]
         LEFT JOIN
         (
@@ -233,8 +229,9 @@ async function getSendData() {
             FROM [QMES2022].[dbo].[MASTER_ITEM_TB]
           ) AS ITEM ON ITEM.NO = [ISPC_ITEM_PK]
         ) AS INST_PROCESS ON INST_PROCESS.NO = [KSKWK_INST_PROCESS_PK]
+        WHERE [KSKWK_STATUS] = '고장중'
+        AND DATEDIFF(second, CONVERT(VARCHAR, [KSKWK_REGIST_DT], 20), CONVERT(VARCHAR, GETDATE(), 20)) <= 32
       ) AS RESULT
-      WHERE 현황 = '고장중'
     `);
 
     return result.recordset;

@@ -110,6 +110,38 @@ router.post("/insert", async (req, res) => {
           (@작업NO,@비가동NO,@시작일시,@종료일시,@비고,@등록자,@등록일시)
       `);
 
+    // 작업현황을 원래대로 돌려놓기
+    await Pool.request()
+      .input("작업NO", req.body.data.작업NO ?? null)
+      .input("비가동NO", req.body.data.비가동NO ?? null)
+      .input(
+        "시작일시",
+        moment(req.body.data.시작일시).format("YYYY-MM-DD HH:mm:ss") ??
+          moment().tz("Asia/Seoul").format("YYYY-MM-DD HH:mm:ss")
+      )
+      .input(
+        "종료일시",
+        moment(req.body.data.종료일시).format("YYYY-MM-DD HH:mm:ss") ??
+          moment().tz("Asia/Seoul").format("YYYY-MM-DD HH:mm:ss")
+      )
+      .input("비고", req.body.data.비고 ?? "")
+      .input("등록자", req.body.user ?? "")
+      .input(
+        "등록일시",
+        moment().tz("Asia/Seoul").format("YYYY-MM-DD HH:mm:ss")
+      ).query(`
+        INSERT INTO [QMES2022].[dbo].[KIOSK_NONWORK_TB]
+          ([KSKNW_WORK_PK]
+          ,[KSKNW_NONWORK_PK]
+          ,[KSKNW_START_DT]
+          ,[KSKNW_END_DT]
+          ,[KSKNW_NOTE]
+          ,[KSKNW_REGIST_NM]
+          ,[KSKNW_REGIST_DT])
+        VALUES
+          (@작업NO,@비가동NO,@시작일시,@종료일시,@비고,@등록자,@등록일시)
+      `);
+
     // 로그기록 저장
     await logSend(
       (type = "등록"),
@@ -155,6 +187,7 @@ router.post("/edit", async (req, res) => {
           SET
             [KSKWK_STATUS] = '고장중'
             ,[KSKWK_REGIST_DT] = @등록일시
+          WHERE [KSKWK_PK] = @NO
         END
       END
       ELSE
