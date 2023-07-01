@@ -1,14 +1,57 @@
 <script setup lang="ts">
-import { ref, watch } from "vue";
+import { getCurrentInstance, onMounted, ref, watch } from "vue";
 import Button from "../../../base-components/Button";
 import Lucide from "../../../base-components/Lucide";
 import dayjs from "dayjs";
 
-// 날짜 구하기
-const now = dayjs().format("YYYY-MM-DD HH:mm:ss");
+// API 보내는 함수 및 인터페이스 불러오기
+import { useSendApi } from "../../../composables/useSendApi";
+import { KioskWork, KioskItem } from "../../../interfaces/menu/kioskInterface";
+import { StockProcess } from "../../../interfaces/menu/stockInterface";
 
-// 임시 데이터
+// 데이터 가져오기
+const props = defineProps<{
+  키오스크no?: any;
+  설비명?: any;
+}>();
 
+// 데이터 내보내기
+const output = ref();
+const emit = defineEmits(["update:output", "update:modalclose"]);
+emit(`update:output`, output.value); // 실제로 내보낼 때 쓰는 코드
+
+// 페이지 로딩 시 시작
+onMounted(async () => {
+  await kiosk_item.searchDatas("", "작업NO", props.키오스크no, "", ""); // 키오스크 투입자재 데이터 불러오기
+  await kiosk_modal_work.searchDatas("", "NO", props.키오스크no, "", ""); // 작업현황 불러오기
+  // await kiosk_modal_itemprocessstock.searchDatas("", "전체", "", "", ""); // 재공 데이터 불러오기
+  await kiosk_modal_itemprocessstock.loadDatas(); // 재공 데이터 불러오기
+
+  itemInsertData.value.작업NO = props.키오스크no;
+});
+
+// ########  등록  ########
+const itemInsertData = ref({} as KioskItem);
+
+const r1 = ref(1);
+
+// 키오스크 투입자재
+const url_kiosk_item = "/api/kiosk/item";
+const kiosk_item = useSendApi<KioskItem>(url_kiosk_item, r1, r1);
+
+// 키오스크 작업 현황 데이터 가져오기
+const url_kiosk_modal_work = "/api/kiosk/modal/kioskwork";
+const kiosk_modal_work = useSendApi<KioskWork>(url_kiosk_modal_work, r1, r1);
+
+// LOT별품목 재공현황 데이터 가져오기
+const url_kiosk_modal_itemprocessstock = "/api/kiosk/modal/itemprocessstock";
+const kiosk_modal_itemprocessstock = useSendApi<StockProcess>(
+  url_kiosk_modal_itemprocessstock,
+  r1,
+  r1
+);
+
+// ###################################################  키패드  ###################################################
 // 키패드
 const num = ref("0");
 const num_show = ref("0");
@@ -69,59 +112,85 @@ watch([num], (newValue, oldValue) => {
                 style="position: sticky; top: 0px; z-index: 2"
               >
                 <th
-                  class="border-l-2 border-t-2 border-r-2 border-[#D9821C] w-24"
+                  class="border-l-2 border-t-2 border-r-2 border-[#D9821C] w-10"
                 >
-                  입고코드
+                  작업코드
                 </th>
-                <th class="border-t-2 border-r-2 border-[#D9821C] w-24">
-                  품목코드
+                <th class="border-t-2 border-r-2 border-[#D9821C] w-10">
+                  LOT코드
                 </th>
-                <th class="border-t-2 border-r-2 border-[#D9821C] w-14">
+                <th class="border-t-2 border-r-2 border-[#D9821C] w-20">
                   품목구분
                 </th>
-                <th class="border-t-2 border-r-2 border-[#D9821C] w-28">
+                <th class="border-t-2 border-r-2 border-[#D9821C] w-20">
                   품명
                 </th>
-                <th class="border-t-2 border-r-2 border-[#D9821C] w-28">
+                <th class="border-t-2 border-r-2 border-[#D9821C] w-20">
                   규격
                 </th>
-                <th class="border-t-2 border-r-2 border-[#D9821C] w-16">
+                <th class="border-t-2 border-r-2 border-[#D9821C] w-20">
                   단위
                 </th>
-                <th class="border-t-2 border-r-2 border-[#D9821C] w-16">
-                  수량
+                <th class="border-t-2 border-r-2 border-[#D9821C] w-20">
+                  재공수
                 </th>
                 <th class="border-t-2 border-r-2 border-[#D9821C] w-20">
                   선택
                 </th>
               </thead>
               <tbody>
-                <tr class="text-center" v-for="i in Array(10).fill('10')">
+                <tr
+                  class="text-center"
+                  v-for="todo in kiosk_modal_itemprocessstock.dataSearchAll
+                    .value"
+                  :key="todo.LOT코드"
+                >
                   <td
                     class="border-l-2 border-b-2 border-r-2 border-[#D9821C] h-16"
                   >
-                    IN0023
+                    {{ todo.작업코드 }}
                   </td>
                   <td class="border-b-2 border-r-2 border-[#D9821C] h-9">
-                    A0003
+                    {{ todo.LOT코드 }}
                   </td>
                   <td class="border-b-2 border-r-2 border-[#D9821C] h-9">
-                    원부자재
+                    {{ todo.품목구분 }}
                   </td>
                   <td class="border-b-2 border-r-2 border-[#D9821C] h-9">
-                    MOLD
+                    {{ todo.품명 }}
                   </td>
                   <td class="border-b-2 border-r-2 border-[#D9821C] h-9">
-                    200mm
-                  </td>
-                  <td class="border-b-2 border-r-2 border-[#D9821C] h-9">장</td>
-                  <td class="border-b-2 border-r-2 border-[#D9821C] h-9">
-                    100
+                    {{ todo.규격 }}
                   </td>
                   <td class="border-b-2 border-r-2 border-[#D9821C] h-9">
-                    <Button class="h-7 w-16" variant="primary"
-                      ><Lucide class="w-5 h-5 mx-auto" icon="CheckSquare"
-                    /></Button>
+                    {{ todo.단위 }}
+                  </td>
+                  <td class="border-b-2 border-r-2 border-[#D9821C] h-9">
+                    {{ todo.재공수 }}
+                  </td>
+                  <td class="border-b-2 border-r-2 border-[#D9821C] h-9">
+                    <Button
+                      class="h-7 w-16"
+                      variant="primary"
+                      @click="
+                        async () => {
+                          itemInsertData.작업NO = props.키오스크no;
+                          itemInsertData.품목NO = todo.품목NO ?? 0;
+                          itemInsertData.LOT코드 = todo.LOT코드 ?? '';
+                          itemInsertData.수량 = '0';
+                          await kiosk_item.insertData(itemInsertData);
+                          await kiosk_item.searchDatas(
+                            '',
+                            '작업NO',
+                            props.키오스크no,
+                            '',
+                            ''
+                          );
+                        }
+                      "
+                    >
+                      <Lucide class="w-5 h-5 mx-auto" icon="CheckSquare" />
+                    </Button>
                   </td>
                 </tr>
               </tbody>
@@ -154,10 +223,7 @@ watch([num], (newValue, oldValue) => {
                 <th
                   class="border-l-2 border-t-2 border-r-2 border-[#D9821C] w-24"
                 >
-                  입고코드
-                </th>
-                <th class="border-t-2 border-r-2 border-[#D9821C] w-24">
-                  품목코드
+                  LOT코드
                 </th>
                 <th class="border-t-2 border-r-2 border-[#D9821C] w-20">
                   품목구분
@@ -182,39 +248,74 @@ watch([num], (newValue, oldValue) => {
                 </th>
               </thead>
               <tbody>
-                <tr class="text-center" v-for="i in Array(10).fill('10')">
+                <tr
+                  class="text-center"
+                  v-for="todo in kiosk_item.dataSearchAll.value"
+                  :key="todo.NO"
+                >
                   <td
                     class="border-l-2 border-b-2 border-r-2 border-[#D9821C] h-16"
                   >
-                    IN0023
+                    {{ todo.LOT코드 }}
                   </td>
                   <td class="border-b-2 border-r-2 border-[#D9821C] h-8">
-                    A0003
+                    {{ todo.품목구분 }}
                   </td>
                   <td class="border-b-2 border-r-2 border-[#D9821C] h-8">
-                    원부자재
+                    {{ todo.품명 }}
                   </td>
                   <td class="border-b-2 border-r-2 border-[#D9821C] h-8">
-                    MOLD
+                    {{ todo.규격 }}
                   </td>
                   <td class="border-b-2 border-r-2 border-[#D9821C] h-8">
-                    200mm
+                    {{ todo.단위 }}
                   </td>
-                  <td class="border-b-2 border-r-2 border-[#D9821C] h-8">장</td>
                   <td class="border-b-2 border-r-2 border-[#D9821C] h-8">
                     <div class="mx-auto p-2 w-20 border-2 border-slate-200">
-                      24
+                      {{ todo.수량 }}
                     </div>
                   </td>
                   <td class="border-b-2 border-r-2 border-[#D9821C] h-8">
-                    <Button class="h-7 w-16" variant="pending"
-                      ><Lucide class="w-5 h-5 mx-auto" icon="Edit"
-                    /></Button>
+                    <Button
+                      class="h-7 w-16"
+                      variant="pending"
+                      @click="
+                        async () => {
+                          itemInsertData = todo;
+                          itemInsertData.수량 = num;
+                          await kiosk_item.editData(itemInsertData);
+                          await kiosk_item.searchDatas(
+                            '',
+                            '작업NO',
+                            props.키오스크no,
+                            '',
+                            ''
+                          );
+                        }
+                      "
+                    >
+                      <Lucide class="w-5 h-5 mx-auto" icon="Edit" />
+                    </Button>
                   </td>
                   <td class="border-b-2 border-r-2 border-[#D9821C] h-8">
-                    <Button class="h-7 w-16" variant="danger"
-                      ><Lucide class="w-5 h-5 mx-auto" icon="Trash2"
-                    /></Button>
+                    <Button
+                      class="h-7 w-16"
+                      variant="danger"
+                      @click="
+                        async () => {
+                          await kiosk_item.deleteData([todo.NO]);
+                          await kiosk_item.searchDatas(
+                            '',
+                            '작업NO',
+                            props.키오스크no,
+                            '',
+                            ''
+                          );
+                        }
+                      "
+                    >
+                      <Lucide class="w-5 h-5 mx-auto" icon="Trash2" />
+                    </Button>
                   </td>
                 </tr>
               </tbody>
@@ -334,6 +435,28 @@ watch([num], (newValue, oldValue) => {
           </div>
         </div>
       </div>
+    </div>
+    <div class="px-5 pb-3 text-center mt-3">
+      <!-- <Button
+          variant="primary"
+          type="button"
+          @click="
+            () => {
+              setItemAddModal(false);
+            }
+          "
+          class="w-40 py-1 text-base mr-10"
+        >
+          확인
+        </Button> -->
+      <Button
+        variant="outline-primary"
+        type="button"
+        class="w-40 py-1 text-base"
+        @click="emit(`update:modalclose`, false)"
+      >
+        닫기
+      </Button>
     </div>
   </div>
 </template>

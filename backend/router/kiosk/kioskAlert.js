@@ -120,7 +120,7 @@ router.post("/insert", async (req, res) => {
         moment().tz("Asia/Seoul").format("YYYY-MM-DD HH:mm:ss")
       ).query(`
         -- 만약 키오스크 작업현황에 작업지시공정이 있다면
-        IF NULL != (SELECT [KSKWK_INST_PROCESS_PK] FROM [QMES2022].[dbo].[KIOSK_WORK_TB] WHERE [KSKWK_PK] = @작업NO)
+        IF  0 != (SELECT COALESCE([KSKWK_INST_PROCESS_PK],0) FROM [QMES2022].[dbo].[KIOSK_WORK_TB] WHERE [KSKWK_PK] = @작업NO)
         BEGIN
           -- 만약 작업지시공정의 진행상황이 작업중이었다면
           IF (SELECT [ISPC_CONDITION] FROM [QMES2022].[dbo].[MANAGE_INSTRUCT_PROCESS_TB]

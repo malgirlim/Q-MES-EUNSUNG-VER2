@@ -137,6 +137,45 @@ router.post("/", async (req, res) => {
         req.body.sortOrder +
         `
       `;
+    } else if (req.body.searchKey == "작업NO") {
+      sql =
+        `
+        SELECT
+          NO AS NO, 작업NO AS 작업NO, 불량NO AS 불량NO, 불량코드 AS 불량코드, 구분 AS 구분, 불량명 AS 불량명, 내용 AS 내용,
+          수량 AS 수량, 비고 AS 비고, 등록자 AS 등록자, 등록일시 AS 등록일시
+        FROM(
+          SELECT
+            [KSKDF_PK] AS NO
+            ,[KSKDF_WORK_PK] AS 작업NO
+            ,[KSKDF_DEFECT_PK] AS 불량NO
+            ,DEFECT.코드 AS 불량코드
+            ,DEFECT.구분 AS 구분
+            ,DEFECT.불량명 AS 불량명
+            ,DEFECT.내용 AS 내용
+            ,[KSKDF_AMOUNT] AS 수량
+            ,[KSKDF_NOTE] AS 비고
+            ,[KSKDF_REGIST_NM] AS 등록자
+            ,[KSKDF_REGIST_DT] AS 등록일시
+          FROM [QMES2022].[dbo].[KIOSK_DEFECT_TB]
+          LEFT JOIN
+          (
+            SELECT
+              [DEFT_PK] AS NO
+              ,[DEFT_CODE] AS 코드
+              ,[DEFT_DIV] AS 구분
+              ,[DEFT_NAME] AS 불량명
+              ,[DEFT_CONTENT] AS 내용
+            FROM [QMES2022].[dbo].[MASTER_DEFECT_TB]
+          ) AS DEFECT ON DEFECT.NO = [KSKDF_DEFECT_PK]
+        ) AS RESULT
+        WHERE (1=1)
+        AND 작업NO = @input
+        ORDER BY ` +
+        req.body.sortKey +
+        ` ` +
+        req.body.sortOrder +
+        `
+      `;
     } else {
       sql =
         `

@@ -30,8 +30,8 @@ onMounted(async () => {
   await kiosk_modal_work.searchDatas("", "NO", props.키오스크no, "", ""); // 작업현황 불러오기
   await kiosk_modal_nonwork.searchDatas("", "구분", "고장", "", ""); // 비가동 데이터 불러오기
 
-  // 고장 시작일시를 따로 받기
   alertInsertData.value.작업NO = props.키오스크no;
+
   // 고장 시작일시를 따로 받기
   alertInsertData.value.시작일시 =
     kiosk_modal_work.dataSearchAll.value[0].등록일시;

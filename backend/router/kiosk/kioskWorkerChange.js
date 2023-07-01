@@ -25,7 +25,7 @@ const logSend = async (type, ct, amount, user) => {
   const Pool = await pool;
   await Pool.request() // 로그기록 저장
     .input("type", type)
-    .input("menu", "키오스크_작업시작") // ############ *중요* 이거 메뉴 이름 바꿔야함 !! #########
+    .input("menu", "키오스크_작업자변경") // ############ *중요* 이거 메뉴 이름 바꿔야함 !! #########
     .input("content", ct.substr(0, 500))
     .input("amount", amount)
     .input("user", user)
@@ -43,25 +43,16 @@ router.post("/edit", async (req, res) => {
     const Pool = await pool;
     await Pool.request()
       .input("NO", req.body.data.NO ?? null)
-      .input("지시공정NO", req.body.data.지시공정NO ?? null)
-      .input("비고", req.body.data.비고 ?? "")
+      .input("작업자ID", req.body.data.작업자ID ?? "")
       .input("등록자", req.body.user ?? "")
       .input(
         "등록일시",
         moment().tz("Asia/Seoul").format("YYYY-MM-DD HH:mm:ss")
       ).query(`
-        -- 작업지시를 작업중으로 수정
-        UPDATE [QMES2022].[dbo].[MANAGE_INSTRUCT_PROCESS_TB]
-        SET
-          [ISPC_CONDITION] = '작업중'
-          ,[ISPC_NOTE] = ''
-        WHERE [ISPC_PK] = @지시공정NO
-
-        -- 설비운전상태를 가동중으로 수정
+        -- 작업자 변경
         UPDATE [QMES2022].[dbo].[KIOSK_WORK_TB]
         SET
-          [KSKWK_START_DT] = GETDATE()
-          ,[KSKWK_STATUS] = '가동중'
+          [KSKWK_USER_ID] = @작업자ID
           ,[KSKWK_REGIST_NM] = @등록자
           ,[KSKWK_REGIST_DT] = @등록일시
         WHERE [KSKWK_PK] = @NO

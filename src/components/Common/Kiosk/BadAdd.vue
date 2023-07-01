@@ -1,14 +1,59 @@
 <script setup lang="ts">
-import { ref, watch } from "vue";
+import { getCurrentInstance, onMounted, ref, watch } from "vue";
 import Button from "../../../base-components/Button";
 import Lucide from "../../../base-components/Lucide";
 import dayjs from "dayjs";
 
-// 날짜 구하기
-const now = dayjs().format("YYYY-MM-DD HH:mm:ss");
+// API 보내는 함수 및 인터페이스 불러오기
+import { useSendApi } from "../../../composables/useSendApi";
+import {
+  KioskWork,
+  KioskDefect,
+} from "../../../interfaces/menu/kioskInterface";
+import { MasterDefect } from "../../../interfaces/menu/masterInterface";
 
-// 임시 데이터
+// 데이터 가져오기
+const props = defineProps<{
+  키오스크no?: any;
+  설비명?: any;
+}>();
 
+// 데이터 내보내기
+const output = ref();
+const emit = defineEmits(["update:output", "update:modalclose"]);
+emit(`update:output`, output.value); // 실제로 내보낼 때 쓰는 코드
+
+// 페이지 로딩 시 시작
+onMounted(async () => {
+  await kiosk_defect.searchDatas("", "작업NO", props.키오스크no, "", ""); // 키오스크 불량 데이터 불러오기
+  await kiosk_modal_work.searchDatas("", "NO", props.키오스크no, "", ""); // 작업현황 불러오기
+  await kiosk_modal_defect.searchDatas("", "전체", "", "", ""); // 불량 데이터 불러오기
+
+  defectInsertData.value.작업NO = props.키오스크no;
+});
+
+// ########  등록  ########
+const defectInsertData = ref({} as KioskDefect);
+
+const r1 = ref(1);
+
+// 키오스크 불량
+const url_kiosk_defect = "/api/kiosk/defect";
+const kiosk_defect = useSendApi<KioskDefect>(url_kiosk_defect, r1, r1);
+
+// 키오스크 작업 현황 데이터 가져오기
+const url_kiosk_modal_work = "/api/kiosk/modal/kioskwork";
+const kiosk_modal_work = useSendApi<KioskWork>(url_kiosk_modal_work, r1, r1);
+
+// 불량 데이터 가져오기
+const url_kiosk_modal_defect = "/api/kiosk/modal/defect";
+const kiosk_modal_defect = useSendApi<MasterDefect>(
+  url_kiosk_modal_defect,
+  r1,
+  r1
+);
+
+// ###################################################  키패드  ###################################################
 // 키패드
 const num = ref("0");
 const num_show = ref("0");
@@ -48,6 +93,10 @@ watch([num], (newValue, oldValue) => {
 });
 </script>
 
+######################################################################################################################
+######################################################################################################################
+######################################################################################################################
+
 <template>
   <div class="p-3">
     <div class="grid grid-cols-10 gap-2 text-lg">
@@ -69,17 +118,17 @@ watch([num], (newValue, oldValue) => {
                 style="position: sticky; top: 0px; z-index: 2"
               >
                 <th
-                  class="border-l-2 border-t-2 border-r-2 border-[#D9821C] w-24"
+                  class="border-l-2 border-t-2 border-r-2 border-[#D9821C] w-20"
                 >
                   코드
                 </th>
-                <th class="border-t-2 border-r-2 border-[#D9821C] w-24">
+                <th class="border-t-2 border-r-2 border-[#D9821C] w-20">
                   구분
                 </th>
-                <th class="border-t-2 border-r-2 border-[#D9821C] w-28">
+                <th class="border-t-2 border-r-2 border-[#D9821C] w-24">
                   불량명
                 </th>
-                <th class="border-t-2 border-r-2 border-[#D9821C] w-28">
+                <th class="border-t-2 border-r-2 border-[#D9821C] w-30">
                   내용
                 </th>
                 <th class="border-t-2 border-r-2 border-[#D9821C] w-20">
@@ -87,25 +136,47 @@ watch([num], (newValue, oldValue) => {
                 </th>
               </thead>
               <tbody>
-                <tr class="text-center" v-for="i in Array(10).fill('10')">
+                <tr
+                  class="text-center"
+                  v-for="todo in kiosk_modal_defect.dataSearchAll.value"
+                  :key="todo.NO"
+                >
                   <td
                     class="border-l-2 border-b-2 border-r-2 border-[#D9821C] h-9"
                   >
-                    BA0023
+                    {{ todo.코드 }}
                   </td>
                   <td class="border-b-2 border-r-2 border-[#D9821C] h-9">
-                    소재불량
+                    {{ todo.구분 }}
                   </td>
                   <td class="border-b-2 border-r-2 border-[#D9821C] h-9">
-                    오염
+                    {{ todo.불량명 }}
                   </td>
                   <td class="border-b-2 border-r-2 border-[#D9821C] h-9">
-                    원단오염
+                    {{ todo.내용 }}
                   </td>
                   <td class="border-b-2 border-r-2 border-[#D9821C] h-9">
-                    <Button class="h-7 w-16" variant="primary"
-                      ><Lucide class="w-5 h-5 mx-auto" icon="CheckSquare"
-                    /></Button>
+                    <Button
+                      class="h-7 w-16"
+                      variant="primary"
+                      @click="
+                        async () => {
+                          defectInsertData.작업NO = props.키오스크no;
+                          defectInsertData.불량NO = todo.NO ?? 0;
+                          defectInsertData.수량 = '0';
+                          await kiosk_defect.insertData(defectInsertData);
+                          await kiosk_defect.searchDatas(
+                            '',
+                            '작업NO',
+                            props.키오스크no,
+                            '',
+                            ''
+                          );
+                        }
+                      "
+                    >
+                      <Lucide class="w-5 h-5 mx-auto" icon="CheckSquare" />
+                    </Button>
                   </td>
                 </tr>
               </tbody>
@@ -136,20 +207,20 @@ watch([num], (newValue, oldValue) => {
                 style="position: sticky; top: 0px; z-index: 2"
               >
                 <th
-                  class="border-l-2 border-t-2 border-r-2 border-[#D9821C] w-24"
+                  class="border-l-2 border-t-2 border-r-2 border-[#D9821C] w-20"
                 >
                   코드
                 </th>
-                <th class="border-t-2 border-r-2 border-[#D9821C] w-24">
+                <th class="border-t-2 border-r-2 border-[#D9821C] w-20">
                   구분
                 </th>
-                <th class="border-t-2 border-r-2 border-[#D9821C] w-20">
+                <th class="border-t-2 border-r-2 border-[#D9821C] w-24">
                   불량명
                 </th>
                 <th class="border-t-2 border-r-2 border-[#D9821C] w-28">
                   내용
                 </th>
-                <th class="border-t-2 border-r-2 border-[#D9821C] w-28">
+                <th class="border-t-2 border-r-2 border-[#D9821C] w-20">
                   수량
                 </th>
                 <th class="border-t-2 border-r-2 border-[#D9821C] w-20">
@@ -160,35 +231,71 @@ watch([num], (newValue, oldValue) => {
                 </th>
               </thead>
               <tbody>
-                <tr class="text-center" v-for="i in Array(10).fill('10')">
+                <tr
+                  class="text-center"
+                  v-for="todo in kiosk_defect.dataSearchAll.value"
+                  :key="todo.NO"
+                >
                   <td
                     class="border-l-2 border-b-2 border-r-2 border-[#D9821C] h-8"
                   >
-                    BA0023
+                    {{ todo.불량코드 }}
                   </td>
                   <td class="border-b-2 border-r-2 border-[#D9821C] h-8">
-                    소재불량
+                    {{ todo.구분 }}
                   </td>
                   <td class="border-b-2 border-r-2 border-[#D9821C] h-8">
-                    오염
+                    {{ todo.불량명 }}
                   </td>
                   <td class="border-b-2 border-r-2 border-[#D9821C] h-8">
-                    원단오염
+                    {{ todo.내용 }}
                   </td>
                   <td class="border-b-2 border-r-2 border-[#D9821C] h-8">
                     <div class="mx-auto p-2 w-32 border-2 border-slate-200">
-                      24
+                      {{ todo.수량 }}
                     </div>
                   </td>
                   <td class="border-b-2 border-r-2 border-[#D9821C] h-8">
-                    <Button class="h-7 w-16" variant="pending"
-                      ><Lucide class="w-5 h-5 mx-auto" icon="Edit"
-                    /></Button>
+                    <Button
+                      class="h-7 w-16"
+                      variant="pending"
+                      @click="
+                        async () => {
+                          defectInsertData = todo;
+                          defectInsertData.수량 = num;
+                          await kiosk_defect.editData(defectInsertData);
+                          await kiosk_defect.searchDatas(
+                            '',
+                            '작업NO',
+                            props.키오스크no,
+                            '',
+                            ''
+                          );
+                        }
+                      "
+                    >
+                      <Lucide class="w-5 h-5 mx-auto" icon="Edit" />
+                    </Button>
                   </td>
                   <td class="border-b-2 border-r-2 border-[#D9821C] h-8">
-                    <Button class="h-7 w-16" variant="danger"
-                      ><Lucide class="w-5 h-5 mx-auto" icon="Trash2"
-                    /></Button>
+                    <Button
+                      class="h-7 w-16"
+                      variant="danger"
+                      @click="
+                        async () => {
+                          await kiosk_defect.deleteData([todo.NO]);
+                          await kiosk_defect.searchDatas(
+                            '',
+                            '작업NO',
+                            props.키오스크no,
+                            '',
+                            ''
+                          );
+                        }
+                      "
+                    >
+                      <Lucide class="w-5 h-5 mx-auto" icon="Trash2" />
+                    </Button>
                   </td>
                 </tr>
               </tbody>
@@ -308,6 +415,28 @@ watch([num], (newValue, oldValue) => {
           </div>
         </div>
       </div>
+    </div>
+    <div class="px-5 pb-3 text-center mt-3">
+      <!-- <Button
+          variant="primary"
+          type="button"
+          @click="
+            () => {
+              setBadAddModal(false);
+            }
+          "
+          class="w-40 py-1 text-base mr-10"
+        >
+          확인
+        </Button> -->
+      <Button
+        variant="outline-primary"
+        type="button"
+        class="w-40 py-1 text-base"
+        @click="emit(`update:modalclose`, false)"
+      >
+        닫기
+      </Button>
     </div>
   </div>
 </template>

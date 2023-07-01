@@ -9,6 +9,7 @@ export interface KioskWork {
   품명: string;
   규격: string;
   단위: string;
+  작업표준서: string;
   지시수량: string;
   완료수량: string;
   시작일: string;

@@ -30,6 +30,7 @@ import {
 import TaskList from "../../components/Common/Kiosk/TaskList.vue";
 import CheckList from "../../components/Common/Kiosk/CheckList.vue";
 import NonOPAdd from "../../components/Common/Kiosk/NonOPAdd.vue";
+import NonOPList from "../../components/Common/Kiosk/NonOPList.vue";
 import BadAdd from "../../components/Common/Kiosk/BadAdd.vue";
 import ItemAdd from "../../components/Common/Kiosk/ItemAdd.vue";
 import WorkerChange from "../../components/Common/Kiosk/WorkerChange.vue";
@@ -112,6 +113,11 @@ onMounted(async () => {
   await kiosk_work.loadDatas();
   await searchKioskWork();
 
+  // 60초에 한번씩은 새로고침이 되도록
+  setInterval(() => {
+    searchKioskWork();
+  }, 60000);
+
   checked.value = false;
 });
 
@@ -186,6 +192,8 @@ async function searchKioskWork() {
     // 만약 설비현황상태가 고장중이면 자동으로 고장 모달이 켜지도록
     if (running.value == "고장중") {
       alertAddModal.value = true;
+    } else if (running.value == "비가동") {
+      nonOPAddModal.value = true;
     }
   }
 }
@@ -221,6 +229,10 @@ const delete_num = () => {
 // 생산수 저장함수
 const 생산수량_초기화 = () => {
   생산수량.value = "0";
+
+  // 생산수 데이터 변경하기
+  kiosk_work_data.value.생산수 = 생산수량.value;
+  kiosk_work.editData(kiosk_work_data.value);
 };
 const 생산수량_증가 = () => {
   생산수량.value = String(Number(생산수량.value) + Number(입력수량.value));
@@ -302,6 +314,12 @@ const setNonOPAddModal = (value: boolean) => {
   nonOPAddModal.value = value;
 };
 
+/* 비가동확인 Modal */
+const nonOPListModal = ref(false);
+const setNonOPListModal = (value: boolean) => {
+  nonOPListModal.value = value;
+};
+
 /* 불량변경 Modal */
 const badAddModal = ref(false);
 const setBadAddModal = (value: boolean) => {
@@ -318,10 +336,13 @@ const setItemAddModal = (value: boolean) => {
 const finishCheckBox = ref(false);
 const taskFinishModal = ref(false);
 const setTaskFinishModal = (value: boolean) => {
-  taskFinishModal.value = value;
-  if (Number(지시수량) > Number(양품수량.value.replace(/,/g, "")))
+  if (Number(지시수량.value) > Number(양품수량.value.replace(/,/g, ""))) {
     finishCheckBox.value = false;
-  else finishCheckBox.value = true;
+  } else {
+    finishCheckBox.value = true;
+  }
+
+  taskFinishModal.value = value;
 };
 
 /* 작업취소, 보류 Modal */
@@ -359,9 +380,11 @@ watch(
   [
     taskListModal,
     checkListModal,
+    taskAcceptModal,
     taskStartModal,
     nonOPModal,
     nonOPAddModal,
+    nonOPListModal,
     badAddModal,
     itemAddModal,
     taskFinishModal,
@@ -549,8 +572,8 @@ watch(
                         as="a"
                         variant="success"
                         @click="setTaskStandardModal(true)"
-                        ><strong>작업표준서 열기</strong></Button
-                      >
+                        ><strong>작업표준서(레시피) 열기</strong>
+                      </Button>
                     </td>
                   </tr>
                 </tbody>
@@ -919,6 +942,7 @@ watch(
           <Button
             class="mx-2 mb-3 h-10 w-full text-xl text-white"
             :variant="task_status == '작업중' ? 'outline-success' : 'success'"
+            :key="task_status"
             @click="setTaskListModal(true)"
             :disabled="task_status == '작업중'"
             ><strong>작업지시목록</strong></Button
@@ -935,6 +959,7 @@ watch(
             v-if="task_status == '작업대기' || task_status == '작업중'"
             class="mx-2 mb-3 h-10 w-full text-xl text-white"
             :variant="task_status == '작업중' ? 'outline-success' : 'success'"
+            :key="task_status"
             :disabled="task_status == '작업중'"
             @click="setTaskStartModal(true)"
             ><strong>작업시작</strong></Button
@@ -942,6 +967,7 @@ watch(
           <Button
             class="mx-2 mb-3 h-10 w-full text-xl"
             :variant="task_status == '작업중' ? 'pending' : 'outline-pending'"
+            :key="task_status"
             @click="setNonOPModal(true)"
             :disabled="task_status != '작업중'"
             ><strong>비가동전환</strong></Button
@@ -949,18 +975,21 @@ watch(
           <Button
             class="mx-2 mb-3 h-10 w-full text-xl"
             :variant="task_status == '작업중' ? 'pending' : 'outline-pending'"
-            @click="setNonOPModal(true)"
+            :key="task_status"
+            @click="setNonOPListModal(true)"
             :disabled="task_status != '작업중'"
             ><strong>비가동확인</strong></Button
           ><Button
             class="mx-2 mb-3 h-10 w-full text-xl"
             :variant="task_status == '작업중' ? 'pending' : 'outline-pending'"
+            :key="task_status"
             @click="setBadAddModal(true)"
             :disabled="task_status != '작업중'"
             ><strong>불량등록</strong></Button
           ><Button
             class="mx-2 mb-3 h-10 w-full text-xl"
             :variant="task_status == '작업중' ? 'pending' : 'outline-pending'"
+            :key="task_status"
             @click="setItemAddModal(true)"
             :disabled="task_status != '작업중'"
             ><strong>투입자재등록</strong></Button
@@ -1125,7 +1154,7 @@ watch(
   </Dialog>
   <!-- END: 작업시작 확인 Modal -->
 
-  <!-- BEGIN: 비가동확인 Modal -->
+  <!-- BEGIN: 비가동전환 Modal -->
   <Dialog :open="nonOPModal" size="lg" @close="setNonOPModal(false)">
     <Dialog.Panel>
       <div class="p-5 text-center">
@@ -1159,7 +1188,7 @@ watch(
       </div>
     </Dialog.Panel>
   </Dialog>
-  <!-- END: 비가동확인 Modal -->
+  <!-- END: 비가동전환 Modal -->
 
   <!-- BEGIN: 비가동중 Modal -->
   <Dialog :open="nonOPAddModal" size="lg">
@@ -1177,21 +1206,50 @@ watch(
           비가동 사유를 선택하고 작업을 재개해 주세요
         </div>
       </div>
-      <div><NonOPAdd /></div>
-
-      <div class="px-5 pb-3 text-center">
-        <Button
-          variant="primary"
-          type="button"
-          class="w-48 text-base"
-          @click="setNonOPAddModal(false)"
-        >
-          작업재개
-        </Button>
+      <div>
+        <NonOPAdd
+          :키오스크no="키오스크NO"
+          :설비명="설비명"
+          v-model:modalclose="nonOPAddModal"
+        />
       </div>
     </Dialog.Panel>
   </Dialog>
   <!-- END: 비가동중 Modal -->
+
+  <!-- BEGIN: 비가동확인 Modal -->
+  <Dialog :open="nonOPListModal" size="xxl" @close="setNonOPListModal(false)">
+    <Dialog.Panel>
+      <div class="p-3 text-center">
+        <div class="flex items-center">
+          <div class="flex mx-auto items-center">
+            <Lucide icon="PauseCircle" class="w-9 h-9 mx-auto text-[#D9821C]" />
+            <div class="pt-1 mx-2 text-lg">
+              <strong>비가동 리스트 확인</strong>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div>
+        <NonOPList
+          :키오스크no="키오스크NO"
+          :설비명="설비명"
+          v-model:modalclose="nonOPAddModal"
+        />
+      </div>
+      <div class="mt-5 px-5 pb-8 text-center">
+        <Button
+          variant="outline-primary"
+          type="button"
+          class="w-48 text-2xl"
+          @click="setNonOPListModal(false)"
+        >
+          닫기
+        </Button>
+      </div>
+    </Dialog.Panel>
+  </Dialog>
+  <!-- END: 비가동확인 Modal -->
 
   <!-- BEGIN: 불량변경 Modal -->
   <Dialog :open="badAddModal" size="xxl" @close="setBadAddModal(false)">
@@ -1199,29 +1257,12 @@ watch(
       <div class="px-3 pt-3 text-center">
         <div class="text-xl"><strong>불량변경</strong></div>
       </div>
-      <div><BadAdd /></div>
-
-      <div class="px-5 pb-3 text-center">
-        <Button
-          variant="primary"
-          type="button"
-          @click="
-            () => {
-              setBadAddModal(false);
-            }
-          "
-          class="w-40 py-1 text-base mr-10"
-        >
-          확인
-        </Button>
-        <Button
-          variant="outline-primary"
-          type="button"
-          class="w-40 py-1 text-base"
-          @click="setBadAddModal(false)"
-        >
-          닫기
-        </Button>
+      <div>
+        <BadAdd
+          :키오스크no="키오스크NO"
+          :설비명="설비명"
+          v-model:modalclose="badAddModal"
+        />
       </div>
     </Dialog.Panel>
   </Dialog>
@@ -1233,29 +1274,12 @@ watch(
       <div class="px-3 pt-3 text-center">
         <div class="text-xl"><strong>투입자재변경</strong></div>
       </div>
-      <div><ItemAdd /></div>
-
-      <div class="px-5 pb-3 text-center">
-        <Button
-          variant="primary"
-          type="button"
-          @click="
-            () => {
-              setItemAddModal(false);
-            }
-          "
-          class="w-40 py-1 text-base mr-10"
-        >
-          확인
-        </Button>
-        <Button
-          variant="outline-primary"
-          type="button"
-          class="w-40 py-1 text-base"
-          @click="setItemAddModal(false)"
-        >
-          닫기
-        </Button>
+      <div>
+        <ItemAdd
+          :키오스크no="키오스크NO"
+          :설비명="설비명"
+          v-model:modalclose="itemAddModal"
+        />
       </div>
     </Dialog.Panel>
   </Dialog>
@@ -1533,7 +1557,9 @@ watch(
         style="height: 540px; overflow-y: scroll; overflow-x: hidden"
       >
         <inner-image-zoom
-          src="../../src/assets/images/task_standard/G5Z24.png"
+          :src="
+            '../../backend/uploads/master/recipe/' + kiosk_work_data.작업표준서
+          "
           :zoomScale="1"
           :hideCloseButton="true"
           :hasSpacer="true"
@@ -1566,29 +1592,12 @@ watch(
         <div class="mt-5 text-3xl"><strong>작업자 변경</strong></div>
         <div class="mt-3 text-2xl">변경할 작업자를 선택해주세요.</div>
       </div>
-      <div><WorkerChange /></div>
-
-      <div class="mt-5 px-5 pb-8 text-center">
-        <Button
-          variant="primary"
-          type="button"
-          @click="
-            () => {
-              setWorkerChangeModal(false);
-            }
-          "
-          class="w-48 text-2xl mr-10"
-        >
-          변경
-        </Button>
-        <Button
-          variant="outline-primary"
-          type="button"
-          class="w-48 text-2xl"
-          @click="setWorkerChangeModal(false)"
-        >
-          취소
-        </Button>
+      <div>
+        <WorkerChange
+          :키오스크no="키오스크NO"
+          :설비명="설비명"
+          v-model:modalclose="workerChangeModal"
+        />
       </div>
     </Dialog.Panel>
   </Dialog>

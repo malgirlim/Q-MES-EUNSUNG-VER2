@@ -12,16 +12,25 @@ import "vue-inner-image-zoom/lib/vue-inner-image-zoom.css";
 import VueJsProgress from "vue-js-progress";
 
 import dayjs from "dayjs";
+
 import { toast } from "vue3-toastify";
 
 import axios from "axios";
 import router from "../../router";
 
-//컴포넌트 로드
+// API 보내는 함수 및 인터페이스 불러오기
+import { useSendApi } from "../../composables/useSendApi";
+import {
+  KioskWork,
+  KioskDefect,
+  KioskNonwork,
+} from "../../interfaces/menu/kioskInterface";
 
+//컴포넌트 로드
 import TaskList from "../../components/Common/Kiosk/TaskList.vue";
 import CheckList from "../../components/Common/Kiosk/CheckList.vue";
 import NonOPAdd from "../../components/Common/Kiosk/NonOPAdd.vue";
+import NonOPList from "../../components/Common/Kiosk/NonOPList.vue";
 import BadAdd from "../../components/Common/Kiosk/BadAdd.vue";
 import ItemAdd from "../../components/Common/Kiosk/ItemAdd.vue";
 import WorkerChange from "../../components/Common/Kiosk/WorkerChange.vue";
@@ -30,7 +39,7 @@ import AlertAdd from "../../components/Common/Kiosk/AlertAdd.vue";
 /* ##########################################  키오스크 정보 관련 (중요!)  ########################################## */
 
 const 키오스크NO = 2;
-const 설비명 = "인쇄기2";
+const 설비명 = "설비명2"; // 인쇄기1
 
 /* ################################################################################################################ */
 
@@ -69,6 +78,28 @@ const setLogoutModal = (value: boolean) => {
 };
 /*로그인 관련 END*/
 
+/* ################################################################################################################ */
+
+const r1 = ref(1);
+
+// dataManager 만들기
+const url_kiosk_work = "/api/kiosk/work";
+const kiosk_work = useSendApi<KioskWork>(url_kiosk_work, r1, ref(100));
+
+// 작업수락
+const url_kiosk_taskaccept = "/api/kiosk/taskaccept";
+const kiosk_taskaccept = useSendApi<KioskWork>(url_kiosk_taskaccept, r1, r1);
+
+// 작업시작
+const url_kiosk_taskstart = "/api/kiosk/taskstart";
+const kiosk_taskstart = useSendApi<KioskWork>(url_kiosk_taskstart, r1, r1);
+
+// 작업반려
+const url_kiosk_taskcancle = "/api/kiosk/taskcancle";
+const kiosk_taskcancle = useSendApi<KioskWork>(url_kiosk_taskcancle, r1, r1);
+
+/* ################################################################################################################ */
+
 // 날짜 구하기
 const now = ref(dayjs().format("YYYY-MM-DD HH:mm:ss"));
 
@@ -76,24 +107,98 @@ const now = ref(dayjs().format("YYYY-MM-DD HH:mm:ss"));
 onMounted(async () => {
   setInterval(() => {
     now.value = dayjs().format("YYYY-MM-DD HH:mm:ss");
+    setRunningTime();
   }, 1000);
+
+  await kiosk_work.loadDatas();
+  await searchKioskWork();
+
+  // 60초에 한번씩은 새로고침이 되도록
+  setInterval(() => {
+    searchKioskWork();
+  }, 60000);
+
+  checked.value = false;
 });
 
-// 임시데이터
-const running = "미가동";
-const task_status = "작업미확인";
-const checked = false;
-const 지시수량 = ref("3000");
+// 작업현황
+const kiosk_work_data = ref({} as KioskWork);
+
+// 가동시간 구하기
+const 가동시작 = ref("");
+const 비가동Time = ref("0");
+const 부하시간 = ref("00h00m00s");
+const 운전시간 = ref("00h00m00s");
+const 비가동시간 = ref("00h00m00s");
+
+function setRunningTime() {
+  if (task_status.value == "작업중") {
+    let diffTime_시작_현재 = dayjs().diff(가동시작.value);
+    let 부하 = dayjs.duration(diffTime_시작_현재);
+    let 운전 = dayjs.duration(diffTime_시작_현재 - Number(비가동Time.value));
+    let 비가동 = dayjs.duration(Number(비가동Time.value));
+
+    부하시간.value =
+      부하.hours() + "h" + 부하.minutes() + "m" + 부하.seconds() + "s";
+    운전시간.value =
+      운전.hours() + "h" + 운전.minutes() + "m" + 운전.seconds() + "s";
+    비가동시간.value =
+      비가동.hours() + "h" + 비가동.minutes() + "m" + 비가동.seconds() + "s";
+  }
+}
+
+// 작업현황 초기값 설정
+const running = ref("미가동");
+const task_status = ref("작업미확인");
+const 지시수량 = ref("0");
 const 완료수량 = ref("0");
 
 // 생산실적 초기값 설정
 const 생산수량 = ref("0");
-const 불량수량 = ref("27");
-const 양품수량 = ref(
-  String(
-    Number(완료수량.value) + Number(생산수량.value) - Number(불량수량.value)
-  )
-);
+const 불량수량 = ref("0");
+const 양품수량 = ref("0");
+
+// 일상점검 확인
+const checked = ref(false);
+
+// 작업현황 조회 함수
+async function searchKioskWork() {
+  // 키오스크 현황 데이터 불러오기
+  await kiosk_work.searchDatas("", "", String(키오스크NO), "", "");
+
+  // 현재 키오스크NO와 같은 데이터만 불러오기
+  kiosk_work_data.value = kiosk_work.dataSearchAll.value.filter(
+    (f) => f.NO === 키오스크NO
+  )[0];
+
+  // 키오스크NO가 있으면 실행
+  if (kiosk_work_data.value != undefined) {
+    가동시작.value = kiosk_work_data.value.시작일시 ?? "";
+    비가동Time.value = kiosk_work_data.value.비가동시간 ?? "0";
+
+    kiosk_work_data.value.작업자ID = kiosk_work_data.value.작업자ID[0] ?? 0;
+    kiosk_work_data.value.작업자 = kiosk_work_data.value.작업자[0] ?? "";
+
+    running.value = kiosk_work_data.value.설비현황 ?? "미가동";
+    task_status.value = kiosk_work_data.value.진행상황 ?? "작업미확인";
+    지시수량.value = kiosk_work_data.value.지시수량 ?? "0";
+    완료수량.value = kiosk_work_data.value.완료수량 ?? "0";
+    생산수량.value = kiosk_work_data.value.생산수 ?? "0";
+    불량수량.value = kiosk_work_data.value.불량수 ?? "0";
+    양품수량.value = String(
+      Number(완료수량.value) + Number(생산수량.value) - Number(불량수량.value)
+    );
+
+    // 만약 설비현황상태가 고장중이면 자동으로 고장 모달이 켜지도록
+    if (running.value == "고장중") {
+      alertAddModal.value = true;
+    } else if (running.value == "비가동") {
+      nonOPAddModal.value = true;
+    }
+  }
+}
+
+/* ################################################################################################################ */
 
 // ########################### 키패드 (생산수입력) BEGIN ###########################
 const 입력수량 = ref("0");
@@ -124,15 +229,29 @@ const delete_num = () => {
 // 생산수 저장함수
 const 생산수량_초기화 = () => {
   생산수량.value = "0";
+
+  // 생산수 데이터 변경하기
+  kiosk_work_data.value.생산수 = 생산수량.value;
+  kiosk_work.editData(kiosk_work_data.value);
 };
 const 생산수량_증가 = () => {
   생산수량.value = String(Number(생산수량.value) + Number(입력수량.value));
+
+  // 생산수 데이터 변경하기
+  kiosk_work_data.value.생산수 = 생산수량.value;
+  kiosk_work.editData(kiosk_work_data.value);
+
   입력수량.value = "0";
   입력수량_show.value = "0";
 };
 const 생산수량_차감 = () => {
   생산수량.value = String(Number(생산수량.value) - Number(입력수량.value));
   if (Number(생산수량.value) < 0) 생산수량.value = "0";
+
+  // 생산수 데이터 변경하기
+  kiosk_work_data.value.생산수 = 생산수량.value;
+  kiosk_work.editData(kiosk_work_data.value);
+
   입력수량.value = "0";
   입력수량_show.value = "0";
 };
@@ -157,6 +276,8 @@ watch([생산수량], (newValue, oldValue) => {
 
 // ########################### 키패드 (생산수입력) END ###########################
 
+/* ################################################################################################################ */
+
 /* 작업지시목록 Modal */
 const taskListModal = ref(false);
 const setTaskListModal = (value: boolean) => {
@@ -164,10 +285,15 @@ const setTaskListModal = (value: boolean) => {
 };
 
 /* 점검목록 Modal */
-const checkListCheckBox = ref(false);
 const checkListModal = ref(false);
 const setCheckListModal = (value: boolean) => {
   checkListModal.value = value;
+};
+
+/* 작업 수락 Modal */
+const taskAcceptModal = ref(false);
+const settaskAcceptModal = (value: boolean) => {
+  taskAcceptModal.value = value;
 };
 
 /* 작업시작 Modal */
@@ -188,6 +314,12 @@ const setNonOPAddModal = (value: boolean) => {
   nonOPAddModal.value = value;
 };
 
+/* 비가동확인 Modal */
+const nonOPListModal = ref(false);
+const setNonOPListModal = (value: boolean) => {
+  nonOPListModal.value = value;
+};
+
 /* 불량변경 Modal */
 const badAddModal = ref(false);
 const setBadAddModal = (value: boolean) => {
@@ -204,10 +336,13 @@ const setItemAddModal = (value: boolean) => {
 const finishCheckBox = ref(false);
 const taskFinishModal = ref(false);
 const setTaskFinishModal = (value: boolean) => {
-  taskFinishModal.value = value;
-  if (Number(지시수량) > Number(양품수량.value.replace(/,/g, "")))
+  if (Number(지시수량.value) > Number(양품수량.value.replace(/,/g, ""))) {
     finishCheckBox.value = false;
-  else finishCheckBox.value = true;
+  } else {
+    finishCheckBox.value = true;
+  }
+
+  taskFinishModal.value = value;
 };
 
 /* 작업취소, 보류 Modal */
@@ -239,6 +374,32 @@ const workerChangeModal = ref(false);
 const setWorkerChangeModal = (value: boolean) => {
   workerChangeModal.value = value;
 };
+
+// [watch] 모달이 켜지거나 꺼질 때 작업현황데이터를 갱신하기 위해
+watch(
+  [
+    taskListModal,
+    checkListModal,
+    taskAcceptModal,
+    taskStartModal,
+    nonOPModal,
+    nonOPAddModal,
+    nonOPListModal,
+    badAddModal,
+    itemAddModal,
+    taskFinishModal,
+    taskCancleModal,
+    alertModal,
+    alertAddModal,
+    taskStandardModal,
+    workerChangeModal,
+  ],
+  (newValue, oldValue) => {
+    setTimeout(() => {
+      searchKioskWork();
+    }, 500);
+  }
+);
 </script>
 
 <!-- 
@@ -261,7 +422,7 @@ const setWorkerChangeModal = (value: boolean) => {
         </h2>
       </div>
       <div class="text-center text-sm">
-        <strong>인쇄기2 설비 작업현황</strong>
+        <strong>{{ 설비명 }} 설비 작업현황</strong>
       </div>
       <div class="mx-auto">
         <div></div>
@@ -288,7 +449,7 @@ const setWorkerChangeModal = (value: boolean) => {
       <div class="flex items-center col-span-1 text-sm">
         <div class="flex items-center mr-3">
           <Lucide class="w-5 h-5 mr-1" icon="CalendarClock" /><strong
-            >가동시작 : 2023-05-11 14:43</strong
+            >가동시작 : {{ 가동시작 ?? "" }}</strong
           >
         </div>
         <div class="flex items-center">
@@ -329,20 +490,17 @@ const setWorkerChangeModal = (value: boolean) => {
       </div>
 
       <div class="flex items-center col-span-1 text-right text-sm">
-        <div class="flex ml-auto items-center mr-3">
-          <Lucide class="w-5 h-5 mr-1 mb-0.5" icon="ArrowUpCircle" /><strong
-            >부하시간 : 14:43:00</strong
-          >
+        <div class="flex ml-auto items-center mr-2">
+          <Lucide class="w-5 h-5 mr-1 mb-0.5" icon="ArrowUpCircle" />
+          <strong>부하 : {{ 부하시간 }}</strong>
         </div>
-        <div class="flex ml-auto items-center mr-3">
-          <Lucide class="w-5 h-5 mr-1 mb-0.5" icon="PlayCircle" /><strong
-            >운전시간 : 14:43:00</strong
-          >
+        <div class="flex items-center mr-2">
+          <Lucide class="w-5 h-5 mr-1 mb-0.5" icon="PlayCircle" />
+          <strong>운전 : {{ 운전시간 }}</strong>
         </div>
         <div class="flex items-center">
-          <Lucide class="w-5 h-5 mr-1 mb-0.5" icon="PauseCircle" /><strong
-            >비가동시간 : 14:43:00</strong
-          >
+          <Lucide class="w-5 h-5 mr-1 mb-0.5" icon="PauseCircle" />
+          <strong>비가동 : {{ 비가동시간 }}</strong>
         </div>
       </div>
     </div>
@@ -365,7 +523,9 @@ const setWorkerChangeModal = (value: boolean) => {
                     >
                       품번
                     </td>
-                    <td class="pl-2 text-left">2074-G901-1</td>
+                    <td class="pl-2 text-left">
+                      {{ kiosk_work_data?.품번 ?? "" }}
+                    </td>
                   </tr>
                   <tr class="border-b-2 border-success h-7">
                     <td
@@ -373,7 +533,9 @@ const setWorkerChangeModal = (value: boolean) => {
                     >
                       구분
                     </td>
-                    <td class="pl-2 text-left">반제품</td>
+                    <td class="pl-2 text-left">
+                      {{ kiosk_work_data?.품목구분 ?? "" }}
+                    </td>
                   </tr>
                   <tr class="border-b-2 border-success h-7">
                     <td
@@ -381,7 +543,9 @@ const setWorkerChangeModal = (value: boolean) => {
                     >
                       품명
                     </td>
-                    <td class="pl-2 text-left">POWER TERMINAL PRE-MOLD</td>
+                    <td class="pl-2 text-left">
+                      {{ kiosk_work_data?.품명 ?? "" }}
+                    </td>
                   </tr>
                   <tr class="border-b-2 border-success h-7">
                     <td
@@ -389,7 +553,9 @@ const setWorkerChangeModal = (value: boolean) => {
                     >
                       규격
                     </td>
-                    <td class="pl-2 text-left">A2 E-EGR</td>
+                    <td class="pl-2 text-left">
+                      {{ kiosk_work_data?.규격 ?? "" }}
+                    </td>
                   </tr>
                   <tr class="border-b-2 border-success h-7">
                     <td
@@ -406,8 +572,8 @@ const setWorkerChangeModal = (value: boolean) => {
                         as="a"
                         variant="success"
                         @click="setTaskStandardModal(true)"
-                        ><strong>작업표준서 열기</strong></Button
-                      >
+                        ><strong>작업표준서(레시피) 열기</strong>
+                      </Button>
                     </td>
                   </tr>
                 </tbody>
@@ -588,7 +754,9 @@ const setWorkerChangeModal = (value: boolean) => {
                     >
                       작업코드
                     </td>
-                    <td class="pl-2 text-left">TAS0022112202</td>
+                    <td class="pl-2 text-left">
+                      {{ kiosk_work_data?.작업코드 ?? "" }}
+                    </td>
                   </tr>
                   <tr class="border-b-2 border-success h-7">
                     <td
@@ -596,7 +764,9 @@ const setWorkerChangeModal = (value: boolean) => {
                     >
                       시작일
                     </td>
-                    <td class="pl-2 text-left">2023-05-11</td>
+                    <td class="pl-2 text-left">
+                      {{ kiosk_work_data?.시작일 ?? "" }}
+                    </td>
                   </tr>
 
                   <tr class="border-b-2 border-success h-7">
@@ -605,7 +775,9 @@ const setWorkerChangeModal = (value: boolean) => {
                     >
                       공정명
                     </td>
-                    <td class="pl-2 text-left">인쇄2공정</td>
+                    <td class="pl-2 text-left">
+                      {{ kiosk_work_data?.공정명 ?? "" }}
+                    </td>
                   </tr>
                   <tr class="border-b-2 border-success h-7">
                     <td
@@ -613,7 +785,9 @@ const setWorkerChangeModal = (value: boolean) => {
                     >
                       설비명
                     </td>
-                    <td class="pl-2 text-left">인쇄기2</td>
+                    <td class="pl-2 text-left">
+                      {{ kiosk_work_data?.설비명 ?? "" }}
+                    </td>
                   </tr>
                   <tr class="border-b-2 border-success h-7">
                     <td
@@ -631,7 +805,9 @@ const setWorkerChangeModal = (value: boolean) => {
                     >
                       단위
                     </td>
-                    <td class="pl-2 text-left">매</td>
+                    <td class="pl-2 text-left">
+                      {{ kiosk_work_data?.단위 ?? "" }}
+                    </td>
                   </tr>
                   <tr class="border-b-2 border-success h-7">
                     <td
@@ -641,7 +817,9 @@ const setWorkerChangeModal = (value: boolean) => {
                     </td>
                     <td class="pl-2 text-left">
                       <div class="flex">
-                        <div class="mr-auto">박명한</div>
+                        <div class="mr-auto">
+                          {{ kiosk_work_data?.작업자 ?? "" }}
+                        </div>
                         <div class="ml-auto">
                           <Button
                             class="h-7 text-white mr-2"
@@ -744,7 +922,7 @@ const setWorkerChangeModal = (value: boolean) => {
             @click="$router.push('/kiosk')"
             ><strong>설비선택</strong></Button
           >
-          <Button
+          <!-- <Button
             :class="[
               'mx-2 mb-3 h-10 w-full text-xl text-white',
               { 'border-4 border-danger': checked == false },
@@ -753,10 +931,18 @@ const setWorkerChangeModal = (value: boolean) => {
             variant="success"
             @click="setCheckListModal(true)"
             ><strong>일상점검</strong></Button
+          > -->
+          <Button
+            class="mx-2 mb-3 h-10 w-full text-xl text-white"
+            as="a"
+            variant="success"
+            @click="setCheckListModal(true)"
+            ><strong>일상점검</strong></Button
           >
           <Button
             class="mx-2 mb-3 h-10 w-full text-xl text-white"
-            variant="success"
+            :variant="task_status == '작업중' ? 'outline-success' : 'success'"
+            :key="task_status"
             @click="setTaskListModal(true)"
             :disabled="task_status == '작업중'"
             ><strong>작업지시목록</strong></Button
@@ -766,39 +952,44 @@ const setWorkerChangeModal = (value: boolean) => {
             class="mx-2 mb-3 h-10 w-full text-xl text-white"
             variant="success"
             :disabled="task_status == ''"
-            @click="setTaskStartModal(true)"
+            @click="settaskAcceptModal(true)"
             ><strong>작업수락</strong></Button
           >
           <Button
             v-if="task_status == '작업대기' || task_status == '작업중'"
             class="mx-2 mb-3 h-10 w-full text-xl text-white"
-            variant="success"
+            :variant="task_status == '작업중' ? 'outline-success' : 'success'"
+            :key="task_status"
             :disabled="task_status == '작업중'"
             @click="setTaskStartModal(true)"
             ><strong>작업시작</strong></Button
           >
           <Button
             class="mx-2 mb-3 h-10 w-full text-xl"
-            variant="pending"
+            :variant="task_status == '작업중' ? 'pending' : 'outline-pending'"
+            :key="task_status"
             @click="setNonOPModal(true)"
             :disabled="task_status != '작업중'"
             ><strong>비가동전환</strong></Button
           >
           <Button
             class="mx-2 mb-3 h-10 w-full text-xl"
-            variant="pending"
-            @click="setNonOPModal(true)"
+            :variant="task_status == '작업중' ? 'pending' : 'outline-pending'"
+            :key="task_status"
+            @click="setNonOPListModal(true)"
             :disabled="task_status != '작업중'"
             ><strong>비가동확인</strong></Button
           ><Button
             class="mx-2 mb-3 h-10 w-full text-xl"
-            variant="pending"
+            :variant="task_status == '작업중' ? 'pending' : 'outline-pending'"
+            :key="task_status"
             @click="setBadAddModal(true)"
             :disabled="task_status != '작업중'"
             ><strong>불량등록</strong></Button
           ><Button
             class="mx-2 mb-3 h-10 w-full text-xl"
-            variant="pending"
+            :variant="task_status == '작업중' ? 'pending' : 'outline-pending'"
+            :key="task_status"
             @click="setItemAddModal(true)"
             :disabled="task_status != '작업중'"
             ><strong>투입자재등록</strong></Button
@@ -817,7 +1008,12 @@ const setWorkerChangeModal = (value: boolean) => {
             "
             class="mx-2 mb-3 h-10 w-full text-xl"
             variant="danger"
-            @click="setTaskCancleModal(true)"
+            @click="
+              () => {
+                kiosk_work_data.비고 = '미입력';
+                setTaskCancleModal(true);
+              }
+            "
             :disabled="task_status == ''"
             ><strong>작업반려</strong></Button
           >
@@ -841,7 +1037,7 @@ const setWorkerChangeModal = (value: boolean) => {
   <Dialog :open="taskListModal" size="xxl" @close="setTaskListModal(false)">
     <Dialog.Panel style="top: -8%">
       <div class="p-3 text-center">
-        <div class="mt-3 text-lg"><strong>인쇄기2 작업지시목록</strong></div>
+        <div class="mt-3 text-lg"><strong>인쇄기1 작업지시목록</strong></div>
       </div>
       <div>
         <TaskList
@@ -871,75 +1067,26 @@ const setWorkerChangeModal = (value: boolean) => {
       <div class="p-3 text-center">
         <div class="text-xl"><strong>일상점검</strong></div>
       </div>
-      <div><CheckList /></div>
-      <label class="cursor-pointer"
-        ><div class="flex text-center text-base mb-3">
-          <div class="flex m-auto mt-2">
-            <div>
-              <Input
-                class="w-4 h-4 mb-1 transition-all duration-100 ease-in-out shadow-sm border-slate-200 cursor-pointer rounded focus:ring-4 focus:ring-offset-0 focus:ring-primary focus:ring-opacity-20 [&[type='checkbox']]:checked:bg-primary [&[type='checkbox']]:checked:border-primary [&[type='checkbox']]:checked:border-opacity-10 [&:disabled:not(:checked)]:bg-slate-100 [&:disabled:not(:checked)]:cursor-not-allowed [&:disabled:checked]:opacity-70 [&:disabled:checked]:cursor-not-allowed"
-                id="checkListCheckBox"
-                type="checkbox"
-                :value="checkListCheckBox"
-                v-model="checkListCheckBox"
-              />
-            </div>
-            <div class="ml-2">위 점검 목록을 확인하였습니다.</div>
-          </div>
-        </div></label
-      >
-      <div class="mt-1 mb-3 text-center text-base">
-        <div class="flex">
-          <div class="flex mx-auto">
-            <div class="mr-3 mt-1.5">점검자 :</div>
-            <div>
-              <FormSelect class="w-32" model-value="강민철">
-                <option>강민철</option>
-                <option>고범석</option>
-                <option>김주현</option>
-                <option>박명한</option>
-                <option>사은미</option>
-                <option>손정일</option>
-                <option>송은아</option>
-                <option>윤호상</option>
-                <option>이훈노</option>
-                <option>최순우</option>
-              </FormSelect>
-            </div>
-          </div>
-        </div>
-      </div>
-      <div class="px-5 pb-8 text-center">
-        <Button
-          variant="primary"
-          type="button"
-          class="w-32 mr-10 text-base"
-          :disabled="!checkListCheckBox"
-          @click="setCheckListModal(false)"
-        >
-          저장
-        </Button>
-
-        <Button
-          variant="outline-primary"
-          type="button"
-          class="w-32 text-base"
-          @click="setCheckListModal(false)"
-        >
-          취소
-        </Button>
+      <div>
+        <CheckList
+          :키오스크no="키오스크NO"
+          :설비명="설비명"
+          v-model:modalclose="checkListModal"
+        />
       </div>
     </Dialog.Panel>
   </Dialog>
   <!-- END: 일상점검 Modal -->
 
-  <!-- BEGIN: 작업시작 확인 Modal -->
-  <Dialog :open="taskStartModal" size="lg" @close="setTaskStartModal(false)">
+  <!-- BEGIN: 작업수락 확인 Modal -->
+  <Dialog :open="taskAcceptModal" size="lg" @close="settaskAcceptModal(false)">
     <Dialog.Panel>
       <div class="p-5 text-center">
-        <Lucide icon="Play" class="w-24 h-24 mx-auto mt-3 text-success" />
-        <div class="mt-5 text-3xl"><strong>작업 시작</strong></div>
-        <div class="mt-3 text-2xl">설비가 작업중으로 전환됩니다.</div>
+        <Lucide icon="Check" class="w-24 h-24 mx-auto mt-3 text-success" />
+        <div class="mt-5 text-3xl"><strong>작업 수락</strong></div>
+        <div class="mt-3 text-2xl">
+          선택된 작업을 수락하고, 작업대기로 전환됩니다.
+        </div>
       </div>
 
       <div class="mt-5 px-5 pb-8 text-center">
@@ -948,6 +1095,45 @@ const setWorkerChangeModal = (value: boolean) => {
           type="button"
           @click="
             () => {
+              kiosk_taskaccept.editData(kiosk_work_data);
+              settaskAcceptModal(false);
+            }
+          "
+          class="w-48 text-2xl mr-10"
+        >
+          수락
+        </Button>
+        <Button
+          variant="outline-primary"
+          type="button"
+          class="w-48 text-2xl"
+          @click="settaskAcceptModal(false)"
+        >
+          취소
+        </Button>
+      </div>
+    </Dialog.Panel>
+  </Dialog>
+  <!-- END: 작업시작 확인 Modal -->
+
+  <!-- BEGIN: 작업시작 확인 Modal -->
+  <Dialog :open="taskStartModal" size="lg" @close="setTaskStartModal(false)">
+    <Dialog.Panel>
+      <div class="p-5 text-center">
+        <Lucide icon="Play" class="w-24 h-24 mx-auto mt-3 text-success" />
+        <div class="mt-5 text-3xl"><strong>작업 시작</strong></div>
+        <div class="mt-3 text-2xl">
+          설비를 가동시키고, 작업중으로 전환됩니다.
+        </div>
+      </div>
+
+      <div class="mt-5 px-5 pb-8 text-center">
+        <Button
+          variant="primary"
+          type="button"
+          @click="
+            () => {
+              kiosk_taskstart.editData(kiosk_work_data);
               setTaskStartModal(false);
             }
           "
@@ -968,7 +1154,7 @@ const setWorkerChangeModal = (value: boolean) => {
   </Dialog>
   <!-- END: 작업시작 확인 Modal -->
 
-  <!-- BEGIN: 비가동확인 Modal -->
+  <!-- BEGIN: 비가동전환 Modal -->
   <Dialog :open="nonOPModal" size="lg" @close="setNonOPModal(false)">
     <Dialog.Panel>
       <div class="p-5 text-center">
@@ -1002,33 +1188,68 @@ const setWorkerChangeModal = (value: boolean) => {
       </div>
     </Dialog.Panel>
   </Dialog>
-  <!-- END: 비가동확인 Modal -->
+  <!-- END: 비가동전환 Modal -->
 
   <!-- BEGIN: 비가동중 Modal -->
   <Dialog :open="nonOPAddModal" size="lg">
     <Dialog.Panel style="top: -8%">
       <div class="p-3 text-center">
-        <Lucide icon="Pause" class="w-16 h-16 mx-auto text-[#D9821C]" />
-        <div class="mt-4 text-xl"><strong>설비가 비가동중입니다</strong></div>
-        <div class="mt-2 text-lg">
+        <div class="flex items-center">
+          <div class="flex mx-auto items-center">
+            <Lucide icon="Pause" class="w-9 h-9 mx-auto text-[#D9821C]" />
+            <div class="pt-1 mx-2 text-lg">
+              <strong>설비가 비가동중입니다</strong>
+            </div>
+          </div>
+        </div>
+        <div class="mt-1 text-sm">
           비가동 사유를 선택하고 작업을 재개해 주세요
         </div>
       </div>
-      <div><NonOPAdd /></div>
-
-      <div class="px-5 pb-3 text-center">
-        <Button
-          variant="primary"
-          type="button"
-          class="w-48 text-base"
-          @click="setNonOPAddModal(false)"
-        >
-          작업재개
-        </Button>
+      <div>
+        <NonOPAdd
+          :키오스크no="키오스크NO"
+          :설비명="설비명"
+          v-model:modalclose="nonOPAddModal"
+        />
       </div>
     </Dialog.Panel>
   </Dialog>
   <!-- END: 비가동중 Modal -->
+
+  <!-- BEGIN: 비가동확인 Modal -->
+  <Dialog :open="nonOPListModal" size="xxl" @close="setNonOPListModal(false)">
+    <Dialog.Panel>
+      <div class="p-3 text-center">
+        <div class="flex items-center">
+          <div class="flex mx-auto items-center">
+            <Lucide icon="PauseCircle" class="w-9 h-9 mx-auto text-[#D9821C]" />
+            <div class="pt-1 mx-2 text-lg">
+              <strong>비가동 리스트 확인</strong>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div>
+        <NonOPList
+          :키오스크no="키오스크NO"
+          :설비명="설비명"
+          v-model:modalclose="nonOPAddModal"
+        />
+      </div>
+      <div class="mt-5 px-5 pb-8 text-center">
+        <Button
+          variant="outline-primary"
+          type="button"
+          class="w-48 text-2xl"
+          @click="setNonOPListModal(false)"
+        >
+          닫기
+        </Button>
+      </div>
+    </Dialog.Panel>
+  </Dialog>
+  <!-- END: 비가동확인 Modal -->
 
   <!-- BEGIN: 불량변경 Modal -->
   <Dialog :open="badAddModal" size="xxl" @close="setBadAddModal(false)">
@@ -1036,29 +1257,12 @@ const setWorkerChangeModal = (value: boolean) => {
       <div class="px-3 pt-3 text-center">
         <div class="text-xl"><strong>불량변경</strong></div>
       </div>
-      <div><BadAdd /></div>
-
-      <div class="px-5 pb-3 text-center">
-        <Button
-          variant="primary"
-          type="button"
-          @click="
-            () => {
-              setBadAddModal(false);
-            }
-          "
-          class="w-40 py-1 text-base mr-10"
-        >
-          확인
-        </Button>
-        <Button
-          variant="outline-primary"
-          type="button"
-          class="w-40 py-1 text-base"
-          @click="setBadAddModal(false)"
-        >
-          닫기
-        </Button>
+      <div>
+        <BadAdd
+          :키오스크no="키오스크NO"
+          :설비명="설비명"
+          v-model:modalclose="badAddModal"
+        />
       </div>
     </Dialog.Panel>
   </Dialog>
@@ -1070,29 +1274,12 @@ const setWorkerChangeModal = (value: boolean) => {
       <div class="px-3 pt-3 text-center">
         <div class="text-xl"><strong>투입자재변경</strong></div>
       </div>
-      <div><ItemAdd /></div>
-
-      <div class="px-5 pb-3 text-center">
-        <Button
-          variant="primary"
-          type="button"
-          @click="
-            () => {
-              setItemAddModal(false);
-            }
-          "
-          class="w-40 py-1 text-base mr-10"
-        >
-          확인
-        </Button>
-        <Button
-          variant="outline-primary"
-          type="button"
-          class="w-40 py-1 text-base"
-          @click="setItemAddModal(false)"
-        >
-          닫기
-        </Button>
+      <div>
+        <ItemAdd
+          :키오스크no="키오스크NO"
+          :설비명="설비명"
+          v-model:modalclose="itemAddModal"
+        />
       </div>
     </Dialog.Panel>
   </Dialog>
@@ -1250,7 +1437,11 @@ const setWorkerChangeModal = (value: boolean) => {
         <div class="mt-3 text-2xl">반려 사유를 입력해주세요.</div>
         <div class="mt-5">
           <div class="mt-5">
-            <FormSelect class="w-64" formSelectSize="xxl" model-value="미입력">
+            <FormSelect
+              class="w-64"
+              formSelectSize="xxl"
+              v-model="kiosk_work_data.비고"
+            >
               <option>미입력</option>
               <option>원자재 부족</option>
               <option>부자재 부족</option>
@@ -1268,7 +1459,12 @@ const setWorkerChangeModal = (value: boolean) => {
           variant="danger"
           type="button"
           class="w-40 text-2xl mr-10"
-          @click="setTaskCancleModal(false)"
+          @click="
+            async () => {
+              await kiosk_taskcancle.editData(kiosk_work_data);
+              setTaskCancleModal(false);
+            }
+          "
         >
           작업반려
         </Button>
@@ -1325,25 +1521,25 @@ const setWorkerChangeModal = (value: boolean) => {
   <Dialog :open="alertAddModal" size="lg">
     <Dialog.Panel style="top: -8%">
       <div class="p-3 text-center">
-        <Lucide icon="Siren" class="w-16 h-16 mx-auto text-danger" />
-        <div class="mt-4 text-xl">
-          <strong>설비가 고장 발생중입니다</strong>
+        <div class="flex items-center">
+          <div class="flex mx-auto items-center">
+            <Lucide icon="Siren" class="w-9 h-9 mx-auto text-danger" />
+            <div class="pt-1 mx-2 text-lg">
+              <strong>설비가 고장 발생중입니다</strong>
+            </div>
+            <Lucide icon="Siren" class="w-9 h-9 mx-auto text-danger" />
+          </div>
         </div>
-        <div class="mt-2 text-lg">
+        <div class="mt-1 text-sm">
           고장 사유를 선택하고 설비를 재개해 주세요
         </div>
       </div>
-      <div><AlertAdd /></div>
-
-      <div class="px-5 pb-2 text-center">
-        <Button
-          variant="primary"
-          type="button"
-          class="w-48 text-base"
-          @click="setAlertAddModal(false)"
-        >
-          설비재개
-        </Button>
+      <div>
+        <AlertAdd
+          :키오스크no="키오스크NO"
+          :설비명="설비명"
+          v-model:modalclose="alertAddModal"
+        />
       </div>
     </Dialog.Panel>
   </Dialog>
@@ -1361,7 +1557,9 @@ const setWorkerChangeModal = (value: boolean) => {
         style="height: 540px; overflow-y: scroll; overflow-x: hidden"
       >
         <inner-image-zoom
-          src="../../src/assets/images/task_standard/G5Z24.png"
+          :src="
+            '../../backend/uploads/master/recipe/' + kiosk_work_data.작업표준서
+          "
           :zoomScale="1"
           :hideCloseButton="true"
           :hasSpacer="true"
@@ -1394,29 +1592,12 @@ const setWorkerChangeModal = (value: boolean) => {
         <div class="mt-5 text-3xl"><strong>작업자 변경</strong></div>
         <div class="mt-3 text-2xl">변경할 작업자를 선택해주세요.</div>
       </div>
-      <div><WorkerChange /></div>
-
-      <div class="mt-5 px-5 pb-8 text-center">
-        <Button
-          variant="primary"
-          type="button"
-          @click="
-            () => {
-              setWorkerChangeModal(false);
-            }
-          "
-          class="w-48 text-2xl mr-10"
-        >
-          변경
-        </Button>
-        <Button
-          variant="outline-primary"
-          type="button"
-          class="w-48 text-2xl"
-          @click="setWorkerChangeModal(false)"
-        >
-          취소
-        </Button>
+      <div>
+        <WorkerChange
+          :키오스크no="키오스크NO"
+          :설비명="설비명"
+          v-model:modalclose="workerChangeModal"
+        />
       </div>
     </Dialog.Panel>
   </Dialog>

@@ -242,7 +242,6 @@ router.post("/insert", async (req, res) => {
           ,[KSKIT_ITEM_PK]
           ,[KSKIT_LOTCODE]
           ,[KSKIT_AMOUNT]
-          ,[KSKIT_DT]
           ,[KSKIT_NOTE]
           ,[KSKIT_REGIST_NM]
           ,[KSKIT_REGIST_DT])

@@ -140,6 +140,46 @@ router.post("/", async (req, res) => {
         req.body.sortOrder +
         `
       `;
+    } else if (req.body.searchKey == "작업NO") {
+      sql =
+        `
+        SELECT
+          NO AS NO, 작업NO AS 작업NO, 비가동NO AS 비가동NO, 비가동코드 AS 비가동코드, 구분 AS 구분, 비가동명 AS 비가동명,
+          내용 AS 내용, 시작일시 AS 시작일시, 종료일시 AS 종료일시, 비고 AS 비고, 등록자 AS 등록자, 등록일시 AS 등록일시
+        FROM(
+          SELECT
+            [KSKNW_PK] AS NO
+            ,[KSKNW_WORK_PK] AS 작업NO
+            ,[KSKNW_NONWORK_PK] AS 비가동NO
+            ,NONWORK.코드 AS 비가동코드
+            ,NONWORK.구분 AS 구분
+            ,NONWORK.비가동명 AS 비가동명
+            ,NONWORK.내용 AS 내용
+            ,CONVERT(VARCHAR, [KSKNW_START_DT], 20) AS 시작일시
+            ,CONVERT(VARCHAR, [KSKNW_END_DT], 20) AS 종료일시
+            ,[KSKNW_NOTE] AS 비고
+            ,[KSKNW_REGIST_NM] AS 등록자
+            ,[KSKNW_REGIST_DT] AS 등록일시
+          FROM [QMES2022].[dbo].[KIOSK_NONWORK_TB]
+          LEFT JOIN
+          (
+            SELECT
+              [NOWK_PK] AS NO
+              ,[NOWK_CODE] AS 코드
+              ,[NOWK_DIV] AS 구분
+              ,[NOWK_NAME] AS 비가동명
+              ,[NOWK_CONTENT] AS 내용
+            FROM [QMES2022].[dbo].[MASTER_NONWORK_TB]
+          ) AS NONWORK ON NONWORK.NO = [KSKNW_NONWORK_PK]
+        ) AS RESULT
+        WHERE (1=1)
+        AND 작업NO = @input
+        ORDER BY ` +
+        req.body.sortKey +
+        ` ` +
+        req.body.sortOrder +
+        `
+      `;
     } else {
       sql =
         `
@@ -254,6 +294,50 @@ router.post("/insert", async (req, res) => {
           (@작업NO,@비가동NO,@시작일시,@종료일시,@비고,@등록자,@등록일시)
       `);
 
+    // 작업현황을 원래대로 돌려놓기
+    await Pool.request()
+      .input("작업NO", req.body.data.작업NO ?? null)
+      .input("비고", req.body.data.비고 ?? "")
+      .input("등록자", req.body.user ?? "")
+      .input(
+        "등록일시",
+        moment().tz("Asia/Seoul").format("YYYY-MM-DD HH:mm:ss")
+      ).query(`
+        -- 만약 키오스크 작업현황에 작업지시공정이 있다면
+        IF 0 != (SELECT COALESCE([KSKWK_INST_PROCESS_PK],0) FROM [QMES2022].[dbo].[KIOSK_WORK_TB] WHERE [KSKWK_PK] = @작업NO)
+        BEGIN
+          -- 만약 작업지시공정의 진행상황이 작업중이었다면
+          IF (SELECT [ISPC_CONDITION] FROM [QMES2022].[dbo].[MANAGE_INSTRUCT_PROCESS_TB]
+              WHERE [ISPC_PK] = (SELECT [KSKWK_INST_PROCESS_PK] FROM [QMES2022].[dbo].[KIOSK_WORK_TB] WHERE [KSKWK_PK] = @작업NO)) = '작업중'
+          BEGIN
+            -- 현황을 변경
+            UPDATE [QMES2022].[dbo].[KIOSK_WORK_TB]
+            SET
+              [KSKWK_STATUS] = '가동중'
+              ,[KSKWK_REGIST_DT] = @등록일시
+            WHERE [KSKWK_PK] = @작업NO;
+          END
+          ELSE
+          BEGIN
+            -- 현황을 변경
+            UPDATE [QMES2022].[dbo].[KIOSK_WORK_TB]
+            SET
+              [KSKWK_STATUS] = '미가동'
+              ,[KSKWK_REGIST_DT] = @등록일시
+            WHERE [KSKWK_PK] = @작업NO;
+          END
+        END
+        ELSE
+        BEGIN
+          -- 현황을 변경
+          UPDATE [QMES2022].[dbo].[KIOSK_WORK_TB]
+          SET
+            [KSKWK_STATUS] = '미가동'
+            ,[KSKWK_REGIST_DT] = @등록일시
+          WHERE [KSKWK_PK] = @작업NO;
+        END
+      `);
+
     // 로그기록 저장
     await logSend(
       (type = "등록"),
@@ -280,36 +364,56 @@ router.post("/insert", async (req, res) => {
 router.post("/edit", async (req, res) => {
   try {
     const Pool = await pool;
+    // await Pool.request()
+    //   .input("NO", req.body.data.NO ?? 0)
+    //   .input("작업NO", req.body.data.작업NO ?? null)
+    //   .input("비가동NO", req.body.data.비가동NO ?? null)
+    //   .input(
+    //     "시작일시",
+    //     moment(req.body.data.시작일시).format("YYYY-MM-DD HH:mm:ss") ??
+    //       moment().tz("Asia/Seoul").format("YYYY-MM-DD HH:mm:ss")
+    //   )
+    //   .input(
+    //     "종료일시",
+    //     moment(req.body.data.종료일시).format("YYYY-MM-DD HH:mm:ss") ??
+    //       moment().tz("Asia/Seoul").format("YYYY-MM-DD HH:mm:ss")
+    //   )
+    //   .input("비고", req.body.data.비고 ?? "")
+    //   .input("등록자", req.body.user ?? "")
+    //   .input(
+    //     "등록일시",
+    //     moment().tz("Asia/Seoul").format("YYYY-MM-DD HH:mm:ss")
+    //   ).query(`
+    //     UPDATE [QMES2022].[dbo].[KIOSK_NONWORK_TB]
+    //       SET
+    //         [KSKNW_WORK_PK] = @작업NO
+    //         ,[KSKNW_NONWORK_PK] = @비가동NO
+    //         ,[KSKNW_START_DT] = @시작일시
+    //         ,[KSKNW_END_DT] = @종료일시
+    //         ,[KSKNW_NOTE] = @비고
+    //         ,[KSKNW_REGIST_NM] = @등록자
+    //         ,[KSKNW_REGIST_DT] = @등록일시
+    //       WHERE [KSKNW_PK] = @NO
+    // `);
+
     await Pool.request()
-      .input("NO", req.body.data.NO ?? 0)
-      .input("작업NO", req.body.data.작업NO ?? null)
-      .input("비가동NO", req.body.data.비가동NO ?? null)
-      .input(
-        "시작일시",
-        moment(req.body.data.시작일시).format("YYYY-MM-DD HH:mm:ss") ??
-          moment().tz("Asia/Seoul").format("YYYY-MM-DD HH:mm:ss")
-      )
-      .input(
-        "종료일시",
-        moment(req.body.data.종료일시).format("YYYY-MM-DD HH:mm:ss") ??
-          moment().tz("Asia/Seoul").format("YYYY-MM-DD HH:mm:ss")
-      )
-      .input("비고", req.body.data.비고 ?? "")
+      .input("NO", req.body.data.NO ?? null)
       .input("등록자", req.body.user ?? "")
       .input(
         "등록일시",
         moment().tz("Asia/Seoul").format("YYYY-MM-DD HH:mm:ss")
       ).query(`
-        UPDATE [QMES2022].[dbo].[KIOSK_NONWORK_TB]
-          SET 
-            [KSKNW_WORK_PK] = @작업NO
-            ,[KSKNW_NONWORK_PK] = @비가동NO
-            ,[KSKNW_START_DT] = @시작일시
-            ,[KSKNW_END_DT] = @종료일시
-            ,[KSKNW_NOTE] = @비고
-            ,[KSKNW_REGIST_NM] = @등록자
-            ,[KSKNW_REGIST_DT] = @등록일시
-          WHERE [KSKNW_PK] = @NO
+
+        -- 만약 비가동이 아니라면 -- 왜 IF를 쓰냐면 등록일시를 이용해서 경과시간을 알아내려고
+        IF (SELECT [KSKWK_STATUS] FROM [QMES2022].[dbo].[KIOSK_WORK_TB] WHERE [KSKWK_PK] = @NO) != '비가동'
+        BEGIN
+          -- 현황을 변경
+          UPDATE [QMES2022].[dbo].[KIOSK_WORK_TB]
+          SET
+            [KSKWK_STATUS] = '비가동'
+            ,[KSKWK_REGIST_DT] = @등록일시
+          WHERE [KSKWK_PK] = @NO
+        END;
     `);
 
     // 로그기록 저장
