@@ -26,6 +26,9 @@ onMounted(async () => {
   }, 1000);
 
   await kiosk_work.loadDatas();
+  setInterval(() => {
+    kiosk_work.loadDatas();
+  }, 10000);
 });
 
 // dataManager 만들기
@@ -119,120 +122,100 @@ const year = ref(dayjs().format("YYYY"));
         <FacilityCard
           name="TEST설비명"
           :running="
-            kiosk_work.dataSearchAll.value.filter((k) => {
-              k.NO == 1;
-            })[0]?.설비현황 ?? '미가동'
+            kiosk_work.dataSearchAll.value.filter((k) => k.NO == 1)[0]
+              ?.설비현황 ?? '미가동'
           "
           :product="
-            kiosk_work.dataSearchAll.value.filter((k) => {
-              k.NO == 1;
-            })[0]?.품명 ?? ''
+            kiosk_work.dataSearchAll.value.filter((k) => k.NO == 1)[0]?.품명 ??
+            ''
           "
           :worker="
-            kiosk_work.dataSearchAll.value.filter((k) => {
-              k.NO == 1;
-            })[0]?.작업자[0] ?? ''
+            kiosk_work.dataSearchAll.value.filter((k) => k.NO == 1)[0]
+              ?.작업자 ?? ''
           "
           :time="
-            kiosk_work.dataSearchAll.value.filter((k) => {
-              k.NO == 1;
-            })[0]?.시작일시 ?? ''
+            kiosk_work.dataSearchAll.value.filter((k) => k.NO == 1)[0]
+              ?.시작일시 ?? ''
           "
           @click="$router.push('/kiosk/facility1/')"
         />
         <FacilityCard
           name="설비명2"
           :running="
-            kiosk_work.dataSearchAll.value.filter((k) => {
-              k.NO == 2;
-            })[0]?.설비현황 ?? '미가동'
+            kiosk_work.dataSearchAll.value.filter((k) => k.NO == 2)[0]
+              ?.설비현황 ?? '미가동'
           "
           :product="
-            kiosk_work.dataSearchAll.value.filter((k) => {
-              k.NO == 2;
-            })[0]?.품명 ?? ''
+            kiosk_work.dataSearchAll.value.filter((k) => k.NO == 2)[0]?.품명 ??
+            ''
           "
           :worker="
-            kiosk_work.dataSearchAll.value.filter((k) => {
-              k.NO == 2;
-            })[0]?.작업자[0] ?? ''
+            kiosk_work.dataSearchAll.value.filter((k) => k.NO == 2)[0]
+              ?.작업자 ?? ''
           "
           :time="
-            kiosk_work.dataSearchAll.value.filter((k) => {
-              k.NO == 2;
-            })[0]?.시작일시 ?? ''
+            kiosk_work.dataSearchAll.value.filter((k) => k.NO == 2)[0]
+              ?.시작일시 ?? ''
           "
           @click="$router.push('/kiosk/facility2/')"
         />
         <FacilityCard
           name="설비명3"
           :running="
-            kiosk_work.dataSearchAll.value.filter((k) => {
-              k.NO == 3;
-            })[0]?.설비현황 ?? '미가동'
+            kiosk_work.dataSearchAll.value.filter((k) => k.NO == 3)[0]
+              ?.설비현황 ?? '미가동'
           "
           :product="
-            kiosk_work.dataSearchAll.value.filter((k) => {
-              k.NO == 3;
-            })[0]?.품명 ?? ''
+            kiosk_work.dataSearchAll.value.filter((k) => k.NO == 3)[0]?.품명 ??
+            ''
           "
           :worker="
-            kiosk_work.dataSearchAll.value.filter((k) => {
-              k.NO == 3;
-            })[0]?.작업자[0] ?? ''
+            kiosk_work.dataSearchAll.value.filter((k) => k.NO == 3)[0]
+              ?.작업자 ?? ''
           "
           :time="
-            kiosk_work.dataSearchAll.value.filter((k) => {
-              k.NO == 3;
-            })[0]?.시작일시 ?? ''
+            kiosk_work.dataSearchAll.value.filter((k) => k.NO == 3)[0]
+              ?.시작일시 ?? ''
           "
           @click="$router.push('/kiosk/facility3/')"
         />
         <FacilityCard
           name="설비명4"
           :running="
-            kiosk_work.dataSearchAll.value.filter((k) => {
-              k.NO == 4;
-            })[0]?.설비현황 ?? '미가동'
+            kiosk_work.dataSearchAll.value.filter((k) => k.NO == 4)[0]
+              ?.설비현황 ?? '미가동'
           "
           :product="
-            kiosk_work.dataSearchAll.value.filter((k) => {
-              k.NO == 4;
-            })[0]?.품명 ?? ''
+            kiosk_work.dataSearchAll.value.filter((k) => k.NO == 4)[0]?.품명 ??
+            ''
           "
           :worker="
-            kiosk_work.dataSearchAll.value.filter((k) => {
-              k.NO == 4;
-            })[0]?.작업자[0] ?? ''
+            kiosk_work.dataSearchAll.value.filter((k) => k.NO == 4)[0]
+              ?.작업자 ?? ''
           "
           :time="
-            kiosk_work.dataSearchAll.value.filter((k) => {
-              k.NO == 4;
-            })[0]?.시작일시 ?? ''
+            kiosk_work.dataSearchAll.value.filter((k) => k.NO == 4)[0]
+              ?.시작일시 ?? ''
           "
           @click="$router.push('/kiosk/facility4/')"
         />
         <FacilityCard
           name="설비명5"
           :running="
-            kiosk_work.dataSearchAll.value.filter((k) => {
-              k.NO == 5;
-            })[0]?.설비현황 ?? '미가동'
+            kiosk_work.dataSearchAll.value.filter((k) => k.NO == 5)[0]
+              ?.설비현황 ?? '미가동'
           "
           :product="
-            kiosk_work.dataSearchAll.value.filter((k) => {
-              k.NO == 5;
-            })[0]?.품명 ?? ''
+            kiosk_work.dataSearchAll.value.filter((k) => k.NO == 5)[0]?.품명 ??
+            ''
           "
           :worker="
-            kiosk_work.dataSearchAll.value.filter((k) => {
-              k.NO == 5;
-            })[0]?.작업자[0] ?? ''
+            kiosk_work.dataSearchAll.value.filter((k) => k.NO == 5)[0]
+              ?.작업자 ?? ''
           "
           :time="
-            kiosk_work.dataSearchAll.value.filter((k) => {
-              k.NO == 5;
-            })[0]?.시작일시 ?? ''
+            kiosk_work.dataSearchAll.value.filter((k) => k.NO == 5)[0]
+              ?.시작일시 ?? ''
           "
           @click="$router.push('/kiosk/facility5/')"
         />
@@ -241,120 +224,100 @@ const year = ref(dayjs().format("YYYY"));
         <FacilityCard
           name="설비명6"
           :running="
-            kiosk_work.dataSearchAll.value.filter((k) => {
-              k.NO == 6;
-            })[0]?.설비현황 ?? '미가동'
+            kiosk_work.dataSearchAll.value.filter((k) => k.NO == 6)[0]
+              ?.설비현황 ?? '미가동'
           "
           :product="
-            kiosk_work.dataSearchAll.value.filter((k) => {
-              k.NO == 6;
-            })[0]?.품명 ?? ''
+            kiosk_work.dataSearchAll.value.filter((k) => k.NO == 6)[0]?.품명 ??
+            ''
           "
           :worker="
-            kiosk_work.dataSearchAll.value.filter((k) => {
-              k.NO == 6;
-            })[0]?.작업자[0] ?? ''
+            kiosk_work.dataSearchAll.value.filter((k) => k.NO == 6)[0]
+              ?.작업자 ?? ''
           "
           :time="
-            kiosk_work.dataSearchAll.value.filter((k) => {
-              k.NO == 6;
-            })[0]?.시작일시 ?? ''
+            kiosk_work.dataSearchAll.value.filter((k) => k.NO == 6)[0]
+              ?.시작일시 ?? ''
           "
           @click="$router.push('/kiosk/facility6/')"
         />
         <FacilityCard
           name="설비명7"
           :running="
-            kiosk_work.dataSearchAll.value.filter((k) => {
-              k.NO == 7;
-            })[0]?.설비현황 ?? '미가동'
+            kiosk_work.dataSearchAll.value.filter((k) => k.NO == 7)[0]
+              ?.설비현황 ?? '미가동'
           "
           :product="
-            kiosk_work.dataSearchAll.value.filter((k) => {
-              k.NO == 7;
-            })[0]?.품명 ?? ''
+            kiosk_work.dataSearchAll.value.filter((k) => k.NO == 7)[0]?.품명 ??
+            ''
           "
           :worker="
-            kiosk_work.dataSearchAll.value.filter((k) => {
-              k.NO == 7;
-            })[0]?.작업자[0] ?? ''
+            kiosk_work.dataSearchAll.value.filter((k) => k.NO == 7)[0]
+              ?.작업자 ?? ''
           "
           :time="
-            kiosk_work.dataSearchAll.value.filter((k) => {
-              k.NO == 7;
-            })[0]?.시작일시 ?? ''
+            kiosk_work.dataSearchAll.value.filter((k) => k.NO == 7)[0]
+              ?.시작일시 ?? ''
           "
           @click="$router.push('/kiosk/facility7/')"
         />
         <FacilityCard
           name="설비명8"
           :running="
-            kiosk_work.dataSearchAll.value.filter((k) => {
-              k.NO == 8;
-            })[0]?.설비현황 ?? '미가동'
+            kiosk_work.dataSearchAll.value.filter((k) => k.NO == 8)[0]
+              ?.설비현황 ?? '미가동'
           "
           :product="
-            kiosk_work.dataSearchAll.value.filter((k) => {
-              k.NO == 8;
-            })[0]?.품명 ?? ''
+            kiosk_work.dataSearchAll.value.filter((k) => k.NO == 8)[0]?.품명 ??
+            ''
           "
           :worker="
-            kiosk_work.dataSearchAll.value.filter((k) => {
-              k.NO == 8;
-            })[0]?.작업자[0] ?? ''
+            kiosk_work.dataSearchAll.value.filter((k) => k.NO == 8)[0]
+              ?.작업자 ?? ''
           "
           :time="
-            kiosk_work.dataSearchAll.value.filter((k) => {
-              k.NO == 8;
-            })[0]?.시작일시 ?? ''
+            kiosk_work.dataSearchAll.value.filter((k) => k.NO == 8)[0]
+              ?.시작일시 ?? ''
           "
           @click="$router.push('/kiosk/facility8/')"
         />
         <FacilityCard
           name="설비명9"
           :running="
-            kiosk_work.dataSearchAll.value.filter((k) => {
-              k.NO == 9;
-            })[0]?.설비현황 ?? '미가동'
+            kiosk_work.dataSearchAll.value.filter((k) => k.NO == 9)[0]
+              ?.설비현황 ?? '미가동'
           "
           :product="
-            kiosk_work.dataSearchAll.value.filter((k) => {
-              k.NO == 9;
-            })[0]?.품명 ?? ''
+            kiosk_work.dataSearchAll.value.filter((k) => k.NO == 9)[0]?.품명 ??
+            ''
           "
           :worker="
-            kiosk_work.dataSearchAll.value.filter((k) => {
-              k.NO == 9;
-            })[0]?.작업자[0] ?? ''
+            kiosk_work.dataSearchAll.value.filter((k) => k.NO == 9)[0]
+              ?.작업자 ?? ''
           "
           :time="
-            kiosk_work.dataSearchAll.value.filter((k) => {
-              k.NO == 9;
-            })[0]?.시작일시 ?? ''
+            kiosk_work.dataSearchAll.value.filter((k) => k.NO == 9)[0]
+              ?.시작일시 ?? ''
           "
           @click="$router.push('/kiosk/facility9/')"
         />
         <FacilityCard
           name="설비명10"
           :running="
-            kiosk_work.dataSearchAll.value.filter((k) => {
-              k.NO == 10;
-            })[0]?.설비현황 ?? '미가동'
+            kiosk_work.dataSearchAll.value.filter((k) => k.NO == 10)[0]
+              ?.설비현황 ?? '미가동'
           "
           :product="
-            kiosk_work.dataSearchAll.value.filter((k) => {
-              k.NO == 10;
-            })[0]?.품명 ?? ''
+            kiosk_work.dataSearchAll.value.filter((k) => k.NO == 10)[0]?.품명 ??
+            ''
           "
           :worker="
-            kiosk_work.dataSearchAll.value.filter((k) => {
-              k.NO == 10;
-            })[0]?.작업자[0] ?? ''
+            kiosk_work.dataSearchAll.value.filter((k) => k.NO == 10)[0]
+              ?.작업자 ?? ''
           "
           :time="
-            kiosk_work.dataSearchAll.value.filter((k) => {
-              k.NO == 10;
-            })[0]?.시작일시 ?? ''
+            kiosk_work.dataSearchAll.value.filter((k) => k.NO == 10)[0]
+              ?.시작일시 ?? ''
           "
           @click="$router.push('/kiosk/facility10/')"
         />

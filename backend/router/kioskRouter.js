@@ -14,6 +14,8 @@ const kioskTaskAcceptRouter = require("./kiosk/kioskTaskAccept");
 const kioskTaskStartRouter = require("./kiosk/kioskTaskStart");
 
 const kioskTaskCancleRouter = require("./kiosk/kioskTaskCancle");
+const kioskTaskFinishRouter = require("./kiosk/kioskTaskFinish");
+
 const kioskAlertRouter = require("./kiosk/kioskAlert");
 
 const kioskWorkerChangeRouter = require("./kiosk/kioskWorkerChange");
@@ -46,6 +48,9 @@ router.use("/taskstart", kioskTaskStartRouter);
 
 // 키오스크 / 작업반려 - router/kiosk/kioskTaskCancle.js
 router.use("/taskcancle", kioskTaskCancleRouter);
+// 키오스크 / 작업종료 - router/kiosk/kioskTaskFinish.js
+router.use("/taskfinish", kioskTaskFinishRouter);
+
 // 키오스크 / 고장발생 - router/kiosk/kioskAlert.js
 router.use("/alert", kioskAlertRouter);
 
