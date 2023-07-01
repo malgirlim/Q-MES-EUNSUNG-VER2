@@ -51,7 +51,7 @@ const url_kiosk_alert = "/api/kiosk/alert";
 const kiosk_alert = useSendApi<KioskNonwork>(url_kiosk_alert, r1, r1);
 
 // 키오스크 작업 현황 데이터 가져오기
-const url_kiosk_modal_work = "/api/kiosk/modal/work";
+const url_kiosk_modal_work = "/api/kiosk/modal/kioskwork";
 const kiosk_modal_work = useSendApi<KioskWork>(url_kiosk_modal_work, r1, r1);
 
 // 비가동 데이터 가져오기

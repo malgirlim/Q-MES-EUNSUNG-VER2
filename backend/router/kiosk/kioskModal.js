@@ -379,10 +379,10 @@ router.post("/nonwork", async (req, res) => {
 });
 
 // ###################################################################################################################
-// ###################################################   작업현황   ###################################################
+// ###################################################   키오스크 작업현황   ###################################################
 // ###################################################################################################################
 // 조회
-router.get("/work", async (req, res) => {
+router.get("/kioskwork", async (req, res) => {
   try {
     const Pool = await pool;
     const result = await Pool.request().query(`
@@ -406,6 +406,9 @@ router.get("/work", async (req, res) => {
         ,INST_PROCESS.진행상황 AS 진행상황
         ,CONVERT(VARCHAR, [KSKWK_START_DT], 20) AS 시작일시
         ,[KSKWK_PRODUCE_AMT] AS 생산수
+        ,(SELECT COALESCE(SUM([KSKDF_AMOUNT]*1),0) FROM [QMES2022].[dbo].[KIOSK_DEFECT_TB] WHERE [KSKDF_WORK_PK] = [KSKWK_PK]) AS 불량수
+        ,(SELECT COALESCE(SUM(DATEDIFF(second,CONVERT(VARCHAR, [KSKNW_START_DT], 20),CONVERT(VARCHAR, [KSKNW_END_DT], 20))),0)
+          FROM [QMES2022].[dbo].[KIOSK_NONWORK_TB] WHERE [KSKNW_WORK_PK] = [KSKWK_PK]) AS 비가동시간
         ,[KSKWK_REPORT] AS 특이사항
         ,[KSKWK_STATUS] AS 설비현황
         ,[KSKWK_NOTE] AS 비고
@@ -477,7 +480,7 @@ router.get("/work", async (req, res) => {
   }
 });
 
-router.post("/work", async (req, res) => {
+router.post("/kioskwork", async (req, res) => {
   try {
     var sql = "";
     sql = `
@@ -485,7 +488,7 @@ router.post("/work", async (req, res) => {
           NO AS NO, 작업자ID AS 작업자ID, 작업자 AS 작업자, 지시공정NO AS 지시공정NO, 작업코드 AS 작업코드, 품목구분 AS 품목구분,
           품번 AS 품번, 품명 AS 품명, 규격 AS 규격, 단위 AS 단위, 지시수량 AS 지시수량, 완료수량 AS 완료수량, 시작일 AS 시작일,
           공정명 AS 공정명, 설비NO AS 설비NO, 설비명 AS 설비명, 작업자ID AS 작업자ID, 작업자 AS 작업자, 진행상황 AS 진행상황, 시작일시 AS 시작일시,
-          생산수 AS 생산수, 특이사항 AS 특이사항, 설비현황 AS 설비현황, 비고 AS 비고, 등록자 AS 등록자, 등록일시 AS 등록일시
+          생산수 AS 생산수, 불량수 AS 불량수, 비가동시간 AS 비가동시간, 특이사항 AS 특이사항, 설비현황 AS 설비현황, 비고 AS 비고, 등록자 AS 등록자, 등록일시 AS 등록일시
         FROM(
           SELECT
             [KSKWK_PK] AS NO
@@ -507,6 +510,9 @@ router.post("/work", async (req, res) => {
             ,INST_PROCESS.진행상황 AS 진행상황
             ,CONVERT(VARCHAR, [KSKWK_START_DT], 20) AS 시작일시
             ,[KSKWK_PRODUCE_AMT] AS 생산수
+            ,(SELECT COALESCE(SUM([KSKDF_AMOUNT]*1),0) FROM [QMES2022].[dbo].[KIOSK_DEFECT_TB] WHERE [KSKDF_WORK_PK] = [KSKWK_PK]) AS 불량수
+            ,(SELECT COALESCE(SUM(DATEDIFF(second,CONVERT(VARCHAR, [KSKNW_START_DT], 20),CONVERT(VARCHAR, [KSKNW_END_DT], 20))),0)
+              FROM [QMES2022].[dbo].[KIOSK_NONWORK_TB] WHERE [KSKNW_WORK_PK] = [KSKWK_PK]) AS 비가동시간
             ,[KSKWK_REPORT] AS 특이사항
             ,[KSKWK_STATUS] AS 설비현황
             ,[KSKWK_NOTE] AS 비고
@@ -565,6 +571,326 @@ router.post("/work", async (req, res) => {
         WHERE (1=1)
         AND NO = @input
       `;
+
+    const Pool = await pool;
+    const result = await Pool.request()
+      .input("input", req.body.searchInput)
+      .query(sql);
+
+    res.send(JSON.stringify(result.recordset));
+  } catch (err) {
+    // 로그기록 저장
+    await logSend(
+      (type = "에러"),
+      (ct = err.message ?? ""),
+      (amount = 0),
+      (user = req.body.user ?? "")
+    );
+    res.status(500);
+    res.send(err.message);
+  }
+});
+
+// ###################################################################################################################
+// ###################################################   키오스크 불량   ###################################################
+// ###################################################################################################################
+
+// 조회
+router.get("/kioskdefect", async (req, res) => {
+  try {
+    const Pool = await pool;
+    const result = await Pool.request().query(`
+      SELECT
+        [KSKDF_PK] AS NO
+        ,[KSKDF_WORK_PK] AS 작업NO
+        ,[KSKDF_DEFECT_PK] AS 불량NO
+        ,DEFECT.코드 AS 불량코드
+        ,DEFECT.구분 AS 구분
+        ,DEFECT.불량명 AS 불량명
+        ,DEFECT.내용 AS 내용
+        ,[KSKDF_AMOUNT] AS 수량
+        ,[KSKDF_NOTE] AS 비고
+        ,[KSKDF_REGIST_NM] AS 등록자
+        ,[KSKDF_REGIST_DT] AS 등록일시
+      FROM [QMES2022].[dbo].[KIOSK_DEFECT_TB]
+      LEFT JOIN
+      (
+        SELECT
+          [DEFT_PK] AS NO
+          ,[DEFT_CODE] AS 코드
+          ,[DEFT_DIV] AS 구분
+          ,[DEFT_NAME] AS 불량명
+          ,[DEFT_CONTENT] AS 내용
+        FROM [QMES2022].[dbo].[MASTER_DEFECT_TB]
+      ) AS DEFECT ON DEFECT.NO = [KSKDF_DEFECT_PK]
+      ORDER BY [KSKDF_PK] DESC
+    `);
+
+    res.send(JSON.stringify(result.recordset));
+  } catch (err) {
+    // 로그기록 저장
+    await logSend(
+      (type = "에러"),
+      (ct = err.message ?? ""),
+      (amount = 0),
+      (user = req.query.user ?? "")
+    );
+    res.status(500);
+    res.send(err.message);
+  }
+});
+
+router.post("/kioskdefect", async (req, res) => {
+  try {
+    var sql = "";
+    if (req.body.searchKey == "전체") {
+      sql =
+        `
+        SELECT
+          NO AS NO, 작업NO AS 작업NO, 불량NO AS 불량NO, 불량코드 AS 불량코드, 구분 AS 구분, 불량명 AS 불량명, 내용 AS 내용,
+          수량 AS 수량, 비고 AS 비고, 등록자 AS 등록자, 등록일시 AS 등록일시
+        FROM(
+          SELECT
+            [KSKDF_PK] AS NO
+            ,[KSKDF_WORK_PK] AS 작업NO
+            ,[KSKDF_DEFECT_PK] AS 불량NO
+            ,DEFECT.코드 AS 불량코드
+            ,DEFECT.구분 AS 구분
+            ,DEFECT.불량명 AS 불량명
+            ,DEFECT.내용 AS 내용
+            ,[KSKDF_AMOUNT] AS 수량
+            ,[KSKDF_NOTE] AS 비고
+            ,[KSKDF_REGIST_NM] AS 등록자
+            ,[KSKDF_REGIST_DT] AS 등록일시
+          FROM [QMES2022].[dbo].[KIOSK_DEFECT_TB]
+          LEFT JOIN
+          (
+            SELECT
+              [DEFT_PK] AS NO
+              ,[DEFT_CODE] AS 코드
+              ,[DEFT_DIV] AS 구분
+              ,[DEFT_NAME] AS 불량명
+              ,[DEFT_CONTENT] AS 내용
+            FROM [QMES2022].[dbo].[MASTER_DEFECT_TB]
+          ) AS DEFECT ON DEFECT.NO = [KSKDF_DEFECT_PK]
+        ) AS RESULT
+        WHERE (1=1)
+        AND ( 불량코드 like concat('%',@input,'%')
+        OR 구분 like concat('%',@input,'%')
+        OR 불량명 like concat('%',@input,'%')
+        OR 내용 like concat('%',@input,'%')
+        OR 수량 like concat('%',@input,'%')
+        OR 비고 like concat('%',@input,'%'))
+        ORDER BY ` +
+        req.body.sortKey +
+        ` ` +
+        req.body.sortOrder +
+        `
+      `;
+    } else {
+      sql =
+        `
+        SELECT
+          NO AS NO, 작업NO AS 작업NO, 불량NO AS 불량NO, 불량코드 AS 불량코드, 구분 AS 구분, 불량명 AS 불량명, 내용 AS 내용,
+          수량 AS 수량, 비고 AS 비고, 등록자 AS 등록자, 등록일시 AS 등록일시
+        FROM(
+          SELECT
+            [KSKDF_PK] AS NO
+            ,[KSKDF_WORK_PK] AS 작업NO
+            ,[KSKDF_DEFECT_PK] AS 불량NO
+            ,DEFECT.코드 AS 불량코드
+            ,DEFECT.구분 AS 구분
+            ,DEFECT.불량명 AS 불량명
+            ,DEFECT.내용 AS 내용
+            ,[KSKDF_AMOUNT] AS 수량
+            ,[KSKDF_NOTE] AS 비고
+            ,[KSKDF_REGIST_NM] AS 등록자
+            ,[KSKDF_REGIST_DT] AS 등록일시
+          FROM [QMES2022].[dbo].[KIOSK_DEFECT_TB]
+          LEFT JOIN
+          (
+            SELECT
+              [DEFT_PK] AS NO
+              ,[DEFT_CODE] AS 코드
+              ,[DEFT_DIV] AS 구분
+              ,[DEFT_NAME] AS 불량명
+              ,[DEFT_CONTENT] AS 내용
+            FROM [QMES2022].[dbo].[MASTER_DEFECT_TB]
+          ) AS DEFECT ON DEFECT.NO = [KSKDF_DEFECT_PK]
+        ) AS RESULT
+        WHERE (1=1)
+        AND ` +
+        req.body.searchKey +
+        ` like concat('%',@input,'%')
+        ORDER BY ` +
+        req.body.sortKey +
+        ` ` +
+        req.body.sortOrder +
+        `
+      `;
+    }
+
+    const Pool = await pool;
+    const result = await Pool.request()
+      .input("input", req.body.searchInput)
+      .query(sql);
+
+    res.send(JSON.stringify(result.recordset));
+  } catch (err) {
+    // 로그기록 저장
+    await logSend(
+      (type = "에러"),
+      (ct = err.message ?? ""),
+      (amount = 0),
+      (user = req.body.user ?? "")
+    );
+    res.status(500);
+    res.send(err.message);
+  }
+});
+
+// ###################################################################################################################
+// ###################################################   키오스크 비가동   ############################################
+// ###################################################################################################################
+
+// 조회
+router.get("/kiosknonwork", async (req, res) => {
+  try {
+    const Pool = await pool;
+    const result = await Pool.request().query(`
+      SELECT
+        [KSKNW_PK] AS NO
+        ,[KSKNW_WORK_PK] AS 작업NO
+        ,[KSKNW_NONWORK_PK] AS 비가동NO
+        ,NONWORK.코드 AS 비가동코드
+        ,NONWORK.구분 AS 구분
+        ,NONWORK.비가동명 AS 비가동명
+        ,NONWORK.내용 AS 내용
+        ,CONVERT(VARCHAR, [KSKNW_START_DT], 20) AS 시작일시
+        ,CONVERT(VARCHAR, [KSKNW_END_DT], 20) AS 종료일시
+        ,[KSKNW_NOTE] AS 비고
+        ,[KSKNW_REGIST_NM] AS 등록자
+        ,[KSKNW_REGIST_DT] AS 등록일시
+      FROM [QMES2022].[dbo].[KIOSK_NONWORK_TB]
+      LEFT JOIN
+      (
+        SELECT
+          [NOWK_PK] AS NO
+          ,[NOWK_CODE] AS 코드
+          ,[NOWK_DIV] AS 구분
+          ,[NOWK_NAME] AS 비가동명
+          ,[NOWK_CONTENT] AS 내용
+        FROM [QMES2022].[dbo].[MASTER_NONWORK_TB]
+      ) AS NONWORK ON NONWORK.NO = [KSKNW_NONWORK_PK]
+      ORDER BY [KSKNW_PK] DESC
+    `);
+
+    res.send(JSON.stringify(result.recordset));
+  } catch (err) {
+    // 로그기록 저장
+    await logSend(
+      (type = "에러"),
+      (ct = err.message ?? ""),
+      (amount = 0),
+      (user = req.query.user ?? "")
+    );
+    res.status(500);
+    res.send(err.message);
+  }
+});
+
+router.post("/kiosknonwork", async (req, res) => {
+  try {
+    var sql = "";
+    if (req.body.searchKey == "전체") {
+      sql =
+        `
+        SELECT
+          NO AS NO, 작업NO AS 작업NO, 비가동NO AS 비가동NO, 비가동코드 AS 비가동코드, 구분 AS 구분, 비가동명 AS 비가동명,
+          내용 AS 내용, 시작일시 AS 시작일시, 종료일시 AS 종료일시, 비고 AS 비고, 등록자 AS 등록자, 등록일시 AS 등록일시
+        FROM(
+          SELECT
+            [KSKNW_PK] AS NO
+            ,[KSKNW_WORK_PK] AS 작업NO
+            ,[KSKNW_NONWORK_PK] AS 비가동NO
+            ,NONWORK.코드 AS 비가동코드
+            ,NONWORK.구분 AS 구분
+            ,NONWORK.비가동명 AS 비가동명
+            ,NONWORK.내용 AS 내용
+            ,CONVERT(VARCHAR, [KSKNW_START_DT], 20) AS 시작일시
+            ,CONVERT(VARCHAR, [KSKNW_END_DT], 20) AS 종료일시
+            ,[KSKNW_NOTE] AS 비고
+            ,[KSKNW_REGIST_NM] AS 등록자
+            ,[KSKNW_REGIST_DT] AS 등록일시
+          FROM [QMES2022].[dbo].[KIOSK_NONWORK_TB]
+          LEFT JOIN
+          (
+            SELECT
+              [NOWK_PK] AS NO
+              ,[NOWK_CODE] AS 코드
+              ,[NOWK_DIV] AS 구분
+              ,[NOWK_NAME] AS 비가동명
+              ,[NOWK_CONTENT] AS 내용
+            FROM [QMES2022].[dbo].[MASTER_NONWORK_TB]
+          ) AS NONWORK ON NONWORK.NO = [KSKNW_NONWORK_PK]
+        ) AS RESULT
+        WHERE (1=1)
+        AND ( 비가동코드 like concat('%',@input,'%')
+        OR 구분 like concat('%',@input,'%')
+        OR 비가동명 like concat('%',@input,'%')
+        OR 내용 like concat('%',@input,'%')
+        OR 시작일시 like concat('%',@input,'%')
+        OR 종료일시 like concat('%',@input,'%')
+        OR 비고 like concat('%',@input,'%'))
+        ORDER BY ` +
+        req.body.sortKey +
+        ` ` +
+        req.body.sortOrder +
+        `
+      `;
+    } else {
+      sql =
+        `
+        SELECT
+          NO AS NO, 작업NO AS 작업NO, 비가동NO AS 비가동NO, 비가동코드 AS 비가동코드, 구분 AS 구분, 비가동명 AS 비가동명,
+          내용 AS 내용, 시작일시 AS 시작일시, 종료일시 AS 종료일시, 비고 AS 비고, 등록자 AS 등록자, 등록일시 AS 등록일시
+        FROM(
+          SELECT
+            [KSKNW_PK] AS NO
+            ,[KSKNW_WORK_PK] AS 작업NO
+            ,[KSKNW_NONWORK_PK] AS 비가동NO
+            ,NONWORK.코드 AS 비가동코드
+            ,NONWORK.구분 AS 구분
+            ,NONWORK.비가동명 AS 비가동명
+            ,NONWORK.내용 AS 내용
+            ,CONVERT(VARCHAR, [KSKNW_START_DT], 20) AS 시작일시
+            ,CONVERT(VARCHAR, [KSKNW_END_DT], 20) AS 종료일시
+            ,[KSKNW_NOTE] AS 비고
+            ,[KSKNW_REGIST_NM] AS 등록자
+            ,[KSKNW_REGIST_DT] AS 등록일시
+          FROM [QMES2022].[dbo].[KIOSK_NONWORK_TB]
+          LEFT JOIN
+          (
+            SELECT
+              [NOWK_PK] AS NO
+              ,[NOWK_CODE] AS 코드
+              ,[NOWK_DIV] AS 구분
+              ,[NOWK_NAME] AS 비가동명
+              ,[NOWK_CONTENT] AS 내용
+            FROM [QMES2022].[dbo].[MASTER_NONWORK_TB]
+          ) AS NONWORK ON NONWORK.NO = [KSKNW_NONWORK_PK]
+        ) AS RESULT
+        WHERE (1=1)
+        AND ` +
+        req.body.searchKey +
+        ` like concat('%',@input,'%')
+        ORDER BY ` +
+        req.body.sortKey +
+        ` ` +
+        req.body.sortOrder +
+        `
+      `;
+    }
 
     const Pool = await pool;
     const result = await Pool.request()

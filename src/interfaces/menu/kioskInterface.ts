@@ -20,6 +20,8 @@ export interface KioskWork {
   진행상황: string;
   시작일시: string;
   생산수: string;
+  불량수: string;
+  비가동시간: string;
   특이사항: string;
   설비현황: string;
   비고: string;

@@ -120,18 +120,18 @@ router.post("/insert", async (req, res) => {
         moment().tz("Asia/Seoul").format("YYYY-MM-DD HH:mm:ss")
       ).query(`
         -- 만약 키오스크 작업현황에 작업지시공정이 있다면
-        IF NULL = (SELECT [KSKWK_INST_PROCESS_PK] FROM [QMES2022].[dbo].[KIOSK_WORK_TB] WHERE [KSKWK_PK] = @NO)
+        IF NULL != (SELECT [KSKWK_INST_PROCESS_PK] FROM [QMES2022].[dbo].[KIOSK_WORK_TB] WHERE [KSKWK_PK] = @작업NO)
         BEGIN
           -- 만약 작업지시공정의 진행상황이 작업중이었다면
           IF (SELECT [ISPC_CONDITION] FROM [QMES2022].[dbo].[MANAGE_INSTRUCT_PROCESS_TB]
-              WHERE [ISPC_PK] = (SELECT [KSKWK_INST_PROCESS_PK] FROM [QMES2022].[dbo].[KIOSK_WORK_TB] WHERE [KSKWK_PK] = @NO)) == '작업중'
+              WHERE [ISPC_PK] = (SELECT [KSKWK_INST_PROCESS_PK] FROM [QMES2022].[dbo].[KIOSK_WORK_TB] WHERE [KSKWK_PK] = @작업NO)) = '작업중'
           BEGIN
             -- 현황을 변경
             UPDATE [QMES2022].[dbo].[KIOSK_WORK_TB]
             SET
               [KSKWK_STATUS] = '가동중'
               ,[KSKWK_REGIST_DT] = @등록일시
-            WHERE [KSKWK_PK] = @NO
+            WHERE [KSKWK_PK] = @작업NO;
           END
           ELSE
           BEGIN
@@ -140,7 +140,7 @@ router.post("/insert", async (req, res) => {
             SET
               [KSKWK_STATUS] = '미가동'
               ,[KSKWK_REGIST_DT] = @등록일시
-            WHERE [KSKWK_PK] = @NO
+            WHERE [KSKWK_PK] = @작업NO;
           END
         END
         ELSE
@@ -150,7 +150,7 @@ router.post("/insert", async (req, res) => {
           SET
             [KSKWK_STATUS] = '미가동'
             ,[KSKWK_REGIST_DT] = @등록일시
-          WHERE [KSKWK_PK] = @NO
+          WHERE [KSKWK_PK] = @작업NO;
         END
       `);
 

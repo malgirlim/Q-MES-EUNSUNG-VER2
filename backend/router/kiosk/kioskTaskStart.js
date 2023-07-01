@@ -25,7 +25,7 @@ const logSend = async (type, ct, amount, user) => {
   const Pool = await pool;
   await Pool.request() // 로그기록 저장
     .input("type", type)
-    .input("menu", "키오스크_작업반려") // ############ *중요* 이거 메뉴 이름 바꿔야함 !! #########
+    .input("menu", "키오스크_작업시작") // ############ *중요* 이거 메뉴 이름 바꿔야함 !! #########
     .input("content", ct.substr(0, 500))
     .input("amount", amount)
     .input("user", user)
@@ -38,7 +38,7 @@ const logSend = async (type, ct, amount, user) => {
 };
 
 // 키오스크 작업반려 등록
-router.post("/edit", async (req, res) => {
+router.post("/insert", async (req, res) => {
   try {
     const Pool = await pool;
     await Pool.request()
@@ -50,23 +50,27 @@ router.post("/edit", async (req, res) => {
         "등록일시",
         moment().tz("Asia/Seoul").format("YYYY-MM-DD HH:mm:ss")
       ).query(`
-        -- 키오스크에 등록되어진 데이터 지우기
-        DELETE FROM [QMES2022].[dbo].[KIOSK_ITEM_TB] WHERE [KSKIT_WORK_PK] = @NO;
-        DELETE FROM [QMES2022].[dbo].[KIOSK_DEFECT_TB] WHERE [KSKDF_WORK_PK] = @NO;
-        DELETE FROM [QMES2022].[dbo].[KIOSK_NONWORK_TB] WHERE [KSKNW_WORK_PK] = @NO;
-        DELETE FROM [QMES2022].[dbo].[KIOSK_WORK_TB] WHERE [KSKWK_PK] = @NO;
-        
-        -- 작업지시를 반려로 수정
+        -- 작업지시를 작업중으로 수정
         UPDATE [QMES2022].[dbo].[MANAGE_INSTRUCT_PROCESS_TB]
-          SET
-          [ISPC_CONDITION] = '작업반려'
-          ,[ISPC_NOTE] = @비고
+        SET
+          [ISPC_CONDITION] = '작업중'
+          ,[ISPC_NOTE] = ''
         WHERE [ISPC_PK] = @지시공정NO
+
+        -- 설비운전상태를 가동중으로 수정
+        UPDATE [QMES2022].[dbo].[KIOSK_WORK_TB]
+        SET
+          [KSKWK_START_DT] = GETDATE()
+          ,[KSKWK_STATUS] = '가동중'
+          ,[KSKWK_REGIST_NM] = @등록자
+          ,[KSKWK_REGIST_DT] = @등록일시
+        WHERE [KSKWK_PK] = @NO
+
     `);
 
     // 로그기록 저장
     await logSend(
-      (type = "수정"),
+      (type = "반려"),
       (ct = JSON.stringify(req.body.data) + " 을 반려."),
       (amount = 1),
       (user = req.body.user ?? "")

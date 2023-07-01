@@ -20,7 +20,11 @@ import router from "../../router";
 
 // API 보내는 함수 및 인터페이스 불러오기
 import { useSendApi } from "../../composables/useSendApi";
-import { KioskWork } from "../../interfaces/menu/kioskInterface";
+import {
+  KioskWork,
+  KioskDefect,
+  KioskNonwork,
+} from "../../interfaces/menu/kioskInterface";
 
 //컴포넌트 로드
 import TaskList from "../../components/Common/Kiosk/TaskList.vue";
@@ -81,6 +85,14 @@ const r1 = ref(1);
 const url_kiosk_work = "/api/kiosk/work";
 const kiosk_work = useSendApi<KioskWork>(url_kiosk_work, r1, ref(100));
 
+// 작업수락
+const url_kiosk_taskaccept = "/api/kiosk/taskaccept";
+const kiosk_taskaccept = useSendApi<KioskWork>(url_kiosk_taskaccept, r1, r1);
+
+// 작업시작
+const url_kiosk_taskstart = "/api/kiosk/taskstart";
+const kiosk_taskstart = useSendApi<KioskWork>(url_kiosk_taskstart, r1, r1);
+
 // 작업반려
 const url_kiosk_taskcancle = "/api/kiosk/taskcancle";
 const kiosk_taskcancle = useSendApi<KioskWork>(url_kiosk_taskcancle, r1, r1);
@@ -94,6 +106,7 @@ const now = ref(dayjs().format("YYYY-MM-DD HH:mm:ss"));
 onMounted(async () => {
   setInterval(() => {
     now.value = dayjs().format("YYYY-MM-DD HH:mm:ss");
+    setRunningTime();
   }, 1000);
 
   await kiosk_work.loadDatas();
@@ -106,9 +119,27 @@ onMounted(async () => {
 const kiosk_work_data = ref({} as KioskWork);
 
 // 가동시간 구하기
+const 가동시작 = ref("");
+const 비가동Time = ref("0");
 const 부하시간 = ref("00h00m00s");
 const 운전시간 = ref("00h00m00s");
 const 비가동시간 = ref("00h00m00s");
+
+function setRunningTime() {
+  if (task_status.value == "작업중") {
+    let diffTime_시작_현재 = dayjs().diff(가동시작.value);
+    let 부하 = dayjs.duration(diffTime_시작_현재);
+    let 운전 = dayjs.duration(diffTime_시작_현재 - Number(비가동Time.value));
+    let 비가동 = dayjs.duration(Number(비가동Time.value));
+
+    부하시간.value =
+      부하.hours() + "h" + 부하.minutes() + "m" + 부하.seconds() + "s";
+    운전시간.value =
+      운전.hours() + "h" + 운전.minutes() + "m" + 운전.seconds() + "s";
+    비가동시간.value =
+      비가동.hours() + "h" + 비가동.minutes() + "m" + 비가동.seconds() + "s";
+  }
+}
 
 // 작업현황 초기값 설정
 const running = ref("미가동");
@@ -126,14 +157,19 @@ const checked = ref(false);
 
 // 작업현황 조회 함수
 async function searchKioskWork() {
-  await kiosk_work.searchDatas("전체기간", "", String(키오스크NO), "", "");
+  // 키오스크 현황 데이터 불러오기
+  await kiosk_work.searchDatas("", "", String(키오스크NO), "", "");
 
+  // 현재 키오스크NO와 같은 데이터만 불러오기
   kiosk_work_data.value = kiosk_work.dataSearchAll.value.filter(
     (f) => f.NO === 키오스크NO
   )[0];
 
   // 키오스크NO가 있으면 실행
   if (kiosk_work_data.value != undefined) {
+    가동시작.value = kiosk_work_data.value.시작일시 ?? "";
+    비가동Time.value = kiosk_work_data.value.비가동시간 ?? "0";
+
     kiosk_work_data.value.작업자ID = kiosk_work_data.value.작업자ID[0] ?? 0;
     kiosk_work_data.value.작업자 = kiosk_work_data.value.작업자[0] ?? "";
 
@@ -142,7 +178,7 @@ async function searchKioskWork() {
     지시수량.value = kiosk_work_data.value.지시수량 ?? "0";
     완료수량.value = kiosk_work_data.value.완료수량 ?? "0";
     생산수량.value = kiosk_work_data.value.생산수 ?? "0";
-    불량수량.value = "0";
+    불량수량.value = kiosk_work_data.value.불량수 ?? "0";
     양품수량.value = String(
       Number(완료수량.value) + Number(생산수량.value) - Number(불량수량.value)
     );
@@ -188,12 +224,22 @@ const 생산수량_초기화 = () => {
 };
 const 생산수량_증가 = () => {
   생산수량.value = String(Number(생산수량.value) + Number(입력수량.value));
+
+  // 생산수 데이터 변경하기
+  kiosk_work_data.value.생산수 = 생산수량.value;
+  kiosk_work.editData(kiosk_work_data.value);
+
   입력수량.value = "0";
   입력수량_show.value = "0";
 };
 const 생산수량_차감 = () => {
   생산수량.value = String(Number(생산수량.value) - Number(입력수량.value));
   if (Number(생산수량.value) < 0) 생산수량.value = "0";
+
+  // 생산수 데이터 변경하기
+  kiosk_work_data.value.생산수 = 생산수량.value;
+  kiosk_work.editData(kiosk_work_data.value);
+
   입력수량.value = "0";
   입력수량_show.value = "0";
 };
@@ -230,6 +276,12 @@ const setTaskListModal = (value: boolean) => {
 const checkListModal = ref(false);
 const setCheckListModal = (value: boolean) => {
   checkListModal.value = value;
+};
+
+/* 작업 수락 Modal */
+const taskAcceptModal = ref(false);
+const settaskAcceptModal = (value: boolean) => {
+  taskAcceptModal.value = value;
 };
 
 /* 작업시작 Modal */
@@ -374,7 +426,7 @@ watch(
       <div class="flex items-center col-span-1 text-sm">
         <div class="flex items-center mr-3">
           <Lucide class="w-5 h-5 mr-1" icon="CalendarClock" /><strong
-            >가동시작 : {{ kiosk_work_data?.시작일시 ?? "" }}</strong
+            >가동시작 : {{ 가동시작 ?? "" }}</strong
           >
         </div>
         <div class="flex items-center">
@@ -866,7 +918,7 @@ watch(
           >
           <Button
             class="mx-2 mb-3 h-10 w-full text-xl text-white"
-            variant="success"
+            :variant="task_status == '작업중' ? 'outline-success' : 'success'"
             @click="setTaskListModal(true)"
             :disabled="task_status == '작업중'"
             ><strong>작업지시목록</strong></Button
@@ -876,39 +928,39 @@ watch(
             class="mx-2 mb-3 h-10 w-full text-xl text-white"
             variant="success"
             :disabled="task_status == ''"
-            @click="setTaskStartModal(true)"
+            @click="settaskAcceptModal(true)"
             ><strong>작업수락</strong></Button
           >
           <Button
             v-if="task_status == '작업대기' || task_status == '작업중'"
             class="mx-2 mb-3 h-10 w-full text-xl text-white"
-            variant="success"
+            :variant="task_status == '작업중' ? 'outline-success' : 'success'"
             :disabled="task_status == '작업중'"
             @click="setTaskStartModal(true)"
             ><strong>작업시작</strong></Button
           >
           <Button
             class="mx-2 mb-3 h-10 w-full text-xl"
-            variant="pending"
+            :variant="task_status == '작업중' ? 'pending' : 'outline-pending'"
             @click="setNonOPModal(true)"
             :disabled="task_status != '작업중'"
             ><strong>비가동전환</strong></Button
           >
           <Button
             class="mx-2 mb-3 h-10 w-full text-xl"
-            variant="pending"
+            :variant="task_status == '작업중' ? 'pending' : 'outline-pending'"
             @click="setNonOPModal(true)"
             :disabled="task_status != '작업중'"
             ><strong>비가동확인</strong></Button
           ><Button
             class="mx-2 mb-3 h-10 w-full text-xl"
-            variant="pending"
+            :variant="task_status == '작업중' ? 'pending' : 'outline-pending'"
             @click="setBadAddModal(true)"
             :disabled="task_status != '작업중'"
             ><strong>불량등록</strong></Button
           ><Button
             class="mx-2 mb-3 h-10 w-full text-xl"
-            variant="pending"
+            :variant="task_status == '작업중' ? 'pending' : 'outline-pending'"
             @click="setItemAddModal(true)"
             :disabled="task_status != '작업중'"
             ><strong>투입자재등록</strong></Button
@@ -997,13 +1049,15 @@ watch(
   </Dialog>
   <!-- END: 일상점검 Modal -->
 
-  <!-- BEGIN: 작업시작 확인 Modal -->
-  <Dialog :open="taskStartModal" size="lg" @close="setTaskStartModal(false)">
+  <!-- BEGIN: 작업수락 확인 Modal -->
+  <Dialog :open="taskAcceptModal" size="lg" @close="settaskAcceptModal(false)">
     <Dialog.Panel>
       <div class="p-5 text-center">
-        <Lucide icon="Play" class="w-24 h-24 mx-auto mt-3 text-success" />
-        <div class="mt-5 text-3xl"><strong>작업 시작</strong></div>
-        <div class="mt-3 text-2xl">설비가 작업중으로 전환됩니다.</div>
+        <Lucide icon="Check" class="w-24 h-24 mx-auto mt-3 text-success" />
+        <div class="mt-5 text-3xl"><strong>작업 수락</strong></div>
+        <div class="mt-3 text-2xl">
+          선택된 작업을 수락하고, 작업대기로 전환됩니다.
+        </div>
       </div>
 
       <div class="mt-5 px-5 pb-8 text-center">
@@ -1012,6 +1066,45 @@ watch(
           type="button"
           @click="
             () => {
+              kiosk_taskaccept.editData(kiosk_work_data);
+              settaskAcceptModal(false);
+            }
+          "
+          class="w-48 text-2xl mr-10"
+        >
+          수락
+        </Button>
+        <Button
+          variant="outline-primary"
+          type="button"
+          class="w-48 text-2xl"
+          @click="settaskAcceptModal(false)"
+        >
+          취소
+        </Button>
+      </div>
+    </Dialog.Panel>
+  </Dialog>
+  <!-- END: 작업시작 확인 Modal -->
+
+  <!-- BEGIN: 작업시작 확인 Modal -->
+  <Dialog :open="taskStartModal" size="lg" @close="setTaskStartModal(false)">
+    <Dialog.Panel>
+      <div class="p-5 text-center">
+        <Lucide icon="Play" class="w-24 h-24 mx-auto mt-3 text-success" />
+        <div class="mt-5 text-3xl"><strong>작업 시작</strong></div>
+        <div class="mt-3 text-2xl">
+          설비를 가동시키고, 작업중으로 전환됩니다.
+        </div>
+      </div>
+
+      <div class="mt-5 px-5 pb-8 text-center">
+        <Button
+          variant="primary"
+          type="button"
+          @click="
+            () => {
+              kiosk_taskstart.editData(kiosk_work_data);
               setTaskStartModal(false);
             }
           "
@@ -1344,7 +1437,7 @@ watch(
           class="w-40 text-2xl mr-10"
           @click="
             async () => {
-              await kiosk_taskcancle.insertData(kiosk_work_data);
+              await kiosk_taskcancle.editData(kiosk_work_data);
               setTaskCancleModal(false);
             }
           "

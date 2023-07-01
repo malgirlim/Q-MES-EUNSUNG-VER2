@@ -62,6 +62,9 @@ router.get("/", async (req, res) => {
         ,INST_PROCESS.진행상황 AS 진행상황
         ,CONVERT(VARCHAR, [KSKWK_START_DT], 20) AS 시작일시
         ,[KSKWK_PRODUCE_AMT] AS 생산수
+        ,(SELECT COALESCE(SUM([KSKDF_AMOUNT]*1),0) FROM [QMES2022].[dbo].[KIOSK_DEFECT_TB] WHERE [KSKDF_WORK_PK] = [KSKWK_PK]) AS 불량수
+        ,(SELECT COALESCE(SUM(DATEDIFF(second,CONVERT(VARCHAR, [KSKNW_START_DT], 20),CONVERT(VARCHAR, [KSKNW_END_DT], 20))),0)
+          FROM [QMES2022].[dbo].[KIOSK_NONWORK_TB] WHERE [KSKNW_WORK_PK] = [KSKWK_PK]) AS 비가동시간
         ,[KSKWK_REPORT] AS 특이사항
         ,[KSKWK_STATUS] AS 설비현황
         ,[KSKWK_NOTE] AS 비고
@@ -149,7 +152,7 @@ router.post("/", async (req, res) => {
           NO AS NO, 작업자ID AS 작업자ID, 작업자 AS 작업자, 지시공정NO AS 지시공정NO, 작업코드 AS 작업코드, 품목구분 AS 품목구분,
           품번 AS 품번, 품명 AS 품명, 규격 AS 규격, 단위 AS 단위, 지시수량 AS 지시수량, 완료수량 AS 완료수량, 시작일 AS 시작일,
           공정명 AS 공정명, 설비NO AS 설비NO, 설비명 AS 설비명, 작업자ID AS 작업자ID, 작업자 AS 작업자, 진행상황 AS 진행상황, 시작일시 AS 시작일시,
-          생산수 AS 생산수, 특이사항 AS 특이사항, 설비현황 AS 설비현황, 비고 AS 비고, 등록자 AS 등록자, 등록일시 AS 등록일시
+          생산수 AS 생산수, 불량수 AS 불량수, 비가동시간 AS 비가동시간, 특이사항 AS 특이사항, 설비현황 AS 설비현황, 비고 AS 비고, 등록자 AS 등록자, 등록일시 AS 등록일시
         FROM(
           SELECT
             [KSKWK_PK] AS NO
@@ -171,6 +174,9 @@ router.post("/", async (req, res) => {
             ,INST_PROCESS.진행상황 AS 진행상황
             ,CONVERT(VARCHAR, [KSKWK_START_DT], 20) AS 시작일시
             ,[KSKWK_PRODUCE_AMT] AS 생산수
+            ,(SELECT COALESCE(SUM([KSKDF_AMOUNT]*1),0) FROM [QMES2022].[dbo].[KIOSK_DEFECT_TB] WHERE [KSKDF_WORK_PK] = [KSKWK_PK]) AS 불량수
+            ,(SELECT COALESCE(SUM(DATEDIFF(second,CONVERT(VARCHAR, [KSKNW_START_DT], 20),CONVERT(VARCHAR, [KSKNW_END_DT], 20))),0)
+              FROM [QMES2022].[dbo].[KIOSK_NONWORK_TB] WHERE [KSKNW_WORK_PK] = [KSKWK_PK]) AS 비가동시간
             ,[KSKWK_REPORT] AS 특이사항
             ,[KSKWK_STATUS] AS 설비현황
             ,[KSKWK_NOTE] AS 비고
