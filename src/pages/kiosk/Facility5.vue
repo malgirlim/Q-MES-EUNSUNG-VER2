@@ -98,6 +98,10 @@ const kiosk_taskstart = useSendApi<KioskWork>(url_kiosk_taskstart, r1, r1);
 const url_kiosk_taskcancle = "/api/kiosk/taskcancle";
 const kiosk_taskcancle = useSendApi<KioskWork>(url_kiosk_taskcancle, r1, r1);
 
+// 작업종료
+const url_kiosk_taskfinish = "/api/kiosk/taskfinish";
+const kiosk_taskfinish = useSendApi<KioskWork>(url_kiosk_taskfinish, r1, r1);
+
 /* ################################################################################################################ */
 
 // 날짜 구하기
@@ -1322,8 +1326,13 @@ watch(
                       variant="pending"
                       type="button"
                       @click="
-                        () => {
+                        async () => {
+                          await kiosk_taskfinish.insertData({
+                            NO: 키오스크NO,
+                            비고: '작업중단',
+                          } as KioskWork);
                           setTaskFinishModal(false);
+                          $router.go(0);
                         }
                       "
                       class="w-40 text-base mb-3 mt-3"
@@ -1398,8 +1407,13 @@ watch(
                       type="button"
                       :disabled="!finishCheckBox"
                       @click="
-                        () => {
+                        async () => {
+                          await kiosk_taskfinish.insertData({
+                            NO: 키오스크NO,
+                            비고: '작업완료',
+                          } as KioskWork);
                           setTaskFinishModal(false);
+                          $router.go(0);
                         }
                       "
                       class="w-40 text-base mb-3 mt-3"
