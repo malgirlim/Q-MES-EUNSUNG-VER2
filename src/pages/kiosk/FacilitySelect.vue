@@ -16,12 +16,23 @@ import router from "../../router";
 
 import FacilityCard from "../../components/Common/Kiosk/FacilityCard.vue";
 
+// API 보내는 함수 및 인터페이스 불러오기
+import { useSendApi } from "../../composables/useSendApi";
+import { KioskWork } from "../../interfaces/menu/kioskInterface";
+
 onMounted(async () => {
   setInterval(() => {
     now.value = dayjs().format("YYYY-MM-DD HH:mm:ss");
   }, 1000);
+
+  await kiosk_work.loadDatas();
 });
 
+// dataManager 만들기
+const url_kiosk_work = "/api/kiosk/work";
+const kiosk_work = useSendApi<KioskWork>(url_kiosk_work, ref(1), ref(1));
+
+// ################################################  로그인 관련  ################################################
 /*로그인 관련 BEGIN*/
 
 const { proxy }: any = getCurrentInstance();
@@ -61,6 +72,10 @@ const setLogoutModal = (value: boolean) => {
 const now = ref(dayjs().format("YYYY-MM-DD HH:mm:ss"));
 const year = ref(dayjs().format("YYYY"));
 </script>
+
+#############################################################################################################################
+#############################################################################################################################
+#############################################################################################################################
 
 <template>
   <div class="pl-4 pr-4 pt-2">
@@ -102,85 +117,245 @@ const year = ref(dayjs().format("YYYY"));
     <div class="p-3 mt-5 mb-5 text-center bg-slate-200 intro-y">
       <div class="grid grid-cols-5 gap-3">
         <FacilityCard
-          name="인쇄기1"
-          running="가동중"
-          product="제품1"
-          worker="박명한"
-          time="2023-05-11 12:34"
+          name="TEST설비명"
+          :running="
+            kiosk_work.dataSearchAll.value.filter((k) => {
+              k.NO == 1;
+            })[0]?.설비현황 ?? '미가동'
+          "
+          :product="
+            kiosk_work.dataSearchAll.value.filter((k) => {
+              k.NO == 1;
+            })[0]?.품명 ?? ''
+          "
+          :worker="
+            kiosk_work.dataSearchAll.value.filter((k) => {
+              k.NO == 1;
+            })[0]?.작업자[0] ?? ''
+          "
+          :time="
+            kiosk_work.dataSearchAll.value.filter((k) => {
+              k.NO == 1;
+            })[0]?.시작일시 ?? ''
+          "
           @click="$router.push('/kiosk/facility1/')"
         />
         <FacilityCard
-          name="인쇄기2"
-          running="가동중"
-          product="제품2"
-          worker="고범석"
-          time="2023-05-11 12:34"
+          name="설비명2"
+          :running="
+            kiosk_work.dataSearchAll.value.filter((k) => {
+              k.NO == 2;
+            })[0]?.설비현황 ?? '미가동'
+          "
+          :product="
+            kiosk_work.dataSearchAll.value.filter((k) => {
+              k.NO == 2;
+            })[0]?.품명 ?? ''
+          "
+          :worker="
+            kiosk_work.dataSearchAll.value.filter((k) => {
+              k.NO == 2;
+            })[0]?.작업자[0] ?? ''
+          "
+          :time="
+            kiosk_work.dataSearchAll.value.filter((k) => {
+              k.NO == 2;
+            })[0]?.시작일시 ?? ''
+          "
           @click="$router.push('/kiosk/facility2/')"
         />
         <FacilityCard
-          name="인쇄기3"
-          running="비가동"
-          product="제품3"
-          worker="윤호상"
-          time="2023-05-11 12:34"
+          name="설비명3"
+          :running="
+            kiosk_work.dataSearchAll.value.filter((k) => {
+              k.NO == 3;
+            })[0]?.설비현황 ?? '미가동'
+          "
+          :product="
+            kiosk_work.dataSearchAll.value.filter((k) => {
+              k.NO == 3;
+            })[0]?.품명 ?? ''
+          "
+          :worker="
+            kiosk_work.dataSearchAll.value.filter((k) => {
+              k.NO == 3;
+            })[0]?.작업자[0] ?? ''
+          "
+          :time="
+            kiosk_work.dataSearchAll.value.filter((k) => {
+              k.NO == 3;
+            })[0]?.시작일시 ?? ''
+          "
           @click="$router.push('/kiosk/facility3/')"
         />
         <FacilityCard
-          name="인쇄기4"
-          running="가동중"
-          product="제품4"
-          worker="강민철"
-          time="2023-05-11 12:34"
+          name="설비명4"
+          :running="
+            kiosk_work.dataSearchAll.value.filter((k) => {
+              k.NO == 4;
+            })[0]?.설비현황 ?? '미가동'
+          "
+          :product="
+            kiosk_work.dataSearchAll.value.filter((k) => {
+              k.NO == 4;
+            })[0]?.품명 ?? ''
+          "
+          :worker="
+            kiosk_work.dataSearchAll.value.filter((k) => {
+              k.NO == 4;
+            })[0]?.작업자[0] ?? ''
+          "
+          :time="
+            kiosk_work.dataSearchAll.value.filter((k) => {
+              k.NO == 4;
+            })[0]?.시작일시 ?? ''
+          "
           @click="$router.push('/kiosk/facility4/')"
         />
         <FacilityCard
-          name="인쇄기5"
-          running="미가동"
-          product="제품5"
-          worker="김주현"
-          time="2023-05-11 12:34"
+          name="설비명5"
+          :running="
+            kiosk_work.dataSearchAll.value.filter((k) => {
+              k.NO == 5;
+            })[0]?.설비현황 ?? '미가동'
+          "
+          :product="
+            kiosk_work.dataSearchAll.value.filter((k) => {
+              k.NO == 5;
+            })[0]?.품명 ?? ''
+          "
+          :worker="
+            kiosk_work.dataSearchAll.value.filter((k) => {
+              k.NO == 5;
+            })[0]?.작업자[0] ?? ''
+          "
+          :time="
+            kiosk_work.dataSearchAll.value.filter((k) => {
+              k.NO == 5;
+            })[0]?.시작일시 ?? ''
+          "
           @click="$router.push('/kiosk/facility5/')"
         />
       </div>
       <div class="grid grid-cols-5 gap-3 mt-10">
         <FacilityCard
-          name="인쇄기6"
-          running="가동중"
-          product="제품6"
-          worker="송은아"
-          time="2023-05-11 12:34"
+          name="설비명6"
+          :running="
+            kiosk_work.dataSearchAll.value.filter((k) => {
+              k.NO == 6;
+            })[0]?.설비현황 ?? '미가동'
+          "
+          :product="
+            kiosk_work.dataSearchAll.value.filter((k) => {
+              k.NO == 6;
+            })[0]?.품명 ?? ''
+          "
+          :worker="
+            kiosk_work.dataSearchAll.value.filter((k) => {
+              k.NO == 6;
+            })[0]?.작업자[0] ?? ''
+          "
+          :time="
+            kiosk_work.dataSearchAll.value.filter((k) => {
+              k.NO == 6;
+            })[0]?.시작일시 ?? ''
+          "
           @click="$router.push('/kiosk/facility6/')"
         />
         <FacilityCard
-          name="인쇄기7"
-          running="가동중"
-          product="제품7"
-          worker="사은미"
-          time="2023-05-11 12:34"
+          name="설비명7"
+          :running="
+            kiosk_work.dataSearchAll.value.filter((k) => {
+              k.NO == 7;
+            })[0]?.설비현황 ?? '미가동'
+          "
+          :product="
+            kiosk_work.dataSearchAll.value.filter((k) => {
+              k.NO == 7;
+            })[0]?.품명 ?? ''
+          "
+          :worker="
+            kiosk_work.dataSearchAll.value.filter((k) => {
+              k.NO == 7;
+            })[0]?.작업자[0] ?? ''
+          "
+          :time="
+            kiosk_work.dataSearchAll.value.filter((k) => {
+              k.NO == 7;
+            })[0]?.시작일시 ?? ''
+          "
           @click="$router.push('/kiosk/facility7/')"
         />
         <FacilityCard
-          name="인쇄기8"
-          running="비가동"
-          product="제품8"
-          worker="이훈노"
-          time="2023-05-11 12:34"
+          name="설비명8"
+          :running="
+            kiosk_work.dataSearchAll.value.filter((k) => {
+              k.NO == 8;
+            })[0]?.설비현황 ?? '미가동'
+          "
+          :product="
+            kiosk_work.dataSearchAll.value.filter((k) => {
+              k.NO == 8;
+            })[0]?.품명 ?? ''
+          "
+          :worker="
+            kiosk_work.dataSearchAll.value.filter((k) => {
+              k.NO == 8;
+            })[0]?.작업자[0] ?? ''
+          "
+          :time="
+            kiosk_work.dataSearchAll.value.filter((k) => {
+              k.NO == 8;
+            })[0]?.시작일시 ?? ''
+          "
           @click="$router.push('/kiosk/facility8/')"
         />
         <FacilityCard
-          name="검사기"
-          running="가동중"
-          product="제품9"
-          worker="최순우"
-          time="2023-05-11 12:34"
+          name="설비명9"
+          :running="
+            kiosk_work.dataSearchAll.value.filter((k) => {
+              k.NO == 9;
+            })[0]?.설비현황 ?? '미가동'
+          "
+          :product="
+            kiosk_work.dataSearchAll.value.filter((k) => {
+              k.NO == 9;
+            })[0]?.품명 ?? ''
+          "
+          :worker="
+            kiosk_work.dataSearchAll.value.filter((k) => {
+              k.NO == 9;
+            })[0]?.작업자[0] ?? ''
+          "
+          :time="
+            kiosk_work.dataSearchAll.value.filter((k) => {
+              k.NO == 9;
+            })[0]?.시작일시 ?? ''
+          "
           @click="$router.push('/kiosk/facility9/')"
         />
         <FacilityCard
-          name="제판기"
-          running="미가동"
-          product="제품10"
-          worker="손정일"
-          time="2023-05-11 12:34"
+          name="설비명10"
+          :running="
+            kiosk_work.dataSearchAll.value.filter((k) => {
+              k.NO == 10;
+            })[0]?.설비현황 ?? '미가동'
+          "
+          :product="
+            kiosk_work.dataSearchAll.value.filter((k) => {
+              k.NO == 10;
+            })[0]?.품명 ?? ''
+          "
+          :worker="
+            kiosk_work.dataSearchAll.value.filter((k) => {
+              k.NO == 10;
+            })[0]?.작업자[0] ?? ''
+          "
+          :time="
+            kiosk_work.dataSearchAll.value.filter((k) => {
+              k.NO == 10;
+            })[0]?.시작일시 ?? ''
+          "
           @click="$router.push('/kiosk/facility10/')"
         />
       </div>
