@@ -945,10 +945,14 @@ watch(
           >
           <Button
             class="mx-2 mb-3 h-10 w-full text-xl text-white"
-            :variant="task_status == '작업중' ? 'outline-success' : 'success'"
+            :variant="
+              task_status == '작업중' && running != '미가동'
+                ? 'outline-success'
+                : 'success'
+            "
             :key="task_status"
             @click="setTaskListModal(true)"
-            :disabled="task_status == '작업중'"
+            :disabled="task_status == '작업중' && running != '미가동'"
             ><strong>작업지시목록</strong></Button
           >
           <Button
@@ -962,43 +966,63 @@ watch(
           <Button
             v-if="task_status == '작업대기' || task_status == '작업중'"
             class="mx-2 mb-3 h-10 w-full text-xl text-white"
-            :variant="task_status == '작업중' ? 'outline-success' : 'success'"
+            :variant="
+              task_status == '작업중' && running != '미가동'
+                ? 'outline-success'
+                : 'success'
+            "
             :key="task_status"
-            :disabled="task_status == '작업중'"
+            :disabled="task_status == '작업중' && running != '미가동'"
             @click="setTaskStartModal(true)"
             ><strong>작업시작</strong></Button
           >
           <Button
             class="mx-2 mb-3 h-10 w-full text-xl"
-            :variant="task_status == '작업중' ? 'pending' : 'outline-pending'"
+            :variant="
+              task_status == '작업중' && running != '미가동'
+                ? 'pending'
+                : 'outline-pending'
+            "
             :key="task_status"
             @click="setNonOPModal(true)"
-            :disabled="task_status != '작업중'"
+            :disabled="task_status != '작업중' && running == '미가동'"
             ><strong>비가동전환</strong></Button
           >
           <Button
             class="mx-2 mb-3 h-10 w-full text-xl"
-            :variant="task_status == '작업중' ? 'pending' : 'outline-pending'"
+            :variant="
+              task_status == '작업중' && running != '미가동'
+                ? 'pending'
+                : 'outline-pending'
+            "
             :key="task_status"
             @click="setNonOPListModal(true)"
-            :disabled="task_status != '작업중'"
+            :disabled="task_status != '작업중' && running == '미가동'"
             ><strong>비가동확인</strong></Button
           ><Button
             class="mx-2 mb-3 h-10 w-full text-xl"
-            :variant="task_status == '작업중' ? 'pending' : 'outline-pending'"
+            :variant="
+              task_status == '작업중' && running != '미가동'
+                ? 'pending'
+                : 'outline-pending'
+            "
             :key="task_status"
             @click="setBadAddModal(true)"
-            :disabled="task_status != '작업중'"
+            :disabled="task_status != '작업중' && running == '미가동'"
             ><strong>불량등록</strong></Button
           ><Button
             class="mx-2 mb-3 h-10 w-full text-xl"
-            :variant="task_status == '작업중' ? 'pending' : 'outline-pending'"
+            :variant="
+              task_status == '작업중' && running != '미가동'
+                ? 'pending'
+                : 'outline-pending'
+            "
             :key="task_status"
             @click="setItemAddModal(true)"
-            :disabled="task_status != '작업중'"
+            :disabled="task_status != '작업중' && running == '미가동'"
             ><strong>투입자재등록</strong></Button
           ><Button
-            v-if="task_status == '작업중'"
+            v-if="task_status == '작업중' && running != '미가동'"
             class="mx-2 mb-3 h-10 w-full text-xl"
             variant="danger"
             @click="setTaskFinishModal(true)"
@@ -1006,9 +1030,10 @@ watch(
           >
           <Button
             v-if="
-              task_status == '작업미확인' ||
-              task_status == '작업대기' ||
-              task_status == ''
+              (task_status == '작업미확인' ||
+                task_status == '작업대기' ||
+                task_status == '') &&
+              running == '미가동'
             "
             class="mx-2 mb-3 h-10 w-full text-xl"
             variant="danger"
