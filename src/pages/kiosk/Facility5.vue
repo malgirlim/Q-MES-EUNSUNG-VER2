@@ -86,6 +86,14 @@ const r1 = ref(1);
 const url_kiosk_work = "/api/kiosk/work";
 const kiosk_work = useSendApi<KioskWork>(url_kiosk_work, r1, ref(100));
 
+// 작업선택취소
+const url_kiosk_taskselectcancle = "/api/kiosk/taskselectcancle";
+const kiosk_taskselectcancle = useSendApi<KioskWork>(
+  url_kiosk_taskselectcancle,
+  r1,
+  r1
+);
+
 // 작업수락
 const url_kiosk_taskaccept = "/api/kiosk/taskaccept";
 const kiosk_taskaccept = useSendApi<KioskWork>(url_kiosk_taskaccept, r1, r1);
@@ -117,10 +125,10 @@ onMounted(async () => {
   await kiosk_work.loadDatas();
   await searchKioskWork();
 
-  // 60초에 한번씩은 새로고침이 되도록
+  // 10초에 한번씩은 새로고침이 되도록
   setInterval(() => {
     searchKioskWork();
-  }, 60000);
+  }, 10000);
 
   checked.value = false;
 });
@@ -373,6 +381,12 @@ const setTaskStandardModal = (value: boolean) => {
   taskStandardModal.value = value;
 };
 
+/* 작업선택취소 Modal */
+const taskSelectCancleModal = ref(false);
+const setTaskSelectCancleModal = (value: boolean) => {
+  taskSelectCancleModal.value = value;
+};
+
 /* 작업자변경 Modal */
 const workerChangeModal = ref(false);
 const setWorkerChangeModal = (value: boolean) => {
@@ -572,10 +586,18 @@ watch(
                   <tr class="border-success h-14">
                     <td class="border-success" colspan="2">
                       <Button
-                        class="mt-2 h-12 w-64 text-xl text-white"
-                        as="a"
-                        variant="success"
+                        :class="[
+                          'mt-2 h-12 w-64 text-xl',
+                          { 'text-white': kiosk_work_data?.NO != undefined },
+                        ]"
+                        :variant="
+                          kiosk_work_data?.NO != undefined
+                            ? 'success'
+                            : 'outline-success'
+                        "
+                        :key="kiosk_work_data?.NO"
                         @click="setTaskStandardModal(true)"
+                        :disabled="kiosk_work_data?.NO == undefined"
                         ><strong>작업표준서(레시피) 열기</strong>
                       </Button>
                     </td>
@@ -759,7 +781,25 @@ watch(
                       작업코드
                     </td>
                     <td class="pl-2 text-left">
-                      {{ kiosk_work_data?.작업코드 ?? "" }}
+                      <div class="flex">
+                        <div class="mr-auto">
+                          {{ kiosk_work_data?.작업코드 ?? "" }}
+                        </div>
+                        <div
+                          v-if="
+                            kiosk_work_data?.NO != undefined &&
+                            running == '미가동'
+                          "
+                          class="ml-auto"
+                        >
+                          <Button
+                            class="h-7 text-white mr-2"
+                            variant="success"
+                            @click="setTaskSelectCancleModal(true)"
+                            >작업선택취소</Button
+                          >
+                        </div>
+                      </div>
                     </td>
                   </tr>
                   <tr class="border-b-2 border-success h-7">
@@ -820,7 +860,7 @@ watch(
                       작업자
                     </td>
                     <td class="pl-2 text-left">
-                      <div class="flex">
+                      <div v-if="kiosk_work_data?.NO != undefined" class="flex">
                         <div class="mr-auto">
                           {{ kiosk_work_data?.작업자 ?? "" }}
                         </div>
@@ -1628,6 +1668,52 @@ watch(
     </Dialog.Panel>
   </Dialog>
   <!-- END: 작업표준서 열기 Modal -->
+
+  <!-- BEGIN: 작업선택취소 확인 Modal -->
+  <Dialog
+    :open="taskSelectCancleModal"
+    size="lg"
+    @close="setTaskSelectCancleModal(false)"
+  >
+    <Dialog.Panel>
+      <div class="p-5 text-center">
+        <Lucide icon="XCircle" class="w-32 h-32 mx-auto mt-3 text-primary" />
+        <div class="mt-10 text-3xl">작업 선택을 취소하시겠습니까?</div>
+      </div>
+      <div class="mt-10 px-5 pb-8 text-center">
+        <Button
+          variant="primary"
+          type="button"
+          @click="
+            async () => {
+              await kiosk_taskselectcancle.deleteData([키오스크NO]);
+              await searchKioskWork();
+              running = '미가동';
+              task_status = '작업미확인';
+              지시수량 = '0';
+              완료수량 = '0';
+              생산수량 = '0';
+              불량수량 = '0';
+              양품수량 = '0';
+              setTaskSelectCancleModal(false);
+            }
+          "
+          class="w-48 mr-10 text-2xl"
+        >
+          확인
+        </Button>
+        <Button
+          variant="outline-secondary"
+          type="button"
+          class="w-48 text-2xl"
+          @click="setTaskSelectCancleModal(false)"
+        >
+          취소
+        </Button>
+      </div>
+    </Dialog.Panel>
+  </Dialog>
+  <!-- END: 작업선택취소 확인 Modal -->
 
   <!-- BEGIN: 작업자 변경 Modal -->
   <Dialog

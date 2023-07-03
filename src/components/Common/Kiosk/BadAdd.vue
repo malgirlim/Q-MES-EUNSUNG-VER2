@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { getCurrentInstance, onMounted, ref, watch } from "vue";
+import { Dialog } from "../../../base-components/Headless";
 import Button from "../../../base-components/Button";
 import Lucide from "../../../base-components/Lucide";
 import dayjs from "dayjs";
@@ -52,6 +53,22 @@ const kiosk_modal_defect = useSendApi<MasterDefect>(
   r1,
   r1
 );
+
+/* 불량목록 수정 Modal */
+const editCheck = ref(false);
+const editData = ref();
+const setEditCheck = (value: boolean) => {
+  kiosk_defect.searchDatas("", "작업NO", props.키오스크no, "", "");
+  editCheck.value = value;
+};
+
+/* 불량목록 삭제 Modal */
+const deleteCheck = ref(false);
+const deleteData = ref();
+const setDeleteCheck = (value: boolean) => {
+  kiosk_defect.searchDatas("", "작업NO", props.키오스크no, "", "");
+  deleteCheck.value = value;
+};
 
 // ###################################################  키패드  ###################################################
 // 키패드
@@ -263,14 +280,7 @@ watch([num], (newValue, oldValue) => {
                         async () => {
                           defectInsertData = todo;
                           defectInsertData.수량 = num;
-                          await kiosk_defect.editData(defectInsertData);
-                          await kiosk_defect.searchDatas(
-                            '',
-                            '작업NO',
-                            props.키오스크no,
-                            '',
-                            ''
-                          );
+                          setEditCheck(true);
                         }
                       "
                     >
@@ -283,14 +293,8 @@ watch([num], (newValue, oldValue) => {
                       variant="danger"
                       @click="
                         async () => {
-                          await kiosk_defect.deleteData([todo.NO]);
-                          await kiosk_defect.searchDatas(
-                            '',
-                            '작업NO',
-                            props.키오스크no,
-                            '',
-                            ''
-                          );
+                          deleteData = todo.NO;
+                          setDeleteCheck(true);
                         }
                       "
                     >
@@ -439,4 +443,96 @@ watch([num], (newValue, oldValue) => {
       </Button>
     </div>
   </div>
+
+  <!-- BEGIN: 불량등록수정 확인 Modal -->
+  <Dialog :open="editCheck" size="lg" @close="setEditCheck(false)">
+    <Dialog.Panel>
+      <div class="p-5 text-center">
+        <Lucide
+          icon="CheckCircle"
+          class="w-24 h-24 mx-auto mt-3 text-primary"
+        />
+        <div class="mt-5 text-3xl">
+          <strong>불량등록 내역 수량 수정</strong>
+        </div>
+        <div class="mt-3 text-2xl">정말 수정하시겠습니까?</div>
+      </div>
+
+      <div class="mt-5 px-5 pb-8 text-center">
+        <Button
+          variant="primary"
+          type="button"
+          @click="
+            async () => {
+              await kiosk_defect.editData(defectInsertData);
+              await kiosk_defect.searchDatas(
+                '',
+                '작업NO',
+                props.키오스크no,
+                '',
+                ''
+              );
+              setEditCheck(false);
+            }
+          "
+          class="w-48 text-2xl mr-10"
+        >
+          수정
+        </Button>
+        <Button
+          variant="outline-primary"
+          type="button"
+          class="w-48 text-2xl"
+          @click="setEditCheck(false)"
+        >
+          취소
+        </Button>
+      </div>
+    </Dialog.Panel>
+  </Dialog>
+  <!-- END: 불량등록수정 확인 Modal -->
+
+  <!-- BEGIN: 불량등록삭제 확인 Modal -->
+  <Dialog :open="deleteCheck" size="lg" @close="setDeleteCheck(false)">
+    <Dialog.Panel>
+      <div class="p-5 text-center">
+        <Lucide icon="XCircle" class="w-24 h-24 mx-auto mt-3 text-danger" />
+        <div class="mt-5 text-3xl"><strong>불량등록 내역 삭제</strong></div>
+        <div class="mt-3 text-2xl">정말 삭제하시겠습니까?</div>
+        <div class="mt-2 text-2xl">삭제하시면 복구가 되지 않습니다.</div>
+      </div>
+
+      <div class="mt-5 px-5 pb-8 text-center">
+        <Button
+          variant="danger"
+          type="button"
+          @click="
+            async () => {
+              await kiosk_defect.deleteData([deleteData]);
+              await kiosk_defect.searchDatas(
+                '',
+                '작업NO',
+                props.키오스크no,
+                '',
+                ''
+              );
+              setDeleteCheck(false);
+            }
+          "
+          class="w-48 text-2xl mr-10"
+        >
+          삭제
+        </Button>
+        <Button
+          variant="outline-primary"
+          type="button"
+          class="w-48 text-2xl"
+          @click="setDeleteCheck(false)"
+        >
+          취소
+        </Button>
+      </div>
+    </Dialog.Panel>
+  </Dialog>
+  <!-- END: 불량등록삭제 확인 Modal -->
 </template>

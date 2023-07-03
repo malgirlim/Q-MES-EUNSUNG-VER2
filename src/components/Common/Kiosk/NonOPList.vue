@@ -109,7 +109,7 @@ const setDeleteCheck = (value: boolean) => {
     </div>
   </div>
 
-  <!-- BEGIN: 작업수락 확인 Modal -->
+  <!-- BEGIN: 비가동내역삭제 확인 Modal -->
   <Dialog :open="deleteCheck" size="lg" @close="setDeleteCheck(false)">
     <Dialog.Panel>
       <div class="p-5 text-center">
@@ -144,5 +144,5 @@ const setDeleteCheck = (value: boolean) => {
       </div>
     </Dialog.Panel>
   </Dialog>
-  <!-- END: 작업시작 확인 Modal -->
+  <!-- END: 비가동내역삭제 확인 Modal -->
 </template>
