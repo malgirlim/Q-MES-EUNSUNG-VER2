@@ -946,8 +946,8 @@ watch(
           <Button
             :class="[
               'mx-2 mb-3 h-10 w-full text-xl',
-              { 'text-white': '비가동' },
-              { 'text-balck': '작업중' },
+              { 'text-white': task_status != '작업중' || running == '미가동' },
+              { 'text-balck': task_status == '작업중' && running != '미가동' },
             ]"
             :variant="
               task_status == '작업중' && running != '미가동'
@@ -971,8 +971,8 @@ watch(
             v-if="task_status == '작업대기' || task_status == '작업중'"
             :class="[
               'mx-2 mb-3 h-10 w-full text-xl',
-              { 'text-white': '작업대기' },
-              { 'text-balck': '작업중' },
+              { 'text-white': task_status != '작업중' || running == '미가동' },
+              { 'text-balck': task_status == '작업중' && running != '미가동' },
             ]"
             :variant="
               task_status == '작업중' && running != '미가동'

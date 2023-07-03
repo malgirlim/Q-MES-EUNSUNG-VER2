@@ -54,7 +54,7 @@ const props = defineProps<{
         <div class="flex text-base mt-2">
           <div class="m-auto items-center text-white">
             <div>
-              <strong>{{ props.time }}</strong>
+              <strong>{{ props.time?.slice(2, 16) }}</strong>
             </div>
             <div>
               <strong>{{ props.worker }}</strong>
@@ -87,7 +87,7 @@ const props = defineProps<{
         <div class="flex text-base mt-2">
           <div class="m-auto items-center text-white">
             <div>
-              <strong>{{ props.time }}</strong>
+              <strong>{{ props.time?.slice(2, 16) }}</strong>
             </div>
             <div>
               <strong>{{ props.worker }}</strong>
