@@ -112,14 +112,14 @@ watch([num], (newValue, oldValue) => {
                 style="position: sticky; top: 0px; z-index: 2"
               >
                 <th
-                  class="border-l-2 border-t-2 border-r-2 border-[#D9821C] w-10"
+                  class="border-l-2 border-t-2 border-r-2 border-[#D9821C] w-20"
                 >
                   작업코드
                 </th>
-                <th class="border-t-2 border-r-2 border-[#D9821C] w-10">
+                <th class="border-t-2 border-r-2 border-[#D9821C] w-20">
                   LOT코드
                 </th>
-                <th class="border-t-2 border-r-2 border-[#D9821C] w-20">
+                <th class="border-t-2 border-r-2 border-[#D9821C] w-10">
                   품목구분
                 </th>
                 <th class="border-t-2 border-r-2 border-[#D9821C] w-20">
@@ -128,10 +128,10 @@ watch([num], (newValue, oldValue) => {
                 <th class="border-t-2 border-r-2 border-[#D9821C] w-20">
                   규격
                 </th>
-                <th class="border-t-2 border-r-2 border-[#D9821C] w-20">
+                <th class="border-t-2 border-r-2 border-[#D9821C] w-10">
                   단위
                 </th>
-                <th class="border-t-2 border-r-2 border-[#D9821C] w-20">
+                <th class="border-t-2 border-r-2 border-[#D9821C] w-10">
                   재공수
                 </th>
                 <th class="border-t-2 border-r-2 border-[#D9821C] w-20">
@@ -146,11 +146,13 @@ watch([num], (newValue, oldValue) => {
                   :key="todo.LOT코드"
                 >
                   <td
-                    class="border-l-2 border-b-2 border-r-2 border-[#D9821C] h-16"
+                    class="break-all border-l-2 border-b-2 border-r-2 border-[#D9821C] h-16"
                   >
                     {{ todo.작업코드 }}
                   </td>
-                  <td class="border-b-2 border-r-2 border-[#D9821C] h-9">
+                  <td
+                    class="break-all border-b-2 border-r-2 border-[#D9821C] h-9"
+                  >
                     {{ todo.LOT코드 }}
                   </td>
                   <td class="border-b-2 border-r-2 border-[#D9821C] h-9">
@@ -221,23 +223,23 @@ watch([num], (newValue, oldValue) => {
                 style="position: sticky; top: 0px; z-index: 2"
               >
                 <th
-                  class="border-l-2 border-t-2 border-r-2 border-[#D9821C] w-24"
+                  class="border-l-2 border-t-2 border-r-2 border-[#D9821C] w-20"
                 >
                   LOT코드
                 </th>
-                <th class="border-t-2 border-r-2 border-[#D9821C] w-20">
+                <th class="border-t-2 border-r-2 border-[#D9821C] w-10">
                   품목구분
                 </th>
-                <th class="border-t-2 border-r-2 border-[#D9821C] w-28">
+                <th class="border-t-2 border-r-2 border-[#D9821C] w-20">
                   품명
                 </th>
-                <th class="border-t-2 border-r-2 border-[#D9821C] w-28">
+                <th class="border-t-2 border-r-2 border-[#D9821C] w-20">
                   규격
                 </th>
-                <th class="border-t-2 border-r-2 border-[#D9821C] w-16">
+                <th class="border-t-2 border-r-2 border-[#D9821C] w-10">
                   단위
                 </th>
-                <th class="border-t-2 border-r-2 border-[#D9821C] w-16">
+                <th class="border-t-2 border-r-2 border-[#D9821C] w-10">
                   수량
                 </th>
                 <th class="border-t-2 border-r-2 border-[#D9821C] w-20">
@@ -254,7 +256,7 @@ watch([num], (newValue, oldValue) => {
                   :key="todo.NO"
                 >
                   <td
-                    class="border-l-2 border-b-2 border-r-2 border-[#D9821C] h-16"
+                    class="break-all border-l-2 border-b-2 border-r-2 border-[#D9821C] h-16"
                   >
                     {{ todo.LOT코드 }}
                   </td>
