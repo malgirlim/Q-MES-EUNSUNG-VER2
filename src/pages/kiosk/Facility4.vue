@@ -946,8 +946,8 @@ watch(
           <Button
             :class="[
               'mx-2 mb-3 h-10 w-full text-xl',
-              { 'text-white': '비가동' },
-              { 'text-balck': '작업중' },
+              { 'text-white': task_status != '작업중' || running == '미가동' },
+              { 'text-balck': task_status == '작업중' && running != '미가동' },
             ]"
             :variant="
               task_status == '작업중' && running != '미가동'
@@ -971,8 +971,8 @@ watch(
             v-if="task_status == '작업대기' || task_status == '작업중'"
             :class="[
               'mx-2 mb-3 h-10 w-full text-xl',
-              { 'text-white': '작업대기' },
-              { 'text-balck': '작업중' },
+              { 'text-white': task_status != '작업중' || running == '미가동' },
+              { 'text-balck': task_status == '작업중' && running != '미가동' },
             ]"
             :variant="
               task_status == '작업중' && running != '미가동'
@@ -1037,21 +1037,19 @@ watch(
             ><strong>작업종료</strong></Button
           >
           <Button
-            v-if="
-              (task_status == '작업미확인' ||
-                task_status == '작업대기' ||
-                task_status == '') &&
-              running == '미가동'
-            "
+            v-if="task_status != '작업중' && running == '미가동'"
             class="mx-2 mb-3 h-10 w-full text-xl"
-            variant="danger"
+            :variant="
+              kiosk_work_data?.NO != undefined ? 'danger' : 'outline-danger'
+            "
+            :key="kiosk_work_data?.NO"
             @click="
               () => {
                 kiosk_work_data.비고 = '미입력';
                 setTaskCancleModal(true);
               }
             "
-            :disabled="task_status == ''"
+            :disabled="kiosk_work_data?.NO == undefined"
             ><strong>작업반려</strong></Button
           >
           <Button

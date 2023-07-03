@@ -1039,14 +1039,17 @@ watch(
           <Button
             v-if="task_status != '작업중' && running == '미가동'"
             class="mx-2 mb-3 h-10 w-full text-xl"
-            variant="danger"
+            :variant="
+              kiosk_work_data?.NO != undefined ? 'danger' : 'outline-danger'
+            "
+            :key="kiosk_work_data?.NO"
             @click="
               () => {
                 kiosk_work_data.비고 = '미입력';
                 setTaskCancleModal(true);
               }
             "
-            :disabled="task_status == ''"
+            :disabled="kiosk_work_data?.NO == undefined"
             ><strong>작업반려</strong></Button
           >
           <Button
