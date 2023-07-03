@@ -57,7 +57,7 @@ router.post("/delete", async (req, res) => {
       // 로그기록 저장
       await logSend(
         (type = "취소"),
-        (ct = JSON.stringify(result.recordset) + " 을 선택취소."),
+        (ct = "키오스크 " + req.body.data[i] + " 번을 선택취소."),
         (amount = 1),
         (user = req.body.user ?? "")
       );
