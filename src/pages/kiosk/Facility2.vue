@@ -1001,7 +1001,10 @@ watch(
           >
           <Button
             v-if="task_status == '작업미확인' || task_status == ''"
-            class="mx-2 mb-3 h-10 w-full text-xl text-white"
+            :class="[
+              'mx-2 mb-3 h-10 w-full text-xl',
+              { 'text-white': kiosk_work_data?.NO != undefined },
+            ]"
             :variant="
               kiosk_work_data?.NO == undefined ? 'outline-success' : 'success'
             "
