@@ -1601,14 +1601,18 @@ watch(
         class="mt-5"
         style="height: 540px; overflow-y: scroll; overflow-x: hidden"
       >
-        <inner-image-zoom
-          :src="
-            '../../backend/uploads/master/recipe/' + kiosk_work_data.작업표준서
-          "
-          :zoomScale="1"
-          :hideCloseButton="true"
-          :hasSpacer="true"
-        />
+        <div class="mt-5 text-center">
+          <inner-image-zoom
+            class="m-auto"
+            :src="
+              '../../backend/uploads/master/recipe/' +
+              kiosk_work_data.작업표준서
+            "
+            :zoomScale="1"
+            :hideCloseButton="true"
+            :hasSpacer="true"
+          />
+        </div>
       </div>
 
       <div class="px-5 pt-2 pb-2 text-center">
