@@ -1606,7 +1606,7 @@ watch(
             class="m-auto"
             :src="
               '../../backend/uploads/master/recipe/' +
-              kiosk_work_data.작업표준서
+                kiosk_work_data?.작업표준서 ?? ''
             "
             :zoomScale="1"
             :hideCloseButton="true"
