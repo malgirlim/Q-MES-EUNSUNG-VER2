@@ -1002,8 +1002,11 @@ watch(
           <Button
             v-if="task_status == '작업미확인' || task_status == ''"
             class="mx-2 mb-3 h-10 w-full text-xl text-white"
-            variant="success"
-            :disabled="task_status == ''"
+            :variant="
+              kiosk_work_data?.NO == undefined ? 'outline-success' : 'success'
+            "
+            :disabled="kiosk_work_data?.NO == undefined"
+            :key="kiosk_work_data?.NO"
             @click="settaskAcceptModal(true)"
             ><strong>작업수락</strong></Button
           >
