@@ -101,14 +101,14 @@ const props = defineProps<{
           <strong>{{ props.name }}</strong>
         </div>
         <div class="flex text-base mt-2">
-          <div class="flex m-auto">
-            <Lucide icon="Siren" class="w-5 h-5 mr-2" />
+          <div class="flex m-auto text-white">
+            <Lucide icon="Siren" class="w-5 h-5 mr-2 text-white" />
             <strong>고장중</strong>
           </div>
         </div>
 
         <div class="flex text-base mt-2">
-          <div class="flex m-auto items-center">
+          <div class="flex m-auto items-center text-white">
             <div>
               <strong>{{ props.product }}</strong>
             </div>
