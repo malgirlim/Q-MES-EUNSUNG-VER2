@@ -1037,12 +1037,7 @@ watch(
             ><strong>작업종료</strong></Button
           >
           <Button
-            v-if="
-              (task_status == '작업미확인' ||
-                task_status == '작업대기' ||
-                task_status == '') &&
-              running == '미가동'
-            "
+            v-if="task_status != '작업중' && running == '미가동'"
             class="mx-2 mb-3 h-10 w-full text-xl"
             variant="danger"
             @click="
