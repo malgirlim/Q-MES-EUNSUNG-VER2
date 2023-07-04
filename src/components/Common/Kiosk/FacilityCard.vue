@@ -47,7 +47,7 @@ const props = defineProps<{
         <div class="flex text-base mt-2">
           <div class="flex m-auto items-center">
             <div>
-              <strong class="truncate ...">{{ props.product }}</strong>
+              <strong>{{ props.product }}</strong>
             </div>
           </div>
         </div>
