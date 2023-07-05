@@ -103,6 +103,8 @@ export interface StockStock {
   기말재공재고?: string;
   기말재고?: string;
   안전재고?: string;
+  단가?: string;
+  재고금액?: string;
 }
 
 // 재고 관리 - 완제품 품목별 재고현황
@@ -119,6 +121,8 @@ export interface StockStockFin {
   출하?: string;
   기말재고?: string;
   안전재고?: string;
+  단가?: string;
+  재고금액?: string;
 }
 
 // 재고 관리 - LOT별 재고현황

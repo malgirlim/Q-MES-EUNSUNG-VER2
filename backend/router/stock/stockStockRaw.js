@@ -57,6 +57,8 @@ router.get("/", async (req, res) => {
         ,기말재공재고 AS 기말재공재고
         ,기말재고 AS 기말재고
         ,안전재고 AS 안전재고
+        ,단가 AS 단가
+        ,재고금액 AS 재고금액
       FROM
       (
         SELECT
@@ -74,6 +76,9 @@ router.get("/", async (req, res) => {
           ,COALESCE(재공_MIDDLE.재공수,0) - COALESCE(사용_MIDDLE.사용수,0) AS 기말재공재고
           ,COALESCE(입고_MIDDLE.입고수,0) - COALESCE(사용_MIDDLE.사용수,0) AS 기말재고
           ,MASTER_ITEM.[ITEM_SAFE] AS 안전재고
+          ,COALESCE(IIF(ISNUMERIC(MASTER_ITEM.[ITEM_COST]) = 0, 0, CONVERT(NUMERIC, MASTER_ITEM.[ITEM_COST])),0) AS 단가
+          ,COALESCE(IIF(ISNUMERIC(MASTER_ITEM.[ITEM_COST]) = 0, 0, CONVERT(NUMERIC, MASTER_ITEM.[ITEM_COST])),0)
+            * (COALESCE(입고_MIDDLE.입고수,0) - COALESCE(사용_MIDDLE.사용수,0)) AS 재고금액
         FROM [QMES2022].[dbo].[MASTER_ITEM_TB] AS MASTER_ITEM
         LEFT JOIN
         (
@@ -156,6 +161,8 @@ router.post("/", async (req, res) => {
           ,기말재공재고 AS 기말재공재고
           ,기말재고 AS 기말재고
           ,안전재고 AS 안전재고
+          ,단가 AS 단가
+          ,재고금액 AS 재고금액
         FROM
         (
           SELECT
@@ -173,6 +180,9 @@ router.post("/", async (req, res) => {
             ,COALESCE(기초재고_MIDDLE.기초재공재고수,0) + COALESCE(재공_MIDDLE.재공수,0) - COALESCE(사용_MIDDLE.사용수,0) AS 기말재공재고
             ,COALESCE(기초재고_MIDDLE.기초재고수,0) + COALESCE(입고_MIDDLE.입고수,0) - COALESCE(사용_MIDDLE.사용수,0) AS 기말재고
             ,MASTER_ITEM.[ITEM_SAFE] AS 안전재고
+            ,COALESCE(IIF(ISNUMERIC(MASTER_ITEM.[ITEM_COST]) = 0, 0, CONVERT(NUMERIC, MASTER_ITEM.[ITEM_COST])),0) AS 단가
+            ,COALESCE(IIF(ISNUMERIC(MASTER_ITEM.[ITEM_COST]) = 0, 0, CONVERT(NUMERIC, MASTER_ITEM.[ITEM_COST])),0)
+              * (COALESCE(입고_MIDDLE.입고수,0) - COALESCE(사용_MIDDLE.사용수,0)) AS 재고금액
           FROM [QMES2022].[dbo].[MASTER_ITEM_TB] AS MASTER_ITEM
           LEFT JOIN
           (
@@ -295,6 +305,8 @@ router.post("/", async (req, res) => {
           ,기말재공재고 AS 기말재공재고
           ,기말재고 AS 기말재고
           ,안전재고 AS 안전재고
+          ,단가 AS 단가
+          ,재고금액 AS 재고금액
         FROM
         (
           SELECT
@@ -312,6 +324,9 @@ router.post("/", async (req, res) => {
             ,COALESCE(기초재고_MIDDLE.기초재공재고수,0) + COALESCE(재공_MIDDLE.재공수,0) - COALESCE(사용_MIDDLE.사용수,0) AS 기말재공재고
             ,COALESCE(기초재고_MIDDLE.기초재고수,0) + COALESCE(입고_MIDDLE.입고수,0) - COALESCE(사용_MIDDLE.사용수,0) AS 기말재고
             ,MASTER_ITEM.[ITEM_SAFE] AS 안전재고
+            ,COALESCE(IIF(ISNUMERIC(MASTER_ITEM.[ITEM_COST]) = 0, 0, CONVERT(NUMERIC, MASTER_ITEM.[ITEM_COST])),0) AS 단가
+            ,COALESCE(IIF(ISNUMERIC(MASTER_ITEM.[ITEM_COST]) = 0, 0, CONVERT(NUMERIC, MASTER_ITEM.[ITEM_COST])),0)
+              * (COALESCE(입고_MIDDLE.입고수,0) - COALESCE(사용_MIDDLE.사용수,0)) AS 재고금액
           FROM [QMES2022].[dbo].[MASTER_ITEM_TB] AS MASTER_ITEM
           LEFT JOIN
           (

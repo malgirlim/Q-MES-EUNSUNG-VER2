@@ -54,6 +54,8 @@ router.get("/", async (req, res) => {
         ,출하 AS 출하
         ,기말재고 AS 기말재고
         ,안전재고 AS 안전재고
+        ,단가 AS 단가
+        ,재고금액 AS 재고금액
       FROM
       (
         SELECT
@@ -68,6 +70,8 @@ router.get("/", async (req, res) => {
           ,SUM(RESULT_MIDDLE.출하수량) AS 출하
           ,SUM(RESULT_MIDDLE.기말재고) AS 기말재고
           ,[ITEM_SAFE] AS 안전재고
+          ,COALESCE(IIF(ISNUMERIC([ITEM_COST]) = 0, 0, CONVERT(NUMERIC, [ITEM_COST])),0) AS 단가
+          ,COALESCE(IIF(ISNUMERIC([ITEM_COST]) = 0, 0, CONVERT(NUMERIC, [ITEM_COST])),0) * SUM(RESULT_MIDDLE.기말재고) AS 재고금액
         FROM [QMES2022].[dbo].[MASTER_ITEM_TB]
 		LEFT JOIN
         (
@@ -132,7 +136,7 @@ router.get("/", async (req, res) => {
           ) AS 출하_기초재고_MIDDLE ON 출하_기초재고_MIDDLE.품목NO = 입고_기초재고_MIDDLE.품목NO
         ) AS RESULT_MIDDLE ON RESULT_MIDDLE.품목NO = [ITEM_PK]
         WHERE [ITEM_DIV] = '완제품'
-        GROUP BY [ITEM_PK],[ITEM_DIV],[ITEM_PRODUCT_NUM],[ITEM_NAME],[ITEM_SIZE],[ITEM_UNIT],[ITEM_SAFE]
+        GROUP BY [ITEM_PK],[ITEM_DIV],[ITEM_PRODUCT_NUM],[ITEM_NAME],[ITEM_SIZE],[ITEM_UNIT],[ITEM_SAFE],[ITEM_COST]
       ) AS RESULT
       ORDER BY 품목NO DESC
     `);
@@ -177,6 +181,8 @@ router.post("/", async (req, res) => {
           ,출하 AS 출하
           ,기말재고 AS 기말재고
           ,안전재고 AS 안전재고
+          ,단가 AS 단가
+          ,재고금액 AS 재고금액
         FROM
         (
           SELECT
@@ -191,6 +197,8 @@ router.post("/", async (req, res) => {
             ,SUM(RESULT_MIDDLE.출하수량) AS 출하
             ,SUM(RESULT_MIDDLE.기말재고) AS 기말재고
             ,[ITEM_SAFE] AS 안전재고
+            ,COALESCE(IIF(ISNUMERIC([ITEM_COST]) = 0, 0, CONVERT(NUMERIC, [ITEM_COST])),0) AS 단가
+            ,COALESCE(IIF(ISNUMERIC([ITEM_COST]) = 0, 0, CONVERT(NUMERIC, [ITEM_COST])),0) * SUM(RESULT_MIDDLE.기말재고) AS 재고금액
           FROM [QMES2022].[dbo].[MASTER_ITEM_TB]
           LEFT JOIN
           (
@@ -267,7 +275,7 @@ router.post("/", async (req, res) => {
             ) AS 출하_기초재고_MIDDLE ON 출하_기초재고_MIDDLE.품목NO = 입고_기초재고_MIDDLE.품목NO
           ) AS RESULT_MIDDLE ON RESULT_MIDDLE.품목NO = [ITEM_PK]
           WHERE [ITEM_DIV] = '완제품'
-          GROUP BY [ITEM_PK],[ITEM_DIV],[ITEM_PRODUCT_NUM],[ITEM_NAME],[ITEM_SIZE],[ITEM_UNIT],[ITEM_SAFE]
+          GROUP BY [ITEM_PK],[ITEM_DIV],[ITEM_PRODUCT_NUM],[ITEM_NAME],[ITEM_SIZE],[ITEM_UNIT],[ITEM_SAFE],[ITEM_COST]
         ) AS RESULT
         WHERE (1=1)
         AND ( 품목구분 like concat('%',@input,'%')
@@ -300,6 +308,8 @@ router.post("/", async (req, res) => {
           ,출하 AS 출하
           ,기말재고 AS 기말재고
           ,안전재고 AS 안전재고
+          ,단가 AS 단가
+          ,재고금액 AS 재고금액
         FROM
         (
           SELECT
@@ -314,6 +324,8 @@ router.post("/", async (req, res) => {
             ,SUM(RESULT_MIDDLE.출하수량) AS 출하
             ,SUM(RESULT_MIDDLE.기말재고) AS 기말재고
             ,[ITEM_SAFE] AS 안전재고
+            ,COALESCE(IIF(ISNUMERIC([ITEM_COST]) = 0, 0, CONVERT(NUMERIC, [ITEM_COST])),0) AS 단가
+            ,COALESCE(IIF(ISNUMERIC([ITEM_COST]) = 0, 0, CONVERT(NUMERIC, [ITEM_COST])),0) * SUM(RESULT_MIDDLE.기말재고) AS 재고금액
           FROM [QMES2022].[dbo].[MASTER_ITEM_TB]
           LEFT JOIN
           (
@@ -390,7 +402,7 @@ router.post("/", async (req, res) => {
             ) AS 출하_기초재고_MIDDLE ON 출하_기초재고_MIDDLE.품목NO = 입고_기초재고_MIDDLE.품목NO
           ) AS RESULT_MIDDLE ON RESULT_MIDDLE.품목NO = [ITEM_PK]
           WHERE [ITEM_DIV] = '완제품'
-          GROUP BY [ITEM_PK],[ITEM_DIV],[ITEM_PRODUCT_NUM],[ITEM_NAME],[ITEM_SIZE],[ITEM_UNIT],[ITEM_SAFE]
+          GROUP BY [ITEM_PK],[ITEM_DIV],[ITEM_PRODUCT_NUM],[ITEM_NAME],[ITEM_SIZE],[ITEM_UNIT],[ITEM_SAFE],[ITEM_COST]
         ) AS RESULT
         WHERE (1=1)
         AND ` +
