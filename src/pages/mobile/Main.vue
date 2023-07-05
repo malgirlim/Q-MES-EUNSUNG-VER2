@@ -5,17 +5,47 @@ import { FormLabel } from "../../base-components/Form";
 
 import Lucide from "../../base-components/Lucide";
 import Button from "../../base-components/Button";
+import PieChart from "../../components/PieChart";
+import VerticalBarChart from "../../components/VerticalBarChart";
+import LineChart from "../../components/LineChart";
 import LoadingIcon from "../../base-components/LoadingIcon";
+
+import KPIChart_line from "../../components/Common/Main/KPIChart_line.vue";
+import KPIChart_bar_line from "../../components/Common/Main/KPIChart_bar_line.vue";
+import KPIChart_line_filled from "../../components/Common/Main/KPIChart_line_filled.vue";
+import KPIChart_bar_bar from "../../components/Common/Main/KPIChart_bar_bar.vue";
+
+import KPI_BadRate_Chart_bar_line from "../../components/Common/Mobile/Main/KPI_BadRate_Chart_bar_line.vue";
+import KPI_FacilityRate_Chart_bar_line from "../../components/Common/Mobile/Main/KPI_FacilityRate_Chart_bar_line.vue";
+import KPI_ManHour_Chart_bar_line from "../../components/Common/Monitoring/KPI_ManHour_Chart_bar_line.vue";
+import KPI_OEE_Chart_bar_line from "../../components/Common/Monitoring/KPI_OEE_Chart_bar_line.vue";
+import KPI_ProductHour_Chart_bar_line from "../../components/Common/Monitoring/KPI_ProductHour_Chart_bar_line.vue";
+import KPI_ReturnCost_Chart_bar_line from "../../components/Common/Monitoring/KPI_ReturnCost_Chart_bar_line.vue";
+import KPI_StockCost_Chart_bar_line from "../../components/Common/Monitoring/KPI_StockCost_Chart_bar_line.vue";
+import {
+  MonitorKPIBadRate,
+  MonitorKPIFacilityRate,
+  MonitorKPIManHour,
+  MonitorKPIOEE,
+  MonitorKPIProductHour,
+  MonitorKPIReturnCost,
+  MonitorKPIStockCost,
+} from "../../interfaces/menu/monitorInterface";
 
 import dayjs from "dayjs";
 
 import RunningCard from "../../components/Common/Mobile/Main/RunningCard.vue";
+import DisabledRunningCard from "../../components/Common/Mobile/Main/DisabledRunningCard.vue";
+import KPICard from "../../components/Common/Main/KPICard.vue";
+import DisabledKPICard from "../../components/Common/Main/DisabledKPICard.vue";
 import NoticeCard2 from "../../components/Common/Main/NoticeCard2.vue";
 
-import KPIChart_line from "../../components/Common/Mobile/Main/KPIChart_line.vue";
-import KPIChart_bar_bar from "../../components/Common/Mobile/Main/KPIChart_bar_bar.vue";
-
+import { Chart } from "chart.js";
 import router from "../../router";
+
+// API 보내는 함수 및 인터페이스 불러오기
+import { useSendApi } from "../../composables/useSendApi";
+import { MainFacilityStatus } from "../../interfaces/mainInterface";
 
 var mobilecheck = function () {
   var check = false;
@@ -37,25 +67,215 @@ if (mobilecheck()) {
 
 onMounted(async () => {
   setInterval(() => {
-    now.value = dayjs().format("YYYY-MM-DD HH:mm:ss");
+    now.value = dayjs().format("YYYY-MM-DD(dd) HH:mm:ss");
   }, 1000);
   // setInterval(() => {
   //   switch_page_func();
   // }, 5000);
+
+  // 60초마다 데이터 불러오기
+  await getMainData(); // 첫 실행
+  setInterval(() => {
+    getMainData();
+  }, 60000);
 });
 
 // 날짜 구하기
-const now = ref(dayjs().format("YYYY-MM-DD HH:mm:ss"));
+dayjs.locale("ko");
+const now = ref(dayjs().format("YYYY-MM-DD(dd) HH:mm:ss"));
+const currentYear = ref(dayjs().format("YYYY"));
 
 // 페이지 전환
 const switch_page = ref("first");
-
 const switch_page_func = () => {
   if (switch_page.value == "second") {
     switch_page.value = "first";
   } else {
     switch_page.value = "second";
   }
+};
+
+// ################################################### 데이터 가져오기 ###################################################
+// 설비상태현황 가져오기
+const url_main_facilitystatus = "/api/main/facilitystatus";
+const facilitystatus = useSendApi<MainFacilityStatus>(
+  url_main_facilitystatus,
+  ref(1),
+  ref(1)
+);
+// KPI 공정불량률 가져오기
+const 공정불량률_실적 = ref([0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]); // 그래프 데이터
+const 공정불량률_목표 = ref([0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]); // 그래프 데이터
+const url_main_kpi_badrate = "/api/main/kpi/badrate";
+const kpi_badrate = useSendApi<MonitorKPIBadRate>(
+  url_main_kpi_badrate,
+  ref(1),
+  ref(1)
+);
+// KPI 설비가동률 가져오기
+const 설비가동률_실적 = ref([0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]); // 그래프 데이터
+const 설비가동률_목표 = ref([0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]); // 그래프 데이터
+const url_main_kpi_facilityrate = "/api/main/kpi/facilityrate";
+const kpi_facilityrate = useSendApi<MonitorKPIFacilityRate>(
+  url_main_kpi_facilityrate,
+  ref(1),
+  ref(1)
+);
+// KPI 작업공수 가져오기
+const 작업공수_실적 = ref([0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]); // 그래프 데이터
+const 작업공수_목표 = ref([0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]); // 그래프 데이터
+const url_main_kpi_manhour = "/api/main/kpi/manhour";
+const kpi_manhour = useSendApi<MonitorKPIManHour>(
+  url_main_kpi_manhour,
+  ref(1),
+  ref(1)
+);
+// KPI OEE 가져오기
+const OEE_실적 = ref([0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]); // 그래프 데이터
+const OEE_목표 = ref([0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]); // 그래프 데이터
+const url_main_kpi_oee = "/api/main/kpi/oee";
+const kpi_oee = useSendApi<MonitorKPIOEE>(url_main_kpi_oee, ref(1), ref(1));
+// KPI 시간당 생산량 가져오기
+const 시간당생산량_실적 = ref([0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]); // 그래프 데이터
+const 시간당생산량_목표 = ref([0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]); // 그래프 데이터
+const url_main_kpi_producthour = "/api/main/kpi/producthour";
+const kpi_producthour = useSendApi<MonitorKPIProductHour>(
+  url_main_kpi_producthour,
+  ref(1),
+  ref(1)
+);
+// KPI 반품비용 가져오기
+const 반품비용_실적 = ref([0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]); // 그래프 데이터
+const 반품비용_목표 = ref([0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]); // 그래프 데이터
+const url_main_kpi_returncost = "/api/main/kpi/returncost";
+const kpi_returncost = useSendApi<MonitorKPIReturnCost>(
+  url_main_kpi_returncost,
+  ref(1),
+  ref(1)
+);
+// KPI 재고비용 가져오기
+const 재고비용_실적 = ref([0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]); // 그래프 데이터
+const 재고비용_목표 = ref([0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]); // 그래프 데이터
+const url_main_kpi_stockcost = "/api/main/kpi/stockcost";
+const kpi_stockcost = useSendApi<MonitorKPIStockCost>(
+  url_main_kpi_stockcost,
+  ref(1),
+  ref(1)
+);
+// 데이터 불러오기 및 가공
+const getMainData = async () => {
+  await facilitystatus.loadDatas();
+  await kpi_badrate.loadDatas();
+  await kpi_facilityrate.loadDatas();
+  await kpi_manhour.loadDatas();
+  await kpi_oee.loadDatas();
+  await kpi_producthour.loadDatas();
+  await kpi_returncost.loadDatas();
+  await kpi_stockcost.loadDatas();
+
+  const badrate_data = kpi_badrate.dataSearchAll.value;
+  const facilityrate_data = kpi_facilityrate.dataSearchAll.value;
+  const manhour_data = kpi_manhour.dataSearchAll.value;
+  const oee_data = kpi_oee.dataSearchAll.value;
+  const producthour_data = kpi_producthour.dataSearchAll.value;
+  const returncost_data = kpi_returncost.dataSearchAll.value;
+  const stockcost_data = kpi_stockcost.dataSearchAll.value;
+
+  currentYear.value = dayjs().format("YYYY");
+  const months = Array.from({ length: 12 }, (_, i) =>
+    (i + 1).toString().padStart(2, "0")
+  );
+
+  공정불량률_실적.value = months.map((month) => {
+    return Number(
+      badrate_data.filter((c) => c.년월 == `${currentYear.value}-${month}`)[0]
+        ?.불량률 ?? 0
+    );
+  });
+  공정불량률_목표.value = months.map((month) => {
+    return Number(
+      badrate_data.filter((c) => c.년월 == `${currentYear.value}-${month}`)[0]
+        ?.목표 ?? 0
+    );
+  });
+  설비가동률_실적.value = months.map((month) => {
+    return Number(
+      facilityrate_data.filter(
+        (c) => c.년월 == `${currentYear.value}-${month}`
+      )[0]?.가동률 ?? 0
+    );
+  });
+  설비가동률_목표.value = months.map((month) => {
+    return Number(
+      facilityrate_data.filter(
+        (c) => c.년월 == `${currentYear.value}-${month}`
+      )[0]?.목표 ?? 0
+    );
+  });
+  작업공수_실적.value = months.map((month) => {
+    return Number(
+      manhour_data.filter((c) => c.년월 == `${currentYear.value}-${month}`)[0]
+        ?.작업공수 ?? 0
+    );
+  });
+  작업공수_목표.value = months.map((month) => {
+    return Number(
+      manhour_data.filter((c) => c.년월 == `${currentYear.value}-${month}`)[0]
+        ?.목표 ?? 0
+    );
+  });
+  OEE_실적.value = months.map((month) => {
+    return Number(
+      oee_data.filter((c) => c.년월 == `${currentYear.value}-${month}`)[0]
+        ?.OEE ?? 0
+    );
+  });
+  OEE_목표.value = months.map((month) => {
+    return Number(
+      oee_data.filter((c) => c.년월 == `${currentYear.value}-${month}`)[0]
+        ?.목표 ?? 0
+    );
+  });
+  시간당생산량_실적.value = months.map((month) => {
+    return Number(
+      producthour_data.filter(
+        (c) => c.년월 == `${currentYear.value}-${month}`
+      )[0]?.시간당생산수 ?? 0
+    );
+  });
+  시간당생산량_목표.value = months.map((month) => {
+    return Number(
+      producthour_data.filter(
+        (c) => c.년월 == `${currentYear.value}-${month}`
+      )[0]?.목표 ?? 0
+    );
+  });
+  반품비용_실적.value = months.map((month) => {
+    return Number(
+      returncost_data.filter(
+        (c) => c.년월 == `${currentYear.value}-${month}`
+      )[0]?.반품금액 ?? 0
+    );
+  });
+  반품비용_목표.value = months.map((month) => {
+    return Number(
+      returncost_data.filter(
+        (c) => c.년월 == `${currentYear.value}-${month}`
+      )[0]?.목표 ?? 0
+    );
+  });
+  재고비용_실적.value = months.map((month) => {
+    return Number(
+      stockcost_data.filter((c) => c.년월 == `${currentYear.value}-${month}`)[0]
+        ?.누적재고비용 ?? 0
+    );
+  });
+  재고비용_목표.value = months.map((month) => {
+    return Number(
+      stockcost_data.filter((c) => c.년월 == `${currentYear.value}-${month}`)[0]
+        ?.목표 ?? 0
+    );
+  });
 };
 </script>
 
@@ -77,23 +297,50 @@ const switch_page_func = () => {
     <div class="text-center"></div>
     <!--BEGIN : 첫번째 표시-->
     <div class="grid grid-cols-2 gap-4 mt-3">
-      <RunningCard name="검사기" :run="true" />
-      <RunningCard name="제판기" :run="true" />
-      <RunningCard name="인쇄기1" :run="true" />
-      <RunningCard name="인쇄기2" :run="true" />
-      <RunningCard name="인쇄기3" :run="false" />
-      <RunningCard name="인쇄기4" :run="false" />
-      <RunningCard name="인쇄기5" :run="false" />
-      <RunningCard name="인쇄기6" :run="false" />
-      <RunningCard name="인쇄기7" :run="false" />
-      <RunningCard name="인쇄기8" :run="false" />
+      <RunningCard
+        name="검사기"
+        :run="facilitystatus.dataSearchAll.value[0]?.설비1 == '가동'"
+      />
+      <RunningCard
+        name="제판기"
+        :run="facilitystatus.dataSearchAll.value[0]?.설비2 == '가동'"
+      />
+      <RunningCard
+        name="인쇄기1"
+        :run="facilitystatus.dataSearchAll.value[0]?.설비3 == '가동'"
+      />
+      <RunningCard
+        name="인쇄기2"
+        :run="facilitystatus.dataSearchAll.value[0]?.설비4 == '가동'"
+      />
+      <RunningCard
+        name="인쇄기3"
+        :run="facilitystatus.dataSearchAll.value[0]?.설비5 == '가동'"
+      />
+      <RunningCard
+        name="인쇄기4"
+        :run="facilitystatus.dataSearchAll.value[0]?.설비6 == '가동'"
+      />
+      <RunningCard
+        name="인쇄기5"
+        :run="facilitystatus.dataSearchAll.value[0]?.설비7 == '가동'"
+      />
+      <RunningCard
+        name="인쇄기6"
+        :run="facilitystatus.dataSearchAll.value[0]?.설비8 == '가동'"
+      />
+      <RunningCard
+        name="인쇄기7"
+        :run="facilitystatus.dataSearchAll.value[0]?.설비9 == '가동'"
+      />
+      <DisabledRunningCard />
     </div>
     <!--END : 첫번째 표시-->
     <!--BEGIN : 공지사항 표시-->
-    <div class="mt-7 grid grid-cols-2 gap-4 mt-5">
+    <!-- <div class="mt-7 grid grid-cols-2 gap-4 mt-5">
       <NoticeCard2 type="all" />
       <NoticeCard2 type="part" />
-    </div>
+    </div> -->
     <!--END : 공지사항 표시-->
     <!--BEGIN : Chart 표시-->
     <div
@@ -104,7 +351,8 @@ const switch_page_func = () => {
           <FormLabel class="text-lg font-bold">KPI 설비가동률</FormLabel>
         </div>
         <div class="p-2">
-          <KPIChart_bar_bar
+          <KPI_FacilityRate_Chart_bar_line
+            :height="265"
             :x_label="[
               '1월',
               '2월',
@@ -119,7 +367,13 @@ const switch_page_func = () => {
               '11월',
               '12월',
             ]"
-            :height="265"
+            :dataset1_label="'가동률'"
+            :dataset1_data="설비가동률_실적"
+            :dataset1_type="'line'"
+            :dataset2_label="'목표'"
+            :dataset2_data="설비가동률_목표"
+            :dataset2_type="'line'"
+            :title_text="currentYear + '년'"
           />
         </div>
       </div>
