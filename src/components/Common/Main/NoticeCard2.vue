@@ -50,8 +50,10 @@ const props = defineProps<{
 const switch_page = ref(props.type);
 
 // ##### 상세 Modal #####
+const detailModalData = ref();
 const detailModal = ref(false);
-const setDetailModal = (value: boolean) => {
+const setDetailModal = (value: boolean, data: any) => {
+  detailModalData.value = data;
   detailModal.value = value;
 };
 
@@ -81,11 +83,15 @@ const days = new_notice(date_all[0]);
               { 'text-white': switch_page == 'all' },
               {
                 'border-danger':
-                  new_notice(공지사항_전체[0]?.등록일시 ?? '2000-01-01') < 7,
+                  new_notice(
+                    공지사항_전체[0]?.등록일시.slice(0, 16) ?? '2000-01-01'
+                  ) < 7,
               },
               {
                 'border-black ':
-                  new_notice(공지사항_전체[0]?.등록일시 ?? '2000-01-01') > 7,
+                  new_notice(
+                    공지사항_전체[0]?.등록일시.slice(0, 16) ?? '2000-01-01'
+                  ) > 7,
               },
             ]"
           >
@@ -99,11 +105,15 @@ const days = new_notice(date_all[0]);
               { 'text-white': switch_page == 'part' },
               {
                 'border-danger':
-                  new_notice(공지사항_부서[0]?.등록일시 ?? '2000-01-01') < 7,
+                  new_notice(
+                    공지사항_부서[0]?.등록일시.slice(0, 16) ?? '2000-01-01'
+                  ) < 7,
               },
               {
                 'border-black ':
-                  new_notice(공지사항_부서[0]?.등록일시 ?? '2000-01-01') > 7,
+                  new_notice(
+                    공지사항_부서[0]?.등록일시.slice(0, 16) ?? '2000-01-01'
+                  ) > 7,
               },
             ]"
           >
@@ -113,7 +123,9 @@ const days = new_notice(date_all[0]);
             class="ml-3 text-danger"
             v-if="
               switch_page == 'all' &&
-              new_notice(공지사항_전체[0]?.등록일시 ?? '2000-01-01') < 7
+              new_notice(
+                공지사항_전체[0]?.등록일시.slice(0, 16) ?? '2000-01-01'
+              ) < 7
             "
           >
             <strong>새로운 공지사항이 있습니다.</strong>
@@ -122,7 +134,9 @@ const days = new_notice(date_all[0]);
             class="ml-3 text-danger"
             v-if="
               switch_page == 'part' &&
-              new_notice(공지사항_부서[0]?.등록일시 ?? '2000-01-01') < 7
+              new_notice(
+                공지사항_부서[0]?.등록일시.slice(0, 16) ?? '2000-01-01'
+              ) < 7
             "
           >
             <strong>새로운 공지사항이 있습니다.</strong>
@@ -137,13 +151,22 @@ const days = new_notice(date_all[0]);
         <div v-if="switch_page == 'all'" class="fade-in-box">
           <div class="flex mt-0.5 items-center">
             <Lucide icon="MessageCircle" class="w-4 h-4" />
-            <div class="mt-1 ml-1">{{ 공지사항_전체[0]?.등록일시 }}</div>
-            <div class="mt-1 ml-5 cursor-pointer" @click="setDetailModal(true)">
+            <div class="mt-1 ml-1">
+              {{ 공지사항_전체[0]?.등록일시.slice(0, 16) }}
+            </div>
+            <div
+              class="mt-1 ml-5 cursor-pointer"
+              @click="setDetailModal(true, 공지사항_전체[0])"
+            >
               {{ 공지사항_전체[0]?.제목 }}
             </div>
             <div
               class="ml-1.5"
-              v-if="new_notice(공지사항_전체[0]?.등록일시 ?? '2000-01-01') < 7"
+              v-if="
+                new_notice(
+                  공지사항_전체[0]?.등록일시.slice(0, 16) ?? '2000-01-01'
+                ) < 7
+              "
             >
               <img src="../../../assets/images/new.png" />
             </div>
@@ -151,13 +174,22 @@ const days = new_notice(date_all[0]);
           </div>
           <div class="flex mt-0.5 items-center">
             <Lucide icon="MessageCircle" class="w-4 h-4" />
-            <div class="mt-1 ml-1">{{ 공지사항_전체[1]?.등록일시 }}</div>
-            <div class="mt-1 ml-5 cursor-pointer" @click="setDetailModal(true)">
+            <div class="mt-1 ml-1">
+              {{ 공지사항_전체[1]?.등록일시.slice(0, 16) }}
+            </div>
+            <div
+              class="mt-1 ml-5 cursor-pointer"
+              @click="setDetailModal(true, 공지사항_전체[1])"
+            >
               {{ 공지사항_전체[1]?.제목 }}
             </div>
             <div
               class="ml-1.5"
-              v-if="new_notice(공지사항_전체[1]?.등록일시 ?? '2000-01-01') < 7"
+              v-if="
+                new_notice(
+                  공지사항_전체[1]?.등록일시.slice(0, 16) ?? '2000-01-01'
+                ) < 7
+              "
             >
               <img src="../../../assets/images/new.png" />
             </div>
@@ -165,61 +197,153 @@ const days = new_notice(date_all[0]);
           </div>
           <div class="flex mt-0.5 items-center">
             <Lucide icon="MessageCircle" class="w-4 h-4" />
-            <div class="mt-1 ml-1">{{ 공지사항_전체[2]?.등록일시 }}</div>
-            <div class="mt-1 ml-5 cursor-pointer" @click="setDetailModal(true)">
+            <div class="mt-1 ml-1">
+              {{ 공지사항_전체[2]?.등록일시.slice(0, 16) }}
+            </div>
+            <div
+              class="mt-1 ml-5 cursor-pointer"
+              @click="setDetailModal(true, 공지사항_전체[2])"
+            >
               {{ 공지사항_전체[2]?.제목 }}
             </div>
             <div
               class="ml-1.5"
-              v-if="new_notice(공지사항_전체[2]?.등록일시 ?? '2000-01-01') < 7"
+              v-if="
+                new_notice(
+                  공지사항_전체[2]?.등록일시.slice(0, 16) ?? '2000-01-01'
+                ) < 7
+              "
             >
               <img src="../../../assets/images/new.png" />
             </div>
             <div class="mt-1 ml-auto pr-1">{{ 공지사항_전체[2]?.등록자 }}</div>
           </div>
+          <div class="flex mt-0.5 items-center">
+            <Lucide icon="MessageCircle" class="w-4 h-4" />
+            <div class="mt-1 ml-1">
+              {{ 공지사항_전체[3]?.등록일시.slice(0, 16) }}
+            </div>
+            <div
+              class="mt-1 ml-5 cursor-pointer"
+              @click="setDetailModal(true, 공지사항_전체[3])"
+            >
+              {{ 공지사항_전체[3]?.제목 }}
+            </div>
+            <div
+              class="ml-1.5"
+              v-if="
+                new_notice(
+                  공지사항_전체[3]?.등록일시.slice(0, 16) ?? '2000-01-01'
+                ) < 7
+              "
+            >
+              <img src="../../../assets/images/new.png" />
+            </div>
+            <div class="mt-1 ml-auto pr-1">
+              {{ 공지사항_전체[3]?.등록자 }}
+            </div>
+          </div>
         </div>
         <div v-if="switch_page == 'part'" class="fade-in-box">
           <div class="flex mt-0.5 items-center">
             <Lucide icon="MessageCircle" class="w-4 h-4" />
-            <div class="mt-1 ml-1">{{ 공지사항_부서[0]?.등록일시 }}</div>
-            <div class="mt-1 ml-5 cursor-pointer" @click="setDetailModal(true)">
+            <div class="mt-1 ml-1">
+              {{ 공지사항_부서[0]?.등록일시.slice(0, 16) }}
+            </div>
+            <div
+              class="mt-1 ml-5 cursor-pointer"
+              @click="setDetailModal(true, 공지사항_부서[0])"
+            >
               {{ 공지사항_부서[0]?.제목 }}
             </div>
             <div
               class="ml-1.5"
-              v-if="new_notice(공지사항_부서[0]?.등록일시 ?? '2000-01-01') < 7"
+              v-if="
+                new_notice(
+                  공지사항_부서[0]?.등록일시.slice(0, 16) ?? '2000-01-01'
+                ) < 7
+              "
             >
               <img src="../../../assets/images/new.png" />
             </div>
-            <div class="mt-1 ml-auto pr-1">{{ 공지사항_부서[0]?.등록자 }}</div>
+            <div class="mt-1 ml-auto pr-1">
+              {{ 공지사항_부서[0]?.등록자 }}
+            </div>
           </div>
           <div class="flex mt-0.5 items-center">
             <Lucide icon="MessageCircle" class="w-4 h-4" />
-            <div class="mt-1 ml-1">{{ 공지사항_부서[1]?.등록일시 }}</div>
-            <div class="mt-1 ml-5 cursor-pointer" @click="setDetailModal(true)">
+            <div class="mt-1 ml-1">
+              {{ 공지사항_부서[1]?.등록일시.slice(0, 16) }}
+            </div>
+            <div
+              class="mt-1 ml-5 cursor-pointer"
+              @click="setDetailModal(true, 공지사항_부서[1])"
+            >
               {{ 공지사항_부서[1]?.제목 }}
             </div>
             <div
               class="ml-1.5"
-              v-if="new_notice(공지사항_부서[1]?.등록일시 ?? '2000-01-01') < 7"
+              v-if="
+                new_notice(
+                  공지사항_부서[1]?.등록일시.slice(0, 16) ?? '2000-01-01'
+                ) < 7
+              "
             >
               <img src="../../../assets/images/new.png" />
             </div>
-            <div class="mt-1 ml-auto pr-1">{{ 공지사항_부서[1]?.등록자 }}</div>
+            <div class="mt-1 ml-auto pr-1">
+              {{ 공지사항_부서[1]?.등록자 }}
+            </div>
           </div>
           <div class="flex mt-0.5 items-center">
             <Lucide icon="MessageCircle" class="w-4 h-4" />
-            <div class="mt-1 ml-1">{{ 공지사항_부서[2]?.등록일시 }}</div>
-            <div class="mt-1 ml-5 cursor-pointer" @click="setDetailModal(true)">
+            <div class="mt-1 ml-1">
+              {{ 공지사항_부서[2]?.등록일시.slice(0, 16) }}
+            </div>
+            <div
+              class="mt-1 ml-5 cursor-pointer"
+              @click="setDetailModal(true, 공지사항_부서[2])"
+            >
               {{ 공지사항_부서[2]?.제목 }}
             </div>
             <div
               class="ml-1.5"
-              v-if="new_notice(공지사항_부서[2]?.등록일시 ?? '2000-01-01') < 7"
+              v-if="
+                new_notice(
+                  공지사항_부서[2]?.등록일시.slice(0, 16) ?? '2000-01-01'
+                ) < 7
+              "
             >
               <img src="../../../assets/images/new.png" />
             </div>
-            <div class="mt-1 ml-auto pr-1">{{ 공지사항_부서[2]?.등록자 }}</div>
+            <div class="mt-1 ml-auto pr-1">
+              {{ 공지사항_부서[2]?.등록자 }}
+            </div>
+          </div>
+          <div class="flex mt-0.5 items-center">
+            <Lucide icon="MessageCircle" class="w-4 h-4" />
+            <div class="mt-1 ml-1">
+              {{ 공지사항_부서[3]?.등록일시.slice(0, 16) }}
+            </div>
+            <div
+              class="mt-1 ml-5 cursor-pointer"
+              @click="setDetailModal(true, 공지사항_부서[3])"
+            >
+              {{ 공지사항_부서[3]?.제목 }}
+            </div>
+            <div
+              class="ml-1.5"
+              v-if="
+                new_notice(
+                  공지사항_부서[3]?.등록일시.slice(0, 16) ?? '2000-01-01'
+                ) < 7
+              "
+            >
+              <img src="../../../assets/images/new.png" />
+            </div>
+            <div class="mt-1 ml-auto pr-1">
+              {{ 공지사항_부서[3]?.등록자 }}
+            </div>
           </div>
         </div>
       </div>
@@ -232,12 +356,12 @@ const days = new_notice(date_all[0]);
     :open="detailModal"
     @close="
       () => {
-        setDetailModal(false);
+        setDetailModal(false, null);
       }
     "
   >
     <Dialog.Panel>
-      <NoticeDetail data="" />
+      <NoticeDetail :data="detailModalData" />
       <div class="px-5 pb-8 text-center">
         <Button
           variant="outline-primary"
@@ -245,7 +369,7 @@ const days = new_notice(date_all[0]);
           type="button"
           @click="
             () => {
-              setDetailModal(false);
+              setDetailModal(false, null);
             }
           "
           class="w-24 mr-1"
