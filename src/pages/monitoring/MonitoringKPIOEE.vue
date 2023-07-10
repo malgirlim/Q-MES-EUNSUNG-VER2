@@ -28,6 +28,7 @@ import { MonitorKPIOEE } from "../../interfaces/menu/monitorInterface";
 
 // 컴포넌트 로드
 import MasterDetail from "../../components/Common/Detail/MasterClientDetail.vue";
+import DocumentPrint from "../../components/Common/Print/Template/KPIReport/Main.vue";
 
 const { proxy }: any = getCurrentInstance();
 const user_level = proxy.gstate.level.MonitoringKPIOEE; //권한레벨
@@ -183,6 +184,13 @@ const search = () => {
     sortKey.value,
     sortOrder.value
   );
+};
+
+// ########################## 보고서 출력 ##########################
+
+const reportModal = ref(false);
+const setReportModal = (value: boolean) => {
+  reportModal.value = value;
 };
 
 // ########################## Print 다운로드 ##########################
@@ -547,7 +555,22 @@ function exportFile(data: any) {
             <Lucide icon="RefreshCcw" class="w-4 h-4 mr-2" /> 새로고침
           </a>
         </div>
-        <div class="ml-5" v-if="searchKey == '설비별'">
+        <div class="ml-3" v-if="searchKey == '월별'">
+          <Button
+            variant="primary"
+            @click="
+              async () => {
+                await searchChartData();
+                setReportModal(true);
+              }
+            "
+            ><Lucide
+              class="h-4 w-4 mr-2 text-white"
+              icon="Printer"
+            />보고서출력</Button
+          >
+        </div>
+        <div class="ml-3" v-if="searchKey == '설비별'">
           <Button
             class="mr-2 shadow-md"
             as="a"
@@ -964,4 +987,21 @@ function exportFile(data: any) {
     </Dialog.Panel>
   </Dialog>
   <!-- END: 프린트 출력 Modal -->
+  <!-- BEGIN: 보고서 출력 Modal -->
+  <Dialog size="xl" :open="reportModal" @close="setReportModal(false)">
+    <Dialog.Panel style="top: -5%">
+      <div
+        class="overflow-hidden intro-y box mb-3"
+        style="overflow-y: scroll; overflow-x: hidden; height: 870px"
+      >
+        <DocumentPrint
+          :월별_데이터="dataManager.dataSearchAll.value"
+          :월별_OEE="월별_OEE"
+          :월별_목표="월별_목표"
+          :selectYear="selectYear"
+        />
+      </div>
+    </Dialog.Panel>
+  </Dialog>
+  <!-- END: 보고서 출력 Modal -->
 </template>
